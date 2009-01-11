@@ -1,18 +1,19 @@
 #summary The Javassonne user stories.
 
-= Introduction =
+= Initial User Stories =
 
--User story 1
+ - A graphical menu system allows to choose gameplay type, join a network game, etc...
 
--User story 2
+ - Users take turns drawing, rotating and placing tiles on a graphical playing field according to game rules.
 
+ - User can place meeple (small morphing people) and claim parts of the board territory.
 
+ - User is awarded points based on scoring rules
 
-= Details =
+ - Game tracks deck of tiles and randomly draws tiles for players
 
-*User Story 1*
-_Story_
+ - Game may be played over a local network or by multiple players on the same machine
 
+ - Game will have different pre-set terrain sets and will give the user the ability to create their own. 
 
-*User Story 2*
-_Story_
+- Users playing over a network can type to chat amongst each other.
