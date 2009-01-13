@@ -1,6 +1,20 @@
 #summary The Javassonne user stories.
 
-= Initial User Stories =
+= Short-Term Objectives =
+ - User sees UI Grid in scrollable inline frame
+      Hamy, David
+ - User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)
+      Hamy, David
+ - User sees UI game control buttons in sidebar(New Game, Saved Game, Draw Terrain Tile, Exit)
+      Brian
+ - User sees saved game tiles loaded
+      Hamy, Kyle, Ben, Adam
+ - User sees terrain-tile generator utility
+      Ben, Adam, Kyle
+
+
+
+= Long-Term Objectives =
 
  - A graphical menu system allows to choose gameplay type, join a network game, etc...
 
