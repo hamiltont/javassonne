@@ -5,12 +5,15 @@
       Hamy, David
  - User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)
       Hamy, David
- - User sees UI game control buttons in sidebar(New Game, Saved Game, Draw Terrain Tile, Exit)
+ - User sees UI control buttons in sidebar (New Game, Load Game, Exit)
       Brian
+ - User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
+      Brian, David
  - User sees saved game tiles loaded
-      Hamy, Kyle, Ben, Adam
+      Ben, Adam, Kyle, Hamy
  - User sees terrain-tile generator utility
       Ben, Adam, Kyle
+
 
 
 
