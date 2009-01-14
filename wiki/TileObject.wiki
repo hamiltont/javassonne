@@ -1,0 +1,27 @@
+#summary Describes how a tile is represented in the program and the motivation behind these design decisions.
+#labels Phase-Design
+
+= Introduction =
+
+Tiles must connect to each other based on what is on each side (for example, fort connects to fort, road to road, nothing to nothing). In addition, the score must be calculated from a contiguous region - whether this be a fort region, a road region, or a farmland region.
+
+
+= Details =
+
+First, we need to store data for each side. For shorthand, we have adopted F,,c,, for fort cap, F,,i,, for fort internal, R for road, and N for nothing. In addition, we must store what lies in the center of a tile. An M denotes a monastery in the center, an R denotes a road region continues through a center, and N denoting nothing otherwise.
+
+In addition, we need a way to calculate farm regions. We settled on dividing a tile into quadrants. Quadrants that are part of the same farmland will be issued the same integer.
+
+A tabular view of some sample tiles appears below. Images examples will be added later.
+
+|| 0 || R || 1 ||
+|| R || R || N ||
+|| 1 || F,,c,, || 1 ||
+
+|| 0 || N || 0 ||
+|| R || M || N ||
+|| 0 || N || 0 ||
+
+|| 0 || F,,i,, || 1 ||
+|| R || N || R ||
+|| 2 || F,,i,, || 3 ||
