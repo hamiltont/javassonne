@@ -36,7 +36,6 @@ public class BasicWindow extends JFrame implements ActionListener {
 		addWindowListener(new WindowDestroyer());		
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (contentPane_.getBackground() == Color.gray)
 			contentPane_.setBackground(Color.red);
