@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+
 public class BasicWindow extends JFrame implements ActionListener {
 
 	private Container contentPane_;
