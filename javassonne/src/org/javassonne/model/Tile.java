@@ -11,11 +11,24 @@ public class Tile {
 	
 	private int[][] farms_ = new int[2][2];
 
-	private int uniqueIdentifier_;
+	private String uniqueIdentifier_;
+	
+	// Constructor
 	
 	public Tile()
 	{
 	}
+	
+	// Helpful Functions
+	
+	public String description()
+	{
+		return String.format("%s Land: [T:%s C:%s B:%s L:%s R:%s], Farms: [%d %d | %d %d]", 
+				uniqueIdentifier_, landTop_, landCenter_, landBottom_, landLeft_, landRight_, 
+				farms_[0][0],farms_[1][0],farms_[0][1],farms_[1][1]);
+	}
+	
+	// Getter and Setter Functionality
 	
 	public void setFarmAtLocation(int farmValue, int x, int y)
 	{
@@ -67,11 +80,11 @@ public class Tile {
 		return landLeft_;
 	}
 
-	public void setUniqueIdentifier(int uniqueIdentifier_) {
+	public void setUniqueIdentifier(String uniqueIdentifier_) {
 		this.uniqueIdentifier_ = uniqueIdentifier_;
 	}
 
-	public int getUniqueIdentifier() {
+	public String getUniqueIdentifier() {
 		return uniqueIdentifier_;
 	}
 	

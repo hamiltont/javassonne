@@ -12,7 +12,12 @@ public class TileSerializer {
 		xstream.alias("tile", Tile.class);
 	}
 
-	public String serializeTile(Tile tile)
+	public TileSet loadTileSet(String filename)
+	{
+		return null;
+	}
+	
+	public String saveTile(Tile tile)
 	{
 		String xml = xstream.toXML(tile);
 		return xml;
