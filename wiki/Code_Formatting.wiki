@@ -1,0 +1,9 @@
+#summary Our personal project code formatting style
+
+
+  * private member names in CamelCase with an underscore after - ex: PrivateMember_
+  * class function names in lower case with underscores between - ex: function_name()
+  * constructors have their first letter caps - Ex: MyClass()
+  * references to code we wrote should use the "this." qualifier, while ref's to code outside the project should not use the qualifier
+
+Ex: this.MyVariable_ ; this.my_function() ; 
