@@ -35,7 +35,7 @@ public class TileSetCreator {
 			// prompt the user to either create or load an existing tile set
 			System.out.println("Would you like to (1) Create a new tile set or (2) Load an existing one?");
 			int response = in.nextInt();
-
+			
 			// fetch the tile set
 			if (response == 1)
 			{
@@ -44,7 +44,7 @@ public class TileSetCreator {
 			else 
 			{
 				System.out.println("Please enter the name of the existing set:");
-				String name = in.nextLine();
+				String name = in.next();
 				set = serializer.loadTileSet(name);
 			}
 		
@@ -60,6 +60,8 @@ public class TileSetCreator {
 				System.out.println("1) Add Tile");
 				System.out.println("2) View Existing Tiles");
 				System.out.println("3) Edit Existing Tile");
+				System.out.println("4) Save TileSet");
+				System.out.println("5) Exit (Without Saving)");
 				System.out.println();
 			
 				int option = in.nextInt();
@@ -92,10 +94,19 @@ public class TileSetCreator {
 					
 					Tile t = set.tileAtIndex(index);
 					promptForTileProperties(t, in);
+				} else if (option==4){
+					System.out.println("Please enter a filename:");
+					String name = in.next();
+					serializer.saveTileSet(set,name);
+					System.out.println("TileSet saved successfully!");
+					System.exit(0);
+				} else if( option==5){
+					System.out.println("Goodbye!");
+					System.exit(0);
 				}
 			}	
 		} catch (IOException e){
-			System.err.println("An IO error occurred.");
+			System.err.println("An IO error occurred: " + e);
 		}
 	}
 	
@@ -105,7 +116,7 @@ public class TileSetCreator {
 		String response;
 		
 		while (true){
-			response = in.nextLine();
+			response = in.nextLine().toUpperCase();
 			if (response.equals("F"))
 				return Tile.LandType.Fort;
 			if (response.equals("FC"))
