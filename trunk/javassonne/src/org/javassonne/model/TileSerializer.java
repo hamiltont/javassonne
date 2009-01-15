@@ -19,20 +19,36 @@
 package org.javassonne.model;
 
 import com.thoughtworks.xstream.*;
+import java.io.*;
 
 public class TileSerializer {
 
 	private XStream xstream;
 	
 	public TileSerializer()
-	{
+	{	
 		xstream = new XStream();
-		xstream.alias("tile", Tile.class);
 	}
 
-	public TileSet loadTileSet(String filename)
-	{
-		return null;
+	public TileSet loadTileSet(String filename) throws IOException {
+		File f = new File(filename);
+		if(!f.exists())
+			throw new IOException("File '" + filename +"' does not exist");
+
+		try{
+			//Read file into a variable
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			StringBuilder xml = new StringBuilder();
+			String line;
+			while( ( line = reader.readLine()) != null)
+				xml.append(line + "\n");
+			
+			TileSet set = (TileSet)xstream.fromXML(xml.toString());
+			return set;
+		}catch(Exception e){
+			System.out.println("Error loading tileset: "+e);
+			throw new IOException();
+		}
 	}
 	
 	public String saveTile(Tile tile)
@@ -40,4 +56,17 @@ public class TileSerializer {
 		String xml = xstream.toXML(tile);
 		return xml;
 	}
+	
+	//Saves tileset to file
+	public void saveTileSet(TileSet set, String filename) throws IOException{
+		try{
+			BufferedWriter out = new BufferedWriter( new FileWriter(filename, true));
+			out.write(xstream.toXML(set));
+            out.close();
+		}catch(Exception e){
+			System.out.println("Error saving tileset: "+ e);
+			throw new IOException();
+		}
+	}
+	
 }
