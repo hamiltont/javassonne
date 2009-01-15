@@ -5,7 +5,7 @@
  * @author Kyle Prete
  * @date Jan 14, 2009
  * 
- * Copyright 2009 Javassonne Team
+ * Copyright 2009 Javasonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License. 
  *  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -18,16 +18,31 @@
 
 package org.javassonne.model;
 
-public interface TileContainer {
+import java.util.HashMap;
 
-	//Returns "home" square - the tile the game began with.
-	public TileContainerIterator homeTile();
+
+public class TileMapBoard implements TileBoard {
 	
-	//Adds tile to the specified TileContainerIterator location
-	public void addTile(TileContainerIterator iter, Tile tile);
+	private HashMap<IntPair, Tile> data_;
+
+	public TileBoardIterator homeTile() {
+		return new TileBoardIterator(this,new IntPair(0,0));
+	}
+
+	//Adds Tile at iter location
+	public void addTile(TileBoardIterator iter, Tile tile) {
+		// TODO Auto-generated method stub
+
+	}
 	
-	//Removes tile from the specified TileContainerIterator location
-	public Tile removeTile(TileContainerIterator iter);
+	//Removes Tile at iter location
+	public Tile removeTile(TileBoardIterator iter) {
+		return data_.remove(iter.getLocation_());
+	}
 	
-	
+	//Returns Tile at iter location, maintaining it in Container
+	public Tile getTile(TileBoardIterator iter) {
+		return data_.get(iter.getLocation_());
+	}
+
 }

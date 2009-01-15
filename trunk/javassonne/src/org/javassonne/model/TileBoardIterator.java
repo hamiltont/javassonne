@@ -5,7 +5,7 @@
  * @author Kyle Prete
  * @date Jan 14, 2009
  * 
- * Copyright 2009 Javassonne Team
+ * Copyright 2009 Javasonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License. 
  *  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -18,25 +18,47 @@
 
 package org.javassonne.model;
 
-import java.util.HashMap;
 
-
-public class TileMapContainer implements TileContainer {
+public class TileBoardIterator  {
 	
-	private HashMap<IntPair, Tile> data_;
+	private TileMapBoard data_;
+	private IntPair location_;
 
-	public void addTile(TileContainerIterator iter, Tile tile) {
+	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair ) {
+		data_ = tileMapContainer;
+		location_ = intPair;
+	}
+
+	public Tile current() {
+		return data_.getTile(this);
+	}
+
+	public void down() {
 		// TODO Auto-generated method stub
 
 	}
 
-	public TileContainerIterator homeTile() {
-		return new TileMapIterator(this,new IntPair(0,0));
+	public void left() {
+		// TODO Auto-generated method stub
+
 	}
 
-	public Tile removeTile(TileContainerIterator iter) {
+	public void right() {
 		// TODO Auto-generated method stub
-		return null;
+
+	}
+
+	public void up() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public IntPair getLocation_() {
+		return location_;
+	}
+
+	public void setLocation_(IntPair location_) {
+		this.location_ = location_;
 	}
 
 }
