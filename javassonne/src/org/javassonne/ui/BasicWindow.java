@@ -30,9 +30,7 @@ public class BasicWindow extends JFrame implements ActionListener {
 		contentPane_.setLayout(new FlowLayout());
 		
 		contentPane_.add(toggle);
-		
-		
-		
+				
 		addWindowListener(new WindowDestroyer());		
 	}
 
