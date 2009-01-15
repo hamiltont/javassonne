@@ -18,20 +18,39 @@
 
 package org.javassonne.model;
 
-public interface TileContainerIterator {
 
-	//Returns current Tile
-	public Tile current();
+public class TileMapIterator implements TileContainerIterator {
 	
-	//Advances up
-	public void up();
-	
-	//Advances right
-	public void right();
-	
-	//Advances left
-	public void left();
-	
-	//Advances down
-	public void down();
+	private TileMapContainer data_;
+	private IntPair location_;
+
+	public TileMapIterator(TileMapContainer tileMapContainer, IntPair intPair ) {
+		data_ = tileMapContainer;
+		location_ = intPair;
+	}
+
+	public Tile current() {
+		return null;
+	}
+
+	public void down() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void left() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void right() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void up() {
+		// TODO Auto-generated method stub
+
+	}
+
 }
