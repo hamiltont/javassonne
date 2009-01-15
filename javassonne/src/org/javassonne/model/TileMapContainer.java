@@ -18,20 +18,25 @@
 
 package org.javassonne.model;
 
-public interface TileContainerIterator {
+import java.util.HashMap;
 
-	//Returns current Tile
-	public Tile current();
+
+public class TileMapContainer implements TileContainer {
 	
-	//Advances up
-	public void up();
-	
-	//Advances right
-	public void right();
-	
-	//Advances left
-	public void left();
-	
-	//Advances down
-	public void down();
+	private HashMap<IntPair, Tile> data_;
+
+	public void addTile(TileContainerIterator iter, Tile tile) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public TileContainerIterator homeTile() {
+		return new TileMapIterator(this,new IntPair(0,0));
+	}
+
+	public Tile removeTile(TileContainerIterator iter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
