@@ -2,7 +2,7 @@
  * Javasonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author Hamilton Turner
+ * @author [Add Name Here]
  * @date Jan 14, 2009
  * 
  * Copyright 2009 Javasonne Team
@@ -18,11 +18,6 @@
 
 package org.javassonne.ui;
 
-public class SwingDemos {
+public class poo {
 
-	public static void main(String args[]) {
-		
-		BasicWindow a = new BasicWindow();
-		a.setVisible(true);
-	}
 }
