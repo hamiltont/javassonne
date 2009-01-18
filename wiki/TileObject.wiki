@@ -8,20 +8,41 @@ Tiles must connect to each other based on what is on each side (for example, for
 
 = Details =
 
+Our information scheme has been divided into a foreground and background view. The background consists of whatever an empty tile would contain - farmland. The foreground consists of the other features - road, fort, etc.
+
+== Foreground ==
+
 First, we need to store data for each side. For shorthand, we have adopted F,,c,, for fort cap, F,,i,, for fort internal, R for road, and N for nothing. In addition, we must store what lies in the center of a tile. An M denotes a monastery in the center, an R denotes a road region continues through a center, and N denoting nothing otherwise.
 
-In addition, we need a way to calculate farm regions. We settled on dividing a tile into quadrants. Quadrants that are part of the same farmland will be issued the same integer.
+== Background ==
 
-A tabular view of some sample tiles appears below. Images examples will be added later.
+In addition, we need a way to calculate farm regions. We settled on dividing a tile into quadrants. Quadrants that are part of the same farmland will be issued the same integer. To avoid the coupling of farm logic with foreground features, when a tile is created, any side that blocks a farmland from continuing (i.e. a fort side) will "draw a wall" across that side (stored as a boolean)
 
+== Examples ==
+
+A tabular and image view of some sample tiles appear below. Foreground and background views have been laid on top of one another - 4 sides and middle are foreground; 4 corners and "walls" are background.
+
+<img src="http://javassonne.googlecode.com/svn/trunk/javassonne/tilesets/standard/tile_standard_26.jpg" height="100px" width="100px">
+|| 0 || R || 1 ||          
+|| R || R || F,,c,, ||
+|| 1 || N || 1 ||
+
+with "wall" on right edge
+
+----
+
+<img src="http://javassonne.googlecode.com/svn/trunk/javassonne/tilesets/standard/tile_standard_10.jpg" height="100px" width="100px">
+|| 0 || N || 0 ||
+|| N || M || N ||
+|| 0 || R || 0 ||
+
+with no "walls"
+
+----
+
+<img src="http://javassonne.googlecode.com/svn/trunk/javassonne/tilesets/standard/tile_standard_19.jpg" height="100px" width="100px">
 || 0 || R || 1 ||
-|| R || R || N ||
-|| 1 || F,,c,, || 1 ||
-
-|| 0 || N || 0 ||
-|| R || M || N ||
-|| 0 || N || 0 ||
-
-|| 0 || F,,i,, || 1 ||
 || R || N || R ||
-|| 2 || F,,i,, || 3 ||
+|| 2 || R || 3 ||
+
+with no "walls"
