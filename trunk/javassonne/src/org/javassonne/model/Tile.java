@@ -108,8 +108,8 @@ public class Tile {
 	public String description()
 	{	
 		// Print out a nice box with the nine areas labeled. Like the Tile page on the wiki.
-		return String.format("---------\r| %d %s %d |\r| %s %s %s |\r| %d %s %d |\r---------",
-			farms_[Quadrant.TopLeft.index], features_[Region.Top.index], farms_[Quadrant.TopRight.index],
+		return String.format("---------\r| %d %s %d |  %s\r| %s %s %s |\r| %d %s %d |\r---------",
+			farms_[Quadrant.TopLeft.index], features_[Region.Top.index], farms_[Quadrant.TopRight.index], uniqueIdentifier_,
 			features_[Region.Left.index], features_[Region.Center.index], features_[Region.Right.index],
 			farms_[Quadrant.BottomLeft.index], features_[Region.Bottom.index], farms_[Quadrant.BottomRight.index]);
 	}

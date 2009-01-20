@@ -38,28 +38,33 @@ public class TileSetCreator {
 				
 			// prompt the user to either create or load an existing tile set
 			System.out.println("Welcome to the Javassonne Tile Set Creator!");
-			System.out.println("Would you like to (1) Create a new tile set or (2) Load an existing one?");
 			
-			int response = in.nextInt();
-			
-			// fetch the tile set
-			if (response == 1)
+			// load a tile set into currentSet
+			while (currentSet == null)
 			{
-				currentSet = new TileSet("Untitled Set");
-			}
-			else 
-			{
-				System.out.println("Select an existing tile set or type a path:");
-				currentSetPath = getTileSetPathInFolder("tilesets/", in);
-				if (currentSetPath != null){
-					currentSet = serializer.loadTileSet(currentSetPath);
-					
-					if (currentSet == null){
-						System.out.println("The tile set could not be found.");
+				System.out.println("Would you like to (1) Create a new tile set or (2) Load an existing one?");
+				
+				int response = in.nextInt();
+				
+				// fetch the tile set
+				if (response == 1)
+				{
+					currentSet = new TileSet("Untitled Set");
+				}
+				else 
+				{
+					System.out.println("Select an existing tile set or type a path:");
+					currentSetPath = getTileSetPathInFolder("tilesets/", in);
+					if (currentSetPath != null){
+						currentSet = serializer.loadTileSet(currentSetPath);
+						
+						if (currentSet == null){
+							System.out.println("The tile set could not be found.");
+						}
 					}
 				}
 			}
-		
+			
 			// present the main menu
 			while (true)
 			{
@@ -84,7 +89,8 @@ public class TileSetCreator {
 				System.out.println();
 				System.out.println("9) Exit (Without Saving)");
 				System.out.println();
-			
+				System.out.print(":");
+				
 				int option = in.nextInt();
 				System.out.println();
 				
@@ -104,7 +110,7 @@ public class TileSetCreator {
 					for (int ii = 0; ii < currentSet.tileCount(); ii++)
 					{
 						Tile t = currentSet.tileAtIndex(ii);
-						System.out.println(String.format("%d: %s", ii, t.description()));
+						System.out.println(String.format("%d\r%s", ii, t.description()));
 					}
 					System.out.println("----------------------------------------------------------------");
 				
@@ -144,12 +150,12 @@ public class TileSetCreator {
 					System.out.println("----- SAVE TILE SET --------------------------------------------");
 
 					if (currentSetPath != null) {
-						System.out.println("Enter a file path, or press enter to use "+currentSetPath+":");
+						System.out.println("Enter a file path, or 1 to use "+currentSetPath+":");
 					} else {
 						System.out.println("Enter a file path:");
 					}
-					String newSetPath = in.nextLine();
-					if (newSetPath.length() > 0)
+					String newSetPath = in.next();
+					if (Integer.valueOf(newSetPath) != 1)
 						currentSetPath = newSetPath;
 					
 					serializer.saveTileSet(currentSet, currentSetPath);
@@ -158,6 +164,7 @@ public class TileSetCreator {
 				} else if (option == 8){
 						System.out.println("Enter a new name for the set:");
 						currentSet.setName(in.next());
+						in.nextLine();
 						
 				} else if( option == 9){
 					System.out.println("Goodbye!");
@@ -210,13 +217,13 @@ public class TileSetCreator {
 	    File[] files = folder.listFiles(fileFilter);
 	    
 	    for (int ii = 0; ii < files.length; ii++)
-	    	System.out.println(String.format("%d: %s", ii, files[ii].getName()));
+	    	System.out.println(String.format("%d: %s", ii+1, files[ii].getName()));
 	    
 	    String r = in.next();
 	    Integer r_int = Integer.valueOf(r);
 	    
 	    if (r_int != 0){
-	    	return files[r_int].getAbsolutePath();
+	    	return files[r_int-1].getAbsolutePath();
 	    } else {
 	    	return r;
 	    }
@@ -227,7 +234,7 @@ public class TileSetCreator {
 		// first, prompt for the features in all five regions
 		for (Region r : Region.values())
 		{
-			System.out.println(String.format("Enter Tile %s Feature: (Currently %s)", r, t.featureIdentifierInRegion(r)));
+			System.out.println(String.format("Enter Tile %s Feature (Currently %s):", r, t.featureIdentifierInRegion(r)));
 			TileFeature feature = getFeature(in);
 			if (feature == null) return false;
 			t.setFeatureInRegion(r, feature);
@@ -236,12 +243,12 @@ public class TileSetCreator {
 		// next, prompt for the four farm values
 		for (Quadrant q : Quadrant.values())
 		{
-			System.out.println(String.format("Enter Tile %s Quadrant: (Currently %d)", q, t.farmInQuadrant(q)));
+			System.out.println(String.format("Enter Tile %s Quadrant (Currently %d):", q, t.farmInQuadrant(q)));
 			t.setFarmInQuadrant(q, in.nextInt());
 		}
 		
 		// next, prompt for the unique tile identifier
-		System.out.println(String.format("Enter Tile Unique Identifier: (Currently %s)", t.getUniqueIdentifier()));
+		System.out.println(String.format("Enter Tile Unique Identifier (Currently %s):", t.getUniqueIdentifier()));
 		t.setUniqueIdentifier(in.next());
 		
 		// wow - that was cool.
@@ -251,15 +258,15 @@ public class TileSetCreator {
 	public static void promptForTileFeatureProperties(TileFeature f, Scanner in)
 	{
 		// prompt for the name
-		System.out.println(String.format("Enter Feature Name: (Currently %s)", f.name));
+		System.out.println(String.format("Enter Feature Name (Currently %s):", f.name));
 		f.name = in.next();
 		
 		// prompt for the identifier
-		System.out.println(String.format("Enter Feature Identifier: (Currently %s)", f.identifier));
+		System.out.println(String.format("Enter Feature Identifier (Currently %s):", f.identifier));
 		f.identifier = in.next();
 		
 		// prompt for actsAsWall
-		System.out.println(String.format("New Feature Acts as Wall?: (Currently %b)", f.actsAsWall));
+		System.out.println(String.format("Should the new feature act as a wall for farms? (Currently %b):", f.actsAsWall));
 		f.actsAsWall = in.nextBoolean();
 	}
 }
