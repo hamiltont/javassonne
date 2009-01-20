@@ -64,9 +64,16 @@ public class TileSerializer {
 	public void saveTileSet(TileSet set, String path) throws IOException
 	{
 		try{
+			// delete the existing file, if there is one
+			File existingFile = new File(path);
+			if (existingFile.exists())
+				existingFile.delete();
+			
+			// create the new file
 			BufferedWriter out = new BufferedWriter( new FileWriter(path, true));
 			out.write(xstream.toXML(set));
             out.close();
+            
 		}catch(Exception e){
 			System.out.println("Error saving tileset: "+ e);
 			throw new IOException();
