@@ -47,7 +47,7 @@ public class IntPair {
 
 	@Override
 	public String toString() {
-		return String.valueOf(this.data1_) + String.valueOf(this.data2_);
+		return String.valueOf(this.data1_) + "," + String.valueOf(this.data2_);
 	}
 
 	public int car() {

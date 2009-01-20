@@ -28,21 +28,30 @@ public class TileMapBoard implements TileBoard {
 	public TileBoardIterator homeTile() {
 		return new TileBoardIterator(this,new IntPair(0,0));
 	}
+	
+	public boolean positionFilled(TileBoardIterator iter)
+	{
+		return data_.containsKey(iter.getLocation());
+	}
 
 	//Adds Tile at iter location
-	public void addTile(TileBoardIterator iter, Tile tile) {
-		// TODO Auto-generated method stub
-
+	//Throws to-be-implemented exception if position is filled
+	public void addTile(TileBoardIterator iter, Tile tile) throws Exception {
+		if(!positionFilled(iter))
+			throw new Exception();
+		else
+			data_.put(iter.getLocation(), tile);
 	}
 	
 	//Removes Tile at iter location
+	//Returns null if position is empty
 	public Tile removeTile(TileBoardIterator iter) {
-		return data_.remove(iter.getLocation_());
+		return data_.remove(iter.getLocation());
 	}
 	
 	//Returns Tile at iter location, maintaining it in Container
 	public Tile getTile(TileBoardIterator iter) {
-		return data_.get(iter.getLocation_());
+		return data_.get(iter.getLocation());
 	}
 
 }
