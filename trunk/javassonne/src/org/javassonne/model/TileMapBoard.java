@@ -20,38 +20,65 @@ package org.javassonne.model;
 
 import java.util.HashMap;
 
-
 public class TileMapBoard implements TileBoard {
-	
+
 	private HashMap<IntPair, Tile> data_;
+	private TileBoardIterator upperLeft_;
+	private TileBoardIterator lowerRight_;
+	
+	public TileMapBoard(Tile homeTile) {
+		data_ = new HashMap<IntPair, Tile>();
+		upperLeft_ = new TileBoardIterator(this, new IntPair(-1, -1));
+		lowerRight_ = new TileBoardIterator(this, new IntPair(1, 1));
+		data_.put(new IntPair(0,0), homeTile);
+	}
 
 	public TileBoardIterator homeTile() {
-		return new TileBoardIterator(this,new IntPair(0,0));
+		return new TileBoardIterator(this, new IntPair(0, 0));
 	}
-	
-	public boolean positionFilled(TileBoardIterator iter)
-	{
+
+	public boolean positionFilled(TileBoardIterator iter) {
 		return data_.containsKey(iter.getLocation());
 	}
 
-	//Adds Tile at iter location
-	//Throws to-be-implemented exception if position is filled
+	// Adds Tile at iter location
+	// Throws to-be-implemented exception if position is filled
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception {
-		if(!positionFilled(iter))
+		if (!positionFilled(iter))
 			throw new Exception();
 		else
+		{
 			data_.put(iter.getLocation(), tile);
+			//Check for bounds extension
+			if (iter.getLocation().car() == upperLeft_.getLocation().car())
+				upperLeft_.up();
+			else if (iter.getLocation().cdr() == upperLeft_.getLocation().cdr())
+				upperLeft_.left();
+			else if (iter.getLocation().car() == lowerRight_.getLocation().car())
+				lowerRight_.down();
+			else if (iter.getLocation().cdr() == lowerRight_.getLocation().cdr())
+				lowerRight_.right();
+		}
 	}
-	
-	//Removes Tile at iter location
-	//Returns null if position is empty
+
+/*
+	// Removes Tile at iter location
+	// Returns null if position is empty
 	public Tile removeTile(TileBoardIterator iter) {
 		return data_.remove(iter.getLocation());
 	}
-	
-	//Returns Tile at iter location, maintaining it in Container
+*/
+	// Returns Tile at iter location, maintaining it in Container
 	public Tile getTile(TileBoardIterator iter) {
 		return data_.get(iter.getLocation());
+	}
+
+	public TileBoardIterator getLowerRightCorner() {
+		return new TileBoardIterator(upperLeft_);
+	}
+
+	public TileBoardIterator getUpperLeftCorner() {
+		return new TileBoardIterator(lowerRight_);
 	}
 
 }

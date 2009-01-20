@@ -27,12 +27,19 @@ public interface TileBoard {
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception;
 	//TODO: implement Exception
 	
+	//Not Needed?
 	//Removes tile from the specified TileBoardIterator location
-	public Tile removeTile(TileBoardIterator iter);
+	//public Tile removeTile(TileBoardIterator iter);
 
 	//Returns tile at specified TileBoardIterator location
 	//without removing Tile from the Board
 	public Tile getTile(TileBoardIterator iter);
+	
+	//Returns upper left corner iterator
+	public TileBoardIterator getUpperLeftCorner();
+	
+	//Returns lower right corner iterator
+	public TileBoardIterator getLowerRightCorner();
 	
 	
 }
