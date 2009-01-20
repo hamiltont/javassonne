@@ -11,7 +11,7 @@ public class TileFeature {
 		this.name = "Untitled";
 		this.identifier = "U";
 		this.actsAsWall = false;
-		this.multiplier = 0;
+		this.multiplier = 1;
 	}
 	
 	public TileFeature(String name, String identifier, boolean actsAsWall, int multiplier)

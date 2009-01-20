@@ -66,6 +66,16 @@ public class TileSet {
 		return tiles_.get(index);
 	}
 	
+	public Tile tileWithUniqueIdentifier(String identifier)
+	{
+		for (Tile t : tiles_)
+		{
+			if (identifier.equals(t.getUniqueIdentifier()))
+				return t;
+		}
+		return null;
+	}
+	
 	public int tileCountAtIndex(int index)
 	{
 		return tileCounts_.get(index);
