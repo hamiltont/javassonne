@@ -23,10 +23,17 @@ public class TileBoardIterator {
 	private TileBoard data_;
 	private IntPair location_;
 	private IntPair previousLocation_;
+	
 
 	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair) {
 		data_ = tileMapContainer;
 		location_ = intPair;
+	}
+	
+	public TileBoardIterator(TileBoardIterator old) {
+		data_ = old.data_;
+		location_ = old.location_;
+		previousLocation_ = old.previousLocation_;
 	}
 
 	public Tile current() {
@@ -66,10 +73,9 @@ public class TileBoardIterator {
 	public IntPair getLocation() {
 		return location_;
 	}
-
-	public void setLocation(IntPair location) {
-		previousLocation_ = location_;
-		location_ = location;
+	
+	public boolean outOfBounds() {
+		return false;
 	}
 
 }
