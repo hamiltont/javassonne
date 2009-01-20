@@ -39,31 +39,36 @@ public class TileBoardIterator {
 		return data_.getTile(this);
 	}
 
-	public void down() {
+	public TileBoardIterator down() {
 		previousLocation_ = location_;
 		location_ = new IntPair(location_.car() + 1, location_.cdr());
+		return this;
 	}
 
-	public void left() {
+	public TileBoardIterator left() {
 		previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() - 1);
+		return this;
 	}
 
-	public void right() {
+	public TileBoardIterator right() {
 		previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() + 1);
+		return this;
 	}
 
-	public void up() {
+	public TileBoardIterator up() {
 		previousLocation_ = location_;
 		location_ = new IntPair(location_.car() - 1, location_.cdr());
+		return this;
 	}
 
 	// Moves iterator to previous location (history size of 1)
-	public void back() throws Exception {
+	public TileBoardIterator back() throws Exception {
 		if (previousLocation_ != null) {
 			location_ = previousLocation_;
 			previousLocation_ = null;
+			return this;
 		} else
 			throw new Exception();
 		// TODO: implement Exception
@@ -83,9 +88,10 @@ public class TileBoardIterator {
 	}
 
 	// Advances iterator to start of next row
-	public void nextRow() {
+	public TileBoardIterator nextRow() {
 		location_ = new IntPair(location_.car() + 1,
 				data_.getUpperLeftCorner().location_.cdr());
+		return this;
 	}
 
 }
