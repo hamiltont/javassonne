@@ -22,7 +22,10 @@ public class SwingDemos {
 
 	public static void main(String args[]) {
 		
-		BasicWindow a = new BasicWindow();
-		a.setVisible(true);
+		TestTDModel model = new TestTDModel();
+		GameWindow view = new GameWindow(model);
+		GameWindowController controller = new GameWindowController(view, model);
+		view.setController(controller);
+
 	}
 }

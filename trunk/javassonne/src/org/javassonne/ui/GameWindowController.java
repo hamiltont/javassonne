@@ -18,24 +18,21 @@
 
 package org.javassonne.ui;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class BasicWindowController implements ActionListener {
+public class GameWindowController implements ActionListener {
 
-	BasicWindow myWindow_;
-	BasicWindowModel myModel_;
+	GameWindow view_;
+	TestTDModel model_;
 
-	public BasicWindowController(BasicWindow window, BasicWindowModel model) {
-		myWindow_ = window;
-		myModel_ = model;
+	public GameWindowController(GameWindow window, TestTDModel model) {
+		view_ = window;
+		model_ = model;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		if (myWindow_.getContentPane().getBackground() == Color.gray)
-			myWindow_.getContentPane().setBackground(Color.red);
-		else
-			myWindow_.getContentPane().setBackground(Color.gray);
+		// Must handle actions from both WorldCanvas, and from
+		// Control Panel
 	}
 }
