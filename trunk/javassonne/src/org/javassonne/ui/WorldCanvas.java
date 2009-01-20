@@ -19,29 +19,36 @@
 package org.javassonne.ui;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionListener;
 
-import org.javassonne.model.Tile;
-import org.javassonne.model.TileSerializer;
-import org.javassonne.model.TileSet;
+import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardIterator;
 
 public class WorldCanvas extends Canvas {
+	private TileBoard board_;
 
-	public WorldCanvas() {
-		setBackground(Color.yellow);
+	public WorldCanvas(TileBoard board) {
+		board_ = board;
 	}
 
 	public void paint(Graphics g) {
 		Graphics2D g2;
-		int Height;
 
-		TileSerializer s = new TileSerializer();
-		TileSet set = s.loadTileSet("tilesets/standard.xml");
-		Tile t = set.tileWithUniqueIdentifier("tile_standard_1");
-		
 		g2 = (Graphics2D) g;
-		g2.drawImage(t.getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
+		TileBoardIterator iter = board_.homeTile();
+
+		g2.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300,
+				300, null);
 	}
+
+	public void redraw() {
+		// Redraw the board
+	}
+
+	public void setActionListener(ActionListener a) {
+		// Register event listener
+	}
+
 }
