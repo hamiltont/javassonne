@@ -16,6 +16,8 @@
  *  permissions and limitations under the License. 
  */
 
+package javassonne.src.org.javassonne.UIcontrol;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

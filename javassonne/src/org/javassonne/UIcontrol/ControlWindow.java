@@ -16,13 +16,16 @@
  *  permissions and limitations under the License. 
  */
 
+package javassonne.src.org.javassonne.UIcontrol;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-public class ctrlWindow extends JFrame implements ActionListener {
+
+public class ControlWindow extends JFrame implements ActionListener {
 	
 	private Container ctrlContentPane_ = this.getContentPane();
 	
@@ -46,3 +49,11 @@ public class ctrlWindow extends JFrame implements ActionListener {
 	}
 
 }
+
+
+public static void main(String [ ] args)
+{
+      
+}
+
+
