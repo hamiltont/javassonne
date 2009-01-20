@@ -102,7 +102,7 @@ public class TileSet {
 				t.setImage(img);
 			}
 		} catch (IOException e) {
-			// do something here!
+			System.err.println("The tile images could not be loaded. One or more tiles may not have images.");
 		}
 	}
 
