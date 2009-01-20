@@ -21,12 +21,14 @@ package org.javassonne.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.javassonne.model.TileBoard;
+
 public class GameWindowController implements ActionListener {
 
 	GameWindow view_;
-	TestTDModel model_;
+	TileBoard model_;
 
-	public GameWindowController(GameWindow window, TestTDModel model) {
+	public GameWindowController(GameWindow window, TileBoard model) {
 		view_ = window;
 		model_ = model;
 	}

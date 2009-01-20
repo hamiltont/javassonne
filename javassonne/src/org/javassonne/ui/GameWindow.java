@@ -27,32 +27,33 @@ import java.awt.Container;
 
 import javax.swing.JFrame;
 
+import org.javassonne.model.TileBoard;
+
 public class GameWindow extends JFrame {
 
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static final Color WINDOW_BG_COLOR = Color.gray;
 
 	private Container contentPane_;
-	private TestTDModel model_;
+	private TileBoard boardModel_;
 	private GameWindowController controller_;
 	private WorldCanvas worldCanvas_;
 	private ControlPanel controlPanel_;
 
-	public GameWindow(TestTDModel model) {
+	public GameWindow(TileBoard model) {
 		// Do initialization for JFrame
 		super();
 
 		// Syntax hack
 		contentPane_ = getContentPane();
 
-		controller_ = controller;
-		model_ = model;
+		boardModel_ = model;
 		setTitle(WINDOW_TITLE);
 		contentPane_.setBackground(WINDOW_BG_COLOR);
 
 		// Set up the layout of the window
 		contentPane_.setLayout(new BorderLayout());
-		worldCanvas_ = new WorldCanvas();
+		worldCanvas_ = new WorldCanvas(boardModel_);
 		controlPanel_ = new ControlPanel();
 		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
 		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
@@ -62,8 +63,8 @@ public class GameWindow extends JFrame {
 
 	public void update() {
 		// Pass the update on to the sub views
-		WorldCanvas.update(model_);
-		ControlPanel.update(model_);
+		worldCanvas_.redraw();
+		controlPanel_.redraw();
 	}
 	
 	public void setController(GameWindowController controller) {

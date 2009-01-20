@@ -42,4 +42,8 @@ public class ControlPanel extends JPanel {
 		newGameButton_.addActionListener(listener);
 		loadGameButton_.addActionListener(listener);
 	}
+	
+	public void redraw() {
+		// re-read the model
+	}
 }

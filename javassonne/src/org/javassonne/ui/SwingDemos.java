@@ -18,11 +18,39 @@
 
 package org.javassonne.ui;
 
+import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardIterator;
+import org.javassonne.model.TileDeck;
+import org.javassonne.model.TileMapBoard;
+import org.javassonne.model.TileSerializer;
+import org.javassonne.model.TileSet;
+
 public class SwingDemos {
 
 	public static void main(String args[]) {
 		
-		TestTDModel model = new TestTDModel();
+		// Load all possible tiles
+		TileSerializer s = new TileSerializer();
+		TileSet set = s.loadTileSet("tilesets/standard.xml");
+		
+		// Populate the set into the deck
+		// 	Note: you can have multiple copies of a tile in a deck,
+		//		  but not in a set 
+		TileDeck deck = new TileDeck();
+		deck.addTileSet(set);
+		
+		TileBoard model = new TileMapBoard(deck.popRandomTile());
+		TileBoardIterator iter = model.homeTile();
+		
+		for (int i = 0; i < 3; i++){
+			if (i%3 == 0)
+				iter.nextRow();
+			try{
+				model.addTile(iter.right(), deck.popRandomTile());
+			} catch (Exception e) {}
+		}	
+		
+		
 		GameWindow view = new GameWindow(model);
 		GameWindowController controller = new GameWindowController(view, model);
 		view.setController(controller);
