@@ -49,6 +49,12 @@ public class BasicWindow extends JFrame {
 		
 		BasicWindowController controller = new BasicWindowController(this, model);
 		
+		// add worldCanvas
+		WorldCanvas c = new WorldCanvas();
+		c.setSize(300, 300);
+		contentPane_.add(c);
+
+		// add button
 		JButton toggle = new JButton("Change BG Color");
 		toggle.addActionListener(controller);
 		
