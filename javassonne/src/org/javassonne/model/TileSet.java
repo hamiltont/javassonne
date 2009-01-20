@@ -25,6 +25,7 @@ public class TileSet {
 	private String name_;
 	private ArrayList<Tile> tiles_;
 	private ArrayList<Integer> tileCounts_;
+	private ArrayList<TileFeature> tileFeatures_;
 	
 	// Constructor
 	
@@ -33,6 +34,7 @@ public class TileSet {
 		name_ = name;
 		tiles_ = new ArrayList<Tile>();
 		tileCounts_ = new ArrayList<Integer>();
+		tileFeatures_ = new ArrayList<TileFeature>();
 	}
 	
 	// Getter and Setter Functionality
@@ -44,6 +46,8 @@ public class TileSet {
 	public String getName() {
 		return name_;
 	}
+	
+	// Convenience Functions
 	
 	public int tileCount(){
 		return tiles_.size();
@@ -65,5 +69,29 @@ public class TileSet {
 	public int tileCountAtIndex(int index)
 	{
 		return tileCounts_.get(index);
+	}
+	
+	// Adding and Removing Tile Features
+	
+	public int tileFeatureCount(){
+		return tileFeatures_.size();
+	}
+	
+	public void addTileFeature(TileFeature f)
+	{
+		tileFeatures_.add(f);
+	}
+	
+	public TileFeature tileFeatureAtIndex(int index)
+	{
+		return tileFeatures_.get(index);
+	}
+	
+	public TileFeature tileFeatureWithIdentifier(String identifier)
+	{
+		for (TileFeature f : tileFeatures_)
+			if (f.identifier.equals(identifier))
+				return f;
+		return null;
 	}
 }
