@@ -25,42 +25,46 @@ public class TileSerializer {
 
 	private XStream xstream;
 	
+	// Constructor: sets up the xstream serializer with a few customizations
+	// to make the XML cleaner in case we have to read it by hand
 	public TileSerializer()
 	{	
 		xstream = new XStream();
+		xstream.alias("Tile", Tile.class);
+		xstream.alias("TileSet", TileSet.class);
+		xstream.alias("TileFeature",TileFeature.class);
 	}
-
-	public TileSet loadTileSet(String filename) throws IOException {
-		File f = new File(filename);
+	
+	// load the tile set from a file path
+	public TileSet loadTileSet(String path)
+	{	
+		File f = new File(path);
+		
 		if(!f.exists())
-			throw new IOException("File '" + filename +"' does not exist");
-
+			return null;
+		
 		try{
 			//Read file into a variable
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			BufferedReader reader = new BufferedReader(new FileReader(path));
 			StringBuilder xml = new StringBuilder();
 			String line;
-			while( ( line = reader.readLine()) != null)
+
+			while((line = reader.readLine()) != null)
 				xml.append(line + "\n");
 			
 			TileSet set = (TileSet)xstream.fromXML(xml.toString());
 			return set;
+
 		}catch(Exception e){
-			System.out.println("Error loading tileset: "+e);
-			throw new IOException();
+			return null;
 		}
 	}
 	
-	public String saveTile(Tile tile)
+	// Save a tileset to a file, given a set and a destination file path
+	public void saveTileSet(TileSet set, String path) throws IOException
 	{
-		String xml = xstream.toXML(tile);
-		return xml;
-	}
-	
-	//Saves tileset to file
-	public void saveTileSet(TileSet set, String filename) throws IOException{
 		try{
-			BufferedWriter out = new BufferedWriter( new FileWriter(filename, true));
+			BufferedWriter out = new BufferedWriter( new FileWriter(path, true));
 			out.write(xstream.toXML(set));
             out.close();
 		}catch(Exception e){

@@ -19,16 +19,33 @@
 package org.javassonne.model;
 
 public class Tile {
-    public enum LandType { Road, Fort, FortCap, River, Cloister, Nothing }
-
-	private LandType landLeft_;
-	private LandType landRight_;
-	private LandType landTop_;
-	private LandType landBottom_;
-	private LandType landCenter_;
 	
-	private int[][] farms_ = new int[2][2];
-
+    public enum Region { 
+    	Left 	(0),
+    	Right	(1), 
+    	Top 	(2),
+    	Bottom 	(3),
+    	Center	(4);
+    	private final int index;
+    	Region (int i){
+    		this.index = i;
+    	}
+    }
+    
+    public enum Quadrant { 
+    	TopLeft 	(0),
+    	TopRight	(1), 
+    	BottomLeft 	(2),
+    	BottomRight (3);
+    	private final int index;
+    	Quadrant (int i){
+    		this.index = i;
+    	}
+    }
+    
+	private String[] features_ = new String[5];
+	private int[] farms_ = new int[4];
+	private boolean[] farmWalls_ = new boolean[4];
 	private String uniqueIdentifier_;
 	
 	// Constructor
@@ -37,67 +54,47 @@ public class Tile {
 	{
 	}
 	
-	// Helpful Functions
+	// FARMS: Getter and Setter Functionality
 	
-	public String description()
+	public int farmInQuadrant(Quadrant q)
 	{
-		return String.format("%s Land: [T:%s C:%s B:%s L:%s R:%s], Farms: [%d %d | %d %d]", 
-				uniqueIdentifier_, landTop_, landCenter_, landBottom_, landLeft_, landRight_, 
-				farms_[0][0],farms_[1][0],farms_[0][1],farms_[1][1]);
+		return farms_[q.index];
 	}
 	
-	// Getter and Setter Functionality
-	
-	public void setFarmAtLocation(int farmValue, int x, int y)
+	public void setFarmInQuadrant(Quadrant q, int farmValue)
 	{
-		farms_[x][y] = farmValue;
+		farms_[q.index] = farmValue;
 	}
 	
-	public int farmAtLocation(int x, int y)
+	public boolean farmWallInRegion(Region r)
 	{
-		return farms_[x][y];
+		return farmWalls_[r.index];
 	}
 	
-	public void setLandCenter(LandType landCenter_) {
-		this.landCenter_ = landCenter_;
+	public void setFarmWallInRegion(Region r, boolean present)
+	{
+		farmWalls_[r.index] = present;
 	}
-
-	public LandType getLandCenter() {
-		return landCenter_;
+	
+	// FEATURES: Getter and Setter Functionality
+	
+	public String featureIdentifierInRegion(Region r)
+	{
+		return features_[r.index];
 	}
-
-	public void setLandBottom(LandType landBottom_) {
-		this.landBottom_ = landBottom_;
+	
+	public void setFeatureIdentifierInRegion(Region r, String identifier)
+	{
+		features_[r.index] = identifier;
 	}
-
-	public LandType getLandBottom() {
-		return landBottom_;
+	
+	public void setFeatureInRegion(Region r, TileFeature feature)
+	{
+		features_[r.index] = feature.identifier;
 	}
-
-	public void setLandTop(LandType landTop_) {
-		this.landTop_ = landTop_;
-	}
-
-	public LandType getLandTop() {
-		return landTop_;
-	}
-
-	public void setLandRight(LandType landRight_) {
-		this.landRight_ = landRight_;
-	}
-
-	public LandType getLandRight() {
-		return landRight_;
-	}
-
-	public void setLandLeft(LandType landLeft_) {
-		this.landLeft_ = landLeft_;
-	}
-
-	public LandType getLandLeft() {
-		return landLeft_;
-	}
-
+	
+	// UNIQUE ID: Getter and Setter Functionality
+	
 	public void setUniqueIdentifier(String uniqueIdentifier_) {
 		this.uniqueIdentifier_ = uniqueIdentifier_;
 	}
@@ -106,5 +103,15 @@ public class Tile {
 		return uniqueIdentifier_;
 	}
 	
+	// Convenience Functions
 	
+	public String description()
+	{	
+		// Print out a nice box with the nine areas labeled. Like the Tile page on the wiki.
+		return String.format("---------\r| %d %s %d |\r| %s %s %s |\r| %d %s %d |\r---------",
+			farms_[Quadrant.TopLeft.index], features_[Region.Top.index], farms_[Quadrant.TopRight.index],
+			features_[Region.Left.index], features_[Region.Center.index], features_[Region.Right.index],
+			farms_[Quadrant.BottomLeft.index], features_[Region.Bottom.index], farms_[Quadrant.BottomRight.index]);
+	}
+		
 }
