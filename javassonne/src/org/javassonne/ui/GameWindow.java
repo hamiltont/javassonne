@@ -21,23 +21,24 @@
 
 package org.javassonne.ui;
 
-// Needed for Container and Color
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 
-public class BasicWindow extends JFrame {
+public class GameWindow extends JFrame {
 
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static final Color WINDOW_BG_COLOR = Color.gray;
 
 	private Container contentPane_;
-	private BasicWindowModel model_;
-	private BasicWindowController controller_;
+	private TestTDModel model_;
+	private GameWindowController controller_;
+	private WorldCanvas worldCanvas_;
+	private ControlPanel controlPanel_;
 
-	public BasicWindow(BasicWindowModel model, BasicWindowController controller) {
+	public GameWindow(TestTDModel model) {
 		// Do initialization for JFrame
 		super();
 
@@ -50,6 +51,26 @@ public class BasicWindow extends JFrame {
 		contentPane_.setBackground(WINDOW_BG_COLOR);
 
 		// Set up the layout of the window
-		contentPane_.setLayout(new GridLayout());
+		contentPane_.setLayout(new BorderLayout());
+		worldCanvas_ = new WorldCanvas();
+		controlPanel_ = new ControlPanel();
+		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
+		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
+		
+		setVisible(true);
+	}
+
+	public void update() {
+		// Pass the update on to the sub views
+		WorldCanvas.update(model_);
+		ControlPanel.update(model_);
+	}
+	
+	public void setController(GameWindowController controller) {
+		controller_ = controller;
+		
+		// Add action listeners
+		worldCanvas_.setActionListener(controller);
+		controlPanel_.setActionListener(controller);
 	}
 }

@@ -1,8 +1,8 @@
 /**
- * Javasonne 
+ * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author David Leinweber
+ * @author Brian Salisbury
  * @date Jan 14, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,30 +18,28 @@
 
 package org.javassonne.ui;
 
-public class BasicWindowModel {
+import java.awt.event.ActionListener;
 
-	int maxTiles_ = 100;
-	int myTiles_[];
-	int curPos_;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
-	public BasicWindowModel() {
-		myTiles_ = new int[maxTiles_];
-		curPos_ = 0;
+public class ControlPanel extends JPanel {
+	
+	private JButton newGameButton_;
+	private JButton loadGameButton_;
+	private JButton exitGameButton_;
+	
+	public ControlPanel() {
+		setSize(300, 150);
+		setVisible(true);
 
-		for (int i = 0; i < maxTiles_; i++) {
-			myTiles_[i] = i;
-		}
+		newGameButton_ = new JButton("New Game");
+		loadGameButton_ = new JButton("Load Game");
+		exitGameButton_ = new JButton("Exit Game");
 	}
 
-	public void next() {
-		curPos_++;
-	}
-
-	public boolean isEmpty() {
-		return curPos_ == (myTiles_.length - 1);
-	}
-
-	public int read() {
-		return myTiles_[curPos_];
+	public void setActionListener(ActionListener listener) {
+		newGameButton_.addActionListener(listener);
+		loadGameButton_.addActionListener(listener);
 	}
 }
