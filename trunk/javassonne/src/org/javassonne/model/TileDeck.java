@@ -48,6 +48,7 @@ public class TileDeck {
 	
 	public Tile popRandomTile()
 	{
+		 if(tiles_.size()==0) return null;
 		 Random generator = new Random( 19580427 );
 		 int index = generator.nextInt(tiles_.size());
 		 
