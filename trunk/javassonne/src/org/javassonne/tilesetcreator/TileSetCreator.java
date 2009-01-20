@@ -64,7 +64,7 @@ public class TileSetCreator {
 					}
 				}
 			}
-			
+
 			// present the main menu
 			while (true)
 			{
@@ -238,6 +238,8 @@ public class TileSetCreator {
 			TileFeature feature = getFeature(in);
 			if (feature == null) return false;
 			t.setFeatureInRegion(r, feature);
+			if (r != Region.Center)
+				t.setFarmWallInRegion(r, feature.actsAsWall);
 		}
 		
 		// next, prompt for the four farm values
@@ -249,7 +251,23 @@ public class TileSetCreator {
 		
 		// next, prompt for the unique tile identifier
 		System.out.println(String.format("Enter Tile Unique Identifier (Currently %s):", t.getUniqueIdentifier()));
-		t.setUniqueIdentifier(in.next());
+		
+		// we will make sure the unique identifier they provide is acutally unique
+		String response = null;
+		while (response == null){
+			response = in.next();
+			
+			if (response.equals("cancel"))
+				return false;
+			
+			if (currentSet.tileWithUniqueIdentifier(response) == null)
+				t.setUniqueIdentifier(in.next());
+			else{
+				response = null;
+				System.out.println("A tile already exists in the set with that identifier. Type another\r" +
+						"identifier or type 'cancel' to go back to the main menu and throw away the tile.");
+			}
+		}
 		
 		// wow - that was cool.
 		return true;
@@ -265,8 +283,13 @@ public class TileSetCreator {
 		System.out.println(String.format("Enter Feature Identifier (Currently %s):", f.identifier));
 		f.identifier = in.next();
 		
+		// prompt for the multiplier
+		System.out.println(String.format("Enter Feature Multiplier (Currently %d):", f.multiplier));
+		f.multiplier = in.nextInt();
+		
 		// prompt for actsAsWall
 		System.out.println(String.format("Should the new feature act as a wall for farms? (Currently %b):", f.actsAsWall));
-		f.actsAsWall = in.nextBoolean();
+		String response = in.next();
+		f.actsAsWall = (response.toLowerCase().startsWith("t"));
 	}
 }
