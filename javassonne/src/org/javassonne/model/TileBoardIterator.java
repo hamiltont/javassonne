@@ -23,13 +23,12 @@ public class TileBoardIterator {
 	private TileBoard data_;
 	private IntPair location_;
 	private IntPair previousLocation_;
-	
 
 	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair) {
 		data_ = tileMapContainer;
 		location_ = intPair;
 	}
-	
+
 	public TileBoardIterator(TileBoardIterator old) {
 		data_ = old.data_;
 		location_ = old.location_;
@@ -73,9 +72,20 @@ public class TileBoardIterator {
 	public IntPair getLocation() {
 		return location_;
 	}
-	
+
 	public boolean outOfBounds() {
+		if (location_.car() < data_.getUpperLeftCorner().location_.car()
+				|| location_.cdr() < data_.getUpperLeftCorner().location_.cdr()
+				|| location_.car() > data_.getUpperLeftCorner().location_.car()
+				|| location_.cdr() > data_.getUpperLeftCorner().location_.cdr())
+			return true;
 		return false;
+	}
+
+	// Advances iterator to start of next row
+	public void nextRow() {
+		location_ = new IntPair(location_.car() + 1,
+				data_.getUpperLeftCorner().location_.cdr());
 	}
 
 }
