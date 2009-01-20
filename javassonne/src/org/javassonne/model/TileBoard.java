@@ -24,7 +24,7 @@ public interface TileBoard {
 	public TileBoardIterator homeTile();
 	
 	//Adds tile to the specified TileContainerIterator location
-	public void addTile(TileBoardIterator iter, Tile tile);
+	public void addTile(TileBoardIterator iter, Tile tile) throws Exception;
 	
 	//Removes tile from the specified TileContainerIterator location
 	public Tile removeTile(TileBoardIterator iter);

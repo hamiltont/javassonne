@@ -34,31 +34,31 @@ public class TileBoardIterator  {
 	}
 
 	public void down() {
-		// TODO Auto-generated method stub
-
+		location_ = new IntPair(location_.car() + 1, location_.cdr());
+		//bounds check?
 	}
 
 	public void left() {
-		// TODO Auto-generated method stub
-
+		location_ = new IntPair(location_.car(), location_.cdr() - 1);
+		//bounds check?
 	}
 
 	public void right() {
-		// TODO Auto-generated method stub
-
+		location_ = new IntPair(location_.car(), location_.cdr() + 1);
+		//bounds check?
 	}
 
 	public void up() {
-		// TODO Auto-generated method stub
-
+		location_ = new IntPair(location_.car() - 1, location_.cdr());
+		//bounds check?
 	}
 
-	public IntPair getLocation_() {
+	public IntPair getLocation() {
 		return location_;
 	}
 
-	public void setLocation_(IntPair location_) {
-		this.location_ = location_;
+	public void setLocation(IntPair location) {
+		this.location_ = location;
 	}
 
 }
