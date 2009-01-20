@@ -5,6 +5,9 @@
  * @author Hamilton Turner
  * @date Jan 14, 2009
  * 
+ * @updated David Leinweber 
+ * @date Jan 20, 2009
+ * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License. 
@@ -25,24 +28,29 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 
-public class BasicWindow extends JFrame implements ActionListener {
+public class BasicWindow extends JFrame {
 
 	private Container contentPane_;
+	private BasicWindowModel model_;
+	
 	public BasicWindow (){
-		this("Window",Color.gray);
+		this("Window",Color.gray,new BasicWindowModel());
 	}
 
-	public BasicWindow (String title, Color background)
+	public BasicWindow (String title, Color background, BasicWindowModel model)
 	{
 		super();
 		contentPane_ = getContentPane();
 		
+		model_ = model;
+		
 		setSize(300, 300);
 		setTitle(title);
 		
+		BasicWindowController controller = new BasicWindowController(this, model);
 		
 		JButton toggle = new JButton("Change BG Color");
-		toggle.addActionListener(this);
+		toggle.addActionListener(controller);
 		
 		contentPane_.setBackground(background);
 		contentPane_.setLayout(new FlowLayout());
@@ -50,12 +58,5 @@ public class BasicWindow extends JFrame implements ActionListener {
 		contentPane_.add(toggle);
 				
 		addWindowListener(new WindowDestroyer());		
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		if (contentPane_.getBackground() == Color.gray)
-			contentPane_.setBackground(Color.red);
-		else
-			contentPane_.setBackground(Color.gray);
 	}
 }
