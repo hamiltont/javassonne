@@ -23,11 +23,16 @@ public interface TileBoard {
 	//Returns "home" square - the tile the game began with.
 	public TileBoardIterator homeTile();
 	
-	//Adds tile to the specified TileContainerIterator location
+	//Adds tile to the specified TileBoardIterator location
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception;
+	//TODO: implement Exception
 	
-	//Removes tile from the specified TileContainerIterator location
+	//Removes tile from the specified TileBoardIterator location
 	public Tile removeTile(TileBoardIterator iter);
+
+	//Returns tile at specified TileBoardIterator location
+	//without removing Tile from the Board
+	public Tile getTile(TileBoardIterator iter);
 	
 	
 }

@@ -18,13 +18,13 @@
 
 package org.javassonne.model;
 
+public class TileBoardIterator {
 
-public class TileBoardIterator  {
-	
-	private TileMapBoard data_;
+	private TileBoard data_;
 	private IntPair location_;
+	private IntPair previousLocation_;
 
-	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair ) {
+	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair) {
 		data_ = tileMapContainer;
 		location_ = intPair;
 	}
@@ -34,23 +34,33 @@ public class TileBoardIterator  {
 	}
 
 	public void down() {
+		previousLocation_ = location_;
 		location_ = new IntPair(location_.car() + 1, location_.cdr());
-		//bounds check?
 	}
 
 	public void left() {
+		previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() - 1);
-		//bounds check?
 	}
 
 	public void right() {
+		previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() + 1);
-		//bounds check?
 	}
 
 	public void up() {
+		previousLocation_ = location_;
 		location_ = new IntPair(location_.car() - 1, location_.cdr());
-		//bounds check?
+	}
+
+	// Moves iterator to previous location (history size of 1)
+	public void back() throws Exception {
+		if (previousLocation_ != null) {
+			location_ = previousLocation_;
+			previousLocation_ = null;
+		} else
+			throw new Exception();
+		// TODO: implement Exception
 	}
 
 	public IntPair getLocation() {
@@ -58,7 +68,8 @@ public class TileBoardIterator  {
 	}
 
 	public void setLocation(IntPair location) {
-		this.location_ = location;
+		previousLocation_ = location_;
+		location_ = location;
 	}
 
 }
