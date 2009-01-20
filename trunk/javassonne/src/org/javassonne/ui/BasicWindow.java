@@ -20,49 +20,36 @@
  */
 
 package org.javassonne.ui;
+
 // Needed for Container and Color
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GridLayout;
 
-import javax.swing.*;
-
+import javax.swing.JFrame;
 
 public class BasicWindow extends JFrame {
 
+	private static final String WINDOW_TITLE = "Javassonne";
+	private static final Color WINDOW_BG_COLOR = Color.gray;
+
 	private Container contentPane_;
 	private BasicWindowModel model_;
-	
-	public BasicWindow (){
-		this("Window",Color.gray,new BasicWindowModel());
-	}
+	private BasicWindowController controller_;
 
-	public BasicWindow (String title, Color background, BasicWindowModel model)
-	{
+	public BasicWindow(BasicWindowModel model, BasicWindowController controller) {
+		// Do initialization for JFrame
 		super();
-		contentPane_ = getContentPane();
-		
-		model_ = model;
-		
-		setSize(300, 300);
-		setTitle(title);
-		
-		BasicWindowController controller = new BasicWindowController(this, model);
-		
-		// add worldCanvas
-		WorldCanvas c = new WorldCanvas();
-		c.setSize(300, 300);
-		contentPane_.add(c);
 
-		// add button
-		JButton toggle = new JButton("Change BG Color");
-		toggle.addActionListener(controller);
-		
-		contentPane_.setBackground(background);
-		contentPane_.setLayout(new FlowLayout());
-		
-		contentPane_.add(toggle);
-				
-		addWindowListener(new WindowDestroyer());		
+		// Syntax hack
+		contentPane_ = getContentPane();
+
+		controller_ = controller;
+		model_ = model;
+		setTitle(WINDOW_TITLE);
+		contentPane_.setBackground(WINDOW_BG_COLOR);
+
+		// Set up the layout of the window
+		contentPane_.setLayout(new GridLayout());
 	}
 }

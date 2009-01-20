@@ -22,7 +22,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileSerializer;
