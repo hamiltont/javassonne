@@ -18,8 +18,14 @@
 
 package org.javassonne.model;
 
-import com.thoughtworks.xstream.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.thoughtworks.xstream.XStream;
 
 public class TileSerializer {
 
@@ -33,6 +39,10 @@ public class TileSerializer {
 		xstream.alias("Tile", Tile.class);
 		xstream.alias("TileSet", TileSet.class);
 		xstream.alias("TileFeature",TileFeature.class);
+		
+		// we don't want to serialize the images that have been cached in the tiles.
+		// These are stored separately in a folder full of JPEGs.
+		xstream.omitField(Tile.class, "image_");
 	}
 	
 	// load the tile set from a file path
