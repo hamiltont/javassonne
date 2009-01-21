@@ -28,19 +28,24 @@ import org.javassonne.model.TileBoardIterator;
 
 public class WorldCanvas extends Canvas {
 	private TileBoard board_;
+	private Graphics2D canvas_;
 
 	public WorldCanvas(TileBoard board) {
 		board_ = board;
 	}
 
 	public void paint(Graphics g) {
-		Graphics2D g2;
-
-		g2 = (Graphics2D) g;
+		canvas_ = (Graphics2D) g;
 		TileBoardIterator iter = board_.homeTile();
-
-		g2.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300,
-				300, null);
+		
+		//*This OLD code below works*
+		//TileSerializer s = new TileSerializer();
+		//TileSet set = s.loadTileSet("tilesets/standard.xml");
+		//Tile t = set.tileWithUniqueIdentifier("tile_standard_1");
+		//canvas_.drawImage(t.getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
+		
+		//*This NEW code that uses the iterator doesn't*
+		//canvas_.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
 	}
 
 	public void redraw() {
