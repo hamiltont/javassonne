@@ -16,14 +16,14 @@
  *  permissions and limitations under the License. 
  */
 
-package javassonne.src.org.javassonne.UIcontrol;
+package org.javassonne.UIcontrol;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoadGame implements ActionListener {
-	
+
 	public void actionPerformed(ActionEvent e) {
-    	/* Load a existing game here*/
+		/* Load a existing game here */
 	}
 }

@@ -31,7 +31,9 @@ public class SwingDemos {
 		
 		// Load all possible tiles
 		TileSerializer s = new TileSerializer();
+		
 		TileSet set = s.loadTileSet("tilesets/standard.xml");
+		set.setTileImagesFolder("tilesets/standard");
 		
 		// Populate the set into the deck
 		// 	Note: you can have multiple copies of a tile in a deck,
@@ -48,7 +50,7 @@ public class SwingDemos {
 			try{
 				model.addTile(iter.right(), deck.popRandomTile());
 			} catch (Exception e) {}
-		}	
+		}
 		
 		
 		GameWindow view = new GameWindow(model);
