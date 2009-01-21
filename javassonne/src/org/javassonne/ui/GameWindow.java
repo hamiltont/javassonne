@@ -59,6 +59,9 @@ public class GameWindow extends JFrame {
 		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
 		
 		setVisible(true);
+		
+		// CHANGE THIS!
+		addWindowListener(new WindowDestroyer());
 	}
 
 	public void update() {
