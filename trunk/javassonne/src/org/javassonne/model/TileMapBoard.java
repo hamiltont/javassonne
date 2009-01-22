@@ -74,11 +74,11 @@ public class TileMapBoard implements TileBoard {
 	}
 
 	public TileBoardIterator getLowerRightCorner() {
-		return new TileBoardIterator(upperLeft_);
+		return new TileBoardIterator(lowerRight_);
 	}
 
 	public TileBoardIterator getUpperLeftCorner() {
-		return new TileBoardIterator(lowerRight_);
+		return new TileBoardIterator(upperLeft_);
 	}
 
 }

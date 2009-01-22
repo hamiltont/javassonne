@@ -46,10 +46,10 @@ public class WorldCanvas extends Canvas {
 		// get the starting tile
 		TileBoardIterator iter = board_.homeTile();
 		BufferedImage tileImage = iter.current().getImage();
-		
+
 		// get the dimensions of the tile image.
-		int tileWidth = (int)(tileImage.getWidth() * scale_);
-		int tileHeight = (int)(tileImage.getHeight() * scale_);
+		int tileWidth = (int) (tileImage.getWidth() * scale_);
+		int tileHeight = (int) (tileImage.getHeight() * scale_);
 
 		// Compute how many rows and columns are visible. We add 1 so that
 		// tiles are drawn right up to the edge of the screen at the edges.
@@ -57,33 +57,37 @@ public class WorldCanvas extends Canvas {
 		int cols = this.getWidth() / tileWidth + 1;
 
 		System.out.println(rows);
-		
+
 		for (int k = 0; k < rows; k++)
 			canvas_.drawLine(0, k * tileHeight, tileWidth, k * tileHeight);
 
 		for (int k = 0; k < cols; k++)
 			canvas_.drawLine(k * tileWidth, 0, k * tileWidth, tileHeight);
 
-		// Place tile images by iterating through the board and wrapping when we reach
+		// Place tile images by iterating through the board and wrapping when we
+		// reach
 		// the end of a row.
 		try {
 			int i, x, y;
 			i = x = y = 0;
-			while (i < (rows * cols) && (iter.current() != null || iter.nextRow() != null)) {
+			while (i < (rows * cols)
+					&& (iter.current() != null || iter.nextRow() != null)) {
 				i++;
 				if (iter.current() != null) {
 					canvas_.drawImage(iter.current().getImage(), x, y,
 							tileWidth, tileHeight, null);
 				}
-
-				iter.right();
 				x += tileWidth;
-
 				if (i % cols == 0) {
 					// Next row
 					x = 0;
 					y += tileHeight;
+					iter.nextRow();
 				}
+				iter.right();
+				
+
+				
 			}
 
 		} catch (Exception e) {

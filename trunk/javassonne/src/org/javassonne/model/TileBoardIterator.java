@@ -89,6 +89,7 @@ public class TileBoardIterator {
 
 	// Advances iterator to start of next row
 	public TileBoardIterator nextRow() {
+		previousLocation_ = location_;
 		location_ = new IntPair(location_.car() + 1,
 				data_.getUpperLeftCorner().location_.cdr());
 		return this;
