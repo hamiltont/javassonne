@@ -45,10 +45,10 @@ public class SwingDemos {
 		TileBoard model = new TileMapBoard(deck.popRandomTile());
 		TileBoardIterator iter = model.homeTile();
 		
-		for (int i = 1; i < 70; i++){
+		for (int i = 2; i < 70; i++){
 			try{
 				model.addTile(iter.right(), deck.popRandomTile());
-				if (i%8 == 0){ iter.nextRow();}
+				if (i%3 == 0){ iter.nextRow();}
 			} catch (Exception e) {}
 		}
 		
