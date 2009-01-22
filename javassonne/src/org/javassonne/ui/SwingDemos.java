@@ -48,7 +48,7 @@ public class SwingDemos {
 		for (int i = 1; i < 70; i++){
 			try{
 				model.addTile(iter.right(), deck.popRandomTile());
-				//if (i%8 == 0){ iter.nextRow();}
+				if (i%8 == 0){ iter.nextRow();}
 			} catch (Exception e) {}
 		}
 		
