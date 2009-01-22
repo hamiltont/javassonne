@@ -50,13 +50,13 @@ public class TileMapBoard implements TileBoard {
 		{
 			data_.put(iter.getLocation(), tile);
 			//Check for bounds extension
-			if (iter.getLocation().first() == upperLeft_.getLocation().first())
+			if (iter.getLocation().car() == upperLeft_.getLocation().car())
 				upperLeft_.up();
-			else if (iter.getLocation().second() == upperLeft_.getLocation().second())
+			else if (iter.getLocation().cdr() == upperLeft_.getLocation().cdr())
 				upperLeft_.left();
-			else if (iter.getLocation().first() == lowerRight_.getLocation().first())
+			else if (iter.getLocation().car() == lowerRight_.getLocation().car())
 				lowerRight_.down();
-			else if (iter.getLocation().second() == lowerRight_.getLocation().second())
+			else if (iter.getLocation().cdr() == lowerRight_.getLocation().cdr())
 				lowerRight_.right();
 		}
 	}
@@ -69,8 +69,8 @@ public class TileMapBoard implements TileBoard {
 	}
 */
 	// Returns Tile at iter location, maintaining it in Container
-	public Tile getTile(IntPair location) {
-		return data_.get(location());
+	public Tile getTile(TileBoardIterator iter) {
+		return data_.get(iter.getLocation());
 	}
 
 	public TileBoardIterator getLowerRightCorner() {
