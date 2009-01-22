@@ -71,8 +71,8 @@ public class WorldCanvas extends Canvas {
 			int i, x, y;
 			i = x = y = 0;
 			while (i < (rows * cols)
-					&& (iter.current() != null || iter.nextRow() != null)) {
-				i++;
+					//&& (iter.current() != null || iter.nextRow() != null)) {
+				){i++;
 				if (iter.current() != null) {
 					canvas_.drawImage(iter.current().getImage(), x, y,
 							tileWidth, tileHeight, null);
