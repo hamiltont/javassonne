@@ -21,29 +21,48 @@ package org.javassonne.ui;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ControlPanel extends JPanel {
-	
+
 	private JButton newGameButton_;
 	private JButton loadGameButton_;
 	private JButton exitGameButton_;
-	
+	private JButton zoomInButton_;
+	private JButton zoomOutButton_;
+
 	public ControlPanel() {
 		setVisible(true);
 
 		newGameButton_ = new JButton("New Game");
 		loadGameButton_ = new JButton("Load Game");
 		exitGameButton_ = new JButton("Exit Game");
-		
+
+		zoomInButton_ = new JButton("Zoom In");
+		zoomOutButton_ = new JButton("Zoom Out");
+
 		newGameButton_.setActionCommand("new_game");
 		loadGameButton_.setActionCommand("load_game");
 		exitGameButton_.setActionCommand("exit_game");
-		
-		
+
 		add(newGameButton_);
 		add(loadGameButton_);
 		add(exitGameButton_);
+		
+		add(new JLabel("                    "));
+		add(new JLabel("                    "));
+		add(zoomInButton_);
+		add(zoomOutButton_);
+		add(new JLabel("                    "));
+		add(new JLabel("                    "));
+		
+		add(new JButton("Pan Up"));
+		add(new JButton("Pan Down"));
+		add(new JButton("Pan Left"));
+		add(new JButton("Pan Right"));
+		
+
 	}
 
 	public void setActionListener(ActionListener listener) {
@@ -51,7 +70,7 @@ public class ControlPanel extends JPanel {
 		loadGameButton_.addActionListener(listener);
 		exitGameButton_.addActionListener(listener);
 	}
-	
+
 	public void redraw() {
 		// re-read the model
 	}
