@@ -23,8 +23,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 
+import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
+import org.javassonne.model.TileSerializer;
+import org.javassonne.model.TileSet;
 
 public class WorldCanvas extends Canvas {
 	private TileBoard board_;
@@ -37,16 +40,13 @@ public class WorldCanvas extends Canvas {
 	public void paint(Graphics g) {
 		canvas_ = (Graphics2D) g;
 		TileBoardIterator iter = board_.homeTile();
-		
-		//*This OLD code below works*
-		//TileSerializer s = new TileSerializer();
-		//TileSet set = s.loadTileSet("tilesets/standard.xml");
-		//Tile t = set.tileWithUniqueIdentifier("tile_standard_1");
-		//canvas_.drawImage(t.getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
-		
-		//*This NEW code that uses the iterator doesn't*
-		//canvas_.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
-		
+
+		try {
+			canvas_.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Error displaying the home tile image.");
+		}
 
 	    int width = getSize().width;
 	    int height = getSize().height;
