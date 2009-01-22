@@ -23,48 +23,66 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 
-import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
-import org.javassonne.model.TileSerializer;
-import org.javassonne.model.TileSet;
 
 public class WorldCanvas extends Canvas {
 	private TileBoard board_;
 	private Graphics2D canvas_;
-
+	private int tileHeight_;
+	private int tileWidth_;
+	private int rows_ =8;
+	private int cols_ =8;
+	
 	public WorldCanvas(TileBoard board) {
 		board_ = board;
 	}
 
 	public void paint(Graphics g) {
 		canvas_ = (Graphics2D) g;
+		redraw();
+	}
+	
+	// Redraw the board
+	public void redraw() {
 		TileBoardIterator iter = board_.homeTile();
-
-		try {
-			canvas_.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
-		}catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("Error displaying the home tile image.");
-		}
-
+		
+		// Draw grid lines
 	    int width = getSize().width;
 	    int height = getSize().height;
 
-	    int rows = 8;
-	    int htOfRow = height / rows;
-	    for (int k = 0; k < rows; k++)
-	    	canvas_.drawLine(0, k * htOfRow , width, k * htOfRow );
+	    tileHeight_ = height / rows_;
+	    tileWidth_ = width  / cols_;
 	    
-	    int columns = 8;
-	    int wdOfRow = width / (columns);
-	    for (int k = 0; k < columns; k++)
-	    	canvas_.drawLine(k*wdOfRow , 0, k*wdOfRow , height);
+	    for (int k = 0; k < rows_; k++)
+	    	canvas_.drawLine(0, k * tileHeight_ , width, k * tileHeight_ );
 	    
-	}
-
-	public void redraw() {
-		// Redraw the board
+	    for (int k = 0; k < cols_; k++)
+	    	canvas_.drawLine(k*tileWidth_ , 0, k*tileWidth_ , height);
+	    
+	    //Place tile images
+		try {
+			int i,x,y;
+			i=x=y=0;
+			while(i < (cols_*rows_) && (iter.current() != null || iter.nextRow() != null )){
+				i++;
+				if(iter.current() != null){
+					canvas_.drawImage(iter.current().getImage(),x,y,tileWidth_,tileHeight_,null);
+				}
+				
+				iter.right();
+				x += tileWidth_;
+				
+				if(i%cols_==0){
+					//Next row
+					x=0;
+					y += tileHeight_;
+				}
+			}
+			
+		}catch (Exception e) {
+			System.out.println("Error displaying a tile image.");
+		}
 	}
 
 	public void setActionListener(ActionListener a) {
