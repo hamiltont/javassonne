@@ -1,3 +1,8 @@
+#labels Featured
 = Downloading, and running =
 
-Download the jar file to a location on your computer, and double click it. If you have the current JRE installed for your machine, the app will run and display correctly. 
+Download the zip file from the downloads section of the Javassonne site to a location on your computer. Double-click it to uncompress the download, and then double-click "Javassonne.jar" to test the file. 
+
+If you have the current JRE installed for your machine, the app will run and display correctly.
+
+Please post any issues to the [http://code.google.com/p/javassonne/issues/list Issues] section of the site.
