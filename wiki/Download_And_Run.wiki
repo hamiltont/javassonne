@@ -1,0 +1,3 @@
+= Downloading, and running =
+
+Download the jar file to a location on your computer, and double click it. If you have the current JRE installed for your machine, the app will run and display correctly. 
