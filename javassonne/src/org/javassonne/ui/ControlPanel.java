@@ -30,17 +30,26 @@ public class ControlPanel extends JPanel {
 	private JButton exitGameButton_;
 	
 	public ControlPanel() {
-		setSize(300, 150);
 		setVisible(true);
 
 		newGameButton_ = new JButton("New Game");
 		loadGameButton_ = new JButton("Load Game");
 		exitGameButton_ = new JButton("Exit Game");
+		
+		newGameButton_.setActionCommand("new_game");
+		loadGameButton_.setActionCommand("load_game");
+		exitGameButton_.setActionCommand("exit_game");
+		
+		
+		add(newGameButton_);
+		add(loadGameButton_);
+		add(exitGameButton_);
 	}
 
 	public void setActionListener(ActionListener listener) {
 		newGameButton_.addActionListener(listener);
 		loadGameButton_.addActionListener(listener);
+		exitGameButton_.addActionListener(listener);
 	}
 	
 	public void redraw() {

@@ -24,19 +24,19 @@ package org.javassonnetests;
 import org.javassonne.*;
 
 
-
+/*
 public class UiWindowTest{
 	
 }
 
 public static void main(String args[]){
-	GameWindow newGameWindow = new GameWindow();
+	//GameWindow newGameWindow = new GameWindow();
 	
 }
 
 
 
-
+*/
 
 
 

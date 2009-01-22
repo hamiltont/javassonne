@@ -46,6 +46,21 @@ public class WorldCanvas extends Canvas {
 		
 		//*This NEW code that uses the iterator doesn't*
 		//canvas_.drawImage(iter.current().getImage(), 0, 0, 300, 300, 50, 50, 300, 300, null);
+		
+
+	    int width = getSize().width;
+	    int height = getSize().height;
+
+	    int rows = 8;
+	    int htOfRow = height / rows;
+	    for (int k = 0; k < rows; k++)
+	    	canvas_.drawLine(0, k * htOfRow , width, k * htOfRow );
+	    
+	    int columns = 8;
+	    int wdOfRow = width / (columns);
+	    for (int k = 0; k < columns; k++)
+	    	canvas_.drawLine(k*wdOfRow , 0, k*wdOfRow , height);
+	    
 	}
 
 	public void redraw() {

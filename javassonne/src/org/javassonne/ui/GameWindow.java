@@ -24,6 +24,9 @@ package org.javassonne.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 
@@ -41,9 +44,9 @@ public class GameWindow extends JFrame {
 	private ControlPanel controlPanel_;
 
 	public GameWindow(TileBoard model) {
-		// Do initialization for JFrame
+		// Do JFrame initialization
 		super();
-
+		
 		// Syntax hack
 		contentPane_ = getContentPane();
 
@@ -58,10 +61,28 @@ public class GameWindow extends JFrame {
 		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
 		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
 		
+		// Remove the border
+		setUndecorated(true);
+		
+		// Switching to full screen mode
+		GraphicsEnvironment.getLocalGraphicsEnvironment().
+			getDefaultScreenDevice().setFullScreenWindow(this);
+		
+		
+		
+		setSize(getWidth(), getHeight());
 		setVisible(true);
 		
-		// CHANGE THIS!
-		addWindowListener(new WindowDestroyer());
+		
+		// Exiting the program on mouse click
+		addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) { System.exit(0); }
+			public void mousePressed(MouseEvent e) {}
+			public void mouseReleased(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseExited(MouseEvent e) {}
+		}
+		);
 	}
 
 	public void update() {
