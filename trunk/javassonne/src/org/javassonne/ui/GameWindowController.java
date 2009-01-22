@@ -36,5 +36,9 @@ public class GameWindowController implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// Must handle actions from both WorldCanvas, and from
 		// Control Panel
+		String action = e.getActionCommand();
+		
+		if (action.equals("exit_game"))
+			System.exit(0);
 	}
 }
