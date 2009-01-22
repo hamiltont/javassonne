@@ -41,25 +41,25 @@ public class TileBoardIterator {
 
 	public TileBoardIterator down() {
 		previousLocation_ = location_;
-		location_ = new IntPair(location_.car() + 1, location_.cdr());
+		location_ = new IntPair(location_.first() + 1, location_.second());
 		return this;
 	}
 
 	public TileBoardIterator left() {
 		previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() - 1);
+		location_ = new IntPair(location_.first(), location_.second() - 1);
 		return this;
 	}
 
 	public TileBoardIterator right() {
 		previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() + 1);
+		location_ = new IntPair(location_.first(), location_.second() + 1);
 		return this;
 	}
 
 	public TileBoardIterator up() {
 		previousLocation_ = location_;
-		location_ = new IntPair(location_.car() - 1, location_.cdr());
+		location_ = new IntPair(location_.first() - 1, location_.second());
 		return this;
 	}
 
@@ -79,18 +79,18 @@ public class TileBoardIterator {
 	}
 
 	public boolean outOfBounds() {
-		if (location_.car() < data_.getUpperLeftCorner().location_.car()
-				|| location_.cdr() < data_.getUpperLeftCorner().location_.cdr()
-				|| location_.car() > data_.getUpperLeftCorner().location_.car()
-				|| location_.cdr() > data_.getUpperLeftCorner().location_.cdr())
+		if (location_.first() < data_.getUpperLeftCorner().location_.first()
+				|| location_.second() < data_.getUpperLeftCorner().location_.second()
+				|| location_.first() > data_.getUpperLeftCorner().location_.first()
+				|| location_.second() > data_.getUpperLeftCorner().location_.second())
 			return true;
 		return false;
 	}
 
 	// Advances iterator to start of next row
 	public TileBoardIterator nextRow() {
-		location_ = new IntPair(location_.car() + 1,
-				data_.getUpperLeftCorner().location_.cdr());
+		location_ = new IntPair(location_.first() + 1,
+				data_.getUpperLeftCorner().location_.second());
 		return this;
 	}
 
