@@ -38,16 +38,19 @@ public class IntPair {
 			return false;
 		else {
 			IntPair tmp = (IntPair) obj;
-			if (this.data1_ == tmp.data1_ && this.data2_ == tmp.data2_)
-				return true;
-			else
-				return false;
+			return (this.data1_ == tmp.data1_ && this.data2_ == tmp.data2_);
 		}
 	}
 
 	@Override
+	public int hashCode()
+	{
+		return this.toString().hashCode();
+	}
+	
+	@Override
 	public String toString() {
-		return String.valueOf(this.data1_) + "," + String.valueOf(this.data2_);
+		return String.format("%d,%d", this.data1_, this.data2_);
 	}
 
 	public int car() {
@@ -57,6 +60,7 @@ public class IntPair {
 	public int cdr() {
 		return data2_;
 	}
+
 /*
 	public void car(int data1_) {
 		this.data1_ = data1_;
