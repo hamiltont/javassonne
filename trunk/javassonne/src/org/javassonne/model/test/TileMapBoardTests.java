@@ -20,18 +20,21 @@ package org.javassonne.model.test;
 
 import junit.framework.TestCase;
 
+import org.javassonne.model.Tile;
 import org.javassonne.model.TileMapBoard;
 
 public class TileMapBoardTests extends TestCase {
 
-	//TileMapBoard board_ = new TileMapBoard();
+	TileMapBoard board_;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		
+		Tile homeTile = new Tile();
+		board_ = new TileMapBoard(homeTile);
 	}
 
+	
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
