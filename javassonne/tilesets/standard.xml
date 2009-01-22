@@ -4,8 +4,8 @@
     <Tile>
       <features__>
         <string>R</string>
-        <string>R</string>
         <string>N</string>
+        <string>R</string>
         <string>R</string>
         <string>N</string>
       </features__>
@@ -26,8 +26,8 @@
     <Tile>
       <features__>
         <string>F</string>
-        <string>N</string>
         <string>F</string>
+        <string>N</string>
         <string>N</string>
         <string>N</string>
       </features__>
@@ -70,8 +70,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>R</string>
         <string>FC</string>
+        <string>R</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -114,8 +114,8 @@
     <Tile>
       <features__>
         <string>FC</string>
-        <string>FC</string>
         <string>N</string>
+        <string>FC</string>
         <string>N</string>
         <string>N</string>
       </features__>
@@ -136,8 +136,8 @@
     <Tile>
       <features__>
         <string>F</string>
-        <string>F</string>
         <string>N</string>
+        <string>F</string>
         <string>N</string>
         <string>FM</string>
       </features__>
@@ -246,8 +246,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>FC</string>
         <string>R</string>
+        <string>FC</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -290,8 +290,8 @@
     <Tile>
       <features__>
         <string>F</string>
-        <string>N</string>
         <string>F</string>
+        <string>N</string>
         <string>N</string>
         <string>N</string>
       </features__>
@@ -312,8 +312,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>FC</string>
         <string>N</string>
+        <string>FC</string>
         <string>FC</string>
         <string>N</string>
       </features__>
@@ -356,8 +356,8 @@
     <Tile>
       <features__>
         <string>R</string>
-        <string>FC</string>
         <string>R</string>
+        <string>FC</string>
         <string>R</string>
         <string>N</string>
       </features__>
@@ -378,8 +378,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>N</string>
         <string>R</string>
+        <string>N</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -422,8 +422,8 @@
     <Tile>
       <features__>
         <string>F</string>
-        <string>R</string>
         <string>F</string>
+        <string>R</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -444,8 +444,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>FC</string>
         <string>N</string>
+        <string>FC</string>
         <string>N</string>
         <string>N</string>
       </features__>
@@ -466,8 +466,8 @@
     <Tile>
       <features__>
         <string>R</string>
-        <string>R</string>
         <string>N</string>
+        <string>R</string>
         <string>R</string>
         <string>N</string>
       </features__>
@@ -488,8 +488,8 @@
     <Tile>
       <features__>
         <string>FM</string>
-        <string>R</string>
         <string>F</string>
+        <string>R</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -510,8 +510,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>N</string>
         <string>R</string>
+        <string>N</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -532,8 +532,8 @@
     <Tile>
       <features__>
         <string>R</string>
-        <string>FC</string>
         <string>R</string>
+        <string>FC</string>
         <string>N</string>
         <string>R</string>
       </features__>
@@ -554,8 +554,8 @@
     <Tile>
       <features__>
         <string>FC</string>
-        <string>FC</string>
         <string>N</string>
+        <string>FC</string>
         <string>N</string>
         <string>N</string>
       </features__>
@@ -576,8 +576,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>N</string>
         <string>R</string>
+        <string>N</string>
         <string>R</string>
         <string>R</string>
       </features__>
@@ -598,8 +598,8 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>N</string>
         <string>FC</string>
+        <string>N</string>
         <string>N</string>
         <string>N</string>
       </features__>

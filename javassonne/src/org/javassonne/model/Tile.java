@@ -23,7 +23,7 @@ import java.awt.image.BufferedImage;
 public class Tile {
 
 	public enum Region {
-		Left(0), Right(1), Top(2), Bottom(3), Center(4);
+		Left(0), Top(1), Right(2), Bottom(3), Center(4);
 		private final int index;
 
 		Region(int i) {
@@ -182,6 +182,49 @@ public class Tile {
 						farms_[Quadrant.BottomLeft.index],
 						features_[Region.Bottom.index],
 						farms_[Quadrant.BottomRight.index]);
+	}
+
+	/**
+	 * Rotates the tile left. It modifies the tile image, changes all of the
+	 * features_, farms_ and farmWall_ values, etc...
+	 */
+	public void rotateLeft() {
+		this.rotate(-1);
+	}
+
+	/**
+	 * Rotates the tile right. It modifies the tile image, changes all of the
+	 * features_, farms_ and farmWall_ values, etc...
+	 */
+	public void rotateRight() {
+		this.rotate(1);
+	}
+	
+	private void rotate(int direction) {
+		// move all of the features, farms, and farmWalls one position to the
+		// right by shifting them within their respective arrays
+		for (int i = 0; i < 4; i++){
+			features_[(i + 1) % 4] = features_[i];
+			farms_[(i + 1) % 4] = farms_[i];
+			farmWalls_[(i + 1) % 4] = farmWalls_[i];
+		}
+
+		// rotate our image, if it exists
+		if (image_ != null){
+			int width = image_.getWidth();
+			int height = image_.getHeight();
+			
+			BufferedImage biFlip = new BufferedImage(height, width, image_.getType());
+			
+			for(int i=0; i<width; i++)
+				for(int j=0; j<height; j++)
+					if (direction == 1)
+						biFlip.setRGB(height-1-j, width-1-i, image_.getRGB(i, j));
+					else
+						biFlip.setRGB(j, i, image_.getRGB(i, j));
+			
+			image_ = biFlip;
+		}
 	}
 
 }
