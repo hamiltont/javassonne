@@ -40,15 +40,15 @@ public class SwingDemos {
 		//		  but not in a set 
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
+		deck.addTileSet(set);
 		
 		TileBoard model = new TileMapBoard(deck.popRandomTile());
 		TileBoardIterator iter = model.homeTile();
 		
-		for (int i = 0; i < 3; i++){
-			if (i%3 == 0)
-				iter.nextRow();
+		for (int i = 0; i < 60; i++){
 			try{
 				model.addTile(iter.right(), deck.popRandomTile());
+				if (i%7 == 0){ iter.nextRow();}
 			} catch (Exception e) {}
 		}
 		
