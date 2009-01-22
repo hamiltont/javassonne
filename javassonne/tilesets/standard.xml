@@ -686,4 +686,5 @@
       <actsAsWall>false</actsAsWall>
     </TileFeature>
   </tileFeatures__>
+  <tileImagesFolder__>tilesets/standard/</tileImagesFolder__>
 </TileSet>

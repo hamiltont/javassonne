@@ -44,7 +44,7 @@ public class TileMapBoard implements TileBoard {
 	// Adds Tile at iter location
 	// Throws to-be-implemented exception if position is filled
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception {
-		if (!positionFilled(iter))
+		if (positionFilled(iter))
 			throw new Exception();
 		else
 		{
