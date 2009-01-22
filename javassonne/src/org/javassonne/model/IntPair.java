@@ -19,17 +19,17 @@
 package org.javassonne.model;
 
 public class IntPair {
-	private int data1_;
-	private int data2_;
+	private int first_;
+	private int second_;
 
 	IntPair(int first, int second) {
-		data1_ = first;
-		data2_ = second;
+		first_ = first;
+		second_ = second;
 	}
 
 	IntPair(IntPair old) {
-		data1_ = old.data1_;
-		data2_ = old.data2_;
+		first_ = old.first_;
+		second_ = old.second_;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class IntPair {
 			return false;
 		else {
 			IntPair tmp = (IntPair) obj;
-			return (this.data1_ == tmp.data1_ && this.data2_ == tmp.data2_);
+			return (this.first_ == tmp.first_ && this.second_ == tmp.second_);
 		}
 	}
 
@@ -50,15 +50,15 @@ public class IntPair {
 	
 	@Override
 	public String toString() {
-		return String.format("%d,%d", this.data1_, this.data2_);
+		return String.format("%d,%d", this.first_, this.second_);
 	}
 
-	public int car() {
-		return data1_;
+	public int first() {
+		return first_;
 	}
 	
-	public int cdr() {
-		return data2_;
+	public int second() {
+		return second_;
 	}
 
 /*
