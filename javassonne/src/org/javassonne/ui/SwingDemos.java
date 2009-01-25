@@ -35,7 +35,10 @@ public class SwingDemos {
 		TileSerializer s = new TileSerializer();
 		
 		TileSet set = s.loadTileSet("tilesets/standard.xml");
-		set.setTileImagesFolder("tilesets/standard");
+		if (set == null){
+			System.err.println("Tile set could not be found.");
+			System.exit(0);
+		}
 		
 		// Populate the set into the deck
 		// 	Note: you can have multiple copies of a tile in a deck,
