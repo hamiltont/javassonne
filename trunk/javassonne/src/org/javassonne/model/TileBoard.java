@@ -20,10 +20,16 @@ package org.javassonne.model;
 
 public interface TileBoard {
 
-	//Returns "home" square - the tile the game began with.
+	/**
+	 * @return - TileBoardIterator pointing to "home" square - the tile the game began with.
+	 */
 	public TileBoardIterator homeTile();
 	
-	//Adds tile to the specified TileBoardIterator location
+	/**
+	 * @param iter - where tile will be inserted in TileBoard
+	 * @param tile - what will be inserted in TileBoard
+	 * @throws Exception - thrown if iter position is filled
+	 */
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception;
 	//TODO: implement Exception
 	
@@ -31,14 +37,20 @@ public interface TileBoard {
 	//Removes tile from the specified TileBoardIterator location
 	//public Tile removeTile(TileBoardIterator iter);
 
-	//Returns tile at specified TileBoardIterator location
-	//without removing Tile from the Board
+	/**
+	 * @param iter - where to grab a tile
+	 * @return - Tile at iter location (or null)
+	 */
 	public Tile getTile(TileBoardIterator iter);
 	
-	//Returns upper left corner iterator
+	/**
+	 * @return - TileBoardIterator pointing to upper left corner of board
+	 */
 	public TileBoardIterator getUpperLeftCorner();
 	
-	//Returns lower right corner iterator
+	/**
+	 * @return - TileBoardIterator pointing to lower right corner of board
+	 */
 	public TileBoardIterator getLowerRightCorner();
 	
 	

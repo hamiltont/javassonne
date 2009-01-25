@@ -20,16 +20,34 @@ package org.javassonne.model;
 
 public interface TileBoardIterator {
 
+	/**
+	 * @return - Tile iterator current points to
+	 */
 	public abstract Tile current();
 	
+	/**
+	 * @return - reference to itself moved right in board
+	 */
 	public abstract TileBoardIterator right();
 	
+	/**
+	 * @return - reference to itself moved to start of next row
+	 */
 	public abstract TileBoardIterator nextRow();
 
+	/**
+	 * @return - IntPair denoting coordinates of current() in board
+	 */
 	public abstract IntPair getLocation();
 	
+	/**
+	 * @return - reference to TileBoard TileBoardIterator belongs to
+	 */
 	public abstract TileBoard getData();
 
+	/**
+	 * @return - true if TileBoardIterator is out of the bounds of the TileBoard
+	 */
 	public abstract boolean outOfBounds();
 
 }

@@ -22,16 +22,26 @@ public class IntPair {
 	private int data1_;
 	private int data2_;
 
+	/**
+	 * @param first - first integer
+	 * @param second - second integer
+	 */
 	IntPair(int first, int second) {
 		data1_ = first;
 		data2_ = second;
 	}
 
+	/**
+	 * @param old - IntPair to copy
+	 */
 	IntPair(IntPair old) {
 		data1_ = old.data1_;
 		data2_ = old.data2_;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof IntPair))
@@ -42,32 +52,35 @@ public class IntPair {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return this.toString().hashCode();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return String.format("%d,%d", this.data1_, this.data2_);
 	}
 
+	/**
+	 * @return - first integer
+	 */
 	public int car() {
 		return data1_;
 	}
 	
+	/**
+	 * @return - second integer
+	 */
 	public int cdr() {
 		return data2_;
 	}
 
-/*
-	public void car(int data1_) {
-		this.data1_ = data1_;
-	}
-
-	public void cdr(int data2_) {
-		this.data2_ = data2_;
-	}
-*/
 }
