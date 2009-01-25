@@ -25,17 +25,18 @@ import javax.swing.JPanel;
 
 public class JImagePanel extends JPanel {
 	BufferedImage image_;
+	int width_;
+	int height_;
 
-	public JImagePanel(BufferedImage image) {
-		this.image_ = image;
+	public JImagePanel(BufferedImage image,int width, int height) {
+		image_ = image;
+		width_ = width;
+		height_ = height;
 	}
 
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		// Center the image
-		int x = (getWidth() - image_.getWidth()) / 2;
-		int y = (getHeight() - image_.getHeight()) / 2;
-		this.setSize(image_.getWidth(), image_.getHeight());
-		g.drawImage(image_,x,y,null);
+		this.setSize(width_,height_);
+		g.drawImage(image_,0,0,width_,height_,null);
 	}
 }
