@@ -26,16 +26,17 @@ import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JPanel;
-
-import org.javassonne.ui.WorldCanvas;
 
 /**
  * Holds all information needed to draw the palette layer on the WorldCanvas
  */
-class PaletteLayer extends JPanel implements MouseListener {
+class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener {
 	private Graphics layer_;
 	private Rectangle2D navTopLeft_;
 	private Rectangle2D navTopRight_;
@@ -43,7 +44,8 @@ class PaletteLayer extends JPanel implements MouseListener {
 	private Rectangle2D navBottomRight_;
 	private WorldCanvas mapController_;
 	private Dimension screenSize_; // Used to maintain this class' size
-
+	private Timer mapShiftTimer_;
+	
 	/**
 	 * Constructor
 	 * @param screenSize
@@ -60,14 +62,16 @@ class PaletteLayer extends JPanel implements MouseListener {
 		int height = screenSize_.height;
 
 		mapController_ = mapController;
-
+		mapShiftTimer_ = null;
+		
 		navTopLeft_ = new Rectangle2D.Double(0, 0, 40, 40);
 		navTopRight_ = new Rectangle2D.Double(width - 40, 0, 50, 50);
 		navBottomLeft_ = new Rectangle2D.Double(0, height - 40, 40, 40);
 		navBottomRight_ = new Rectangle2D.Double(width - 40, height - 40,
 				40, 40);
-
-		addMouseListener(this);
+		
+		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
 	}
 
 	/**
@@ -101,40 +105,79 @@ class PaletteLayer extends JPanel implements MouseListener {
 	 * @param a
 	 *            The ActionListener events should be sent to
 	 */
+	
 	public void setActionListener(ActionListener a) {
 		// Register event listener
 	}
 	
-	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseDragged(MouseEvent e){
+	}
+	
+	public void mouseReleased(MouseEvent e)
+	{
+	}
+	
+	public void mousePressed(MouseEvent e)
+	{
+	}
+	
+	public void mouseClicked(MouseEvent e)
+	{
+	}
+	
+	public void mouseEntered(MouseEvent e)
+	{
+	}
+	
+	public void mouseExited(MouseEvent e)
+	{
+	}
+	
+	public void mouseMoved(MouseEvent e)
+	{
 		Point current = e.getPoint();
-		int offset = 8;
+		Point offset = null;
+		
+		int delta = 2;
 
-		// Figure out if the click was on any of the 
-		// 		nav buttons, and handle it appropriately
+		// are we inside one of the directional containers?
 		if (navBottomRight_.contains(current))
-			mapController_.shiftView(new Point(offset, offset));
+			offset = new Point(delta, delta);
 		else if (navBottomLeft_.contains(current))
-			mapController_.shiftView(new Point(-offset, offset));
+			offset = new Point(-delta, delta);
 		else if (navTopRight_.contains(current))
-			mapController_.shiftView(new Point(offset, -offset));
+			offset = new Point(delta, -delta);
 		else if (navTopLeft_.contains(current))
-			mapController_.shiftView(new Point(-offset, -offset));
-	}
+			offset = new Point(-delta, -delta);
 
-	@Override
-	public void mouseExited(MouseEvent e) {
+		// if we are within a container and we're not scrolling, create a 
+		// task to fire the "shift" event over and over again, until we leave the container
+		if (offset != null){
+			if (mapShiftTimer_ == null)
+			{
+				ShiftTask task = new ShiftTask();
+				task.setOffset(offset);
+				
+				mapShiftTimer_ = new Timer();
+				mapShiftTimer_.schedule(task, 0, 2);
+			}
+		} else if (mapShiftTimer_ != null){
+			// if we have left a directional container and the timer still exists,
+			// cancel it so we stop sending "shift" events to the map view.
+			mapShiftTimer_.cancel();
+			mapShiftTimer_ = null;
+		}
 	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-	}
+	
+	class ShiftTask extends TimerTask {
+		private Point p_;
+		public void setOffset(Point p)
+		{
+			this.p_ = p;
+		}
+	    
+		public void run() {
+	    	mapController_.shiftView(this.p_);
+	    }
+	  }
 }
