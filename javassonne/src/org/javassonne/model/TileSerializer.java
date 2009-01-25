@@ -28,13 +28,13 @@ import java.io.IOException;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * @author bengotow The TileSerializer is a general purpose class for reading
- *         and writing TileSets to disk. It uses the XStream library to
- *         automatically serialize Java objects, so it is not necessary to
- *         directly work with XML. The TileSerializer should always be used to
- *         load tile sets, because its underlying implementation may be changed
- *         in the future.
+ * The TileSerializer is a general purpose class for reading and writing
+ * TileSets to disk. It uses the XStream library to automatically serialize Java
+ * objects, so it is not necessary to directly work with XML. The TileSerializer
+ * should always be used to load tile sets, because its underlying
+ * implementation may be changed in the future.
  * 
+ * @author bengotow
  */
 public class TileSerializer {
 

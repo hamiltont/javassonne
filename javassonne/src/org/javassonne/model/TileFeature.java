@@ -1,13 +1,13 @@
 package org.javassonne.model;
 
 /**
- * @author bengotow The TileFeature class is used to represent foreground items
- *         in the game. These include roads, forts, cloisters, etc... It is a
- *         relatively simple container class and leaves the user responsible for
- *         interpreting it's properties. Each tile has five regions for
- *         tile features, and the TileSet maintains an array of possible tile
- *         features.
+ * The TileFeature class is used to represent foreground items in the game.
+ * These include roads, forts, cloisters, etc... It is a relatively simple
+ * container class and leaves the user responsible for interpreting it's
+ * properties. Each tile has five regions for tile features, and the TileSet
+ * maintains an array of possible tile features.
  * 
+ * @author bengotow
  */
 public class TileFeature {
 	public String name;
