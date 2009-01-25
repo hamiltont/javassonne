@@ -24,9 +24,8 @@ package org.javassonne.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 
@@ -54,13 +53,6 @@ public class GameWindow extends JFrame {
 		setTitle(WINDOW_TITLE);
 		contentPane_.setBackground(WINDOW_BG_COLOR);
 
-		// Set up the layout of the window
-		contentPane_.setLayout(new BorderLayout());
-		worldCanvas_ = new WorldCanvas(boardModel_);
-		controlPanel_ = new ControlPanel();
-		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
-		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
-		
 		// Remove the border
 		setUndecorated(true);
 		
@@ -69,33 +61,41 @@ public class GameWindow extends JFrame {
 			getDefaultScreenDevice().setFullScreenWindow(this);
 		
 		
-		
-		setSize(getWidth(), getHeight());
+		// We need to force the control panel to render, so 
+		//		we can get the height
+		// perhaps I could use controlPanel_.pack here instead?
+		contentPane_.setLayout(new BorderLayout());
+		controlPanel_ = new ControlPanel();
+		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
 		setVisible(true);
 		
+		// Set up the layout of the window
 		
-		// Exiting the program on mouse click
-		addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) { System.exit(0); }
-			public void mousePressed(MouseEvent e) {}
-			public void mouseReleased(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-		}
-		);
+		int controlPanelHeight = controlPanel_.getHeight();
+		int height = getHeight() - controlPanelHeight;
+		int width = getWidth();
+		worldCanvas_ = new WorldCanvas(boardModel_, new Dimension(width, height));
+		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
+		
+		setSize(getWidth(), getHeight());
+		
+		// Force a redraw to show the new components
+		setVisible(false);
+		setVisible(true);
 	}
 
 	public void update() {
 		// Pass the update on to the sub views
 		worldCanvas_.redraw();
 		controlPanel_.redraw();
+		
 	}
 	
 	public void setController(GameWindowController controller) {
 		controller_ = controller;
 		
 		// Add action listeners
-		worldCanvas_.setActionListener(controller);
+		worldCanvas_.setDefaultActionListener(controller);
 		controlPanel_.setActionListener(controller);
 	}
 }
