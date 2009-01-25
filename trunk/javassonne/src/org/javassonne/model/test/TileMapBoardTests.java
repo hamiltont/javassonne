@@ -18,8 +18,6 @@
 
 package org.javassonne.model.test;
 
-import junit.framework.TestCase;
-
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileMapBoard;
 

@@ -64,9 +64,6 @@ public class TileSerializer {
 			
 			TileSet set = (TileSet)xstream.fromXML(xml.toString());
 			
-			// We need both the XML, and the images path
-			// So we are cuttting off the '.xml'
-			set.setTileImagesFolder(path.substring(0,path.length()-4));
 			set.loadTileImages();
 			return set;
 
