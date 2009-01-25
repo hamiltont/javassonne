@@ -38,22 +38,25 @@ import javax.swing.JPanel;
  */
 class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener {
 	private Graphics layer_;
-	private Rectangle2D navTopLeft_;
-	private Rectangle2D navTopRight_;
-	private Rectangle2D navBottomLeft_;
-	private Rectangle2D navBottomRight_;
+	private Rectangle2D navLeft_;
+	private Rectangle2D navRight_;
+	private Rectangle2D navTop_;
+	private Rectangle2D navBottom_;
 	private WorldCanvas mapController_;
 	private Dimension screenSize_; // Used to maintain this class' size
+
 	private Timer mapShiftTimer_;
-	
+	private Point mapShift_;
+
 	/**
 	 * Constructor
+	 * 
 	 * @param screenSize
-	 * 				The dimensions of the amount of screen realestate 
-	 * 				alotted to the world canvas
+	 *            The dimensions of the amount of screen realestate alotted to
+	 *            the world canvas
 	 * @param mapController
-	 * 				The interface that allows this class to interact
-	 * 				and request actions on the map
+	 *            The interface that allows this class to interact and request
+	 *            actions on the map
 	 */
 	public PaletteLayer(Dimension screenSize, WorldCanvas mapController) {
 		setOpaque(false);
@@ -63,31 +66,21 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 
 		mapController_ = mapController;
 		mapShiftTimer_ = null;
-		
-		navTopLeft_ = new Rectangle2D.Double(0, 0, 40, 40);
-		navTopRight_ = new Rectangle2D.Double(width - 40, 0, 50, 50);
-		navBottomLeft_ = new Rectangle2D.Double(0, height - 40, 40, 40);
-		navBottomRight_ = new Rectangle2D.Double(width - 40, height - 40,
-				40, 40);
-		
+
+		navLeft_ = new Rectangle2D.Double(0, 0, 40, height);
+		navRight_ = new Rectangle2D.Double(width - 40, 0, 40, height);
+		navTop_ = new Rectangle2D.Double(0, 0, width, 40);
+		navBottom_ = new Rectangle2D.Double(0, height - 40, width, 40);
+
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 	}
 
 	/**
-	 * Override of the default JPanel function to 
-	 * 		render the palette layer controls to the 
-	 * 		world canvas
+	 * Override of the default JPanel function to render the palette layer
+	 * controls to the world canvas
 	 */
 	public void paintComponent(Graphics g) {
-		layer_ = g;
-
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setPaint(Color.GREEN);
-		g2.fill(navTopLeft_);
-		g2.fill(navTopRight_);
-		g2.fill(navBottomLeft_);
-		g2.fill(navBottomRight_);
 	}
 
 	/**
@@ -104,80 +97,81 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 	 * @param a
 	 *            The ActionListener events should be sent to
 	 */
-	
+
 	public void setActionListener(ActionListener a) {
 		// Register event listener
 	}
-	
-	public void mouseDragged(MouseEvent e)
-	{
+
+	public void mouseDragged(MouseEvent e) {
 	}
-	
-	public void mouseReleased(MouseEvent e)
-	{
+
+	public void mouseReleased(MouseEvent e) {
 	}
-	
-	public void mousePressed(MouseEvent e)
-	{
+
+	public void mousePressed(MouseEvent e) {
 	}
-	
-	public void mouseClicked(MouseEvent e)
-	{
+
+	public void mouseClicked(MouseEvent e) {
 	}
-	
-	public void mouseEntered(MouseEvent e)
-	{
+
+	public void mouseEntered(MouseEvent e) {
 	}
-	
-	public void mouseExited(MouseEvent e)
-	{
+
+	public void mouseExited(MouseEvent e) {
 	}
-	
-	public void mouseMoved(MouseEvent e)
-	{
+
+	public void mouseMoved(MouseEvent e) {
 		Point current = e.getPoint();
-		Point offset = null;
-		
-		int delta = 2;
+		int dx = 0;
+		int dy = 0;
+		int delta = 3;
 
 		// are we inside one of the directional containers?
-		if (navBottomRight_.contains(current))
-			offset = new Point(delta, delta);
-		else if (navBottomLeft_.contains(current))
-			offset = new Point(-delta, delta);
-		else if (navTopRight_.contains(current))
-			offset = new Point(delta, -delta);
-		else if (navTopLeft_.contains(current))
-			offset = new Point(-delta, -delta);
+		if (navRight_.contains(current))
+			dx = delta;
+		if (navLeft_.contains(current))
+			dx = -delta;
+		if (navTop_.contains(current))
+			dy = -delta;
+		if (navBottom_.contains(current))
+			dy = delta;
 
-		// if we are within a container and we're not scrolling, create a 
-		// task to fire the "shift" event over and over again, until we leave the container
-		if (offset != null){
-			if (mapShiftTimer_ == null)
-			{
+		// if we are within a container and we're not scrolling, create a
+		// task to fire the "shift" event over and over again, until we leave
+		// the container
+		if ((dx != 0) || (dy != 0)) {
+			Point newShift = new Point(dx, dy);
+
+			if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
 				ShiftTask task = new ShiftTask();
-				task.setOffset(offset);
+				task.setOffset(newShift);
 				
+				mapShift_ = newShift;
+
+				if (mapShiftTimer_ != null)
+					mapShiftTimer_.cancel();
 				mapShiftTimer_ = new Timer();
-				mapShiftTimer_.schedule(task, 0, 2);
+				mapShiftTimer_.schedule(task, 0, 8);
 			}
-		} else if (mapShiftTimer_ != null){
-			// if we have left a directional container and the timer still exists,
-			// cancel it so we stop sending "shift" events to the map view.
+
+		} else if (mapShiftTimer_ != null) {
+			// if we have left a directional container and the timer still
+			// exists, cancel it so we stop sending "shift" events to the map
+			// view.
 			mapShiftTimer_.cancel();
 			mapShiftTimer_ = null;
 		}
 	}
-	
+
 	class ShiftTask extends TimerTask {
 		private Point p_;
-		public void setOffset(Point p)
-		{
+
+		public void setOffset(Point p) {
 			this.p_ = p;
 		}
-	    
+
 		public void run() {
-	    	mapController_.shiftView(this.p_);
-	    }
-	  }
+			mapController_.shiftView(this.p_);
+		}
+	}
 }
