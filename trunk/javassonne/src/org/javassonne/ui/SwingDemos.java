@@ -21,6 +21,7 @@ package org.javassonne.ui;
 import javax.swing.JFrame;
 
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileMapBoard;

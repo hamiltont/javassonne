@@ -23,18 +23,18 @@ import java.util.HashMap;
 public class TileMapBoard implements TileBoard {
 
 	private HashMap<IntPair, Tile> data_;
-	private TileBoardIterator upperLeft_;
-	private TileBoardIterator lowerRight_;
+	private TileBoardGenIterator upperLeft_;
+	private TileBoardGenIterator lowerRight_;
 	
 	public TileMapBoard(Tile homeTile) {
 		data_ = new HashMap<IntPair, Tile>();
-		upperLeft_ = new TileBoardIterator(this, new IntPair(-1, -1));
-		lowerRight_ = new TileBoardIterator(this, new IntPair(1, 1));
+		upperLeft_ = new TileBoardGenIterator(this, new IntPair(-1, -1));
+		lowerRight_ = new TileBoardGenIterator(this, new IntPair(1, 1));
 		data_.put(new IntPair(0,0), homeTile);
 	}
 
 	public TileBoardIterator homeTile() {
-		return new TileBoardIterator(this, new IntPair(0, 0));
+		return new TileBoardGenIterator(this, new IntPair(0, 0));
 	}
 
 	public boolean positionFilled(TileBoardIterator iter) {
@@ -74,11 +74,11 @@ public class TileMapBoard implements TileBoard {
 	}
 
 	public TileBoardIterator getLowerRightCorner() {
-		return new TileBoardIterator(lowerRight_);
+		return new TileBoardGenIterator(lowerRight_);
 	}
 
 	public TileBoardIterator getUpperLeftCorner() {
-		return new TileBoardIterator(upperLeft_);
+		return new TileBoardGenIterator(upperLeft_);
 	}
 
 }
