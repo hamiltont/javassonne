@@ -165,7 +165,7 @@ public class Tile {
 	// Convenience Functions
 
 	/**
-	 * @return Returns a square box with the nine areas of the tile identified
+	 * @return Returns a string that visually represents the nine areas of the tile identified
 	 */
 	public String description() {
 		// Print out a nice box with the nine areas labeled. Like the Tile page
@@ -200,6 +200,10 @@ public class Tile {
 		this.rotate(1);
 	}
 	
+	
+	/**
+	 * @param direction Direction that properties of the tile should be shifted
+	 */
 	private void rotate(int direction) {
 		// move all of the features, farms, and farmWalls one position to the
 		// right by shifting them within their respective arrays

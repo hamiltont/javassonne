@@ -26,7 +26,7 @@ import org.javassonne.model.Tile;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
 
-public class TileSerializerTest extends TestCase {
+public class TileSerializerTests extends TestCase {
 	TileSerializer serial_;
 
 	protected void setUp() throws Exception {

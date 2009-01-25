@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Jan 21, 2009
+ * @date Jan 25, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,22 +21,42 @@ package org.javassonne.model.test;
 import junit.framework.TestCase;
 
 import org.javassonne.model.Tile;
-import org.javassonne.model.TileMapBoard;
+import org.javassonne.model.TileDeck;
 
-public class TileMapBoardTests extends TestCase {
+public class TileDeckTests extends TestCase {
 
-	TileMapBoard board_;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
+	public void testAddTiles()
+	{
+		TileDeck d = new TileDeck();
 		
-		Tile homeTile = new Tile();
-		board_ = new TileMapBoard(homeTile);
+		d.addTile(new Tile(), 1);
+		
+		assertTrue(d.tilesRemaining() == 1);
+		
+		d.addTile(new Tile(), 2);
+		
+		assertTrue(d.tilesRemaining() == 3);
 	}
-
 	
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	public void testPopTile()
+	{
+		TileDeck d = new TileDeck();
+		Tile t = new Tile();
+		d.addTile(t, 1);
+		
+		assertTrue(d.popRandomTile() == t);
+		assertTrue(d.tilesRemaining() == 0);
 	}
-
+	
+	public void testUnderflow()
+	{
+		TileDeck d = new TileDeck();
+		
+		assertNull(d.popRandomTile());
+		
+		d.addTile(new Tile(), 1);
+		
+		assertNotNull(d.popRandomTile());
+		assertNull(d.popRandomTile());
+	}
 }

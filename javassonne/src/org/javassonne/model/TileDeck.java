@@ -21,41 +21,77 @@ package org.javassonne.model;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * @author bengotow The Tile Deck class represents a collection of tiles used
+ *         during gameplay. A tile deck is different from a tile set, because it
+ *         may contain multiple copies of each tile object. A tile deck may
+ *         contain tiles from multiple tile sets, if a user is playing with
+ *         tiles from two sources (the original game, and an expansion pack -
+ *         for example).
+ */
 public class TileDeck {
 
 	private ArrayList<Tile> tiles_;
 
+	/**
+	 * A general purpose constructor that initializes an empty tile deck.
+	 */
 	public TileDeck() {
 		tiles_ = new ArrayList<Tile>();
 	}
 
 	// Adding Tiles
-	
-	public void addTileSet(TileSet set)
-	{
-		for (int ii = 0; ii < set.tileCount(); ii++){
+
+	/**
+	 * @param set
+	 *            The set of tiles you'd like to add to the tile deck. A tile
+	 *            deck may contain multiple sets of tiles, since a user might
+	 *            play with the original tiles and the tiles from an expansion
+	 *            pack.
+	 */
+	public void addTileSet(TileSet set) {
+		for (int ii = 0; ii < set.tileCount(); ii++) {
 			addTile(set.tileAtIndex(ii), set.tileCountAtIndex(ii));
 		}
 	}
-	
-	public void addTile(Tile t, int count)
-	{
+
+	/**
+	 * This function adds a single tile to the deck. In general, tiles should be
+	 * arranged in sets and added to tile decks by set.
+	 * 
+	 * @param t
+	 *            The individual tile to add to the deck.
+	 * @param count
+	 *            The number of copies of that tile that should be in the deck.
+	 */
+	public void addTile(Tile t, int count) {
 		for (int ii = 0; ii < count; ii++)
 			tiles_.add(t);
 	}
-	
+
 	// Pulling Tiles
-	
-	public Tile popRandomTile()
-	{
-		 if(tiles_.size()==0) return null;
-		 Random generator = new Random( 19580427 );
-		 int index = generator.nextInt(tiles_.size());
-		 
-		 Tile t = tiles_.get(index);
-		 tiles_.remove(index);
-		 
-		 return t;
+
+	/**
+	 * @return Returns a random tile from the remaining tiles in the deck and
+	 *         removes it from the deck.
+	 */
+	public Tile popRandomTile() {
+		if (tiles_.size() == 0)
+			return null;
+		Random generator = new Random(19580427);
+		int index = generator.nextInt(tiles_.size());
+
+		Tile t = tiles_.get(index);
+		tiles_.remove(index);
+
+		return t;
 	}
-	
+
+	/**
+	 * @return The number of tiles remaining in the deck. Should decrement when
+	 *         popRandomTile() is caled.
+	 */
+	public int tilesRemaining() {
+		return tiles_.size();
+	}
 }
