@@ -1,17 +1,17 @@
 #summary The Javassonne user stories.
 
 = Short-Term Objectives =
- - User sees UI Grid in scrollable inline frame
+ - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI Grid in scrollable inline frame
       Hamy, David
- - User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)
+ - <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='16' width='16' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ Decided to put pan functionality in game window, not sizebar. Zoom remains in sidebar for now
       Hamy, David
- - User sees UI control buttons in sidebar (New Game, Load Game, Exit)
+ - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI control buttons in sidebar (New Game, Load Game, Exit)
       Brian
  - User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
       Brian, David
- - User sees saved game tiles loaded
+ - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees saved game tiles loaded
       Ben, Adam, Kyle, Hamy
- - User sees terrain-tile generator utility
+ - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees terrain-tile generator utility
       Ben, Adam, Kyle
 
 
