@@ -25,6 +25,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import javax.swing.JFrame;
@@ -52,15 +54,15 @@ public class GameWindow extends JFrame {
 		boardModel_ = model;
 		setTitle(WINDOW_TITLE);
 		contentPane_.setBackground(WINDOW_BG_COLOR);
-
-		// Remove the border
-		setUndecorated(true);
+		
 		
 		// Switching to full screen mode
-		GraphicsEnvironment.getLocalGraphicsEnvironment().
-			getDefaultScreenDevice().setFullScreenWindow(this);
-		
-		
+		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		this.setUndecorated(true);
+
+		DisplayMode mode = d.getDisplayMode();
+		setSize(mode.getWidth(), mode.getHeight()-20);		
+			
 		// We need to force the control panel to render, so 
 		//		we can get the height
 		// perhaps I could use controlPanel_.pack here instead?

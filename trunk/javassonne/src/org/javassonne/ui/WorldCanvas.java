@@ -186,7 +186,6 @@ public class WorldCanvas extends JLayeredPane {
 		private class Map extends JPanel {
 			private double scale_ = 0.3;
 
-			
 			/**
 			 * Constructor
 			 * 
@@ -208,7 +207,10 @@ public class WorldCanvas extends JLayeredPane {
 			 * any grid.
 			 */
 			public void paintComponent(Graphics gra) {
-				
+
+				// clear the graphics layer
+				gra.clearRect(0, 0, this.getWidth(), this.getHeight());
+
 				// get the starting tile
 				TileBoardIterator iter = board_.homeTile();
 				BufferedImage tileImage = iter.current().getImage();
@@ -224,7 +226,6 @@ public class WorldCanvas extends JLayeredPane {
 				int rows = this.getHeight() / tileHeight + 1;
 				int cols = this.getWidth() / tileWidth + 1;
 
-				System.out.println(rows);
 
 				for (int k = 0; k < rows; k++)
 					gra.drawLine(0, k * tileHeight, tileWidth, k * tileHeight);
@@ -261,7 +262,6 @@ public class WorldCanvas extends JLayeredPane {
 				} catch (Exception e) {
 					System.out.println("Error displaying a tile image.");
 				}
-				
 
 			}
 		} // End Map

@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Jan 21, 2009
+ * @date Jan 25, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,25 +18,28 @@
 
 package org.javassonne.model.test;
 
+import org.javassonne.model.TileFeature;
+
 import junit.framework.TestCase;
 
-import org.javassonne.model.Tile;
-import org.javassonne.model.TileMapBoard;
+public class TileFeatureTests extends TestCase {
 
-public class TileMapBoardTests extends TestCase {
-
-	TileMapBoard board_;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
+	public void testTileFeatureConstructor()
+	{
+		// create tile feature with some properties, and test that the 
+		// constructor works as advertised.
+		TileFeature f = new TileFeature("name","identifier", true, 2);
 		
-		Tile homeTile = new Tile();
-		board_ = new TileMapBoard(homeTile);
+		assertTrue(f.name == "name");
+		assertTrue(f.identifier == "identifier");
+		assertTrue(f.actsAsWall == true);
+		assertTrue(f.multiplier == 2);
 	}
-
 	
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	public void testTileFeatureDescription()
+	{
+		// make sure the tileFeature correctly returns a description of itself.
+		TileFeature f = new TileFeature();
+		assertTrue(f.description().length() > 0);
 	}
-
 }

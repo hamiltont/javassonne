@@ -25,6 +25,17 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+/**
+ * @author bengotow The tile set class represents a collection of tiles, and
+ *         stores the number of times each one may be drawn during the game.
+ *         Tile sets may be loaded from disk using the TileSerializer class, and
+ *         should be created using the TileSetCreator. Tile sets are different
+ *         from tile decks. A tile set represents a single collection of tiles -
+ *         for example, the tiles from an expansion pack. A tile deck may
+ *         contain multiple tile sets, and represents the pool of tiles the user
+ *         is actually playing with. Additionally, a tile set contains a single
+ *         copy of each tile object, while the tile deck may contain multiple.
+ */
 public class TileSet {
 
 	private String name_;
@@ -34,8 +45,10 @@ public class TileSet {
 
 	private String tileImagesFolder_;
 
-	// Constructor
-
+	/**
+	 * @param name
+	 *            The name of the tile set being created.
+	 */
 	public TileSet(String name) {
 		name_ = name;
 		tiles_ = new ArrayList<Tile>();
@@ -92,6 +105,10 @@ public class TileSet {
 		this.tileImagesFolder_ = folder;
 	}
 
+	/**
+	 * This function should be called before gameplay starts. It loads images for each tile
+	 * from the tileImagesFolder_ and caches them in the tile objects.
+	 */
 	public void loadTileImages() {
 		try {
 			for (Tile t : this.tiles_) {
@@ -101,7 +118,8 @@ public class TileSet {
 				t.setImage(img);
 			}
 		} catch (IOException e) {
-			System.err.println("The tile images could not be loaded. One or more tiles may not have images.");
+			System.err
+					.println("The tile images could not be loaded. One or more tiles may not have images.");
 		}
 	}
 

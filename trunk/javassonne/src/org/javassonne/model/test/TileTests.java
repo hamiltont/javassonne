@@ -18,72 +18,65 @@
 
 package org.javassonne.model.test;
 
+import junit.framework.TestCase;
+
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileFeature;
-import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.Tile.Quadrant;
 import org.javassonne.model.Tile.Region;
-
-import junit.framework.TestCase;
 
 public class TileTests extends TestCase {
 
 	Tile tile_;
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		tile_ = new Tile();
 	}
 
-	public void testSetFarm()
-	{
+	public void testSetFarm() {
 		tile_.setFarmInQuadrant(Quadrant.TopLeft, 1);
 		assertTrue(tile_.farmInQuadrant(Quadrant.TopLeft) == 1);
 	}
-	
-	public void testSetFarmWall()
-	{
+
+	public void testSetFarmWall() {
 		tile_.setFarmWallInRegion(Region.Left, true);
 		assertTrue(tile_.farmWallInRegion(Region.Left));
 	}
-	
-	public void testSetUniqueIdentifier()
-	{
+
+	public void testSetUniqueIdentifier() {
 		tile_.setUniqueIdentifier("sample");
 		assertTrue(tile_.getUniqueIdentifier() == "sample");
 	}
-	
-	public void testSetFeature()
-	{
+
+	public void testSetFeature() {
 		TileFeature f = new TileFeature();
-		
+
 		tile_.setFeatureIdentifierInRegion(Region.Left, f.identifier);
 		assertTrue(tile_.featureIdentifierInRegion(Region.Left) == f.identifier);
 
 		tile_.setFeatureInRegion(Region.Right, f);
 		assertTrue(tile_.featureIdentifierInRegion(Region.Right) == f.identifier);
 	}
-	
-	public void testRotateLeft()
-	{
+
+	public void testRotateLeft() {
 		tile_.setFarmInQuadrant(Quadrant.TopLeft, 1);
 		tile_.setFarmWallInRegion(Region.Left, true);
 		tile_.setFeatureIdentifierInRegion(Region.Left, "f");
-	
+
 		tile_.rotateLeft();
 
 		assertTrue(tile_.farmInQuadrant(Quadrant.BottomLeft) == 1);
 		assertTrue(tile_.farmWallInRegion(Region.Bottom));
 		assertTrue(tile_.featureIdentifierInRegion(Region.Bottom) == "f");
 	}
-	
-	public void testRotateRight()
-	{
+
+	public void testRotateRight() {
 		tile_.setFarmInQuadrant(Quadrant.TopLeft, 1);
 		tile_.setFarmWallInRegion(Region.Left, true);
 		tile_.setFeatureIdentifierInRegion(Region.Left, "f");
-	
+
 		tile_.rotateLeft();
 
 		assertTrue(tile_.farmInQuadrant(Quadrant.TopRight) == 1);
