@@ -183,7 +183,15 @@ public class TileSetCreator {
 						System.out.println("Enter a file path:");
 					}
 					String newSetPath = in.next();
-					if (Integer.valueOf(newSetPath) != 1)
+					Integer newSetPathInt = 0;
+					
+					try{
+						newSetPathInt = Integer.parseInt(newSetPath);
+					} catch (NumberFormatException e){
+						// TODO: This is ugly.
+					}
+					
+					if (newSetPathInt != 1)
 						currentSetPath = newSetPath;
 
 					serializer.saveTileSet(currentSet, currentSetPath);
