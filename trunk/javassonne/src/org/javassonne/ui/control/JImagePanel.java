@@ -35,6 +35,7 @@ public class JImagePanel extends JPanel {
 		// Center the image
 		int x = (getWidth() - image_.getWidth()) / 2;
 		int y = (getHeight() - image_.getHeight()) / 2;
-		g.drawImage(image_, x, y, this);
+		this.setSize(image_.getWidth(), image_.getHeight());
+		g.drawImage(image_,x,y,null);
 	}
 }
