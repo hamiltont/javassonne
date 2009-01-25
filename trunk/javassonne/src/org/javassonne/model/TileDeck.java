@@ -22,12 +22,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * @author bengotow The Tile Deck class represents a collection of tiles used
- *         during gameplay. A tile deck is different from a tile set, because it
- *         may contain multiple copies of each tile object. A tile deck may
- *         contain tiles from multiple tile sets, if a user is playing with
- *         tiles from two sources (the original game, and an expansion pack -
- *         for example).
+ * The Tile Deck class represents a collection of tiles used during gameplay. A
+ * tile deck is different from a tile set, because it may contain multiple
+ * copies of each tile object. A tile deck may contain tiles from multiple tile
+ * sets, if a user is playing with tiles from two sources (the original game,
+ * and an expansion pack - for example).
+ * 
+ * @author bengotow
  */
 public class TileDeck {
 

@@ -20,8 +20,35 @@ package org.javassonne.model;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * The Tile class is used to represent a single tile in the game. Tiles are
+ * collected into tile sets, which are in turn collected into tile decks. Tiles
+ * may then be popped from the "deck" and placed on the tile board.
+ * 
+ * Tiles have two "layers" of features. The bottom layer (farms) is divided into
+ * quadrants. Each quadrant is assigned a number that indicates what farm it is
+ * part of. The top layer (features) is divided into five regions. Each of these
+ * five regions is bound to a TileFeature that represents the content of that
+ * part of the tile - a road, cloister, or fort, for example.
+ * 
+ * The Tile also has an image property, that is set when the tile is loaded into
+ * the tile set. The Tile itself does not know where its image is saved. You can
+ * think of images being "cached" in the tile objects at runtime.
+ * 
+ * For more, see http://code.google.com/p/javassonne/wiki/TileObject
+ * 
+ * @author bengotow
+ * 
+ */
 public class Tile {
 
+	/**
+	 * The Region enum allows regions of the Tile to be addressed more easily.
+	 * Ex: {@code tile_.featureIdentifierInRegion(Region.Left);}
+	 * 
+	 * @author bengotow
+	 * 
+	 */
 	public enum Region {
 		Left(0), Top(1), Right(2), Bottom(3), Center(4);
 		private final int index;
@@ -31,6 +58,13 @@ public class Tile {
 		}
 	}
 
+	/**
+	 * The Quadrant enum allows quadrants of the Tile to be addressed more
+	 * easily. Ex: {@code tile_.farmInQuadrant(Quadrant.TopLeft);}
+	 * 
+	 * @author bengotow
+	 * 
+	 */
 	public enum Quadrant {
 		TopLeft(0), TopRight(1), BottomLeft(2), BottomRight(3);
 		private final int index;
@@ -58,7 +92,7 @@ public class Tile {
 
 	/**
 	 * @param q
-	 *            The qudardant you want the farm value for
+	 *            The qudadrant you want the farm value for
 	 * @return The farm value
 	 */
 	public int farmInQuadrant(Quadrant q) {
@@ -165,7 +199,8 @@ public class Tile {
 	// Convenience Functions
 
 	/**
-	 * @return Returns a string that visually represents the nine areas of the tile identified
+	 * @return Returns a string that visually represents the nine areas of the
+	 *         tile identified
 	 */
 	public String description() {
 		// Print out a nice box with the nine areas labeled. Like the Tile page
@@ -199,34 +234,36 @@ public class Tile {
 	public void rotateRight() {
 		this.rotate(1);
 	}
-	
-	
+
 	/**
-	 * @param direction Direction that properties of the tile should be shifted
+	 * @param direction
+	 *            Direction that properties of the tile should be shifted
 	 */
 	private void rotate(int direction) {
 		// move all of the features, farms, and farmWalls one position to the
 		// right by shifting them within their respective arrays
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 4; i++) {
 			features_[(i + 1) % 4] = features_[i];
 			farms_[(i + 1) % 4] = farms_[i];
 			farmWalls_[(i + 1) % 4] = farmWalls_[i];
 		}
 
 		// rotate our image, if it exists
-		if (image_ != null){
+		if (image_ != null) {
 			int width = image_.getWidth();
 			int height = image_.getHeight();
-			
-			BufferedImage biFlip = new BufferedImage(height, width, image_.getType());
-			
-			for(int i=0; i<width; i++)
-				for(int j=0; j<height; j++)
+
+			BufferedImage biFlip = new BufferedImage(height, width, image_
+					.getType());
+
+			for (int i = 0; i < width; i++)
+				for (int j = 0; j < height; j++)
 					if (direction == 1)
-						biFlip.setRGB(height-1-j, width-1-i, image_.getRGB(i, j));
+						biFlip.setRGB(height - 1 - j, width - 1 - i, image_
+								.getRGB(i, j));
 					else
 						biFlip.setRGB(j, i, image_.getRGB(i, j));
-			
+
 			image_ = biFlip;
 		}
 	}
