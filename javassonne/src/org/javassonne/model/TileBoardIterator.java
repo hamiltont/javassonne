@@ -2,10 +2,10 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author Kyle Prete
- * @date Jan 14, 2009
+ * @author [Add Name Here]
+ * @date Jan 25, 2009
  * 
- * Copyright 2009 Javasonne Team
+ * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License. 
  *  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -18,81 +18,18 @@
 
 package org.javassonne.model;
 
-public class TileBoardIterator {
+public interface TileBoardIterator {
 
-	private TileBoard data_;
-	private IntPair location_;
-	private IntPair previousLocation_;
+	public abstract Tile current();
+	
+	public abstract TileBoardIterator right();
+	
+	public abstract TileBoardIterator nextRow();
 
-	public TileBoardIterator(TileMapBoard tileMapContainer, IntPair intPair) {
-		data_ = tileMapContainer;
-		location_ = intPair;
-	}
+	public abstract IntPair getLocation();
+	
+	public abstract TileBoard getData();
 
-	public TileBoardIterator(TileBoardIterator old) {
-		data_ = old.data_;
-		location_ = old.location_;
-		previousLocation_ = old.previousLocation_;
-	}
-
-	public Tile current() {
-		return data_.getTile(this);
-	}
-
-	public TileBoardIterator down() {
-		previousLocation_ = location_;
-		location_ = new IntPair(location_.car() + 1, location_.cdr());
-		return this;
-	}
-
-	public TileBoardIterator left() {
-		previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() - 1);
-		return this;
-	}
-
-	public TileBoardIterator right() {
-		previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() + 1);
-		return this;
-	}
-
-	public TileBoardIterator up() {
-		previousLocation_ = location_;
-		location_ = new IntPair(location_.car() - 1, location_.cdr());
-		return this;
-	}
-
-	// Moves iterator to previous location (history size of 1)
-	public TileBoardIterator back() throws Exception {
-		if (previousLocation_ != null) {
-			location_ = previousLocation_;
-			previousLocation_ = null;
-			return this;
-		} else
-			throw new Exception();
-		// TODO: implement Exception
-	}
-
-	public IntPair getLocation() {
-		return location_;
-	}
-
-	public boolean outOfBounds() {
-		if (location_.car() < data_.getUpperLeftCorner().location_.car()
-				|| location_.cdr() < data_.getUpperLeftCorner().location_.cdr()
-				|| location_.car() > data_.getUpperLeftCorner().location_.car()
-				|| location_.cdr() > data_.getUpperLeftCorner().location_.cdr())
-			return true;
-		return false;
-	}
-
-	// Advances iterator to start of next row
-	public TileBoardIterator nextRow() {
-		previousLocation_ = location_;
-		location_ = new IntPair(location_.car() + 1,
-				data_.getUpperLeftCorner().location_.cdr());
-		return this;
-	}
+	public abstract boolean outOfBounds();
 
 }

@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 
 /**
