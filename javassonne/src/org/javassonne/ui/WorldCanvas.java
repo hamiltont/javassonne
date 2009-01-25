@@ -213,8 +213,8 @@ public class WorldCanvas extends JLayeredPane {
 				gra.clearRect(0, 0, this.getWidth(), this.getHeight());
 
 				// get the starting tile
-				TileBoardIterator iter = board_.homeTile();
-				BufferedImage tileImage = iter.current().getImage();
+				TileBoardIterator iter = board_.getUpperLeftCorner();
+				BufferedImage tileImage = board_.homeTile().current().getImage();
 
 				// get the dimensions of the tile image.
 				int tileWidth = (int) (tileImage.getWidth() * scale_);
