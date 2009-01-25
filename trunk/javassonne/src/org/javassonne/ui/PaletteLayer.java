@@ -88,7 +88,6 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 		g2.fill(navTopRight_);
 		g2.fill(navBottomLeft_);
 		g2.fill(navBottomRight_);
-
 	}
 
 	/**
@@ -110,7 +109,8 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 		// Register event listener
 	}
 	
-	public void mouseDragged(MouseEvent e){
+	public void mouseDragged(MouseEvent e)
+	{
 	}
 	
 	public void mouseReleased(MouseEvent e)

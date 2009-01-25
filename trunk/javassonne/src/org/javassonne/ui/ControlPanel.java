@@ -18,8 +18,14 @@
 
 package org.javassonne.ui;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +37,7 @@ public class ControlPanel extends JPanel {
 	private JButton exitGameButton_;
 	private JButton zoomInButton_;
 	private JButton zoomOutButton_;
+	private BufferedImage background_;
 
 	public ControlPanel() {
 		setVisible(true);
@@ -49,19 +56,18 @@ public class ControlPanel extends JPanel {
 		add(newGameButton_);
 		add(loadGameButton_);
 		add(exitGameButton_);
-		
+
 		add(new JLabel("                    "));
 		add(new JLabel("                    "));
 		add(zoomInButton_);
 		add(zoomOutButton_);
 		add(new JLabel("                    "));
 		add(new JLabel("                    "));
-		
+
 		add(new JButton("Pan Up"));
 		add(new JButton("Pan Down"));
 		add(new JButton("Pan Left"));
 		add(new JButton("Pan Right"));
-		
 
 	}
 
@@ -69,6 +75,21 @@ public class ControlPanel extends JPanel {
 		newGameButton_.addActionListener(listener);
 		loadGameButton_.addActionListener(listener);
 		exitGameButton_.addActionListener(listener);
+	}
+
+	public void paintComponent(Graphics g) {
+		if (background_ == null) {
+			try {
+				background_ = ImageIO.read(new File(
+						"images/bottom_bar_background.jpg"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(background_, 0, 0, this.getWidth(), this.getHeight(), 0,
+				0, background_.getWidth(), background_.getHeight(), null);
 	}
 
 	public void redraw() {
