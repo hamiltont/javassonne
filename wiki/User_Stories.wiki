@@ -3,7 +3,7 @@
 = Short-Term Objectives =
  - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI Grid in scrollable inline frame
       Hamy, David
- - <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='16' width='16' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ Decided to put pan functionality in game window, not sizebar. Zoom remains in sidebar for now
+ - <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='16' width='16' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ <br />Decided to put pan functionality in game window, not sizebar. Zoom remains in sidebar for now
       Hamy, David
  - <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI control buttons in sidebar (New Game, Load Game, Exit)
       Brian
