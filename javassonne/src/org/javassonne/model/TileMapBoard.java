@@ -26,6 +26,9 @@ public class TileMapBoard implements TileBoard {
 	private TileBoardGenIterator upperLeft_;
 	private TileBoardGenIterator lowerRight_;
 	
+	/**
+	 * @param homeTile - Tile to insert at home location to start board
+	 */
 	public TileMapBoard(Tile homeTile) {
 		data_ = new HashMap<IntPair, Tile>();
 		upperLeft_ = new TileBoardGenIterator(this, new IntPair(-1, -1));
@@ -33,16 +36,24 @@ public class TileMapBoard implements TileBoard {
 		data_.put(new IntPair(0,0), homeTile);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#homeTile()
+	 */
 	public TileBoardIterator homeTile() {
 		return new TileBoardGenIterator(this, new IntPair(0, 0));
 	}
 
+	/**
+	 * @param iter - TileBoardIterator pointing to location queried
+	 * @return - true if TileBoardIterator location is filled in TileBoard
+	 */
 	public boolean positionFilled(TileBoardIterator iter) {
 		return data_.containsKey(iter.getLocation());
 	}
 
-	// Adds Tile at iter location
-	// Throws to-be-implemented exception if position is filled
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#addTile(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile)
+	 */
 	public void addTile(TileBoardIterator iter, Tile tile) throws Exception {
 		if (positionFilled(iter))
 			throw new Exception();
@@ -61,22 +72,23 @@ public class TileMapBoard implements TileBoard {
 		}
 	}
 
-/*
-	// Removes Tile at iter location
-	// Returns null if position is empty
-	public Tile removeTile(TileBoardIterator iter) {
-		return data_.remove(iter.getLocation());
-	}
-*/
-	// Returns Tile at iter location, maintaining it in Container
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#getTile(org.javassonne.model.TileBoardIterator)
+	 */
 	public Tile getTile(TileBoardIterator iter) {
 		return data_.get(iter.getLocation());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#getLowerRightCorner()
+	 */
 	public TileBoardIterator getLowerRightCorner() {
 		return new TileBoardGenIterator(lowerRight_);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#getUpperLeftCorner()
+	 */
 	public TileBoardIterator getUpperLeftCorner() {
 		return new TileBoardGenIterator(upperLeft_);
 	}

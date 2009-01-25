@@ -25,12 +25,18 @@ public class TileBoardGenIterator implements TileBoardIterator {
 
 	// private IntPair previousLocation_;
 
-	
+	/**
+	 * @param data - reference to TileBoard where data is stored
+	 * @param intPair - IntPair location of current location
+	 */
 	public TileBoardGenIterator(TileBoard data, IntPair intPair) {
 		data_ = data;
 		location_ = intPair;
 	}
 
+	/**
+	 * @param old - TileBoardIterator to copy from
+	 */
 	public TileBoardGenIterator(TileBoardIterator old) {
 		data_ = old.getData();
 		location_ = old.getLocation();
@@ -46,48 +52,68 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return data_.getTile(this);
 	}
 
+	/**
+	 * @return - moves iterator down in board and returns reference to itself 
+	 */
 	public TileBoardIterator down() {
 		// previousLocation_ = location_;
 		location_ = new IntPair(location_.car() + 1, location_.cdr());
 		return this;
 	}
 
+	/**
+	 * @return - returns reference to copy of iterator, moved down
+	 */
 	public TileBoardIterator downCopy() {
-		return new TileBoardGenIterator(data_, new IntPair(location_.car() + 1,
-				location_.cdr()));
+		return (new TileBoardGenIterator(this)).down();
 	}
 
+	/**
+	 * @return - moves iterator left in board and returns reference to itself 
+	 */
 	public TileBoardIterator left() {
 		// previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() - 1);
 		return this;
 	}
 
+	/**
+	 * @return - returns reference to copy of iterator, moved left
+	 */
 	public TileBoardIterator leftCopy() {
-		return new TileBoardGenIterator(data_, new IntPair(location_.car(),
-				location_.cdr() - 1));
+		return (new TileBoardGenIterator(this)).left();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#right()
+	 */
 	public TileBoardIterator right() {
 		// previousLocation_ = location_;
 		location_ = new IntPair(location_.car(), location_.cdr() + 1);
 		return this;
 	}
 
+	/**
+	 * @return - returns reference to copy of iterator, moved right
+	 */
 	public TileBoardIterator rightCopy() {
-		return new TileBoardGenIterator(data_, new IntPair(location_.car(),
-				location_.cdr() + 1));
+		return (new TileBoardGenIterator(this)).right();
 	}
 
+	/**
+	 * @return - moves iterator up in board and returns reference to itself
+	 */
 	public TileBoardIterator up() {
 		// previousLocation_ = location_;
 		location_ = new IntPair(location_.car() - 1, location_.cdr());
 		return this;
 	}
 
+	/**
+	 * @return - returns reference to copy of iterator, moved up
+	 */
 	public TileBoardIterator upCopy() {
-		return new TileBoardGenIterator(data_, new IntPair(location_.car() - 1,
-				location_.cdr()));
+		return (new TileBoardGenIterator(this)).up();
 	}
 
 	/*
@@ -96,6 +122,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	 * null) { location_ = previousLocation_; previousLocation_ = null; return
 	 * this; } else throw new Exception(); // TODO: implement Exception }
 	 */
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -123,6 +150,9 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	// Advances iterator to start of next row
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#nextRow()
+	 */
 	public TileBoardIterator nextRow() {
 		// previousLocation_ = location_;
 		location_ = new IntPair(location_.car() + 1, data_.getUpperLeftCorner()
@@ -130,16 +160,23 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return this;
 	}
 
-	// Advances iterator to start of next row
+	/**
+	 * @return - returns reference to copy of iterator, moved to start of next row
+	 */
 	public TileBoardIterator nextRowCopy() {
-		return new TileBoardGenIterator(data_, new IntPair(location_.car() + 1,
-				data_.getUpperLeftCorner().getLocation().cdr()));
+		return (new TileBoardGenIterator(this)).nextRow();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#getData()
+	 */
 	public TileBoard getData() {
 		return data_;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof TileBoardIterator))
@@ -149,11 +186,17 @@ public class TileBoardGenIterator implements TileBoardIterator {
 					this.location_.equals(((TileBoardIterator) obj).getLocation()));
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return this.toString().hashCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return String.format("%s:%s",data_.toString(),location_.toString());

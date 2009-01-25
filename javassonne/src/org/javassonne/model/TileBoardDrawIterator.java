@@ -19,6 +19,7 @@
 package org.javassonne.model;
 
 //THIS IS NOT DONE!!!
+// TODO: add comments, and test
 
 public class TileBoardDrawIterator implements TileBoardIterator  {
 	private TileBoard data_;
