@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Adam Albright
  * @date Jan 22, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,25 +18,43 @@
 
 package org.javassonne.ui.test;
 
+import java.awt.Dimension;
+
 import junit.framework.TestCase;
-import org.javassonne.ui.*;
 
+import org.javassonne.model.Tile;
+import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileMapBoard;
+import org.javassonne.model.TileSerializer;
+import org.javassonne.model.TileSet;
+import org.javassonne.ui.WorldCanvas;
+
+/**
+ * Unit tests for WorldCanvas class
+ * @author Administrator
+ *
+ */
 public class WorldCanvasTest extends TestCase {
+	WorldCanvas wc_;
 
-	public void testWorldCanvas() {
-		fail("Not yet implemented");
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		// Build a TileBoard to pass to default constructor
+		TileSerializer s = new TileSerializer();
+		TileSet set = s.loadTileSet("tilesets/standard.xml");
+		Tile t = set.tileWithUniqueIdentifier("tile_standard_1");
+		TileBoard model = new TileMapBoard(t);
+
+		wc_ = new WorldCanvas(model, new Dimension(100, 100));
 	}
 
-	public void testPaintGraphics() {
-		fail("Not yet implemented");
+	protected void tearDown() throws Exception {
+		super.tearDown();
 	}
 
 	public void testRedraw() {
-		fail("Not yet implemented");
-	}
-
-	public void testSetActionListener() {
-		fail("Not yet implemented");
+		wc_.redraw();
 	}
 
 }
