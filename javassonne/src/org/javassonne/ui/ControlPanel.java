@@ -34,7 +34,7 @@ import org.javassonne.ui.control.JImagePanel;
 
 public class ControlPanel extends JPanel {
 
-	private static final String DRAW_NEXT_TILE = "Draw Next Tile";
+	private static final String DRAW_NEXT_TILE = "Draw";
 	private static final String ZOOM_OUT = "Zoom Out";
 	private static final String ZOOM_IN = "Zoom In";
 	private static final String EXIT_GAME = "Exit Game";
@@ -82,13 +82,8 @@ public class ControlPanel extends JPanel {
 		add(loadGameButton_);
 		add(exitGameButton_);
 
-		// spacing for aesthetic purposes
-		add(new JLabel("                    "));
-		add(new JLabel("                    "));
 		add(zoomInButton_);
 		add(zoomOutButton_);
-		add(new JLabel("                    "));
-		add(new JLabel("                    "));
 
 		// getting image for current tile (temporarily reading directly from
 		// file)
