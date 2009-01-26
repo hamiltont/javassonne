@@ -105,7 +105,7 @@ public class WorldCanvas extends JLayeredPane {
 	 */
 	public void redraw() {
 		// Redraw the map, and the palette
-
+		this.invalidate();
 	}
 
 	/**
