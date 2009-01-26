@@ -228,11 +228,11 @@ public class WorldCanvas extends JLayeredPane {
 				int cols = this.getWidth() / tileWidth + 1;
 
 
-				for (int k = 0; k < rows; k++)
-					gra.drawLine(0, k * tileHeight, tileWidth, k * tileHeight);
+				for (int k = 0; k <= rows+1; k++)
+					gra.drawLine(0, k * tileHeight, this.getWidth(), k * tileHeight);
 
-				for (int k = 0; k < cols; k++)
-					gra.drawLine(k * tileWidth, 0, k * tileWidth, tileHeight);
+				for (int k = 0; k <= cols+1; k++)
+					gra.drawLine(k * tileWidth, 0, k * tileWidth, this.getHeight());
 
 				// Place tile images by iterating through the board and wrapping
 				// when we
