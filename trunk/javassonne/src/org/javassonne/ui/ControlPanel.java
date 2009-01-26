@@ -30,33 +30,59 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.javassonne.ui.control.JImagePanel;
+
 public class ControlPanel extends JPanel {
+
+	private static final String DRAW_NEXT_TILE = "Draw Next Tile";
+	private static final String ZOOM_OUT = "Zoom Out";
+	private static final String ZOOM_IN = "Zoom In";
+	private static final String EXIT_GAME = "Exit Game";
+	private static final String LOAD_GAME = "Load Game";
+	private static final String NEW_GAME = "New Game";
 
 	private JButton newGameButton_;
 	private JButton loadGameButton_;
 	private JButton exitGameButton_;
 	private JButton zoomInButton_;
 	private JButton zoomOutButton_;
+	private JButton drawTile_;
+	private JButton rotateRight_;
+	private JButton rotateLeft_;
+
+	private JImagePanel curTileImage_;
+
 	private BufferedImage background_;
 
 	public ControlPanel() {
 		setVisible(true);
 
-		newGameButton_ = new JButton("New Game");
-		loadGameButton_ = new JButton("Load Game");
-		exitGameButton_ = new JButton("Exit Game");
+		add(new JLabel("Player 1's Turn "));
 
-		zoomInButton_ = new JButton("Zoom In");
-		zoomOutButton_ = new JButton("Zoom Out");
+		newGameButton_ = new JButton(NEW_GAME);
+		loadGameButton_ = new JButton(LOAD_GAME);
+		exitGameButton_ = new JButton(EXIT_GAME);
+
+		zoomInButton_ = new JButton(ZOOM_IN);
+		zoomOutButton_ = new JButton(ZOOM_OUT);
+
+		drawTile_ = new JButton(DRAW_NEXT_TILE);
+
+		rotateRight_ = new JButton("=>");
+		rotateLeft_ = new JButton("<=");
 
 		newGameButton_.setActionCommand("new_game");
 		loadGameButton_.setActionCommand("load_game");
 		exitGameButton_.setActionCommand("exit_game");
+		drawTile_.setActionCommand("draw_tile");
+		rotateRight_.setActionCommand("rotate_right");
+		rotateLeft_.setActionCommand("rotate_left");
 
 		add(newGameButton_);
 		add(loadGameButton_);
 		add(exitGameButton_);
 
+		// spacing for aesthetic purposes
 		add(new JLabel("                    "));
 		add(new JLabel("                    "));
 		add(zoomInButton_);
@@ -64,10 +90,29 @@ public class ControlPanel extends JPanel {
 		add(new JLabel("                    "));
 		add(new JLabel("                    "));
 
+		// getting image for current tile (temporarily reading directly from
+		// file)
+		BufferedImage image = null;
+
+		try {
+			image = ImageIO.read(new File(
+					"tilesets/standard/tile_standard_1.jpg"));
+		} catch (IOException e) {
+		}
+
+		curTileImage_ = new JImagePanel(image, 50, 50);
+
+		add(rotateLeft_);
+		add(curTileImage_);
+		add(new JLabel("             "));
+		add(rotateRight_);
+
 		add(new JButton("Pan Up"));
 		add(new JButton("Pan Down"));
 		add(new JButton("Pan Left"));
 		add(new JButton("Pan Right"));
+
+		add(drawTile_);
 
 	}
 
@@ -75,6 +120,9 @@ public class ControlPanel extends JPanel {
 		newGameButton_.addActionListener(listener);
 		loadGameButton_.addActionListener(listener);
 		exitGameButton_.addActionListener(listener);
+		drawTile_.addActionListener(listener);
+		rotateLeft_.addActionListener(listener);
+		rotateRight_.addActionListener(listener);
 	}
 
 	public void paintComponent(Graphics g) {
