@@ -14,7 +14,7 @@
  * Users playing over a network can type to chat amongst each other.
 
 = Potential User Stories = 
-
+ * More to come soon
 
 
 = Completed User Stories = 
