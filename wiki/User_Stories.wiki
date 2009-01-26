@@ -19,15 +19,15 @@
 
 = Completed User Stories = 
 
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI Grid in scrollable inline frame
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' height='15' width='15'  />User sees UI Grid in scrollable inline frame
   * Hamy, David
- * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='16' width='16' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ <br />Completed Pan by embedding into game window rather than as buttons in sidebar. Zoom remains in sidebar for now
+ * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ <br />Completed Pan by embedding into game window rather than as buttons in sidebar. Zoom remains in sidebar for now
   * Hamy, David
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI control buttons in sidebar (New Game, Load Game, Exit)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees UI control buttons in sidebar (New Game, Load Game, Exit)
   * Brian
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
   * Brian, David
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees saved game tiles loaded
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees saved game tiles loaded
   * Ben, Adam, Kyle, Hamy
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' />User sees terrain*tile generator utility
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees terrain*tile generator utility
   * Ben, Adam, Kyle
