@@ -79,9 +79,8 @@ public class WorldCanvas extends JLayeredPane {
 		// width/height of 0/0 and will not be rendered
 		// If you setSize to the screen size, instead of the mapSize,
 		// then the map layer will be scaled
-		Dimension mapSize = default_.getMapSize();
-		setSize(mapSize);
-		palette_.setSize(mapSize);
+		setSize(screenSize);
+		palette_.setSize(screenSize);
 
 		add(default_, JLayeredPane.DEFAULT_LAYER);
 		add(palette_, JLayeredPane.PALETTE_LAYER);
@@ -136,16 +135,19 @@ public class WorldCanvas extends JLayeredPane {
 		 */
 		public MapLayer(Dimension screenSize) {
 			map_ = new Map(screenSize);
-			setSize(getMapSize());
+
+			setSize(screenSize);
+			
 
 			viewport_ = new JViewport();
 			viewport_.setExtentSize(screenSize);
+			viewport_.setLayout(null);
 			viewport_.setView(map_);
-
+			
 			// This layout allows the viewport to expand and take
 			// all available space
 			setLayout(new BorderLayout());
-			add(viewport_, BorderLayout.CENTER);
+			add(viewport_);//, BorderLayout.CENTER);
 
 		}
 
@@ -203,6 +205,9 @@ public class WorldCanvas extends JLayeredPane {
 				setSize(screenSize.width * 2, screenSize.height * 2);
 			}
 
+			
+			
+			
 			/**
 			 * Override of the default JPanel function to render the map, and
 			 * any grid.
