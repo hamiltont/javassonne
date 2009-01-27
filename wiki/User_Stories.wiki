@@ -1,9 +1,5 @@
 #summary The Javassonne user stories.
 
-= Short-Term Objectives =
-
- * Implement a model-view-controller architecture for the UI, with a pub sub notification system for passing messages around the app. Notification system should be open enough that we can attach a socket observer + publisher to it and run messages across the network transparently. (Ben)
-
 = Potential User Stories = 
 
  * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism.
@@ -31,6 +27,12 @@
   * Ben, Adam, Kyle, Hamy
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees terrain*tile generator utility
   * Ben, Adam, Kyle
+
+----
+
+= Short-Term Objectives =
+
+ * Implement a model-view-controller architecture for the UI, with a pub sub notification system for passing messages around the app. Notification system should be open enough that we can attach a socket observer + publisher to it and run messages across the network transparently. (Ben)
 
 = Long-Term Objectives =
  * A graphical menu system allows to choose gameplay type, join a network game, etc...
