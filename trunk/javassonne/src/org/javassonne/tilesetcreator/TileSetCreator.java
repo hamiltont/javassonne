@@ -52,8 +52,8 @@ public class TileSetCreator {
 
 			// load a tile set into currentSet
 			while (currentSet == null) {
-				System.out
-						.println("Would you like to (1) Create a new tile set or (2) Load an existing one?");
+				System.out.println("Would you like to (1) Create "
+						+ "a new tile set or (2) Load an existing one?");
 
 				int response = in.nextInt();
 
@@ -61,8 +61,8 @@ public class TileSetCreator {
 				if (response == 1) {
 					currentSet = new TileSet("Untitled Set");
 				} else {
-					System.out
-							.println("Select an existing tile set or type a path:");
+					System.out.println("Select an existing tile set"
+							+ " or type a path:");
 					currentSetPath = getTileSetPathInFolder("tilesets/", in);
 					if (currentSetPath != null) {
 						currentSet = serializer.loadTileSet(currentSetPath);
@@ -82,13 +82,10 @@ public class TileSetCreator {
 				System.out
 						.println("------------------------- TILESET CREATOR --------------------");
 				if (currentSet != null)
-					System.out
-							.println(String
-									.format(
-											"Editing '%s' with %d tiles and %d types of features.",
-											currentSet.getName(), currentSet
-													.tileCount(), currentSet
-													.tileFeatureCount()));
+					System.out.println(String.format("Editing '%s' with %d "
+							+ "tiles and %d types of features.", currentSet
+							.getName(), currentSet.tileCount(), currentSet
+							.tileFeatureCount()));
 				System.out
 						.println("--------------------------------------------------------------");
 
@@ -117,8 +114,8 @@ public class TileSetCreator {
 
 					Tile t = new Tile();
 					if (promptForTileProperties(t, in)) {
-						System.out
-								.println("How many of this tile should be included in the set?");
+						System.out.println("How many of this tile "
+								+ "should be included in the set?");
 						int count = in.nextInt();
 						currentSet.addTile(t, count);
 					}
@@ -184,13 +181,13 @@ public class TileSetCreator {
 					}
 					String newSetPath = in.next();
 					Integer newSetPathInt = 0;
-					
-					try{
+
+					try {
 						newSetPathInt = Integer.parseInt(newSetPath);
-					} catch (NumberFormatException e){
+					} catch (NumberFormatException e) {
 						// TODO: This is ugly.
 					}
-					
+
 					if (newSetPathInt != 1)
 						currentSetPath = newSetPath;
 
@@ -203,8 +200,9 @@ public class TileSetCreator {
 					in.nextLine();
 
 				} else if (option == 9) {
-					System.out
-							.println("Enter the application relative path to the images folder\r(including the trailing slash):");
+					System.out.println("Enter the application relative "
+							+ "path to the images folder\r(including"
+							+ " the trailing slash):");
 					currentSet.setTileImagesFolder(in.next());
 					in.nextLine();
 
@@ -232,8 +230,8 @@ public class TileSetCreator {
 			System.out.println(s.toString());
 
 		} else {
-			System.out
-					.println("There are no available features! Create a feature before creating tiles.");
+			System.out.println("There are no available features!"
+					+ " Create a feature before creating tiles.");
 			return null;
 		}
 
@@ -275,9 +273,9 @@ public class TileSetCreator {
 	public static boolean promptForTileProperties(Tile t, Scanner in) {
 		// first, prompt for the features in all five regions
 		for (Region r : Region.values()) {
-			System.out.println(String.format(
-					"Enter Tile %s Feature (Currently %s):", r, t
-							.featureIdentifierInRegion(r)));
+			System.out.println(String.format("Enter Tile %s Feature"
+					+ " (Currently %s):", r, t.featureIdentifierInRegion(r)));
+			
 			TileFeature feature = getFeature(in);
 			if (feature == null)
 				return false;
@@ -299,7 +297,7 @@ public class TileSetCreator {
 				"Enter Tile Unique Identifier (Currently %s):", t
 						.getUniqueIdentifier()));
 
-		// we will make sure the unique identifier they provide is acutally
+		// we will make sure the unique identifier they provide is actually
 		// unique
 		String response = null;
 		while (response == null) {
@@ -312,9 +310,10 @@ public class TileSetCreator {
 				t.setUniqueIdentifier(in.next());
 			else {
 				response = null;
-				System.out
-						.println("A tile already exists in the set with that identifier. Type another\r"
-								+ "identifier or type 'cancel' to go back to the main menu and throw away the tile.");
+				System.out.println("A tile already exists in the set "
+						+ "with that identifier. Type another\r identifier"
+						+ " or type 'cancel' to go back to the main menu "
+						+ "and throw away the tile.");
 			}
 		}
 
@@ -339,11 +338,8 @@ public class TileSetCreator {
 		f.multiplier = in.nextInt();
 
 		// prompt for actsAsWall
-		System.out
-				.println(String
-						.format(
-								"Should the new feature act as a wall for farms? (Currently %b):",
-								f.actsAsWall));
+		System.out.println(String.format("Should the new feature act "
+				+ "as a wall for farms? (Currently %b):", f.actsAsWall));
 		String response = in.next();
 		f.actsAsWall = (response.toLowerCase().startsWith("t"));
 	}
