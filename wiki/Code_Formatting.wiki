@@ -3,12 +3,18 @@
 = Member Variables =
 Private members should be in camelCase with an underscore following the name.
 
-EX: {{{memberVariable_ = 4}}}
+EX: 
+{{{
+memberVariable_ = 4
+}}}
 
 = Functions =
 Functions should be named using camelCase. The first word of the function should be lowercase, unless the function is a constructor.
 
-EX: {{{functionName();}}}
+EX: 
+{{{
+functionName();
+}}}
 
 = Referencing Members and Functions = 
 
