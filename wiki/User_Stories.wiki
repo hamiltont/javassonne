@@ -1,7 +1,8 @@
 #summary The Javassonne user stories.
 
-= Potential User Stories = 
+= User Stories = 
 
+== Potential Stories ==
  * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism.
  * User sees heads up display floating on top of the map, rather than at the bottom of the screen.
  * User sees the number of each type of tile remaining in part of the H.U.D.
@@ -13,7 +14,7 @@
  * User sees a decorative background pattern behind the map.
  * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. 
 
-= 1st Build User Stories = 
+== 1st Build (Jan. 13 - Jan. 22) == 
 
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' height='15' width='15'  />User sees UI Grid in scrollable inline frame
   * Hamy, David
