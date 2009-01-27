@@ -32,11 +32,10 @@
 
 ----
 
-= Short-Term Objectives =
+= Long-Term Objectives =
 
  * Implement a model-view-controller architecture for the UI, with a pub sub notification system for passing messages around the app. Notification system should be open enough that we can attach a socket observer + publisher to it and run messages across the network transparently. (Ben)
 
-= Long-Term Objectives =
  * A graphical menu system allows to choose gameplay type, join a network game, etc...
  * Users take turns drawing, rotating and placing tiles on a graphical playing field according to game rules.
  * User can place meeple (small morphing people) and claim parts of the board territory.
