@@ -13,6 +13,7 @@
  * User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles.
  * User sees a decorative background pattern behind the map.
  * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. 
+ * User can press escape to exit the game.
 
 == 1st Build (Jan. 13 - Jan. 22) == 
 
