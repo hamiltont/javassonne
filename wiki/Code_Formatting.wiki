@@ -15,8 +15,10 @@ EX: {{{functionName();}}}
 References to functions and member variables should use the "this." qualifier, providing they are part of our source. References to external code should not use the qualifier.
 
 EX: 
-{{{this.myVariable_;
-this.myFunction();}}}
+{{{
+this.myVariable_;
+this.myFunction();
+}}}
 
 = Getters and Setters =
 
