@@ -54,9 +54,10 @@ public class TileMapBoard implements TileBoard {
 	/* (non-Javadoc)
 	 * @see org.javassonne.model.TileBoard#addTile(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile)
 	 */
-	public void addTile(TileBoardIterator iter, Tile tile) throws Exception {
+	public void addTile(TileBoardIterator iter, Tile tile) throws BoardPositionFilledException {
 		if (positionFilled(iter))
-			throw new Exception();
+			throw new BoardPositionFilledException(iter.getLocation());
+		//TODO: Check for out of bounds?
 		else
 		{
 			data_.put(iter.getLocation(), tile);
