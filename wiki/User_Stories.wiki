@@ -3,17 +3,20 @@
 = User Stories = 
 
 == Potential Stories ==
- * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism.
- * User sees heads up display floating on top of the map, rather than at the bottom of the screen.
- * User sees the number of each type of tile remaining in part of the H.U.D.
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
- * User can open the main menu and see options like "New Game", "Quit", etc...
- * User can rotate the tile in their hand.
  * User can see possible locations where the tile is allowed to be placed.
- * User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles.
  * User sees a decorative background pattern behind the map.
- * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. 
- * User can press escape to exit the game.
+
+== 2nd Build (Jan. 22 - Jan. 29) == 
+
+ * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
+ * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. (Ben)
+ * User sees heads up display floating on top of the map, rather than at the bottom of the screen. (Hamy)
+ * User sees the number of each type of tile remaining in part of the H.U.D. (Brian, Adam)
+ * User can rotate the tile in their hand. (Brian, David)
+ * User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles. (David)
+ * User can open the main menu and see options like "New Game", "Quit", etc... (Kyle, Adam)
+ * User can press escape to exit the game. (Adam)
 
 == 1st Build (Jan. 13 - Jan. 22) == 
 
