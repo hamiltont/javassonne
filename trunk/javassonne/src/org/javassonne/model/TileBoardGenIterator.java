@@ -116,12 +116,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return (new TileBoardGenIterator(this)).up();
 	}
 
-	/*
-	 * // Moves iterator to previous location (history size of 1) public
-	 * TileBoardIterator back() throws Exception { if (previousLocation_ !=
-	 * null) { location_ = previousLocation_; previousLocation_ = null; return
-	 * this; } else throw new Exception(); // TODO: implement Exception }
-	 */
+	
 	
 	/*
 	 * (non-Javadoc)
@@ -139,12 +134,11 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	 */
 	public boolean outOfBounds() {
 		if (location_.car() < data_.getUpperLeftCorner().getLocation().car()
-				|| location_.cdr() < data_.getUpperLeftCorner().getLocation()
-						.cdr()
-				|| location_.car() > data_.getUpperLeftCorner().getLocation()
-						.car()
-				|| location_.cdr() > data_.getUpperLeftCorner().getLocation()
-						.cdr())
+				|| location_.cdr() < data_.getUpperLeftCorner().getLocation().cdr()
+				|| location_.car() > data_.getLowerRightCorner().getLocation().car()
+				|| location_.cdr() > data_.getLowerRightCorner().getLocation().cdr()
+				|| this == data_.getUpperLeftCorner() 
+				|| this == data_.getLowerRightCorner())
 			return true;
 		return false;
 	}

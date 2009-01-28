@@ -30,8 +30,7 @@ public interface TileBoard {
 	 * @param tile - what will be inserted in TileBoard
 	 * @throws Exception - thrown if iter position is filled
 	 */
-	public void addTile(TileBoardIterator iter, Tile tile) throws Exception;
-	//TODO: implement Exception
+	public void addTile(TileBoardIterator iter, Tile tile) throws BoardPositionFilledException;
 	
 	//Not Needed?
 	//Removes tile from the specified TileBoardIterator location
