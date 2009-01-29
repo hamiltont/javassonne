@@ -25,8 +25,10 @@ import org.javassonne.model.TileBoard;
 
 public class GameWindowController implements ActionListener {
 
-	GameWindow view_;
-	TileBoard model_;
+	private GameWindow view_;
+	private TileBoard model_;
+	private DrawTile drawTile_;
+	private RotateTile rotateTile_;
 
 	public GameWindowController(GameWindow window, TileBoard model) {
 		view_ = window;
@@ -40,5 +42,15 @@ public class GameWindowController implements ActionListener {
 		
 		if (action.equals("exit_game"))
 			System.exit(0);
+		if (action.equals("draw_tile"));
+		{
+			drawTile_ = new DrawTile();
+			drawTile_.actionPerformed(e);
+		}
+		if (action.equals("rotate_right"))
+		{
+			rotateTile_ = new RotateTile();
+			rotateTile_.actionPerformed(e);
+		}
 	}
 }

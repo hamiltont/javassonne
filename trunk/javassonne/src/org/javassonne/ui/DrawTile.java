@@ -23,7 +23,13 @@ import java.awt.event.ActionListener;
 
 public class DrawTile implements ActionListener {
 
+	private TurnIndicator curPlayer_;
+	
 	public void actionPerformed(ActionEvent e) {
 		/* draw next tile here */
+		
+		//advance curPlayer_
+		curPlayer_.nextPlayer();
+		curPlayer_.updateUI();
 	}
 }

@@ -51,13 +51,14 @@ public class ControlPanel extends JPanel {
 	private JButton rotateLeft_;
 
 	private JImagePanel curTileImage_;
+	
+	private TurnIndicator playerTurn_;
+	private int curPlayer_ = 0;
 
 	private BufferedImage background_;
 
 	public ControlPanel() {
 		setVisible(true);
-
-		add(new JLabel("Player 1's Turn "));
 
 		newGameButton_ = new JButton(NEW_GAME);
 		loadGameButton_ = new JButton(LOAD_GAME);
@@ -77,7 +78,10 @@ public class ControlPanel extends JPanel {
 		drawTile_.setActionCommand("draw_tile");
 		rotateRight_.setActionCommand("rotate_right");
 		rotateLeft_.setActionCommand("rotate_left");
-
+		
+		playerTurn_ = new TurnIndicator("Player " + (curPlayer_+1) + "'s Turn");
+		add(playerTurn_);
+		
 		add(newGameButton_);
 		add(loadGameButton_);
 		add(exitGameButton_);

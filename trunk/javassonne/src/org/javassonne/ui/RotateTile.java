@@ -21,10 +21,25 @@ package org.javassonne.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.javassonne.model.Tile;
+
 public class RotateTile implements ActionListener {
 
+	private Tile tile_;
+	
 	public void actionPerformed(ActionEvent e) {
 		/* rotate tile here */
+		
+		String action = e.getActionCommand();
+		
+		if(action.equals("rotate_right"))
+		{
+			tile_.rotateRight();
+		}
+		else
+		{
+			tile_.rotateLeft();
+		}
 	}
 
 }
