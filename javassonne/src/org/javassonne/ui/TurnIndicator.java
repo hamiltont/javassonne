@@ -30,6 +30,7 @@ public class TurnIndicator extends JLabel {
 
 	public void nextPlayer() {
 		curPlayer_ = ((curPlayer_ + 1) % MAX_SIZE);
+		super.updateUI();
 	}
 
 }
