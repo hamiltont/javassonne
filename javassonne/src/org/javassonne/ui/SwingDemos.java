@@ -18,8 +18,6 @@
 
 package org.javassonne.ui;
 
-import javax.swing.JFrame;
-
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
@@ -61,5 +59,7 @@ public class SwingDemos {
 		GameWindow view = new GameWindow(model);
 		GameWindowController controller = new GameWindowController(view, model);
 		view.setController(controller);
+		
+		LogWindow log = new LogWindow();
 	}
 }
