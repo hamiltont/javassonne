@@ -37,6 +37,7 @@ import org.javassonne.model.TileSet;
  * @author bengotow
  */
 public class GameController {
+	private static final long serialVersionUID = 1L;
 
 	private BoardController boardController_;
 	private HUDController hudController_;

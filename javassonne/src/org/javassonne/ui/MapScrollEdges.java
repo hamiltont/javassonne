@@ -18,14 +18,10 @@
 
 package org.javassonne.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.Timer;
@@ -33,16 +29,14 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-/**
- * Holds all information needed to draw the palette layer on the WorldCanvas
- */
-class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener {
-	private Graphics layer_;
+class MapScrollEdges extends JPanel implements MouseMotionListener {
+	private static final long serialVersionUID = 1L;
+	
 	private Rectangle2D navLeft_;
 	private Rectangle2D navRight_;
 	private Rectangle2D navTop_;
 	private Rectangle2D navBottom_;
-	private LayeredDisplayPane mapController_;
+	private WorldCanvas mapController_;
 	private Dimension screenSize_; // Used to maintain this class' size
 
 	private Timer mapShiftTimer_;
@@ -58,7 +52,7 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 	 *            The interface that allows this class to interact and request
 	 *            actions on the map
 	 */
-	public PaletteLayer(Dimension screenSize, LayeredDisplayPane mapController) {
+	public MapScrollEdges(Dimension screenSize, WorldCanvas mapController) {
 		setOpaque(false);
 		screenSize_ = screenSize;
 		int width = screenSize_.width;
@@ -72,7 +66,6 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 		navTop_ = new Rectangle2D.Double(0, 0, width, 40);
 		navBottom_ = new Rectangle2D.Double(0, height - 40, width, 40);
 
-		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 	}
 
@@ -90,36 +83,17 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 		// Redraw the board
 	}
 
-	/**
-	 * After setting this, any action events this class generates will be sent
-	 * to a
-	 * 
-	 * @param a
-	 *            The ActionListener events should be sent to
-	 */
-
-	public void setActionListener(ActionListener a) {
-		// Register event listener
-	}
-
-	public void mouseDragged(MouseEvent e) {
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	public void mousePressed(MouseEvent e) {
-	}
-
-	public void mouseClicked(MouseEvent e) {
-	}
-
 	public void mouseEntered(MouseEvent e) {
 	}
 
 	public void mouseExited(MouseEvent e) {
 	}
 
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void mouseMoved(MouseEvent e) {
 		Point current = e.getPoint();
 		int dx = 0;
@@ -143,7 +117,7 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 			Point newShift = new Point(dx, dy);
 
 			if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
-				ShiftTask task = new ShiftTask();
+				WorldScrollTask task = new WorldScrollTask();
 				task.setOffset(newShift);
 				
 				mapShift_ = newShift;
@@ -163,7 +137,7 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 		}
 	}
 
-	class ShiftTask extends TimerTask {
+	class WorldScrollTask extends TimerTask {
 		private Point p_;
 
 		public void setOffset(Point p) {
