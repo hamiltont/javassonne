@@ -43,6 +43,8 @@ import org.javassonne.ui.control.JImagePanel;
  */
 public class HUDPanel extends JPanel implements ActionListener {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final String DRAW_NEXT_TILE = "Draw";
 	private static final String ZOOM_OUT = "Zoom Out";
 	private static final String ZOOM_IN = "Zoom In";
@@ -65,7 +67,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 
 	public HUDPanel() {
 		setVisible(true);
-
+		setSize(140, 400);
+		
 		// Create all of the components that will be shown
 
 		newGameButton_ = new JButton(NEW_GAME);
