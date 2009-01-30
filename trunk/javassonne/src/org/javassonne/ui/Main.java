@@ -31,5 +31,9 @@ public class Main {
 		
 		LogWindow log = new LogWindow();
 		log.setVisible(true);
+		
+		// set the display helper's layeredPane so that other controllers can add JPanels to 
+		// the window really easily.
+		DisplayHelper.getInstance().setLayeredPane(window.getDisplayLayeredPane());
 	}
 }

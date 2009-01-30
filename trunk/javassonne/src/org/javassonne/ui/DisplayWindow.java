@@ -21,16 +21,12 @@
 
 package org.javassonne.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import javax.swing.JFrame;
-
-import org.javassonne.model.TileBoard;
 
 /**
  * @author Hamilton Turner
@@ -43,7 +39,7 @@ public class DisplayWindow extends JFrame {
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static final Color WINDOW_BG_COLOR = Color.WHITE;
 
-	private LayeredDisplayPane layeredDisplayPane_;
+	private DisplayLayeredPane displayPane_;
 
 	/**
 	 * Constructor. Sets application to full screen mode, adds the JLayeredPane
@@ -53,6 +49,7 @@ public class DisplayWindow extends JFrame {
 		// Do JFrame initialization
 		super();
 
+		// Set a few basic properties of our window
 		setTitle(WINDOW_TITLE);
 		getContentPane().setBackground(WINDOW_BG_COLOR);
 
@@ -61,21 +58,24 @@ public class DisplayWindow extends JFrame {
 		// http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html
 		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice();
+
+		// Make our window full screen
+		DisplayMode mode = d.getDisplayMode();
+		this.setSize(mode.getWidth(), mode.getHeight() - 20);
+
+		// Hide the bar at the top of the window and the window border
 		this.setUndecorated(true);
 
-		DisplayMode mode = d.getDisplayMode();
-		setSize(mode.getWidth(), mode.getHeight() - 20);
+		// Add the JLayeredPane to our contents
+		displayPane_ = new DisplayLayeredPane(this.getSize());
+		getContentPane().add(displayPane_);
 
-		// Set up the layout of the window
-		int height = getHeight();
-		int width = getWidth();
-		Dimension dim = new Dimension(width, height);
-		layeredDisplayPane_ = new LayeredDisplayPane(dim);
-
-		// Add the JLayeredPane
-		getContentPane().add(layeredDisplayPane_);
-
-		// Show ourself
+		// Show the window
 		setVisible(true);
+	}
+	
+	public DisplayLayeredPane getDisplayLayeredPane()
+	{
+		return displayPane_;
 	}
 }

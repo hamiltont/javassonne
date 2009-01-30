@@ -22,9 +22,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.JViewport;
+
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardIterator;
 
 /**
  * The default panel, displayed below all others. This panel contains the
@@ -33,13 +39,14 @@ import javax.swing.JViewport;
 public class MapLayer extends JPanel {
 	private JViewport viewport_;
 	private Map map_;
+	private TileBoard board_;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param screenSize
-	 *            The amount of screen the JViewport will have to display
-	 *            the map
+	 *            The amount of screen the JViewport will have to display the
+	 *            map
 	 */
 	public MapLayer(Dimension screenSize) {
 		map_ = new Map(screenSize);
@@ -51,20 +58,28 @@ public class MapLayer extends JPanel {
 		viewport_.setLayout(null);
 		viewport_.setView(map_);
 
-		// This layout allows the viewport to expand and take
-		// all available space
+		// This layout allows the viewport to expand and take all available
+		// space
 		setLayout(new BorderLayout());
 		add(viewport_);// , BorderLayout.CENTER);
 
+		// Listen for notification setting our board model
+		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
+				this, "setBoard");
+	}
+
+	public void setBoard(Notification n) {
+		board_ = (TileBoard) n.argument();
+		this.repaint();
 	}
 
 	/**
 	 * Helper function that allows other layers to know the amount of room
-	 * needed to render the map. This allows the other layers to setSize
-	 * without accidentally rescaling the map
+	 * needed to render the map. This allows the other layers to setSize without
+	 * accidentally rescaling the map
 	 * 
-	 * @return The width and height needed to render the full map (including
-	 *         any offscreen portion)
+	 * @return The width and height needed to render the full map (including any
+	 *         offscreen portion)
 	 */
 	public Dimension getMapSize() {
 		return map_.getSize();
@@ -72,25 +87,23 @@ public class MapLayer extends JPanel {
 
 	/**
 	 * Helper function for setting the upper left and lower right tile
-	 * positions. Note that this is in the board coord's, so an upper left
-	 * value of -3,0 would indicate the current upper left tile on the board
-	 * was 3 left, and 0 up. This allows the viewport to not scroll beyone
-	 * the currently visible map.
+	 * positions. Note that this is in the board coord's, so an upper left value
+	 * of -3,0 would indicate the current upper left tile on the board was 3
+	 * left, and 0 up. This allows the viewport to not scroll beyone the
+	 * currently visible map.
 	 */
-	public void setBoardConstraints(Point upperLeftTile,
-			Point lowerRightTile) {
+	public void setBoardConstraints(Point upperLeftTile, Point lowerRightTile) {
 		// TODO Implement setBoardConstraints function
 	}
 
 	/**
-	 * Shifts the internal JViewport so a different portion of the map is
-	 * shown
+	 * Shifts the internal JViewport so a different portion of the map is shown
 	 * 
 	 * @param amount
 	 *            The amount the view should be shifted. Values should be
-	 *            relative to position 0,0 on the normal cartesian plane.
-	 *            Ex: x/y of 3,-3 would shift the map to the right 3 units,
-	 *            and down 3 units.
+	 *            relative to position 0,0 on the normal cartesian plane. Ex:
+	 *            x/y of 3,-3 would shift the map to the right 3 units, and down
+	 *            3 units.
 	 */
 	public void shiftView(Point amount) {
 		Point current = viewport_.getViewPosition();
@@ -100,10 +113,9 @@ public class MapLayer extends JPanel {
 	}
 
 	/**
-	 * Because the JViewport needs to wrapper something, this class is a
-	 * logical construct that simply displays/renders the map. Currently no
-	 * optimization is provided. Map decides how much size is needed to
-	 * render the map.
+	 * Because the JViewport needs to wrapper something, this class is a logical
+	 * construct that simply displays/renders the map. Currently no optimization
+	 * is provided. Map decides how much size is needed to render the map.
 	 */
 	private class Map extends JPanel {
 		private double scale_ = 0.3;
@@ -112,8 +124,8 @@ public class MapLayer extends JPanel {
 		 * Constructor
 		 * 
 		 * @param screenSize
-		 *            Useful in determining the initial size of the map.
-		 *            This param may be removed later.
+		 *            Useful in determining the initial size of the map. This
+		 *            param may be removed later.
 		 */
 		public Map(Dimension screenSize) {
 
@@ -125,18 +137,13 @@ public class MapLayer extends JPanel {
 		}
 
 		/**
-		 * Override of the default JPanel function to render the map, and
-		 * any grid.
+		 * Override of the default JPanel function to render the map, and any
+		 * grid.
 		 */
 		public void paintComponent(Graphics gra) {
 
 			// clear the graphics layer
 			gra.clearRect(0, 0, this.getWidth(), this.getHeight());
-
-			// get the starting tile
-			// TileBoardIterator iter = board_.getUpperLeftCorner();
-			// BufferedImage tileImage = board_.homeTile().current()
-			// .getImage();
 
 			// get the dimensions of the tile image.
 			int tileWidth = 30; // (int) (tileImage.getWidth() * scale_);
@@ -150,32 +157,43 @@ public class MapLayer extends JPanel {
 			int cols = this.getWidth() / tileWidth + 1;
 
 			for (int k = 0; k <= rows + 1; k++)
-				gra.drawLine(0, k * tileHeight, this.getWidth(), k
-						* tileHeight);
+				gra
+						.drawLine(0, k * tileHeight, this.getWidth(), k
+								* tileHeight);
 
 			for (int k = 0; k <= cols + 1; k++)
-				gra.drawLine(k * tileWidth, 0, k * tileWidth, this
-						.getHeight());
+				gra.drawLine(k * tileWidth, 0, k * tileWidth, this.getHeight());
+
+			if (board_ == null)
+				return;
+
+			// get the starting tile
+			TileBoardIterator iter = board_.getUpperLeftCorner();
+			BufferedImage tileImage = board_.homeTile().current().getImage();
 
 			// Place tile images by iterating through the board and wrapping
-			// when we
-			// reach
-			// the end of a row.
-			/*
-			 * try { int i, x, y; i = x = y = 0; while (i < (rows cols) //
-			 * && (iter.current() != null || iter.nextRow() != null)) { ) {
-			 * i++; if (iter.current() != null) {
-			 * gra.drawImage(iter.current().getImage(), x, y, tileWidth,
-			 * tileHeight, null); } x += tileWidth; if (i % cols == 0) { //
-			 * Next row x = 0; y += tileHeight; iter.nextRow(); }
-			 * iter.right();
-			 * 
-			 * }
-			 * 
-			 * } catch (Exception e) {
-			 * System.out.println("Error displaying a tile image."); }
-			 */
-
+			// when we reach the end of a row.
+			try {
+				int i, x, y;
+				i = x = y = 0;
+				while (i < (rows * cols)) {
+					i++;
+					if (iter.current() != null) {
+						gra.drawImage(iter.current().getImage(), x, y,
+								tileWidth, tileHeight, null);
+					}
+					x += tileWidth;
+					if (i % cols == 0) {
+						// Next row
+						x = 0;
+						y += tileHeight;
+						iter.nextRow();
+					}
+					iter.right();
+				}
+			} catch (Exception e) {
+				System.out.println("Error displaying a tile image.");
+			}
 		}
 	} // End Map
 } // End MapLayer

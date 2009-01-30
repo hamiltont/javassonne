@@ -49,7 +49,9 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 	 */
 	public MapScrollEdges(MapLayer map) {
 		setOpaque(false);
-
+		setVisible(true);
+		setSize(map.getSize());
+		
 		map_ = map;
 		mapShiftTimer_ = null;
 
@@ -63,6 +65,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		this.addMouseMotionListener(this);
 	}
 
+	
 	public void mouseEntered(MouseEvent e) {
 	}
 

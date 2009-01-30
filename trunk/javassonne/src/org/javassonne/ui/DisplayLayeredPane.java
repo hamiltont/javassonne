@@ -31,7 +31,7 @@ import javax.swing.JLayeredPane;
  *         JPanels on the screen.
  * 
  */
-public class LayeredDisplayPane extends JLayeredPane {
+public class DisplayLayeredPane extends JLayeredPane {
 
 	/**
 	 * Constructor. Creates the MapLayer, passing it the screenSize. Also adds
@@ -46,7 +46,7 @@ public class LayeredDisplayPane extends JLayeredPane {
 	 *            The amount of the screen that the map is allowed to use for
 	 *            rendering itself.
 	 */
-	public LayeredDisplayPane(Dimension screenSize) {
+	public DisplayLayeredPane(Dimension screenSize) {
 		// Create the map layer
 		MapLayer map = new MapLayer(screenSize);
 
