@@ -42,7 +42,7 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 	private Rectangle2D navRight_;
 	private Rectangle2D navTop_;
 	private Rectangle2D navBottom_;
-	private WorldCanvas mapController_;
+	private LayeredDisplayPane mapController_;
 	private Dimension screenSize_; // Used to maintain this class' size
 
 	private Timer mapShiftTimer_;
@@ -58,7 +58,7 @@ class PaletteLayer extends JPanel implements MouseMotionListener, MouseListener 
 	 *            The interface that allows this class to interact and request
 	 *            actions on the map
 	 */
-	public PaletteLayer(Dimension screenSize, WorldCanvas mapController) {
+	public PaletteLayer(Dimension screenSize, LayeredDisplayPane mapController) {
 		setOpaque(false);
 		screenSize_ = screenSize;
 		int width = screenSize_.width;
