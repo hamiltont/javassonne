@@ -18,26 +18,48 @@
 
 package org.javassonne.messaging;
 
+/**
+ * The Notification class represents a single notification sent using the
+ * NotificationManager. Each notification has a few important properties:
+ * 
+ * argument: an object that was passed using sendNotification
+ * 
+ * identifier: in class, we referred to this as the EventType. It should be one
+ * of the static final values below.
+ * 
+ * @author bengotow
+ * 
+ */
 public class Notification {
 
 	public static final String LOG_WARNING = "NotificationLogWarning";
 	public static final String LOG_ERROR = "NotificationLogError";
-	
+
+	public static final String TILE_IN_HAND_CHANGED = "NotificationGameDrawTile";
+	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
+	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
+	public static final String ZOOM_IN = "NotificationGameZoomIn";
+	public static final String ZOOM_OUT = "NotificationGameZoomOut";
+
+	public static final String NEW_GAME = "NotificationNewGame";
+	public static final String LOAD_GAME = "NotificationLoadGame";
+	public static final String EXIT_GAME = "NotificationExitGame";
+
+	public static final String BOARD_SET = "NotificationSetBoard";
+
 	private String identifier_;
 	private Object argument_;
-	
+
 	public Notification(String identifier, Object arg) {
 		identifier_ = identifier;
 		argument_ = arg;
 	}
-	
-	public String identifier()
-	{
+
+	public String identifier() {
 		return identifier_;
 	}
-	
-	public Object argument()
-	{
+
+	public Object argument() {
 		return argument_;
 	}
 

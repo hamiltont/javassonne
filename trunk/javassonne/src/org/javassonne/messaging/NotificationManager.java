@@ -23,8 +23,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.javassonne.messaging.test.NotificationManagerTests;
-
+/**
+ * The NotificationManager is a singleton that allows you to quickly and
+ * efficiently pass messages around the app. To send a notification, call
+ * sendNotification() and pass a notification "identifier" (EventType).
+ * 
+ * To receive notifications, you need to register your object as an observer for
+ * certain types of events. For instance, the HUDController wants to know when
+ * the user clicks the "Rotate Tile" button, so it listens for the identifier
+ * "Notification.TILE_ROTATE_LEFT". To add yourself as an observer, call the
+ * addObserver function. See details on that below.
+ * 
+ * @author bengotow
+ * 
+ */
 public class NotificationManager {
 
 	private static NotificationManager instance_ = null;
@@ -102,18 +114,17 @@ public class NotificationManager {
 	}
 
 	public void removeObserver(Object o) {
-		Collection<ArrayList<NotificationCallback>> notifications = bindings_.values();
-		for (ArrayList<NotificationCallback> callbacks : notifications)
-		{
-			for (int ii = callbacks.size()-1; ii >= 0; ii--)
-			{
+		Collection<ArrayList<NotificationCallback>> notifications = bindings_
+				.values();
+		for (ArrayList<NotificationCallback> callbacks : notifications) {
+			for (int ii = callbacks.size() - 1; ii >= 0; ii--) {
 				NotificationCallback callback = callbacks.get(ii);
 				if (callback.target().equals(o))
 					callbacks.remove(ii);
 			}
 		}
 	}
-	
+
 	public void sendNotification(String identifier) {
 		this.sendNotification(identifier, null);
 	}

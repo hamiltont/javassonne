@@ -38,66 +38,38 @@ public class GameWindow extends JFrame {
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static final Color WINDOW_BG_COLOR = Color.gray;
 
-	private Container contentPane_;
-	private TileBoard boardModel_;
-	private GameWindowController controller_;
 	private WorldCanvas worldCanvas_;
-	private ControlPanel controlPanel_;
+	private HUDPanel controlPanel_;
 
-	public GameWindow(TileBoard model) {
+	public GameWindow() {
 		// Do JFrame initialization
 		super();
 		
-		// Syntax hack
-		contentPane_ = getContentPane();
-
-		boardModel_ = model;
+		// set up some default properties
 		setTitle(WINDOW_TITLE);
-		contentPane_.setBackground(WINDOW_BG_COLOR);
-		
+		this.getContentPane().setBackground(WINDOW_BG_COLOR);
 		
 		// Switching to full screen mode
 		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		this.setUndecorated(true);
 
-		DisplayMode mode = d.getDisplayMode();
-		setSize(mode.getWidth(), mode.getHeight()-20);		
-			
-		// We need to force the control panel to render, so 
-		//		we can get the height
-		// perhaps I could use controlPanel_.pack here instead?
-		contentPane_.setLayout(new BorderLayout());
-		controlPanel_ = new ControlPanel();
-		contentPane_.add(controlPanel_, BorderLayout.PAGE_END);
-		setVisible(true);
+		this.setVisible(false);
+		this.setVisible(true);
 		
-		// Set up the layout of the window
+		DisplayMode mode = d.getDisplayMode();
+		this.setSize(mode.getWidth(), mode.getHeight()-20);		
+			
+		// We need to force the control panel to render, so we can get the height
+		// perhaps I could use controlPanel_.pack here instead?
+		controlPanel_ = new HUDPanel();
+		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().add(controlPanel_, BorderLayout.PAGE_END);
+		
 		
 		int controlPanelHeight = controlPanel_.getHeight();
 		int height = getHeight() - controlPanelHeight;
 		int width = getWidth();
-		worldCanvas_ = new WorldCanvas(boardModel_, new Dimension(width, height));
-		contentPane_.add(worldCanvas_, BorderLayout.CENTER);
-		
-		setSize(getWidth(), getHeight());
-		
-		// Force a redraw to show the new components
-		setVisible(false);
-		setVisible(true);
-	}
-
-	public void update() {
-		// Pass the update on to the sub views
-		worldCanvas_.redraw();
-		controlPanel_.redraw();
-		
-	}
-	
-	public void setController(GameWindowController controller) {
-		controller_ = controller;
-		
-		// Add action listeners
-		worldCanvas_.setDefaultActionListener(controller);
-		controlPanel_.setActionListener(controller);
+		worldCanvas_ = new WorldCanvas(new Dimension(width, height));
+		this.getContentPane().add(worldCanvas_, BorderLayout.CENTER);
 	}
 }
