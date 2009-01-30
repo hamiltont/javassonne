@@ -20,7 +20,7 @@ package org.javassonne.ui.test;
 
 import junit.framework.TestCase;
 
-import org.javassonne.ui.GameWindow;
+import org.javassonne.ui.DisplayWindow;
 import org.javassonne.model.TileBoard;
 
 public class GameWindowTest extends TestCase {

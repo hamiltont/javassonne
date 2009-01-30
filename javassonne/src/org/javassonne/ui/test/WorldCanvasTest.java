@@ -27,7 +27,7 @@ import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
-import org.javassonne.ui.WorldCanvas;
+import org.javassonne.ui.LayeredDisplayPane;
 
 /**
  * Unit tests for WorldCanvas class
@@ -35,7 +35,7 @@ import org.javassonne.ui.WorldCanvas;
  *
  */
 public class WorldCanvasTest extends TestCase {
-	WorldCanvas wc_;
+	LayeredDisplayPane wc_;
 
 	protected void setUp() throws Exception {
 		super.setUp();

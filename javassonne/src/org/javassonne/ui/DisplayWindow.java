@@ -23,7 +23,6 @@ package org.javassonne.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -33,43 +32,50 @@ import javax.swing.JFrame;
 
 import org.javassonne.model.TileBoard;
 
-public class GameWindow extends JFrame {
+/**
+ * @author Hamilton Turner
+ * 
+ *         The Display serves only the purpose of wrapper-ing the
+ *         LayeredDisplayPane so that it can be set to full-screen mode.
+ */
+public class DisplayWindow extends JFrame {
 
 	private static final String WINDOW_TITLE = "Javassonne";
-	private static final Color WINDOW_BG_COLOR = Color.gray;
+	private static final Color WINDOW_BG_COLOR = Color.WHITE;
 
-	private WorldCanvas worldCanvas_;
-	private HUDPanel controlPanel_;
+	private LayeredDisplayPane layeredDisplayPane_;
 
-	public GameWindow() {
+	/**
+	 * Constructor. Sets application to full screen mode, adds the JLayeredPane
+	 * for display, and begins rendering (setVisible true)
+	 */
+	public DisplayWindow() {
 		// Do JFrame initialization
 		super();
-		
-		// set up some default properties
+
 		setTitle(WINDOW_TITLE);
-		this.getContentPane().setBackground(WINDOW_BG_COLOR);
-		
+		getContentPane().setBackground(WINDOW_BG_COLOR);
+
 		// Switching to full screen mode
-		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		// TODO read fullscreen javadocs to make this multiOS friendly
+		// http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html
+		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getDefaultScreenDevice();
 		this.setUndecorated(true);
 
-		this.setVisible(false);
-		this.setVisible(true);
-		
 		DisplayMode mode = d.getDisplayMode();
-		this.setSize(mode.getWidth(), mode.getHeight()-20);		
-			
-		// We need to force the control panel to render, so we can get the height
-		// perhaps I could use controlPanel_.pack here instead?
-		controlPanel_ = new HUDPanel();
-		this.getContentPane().setLayout(new BorderLayout());
-		this.getContentPane().add(controlPanel_, BorderLayout.PAGE_END);
-		
-		
-		int controlPanelHeight = controlPanel_.getHeight();
-		int height = getHeight() - controlPanelHeight;
+		setSize(mode.getWidth(), mode.getHeight() - 20);
+
+		// Set up the layout of the window
+		int height = getHeight();
 		int width = getWidth();
-		worldCanvas_ = new WorldCanvas(new Dimension(width, height));
-		this.getContentPane().add(worldCanvas_, BorderLayout.CENTER);
+		Dimension dim = new Dimension(width, height);
+		layeredDisplayPane_ = new LayeredDisplayPane(dim);
+
+		// Add the JLayeredPane
+		getContentPane().add(layeredDisplayPane_);
+
+		// Show ourself
+		setVisible(true);
 	}
 }
