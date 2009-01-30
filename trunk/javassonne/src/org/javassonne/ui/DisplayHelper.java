@@ -18,6 +18,7 @@
 
 package org.javassonne.ui;
 
+import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.JLayeredPane;
@@ -103,6 +104,12 @@ public class DisplayHelper {
 
 		layeredPane_ = layeredDisplayPane;
 	}
+	
+	public Dimension getScreenSize(){
+		if (!isLayeredPaneInvalid())
+			return null;
+		return layeredPane_.getSize();
+	}
 
 	/**
 	 * Allows for easy addition of an object to the screen, by passing in the
@@ -117,11 +124,8 @@ public class DisplayHelper {
 	 *            The appropriate layer to display this object on.
 	 * 
 	 */
-	public void show(JPanel displayMe, DisplayHelper.Layer displayLayer) {
-		if (isLayeredPaneInvalid())
-			return;
-		
-		
+	public void add(JPanel displayMe, DisplayHelper.Layer displayLayer) {
+		add(displayMe, displayLayer, new Point(0,0));
 	}
 
 	/**
@@ -138,15 +142,41 @@ public class DisplayHelper {
 	 * @param
 	 * 
 	 */
-	public void show(JPanel displayMe, DisplayHelper.Layer displayLayer,
+	public void add(JPanel displayMe, DisplayHelper.Layer displayLayer,
 			Point startingLocation) {
+		// Check that the layered pane is present
 		if (isLayeredPaneInvalid())
 			return;
-
+		
+		// Check that the item is not already present
+		int checkAlreadyPresent = layeredPane_.getIndexOf(displayMe);
+		if (checkAlreadyPresent != 0)
+		{
+			updateLayer(displayMe, displayLayer);
+			updateLocation(displayMe, startingLocation);
+		}
+		
+		layeredPane_.add(displayMe);
+		showOnTop(displayMe);
+		displayMe.setLocation(startingLocation);
 	}
 	
-	public void 
+	public void remove(JPanel removeMe) {
+		layeredPane_.remove(removeMe);
+	}
 
+	public void updateLayer(JPanel updateMe, DisplayHelper.Layer displayLayer){
+		//TODO implement function
+	}
+	
+	public void updateLocation(JPanel updateMe, Point newLocation) {
+		//TODO  implement function
+	}
+	
+	public void showOnTop(JPanel showMe) {
+		layeredPane_.moveToFront(showMe);
+	}
+	
 	private boolean isLayeredPaneInvalid() {
 		boolean equalsNull = (layeredPane_ == null);
 		return equalsNull;
