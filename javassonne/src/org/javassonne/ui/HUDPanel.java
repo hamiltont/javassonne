@@ -20,6 +20,7 @@ package org.javassonne.ui;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,9 +31,17 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Tile;
 import org.javassonne.ui.control.JImagePanel;
 
-public class ControlPanel extends JPanel {
+/**
+ * The primary JPanel in the HUD
+ * @author bengotow
+ *
+ */
+public class HUDPanel extends JPanel implements ActionListener {
 
 	private static final String DRAW_NEXT_TILE = "Draw";
 	private static final String ZOOM_OUT = "Zoom Out";
@@ -51,79 +60,68 @@ public class ControlPanel extends JPanel {
 	private JButton rotateLeft_;
 
 	private JImagePanel curTileImage_;
-	
 	private TurnIndicator playerTurn_;
-	private int curPlayer_ = 0;
-
 	private BufferedImage background_;
 
-	public ControlPanel() {
+	public HUDPanel() {
 		setVisible(true);
 
+		// Create all of the components that will be shown
+
 		newGameButton_ = new JButton(NEW_GAME);
+		newGameButton_.setActionCommand(Notification.NEW_GAME);
+		newGameButton_.addActionListener(this);
+
 		loadGameButton_ = new JButton(LOAD_GAME);
+		loadGameButton_.setActionCommand(Notification.LOAD_GAME);
+		loadGameButton_.addActionListener(this);
+
 		exitGameButton_ = new JButton(EXIT_GAME);
+		exitGameButton_.setActionCommand(Notification.EXIT_GAME);
+		exitGameButton_.addActionListener(this);
 
 		zoomInButton_ = new JButton(ZOOM_IN);
+		zoomInButton_.setActionCommand(Notification.ZOOM_IN);
 		zoomOutButton_ = new JButton(ZOOM_OUT);
+		zoomOutButton_.setActionCommand(Notification.ZOOM_OUT);
 
 		drawTile_ = new JButton(DRAW_NEXT_TILE);
 
 		rotateRight_ = new JButton("=>");
-		rotateLeft_ = new JButton("<=");
+		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
+		rotateRight_.addActionListener(this);
 
-		newGameButton_.setActionCommand("new_game");
-		loadGameButton_.setActionCommand("load_game");
-		exitGameButton_.setActionCommand("exit_game");
-		drawTile_.setActionCommand("draw_tile");
-		rotateRight_.setActionCommand("rotate_right");
-		rotateLeft_.setActionCommand("rotate_left");
-		
-		playerTurn_ = new TurnIndicator("Player " + (curPlayer_+1) + "'s Turn");
+		rotateLeft_ = new JButton("<=");
+		rotateLeft_.setActionCommand(Notification.TILE_ROTATE_LEFT);
+		rotateLeft_.addActionListener(this);
+
+		playerTurn_ = new TurnIndicator("Player " + 1 + "'s Turn");
+
+		curTileImage_ = new JImagePanel(null, 50, 50);
+
+		// attach all of the components to the JFrame
+
 		add(playerTurn_);
-		
 		add(newGameButton_);
 		add(loadGameButton_);
 		add(exitGameButton_);
-
 		add(zoomInButton_);
 		add(zoomOutButton_);
-
-		// getting image for current tile (temporarily reading directly from
-		// file)
-		BufferedImage image = null;
-
-		try {
-			image = ImageIO.read(new File(
-					"tilesets/standard/tile_standard_1.jpg"));
-		} catch (IOException e) {
-		}
-
-		curTileImage_ = new JImagePanel(image, 50, 50);
-
 		add(rotateLeft_);
 		add(curTileImage_);
 		add(new JLabel("             "));
 		add(rotateRight_);
-
-		add(new JButton("Pan Up"));
-		add(new JButton("Pan Down"));
-		add(new JButton("Pan Left"));
-		add(new JButton("Pan Right"));
-
 		add(drawTile_);
 
+		// Subscribe for notifications from the controller so we know when to
+		// update ourselves!
+		NotificationManager.getInstance().addObserver(
+				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
 	}
 
-	public void setActionListener(ActionListener listener) {
-		newGameButton_.addActionListener(listener);
-		loadGameButton_.addActionListener(listener);
-		exitGameButton_.addActionListener(listener);
-		drawTile_.addActionListener(listener);
-		rotateLeft_.addActionListener(listener);
-		rotateRight_.addActionListener(listener);
-	}
-
+	/*
+	 * This function is responsible for painting the background image we have.
+	 */
 	public void paintComponent(Graphics g) {
 		if (background_ == null) {
 			try {
@@ -139,7 +137,24 @@ public class ControlPanel extends JPanel {
 				0, background_.getWidth(), background_.getHeight(), null);
 	}
 
-	public void redraw() {
-		// re-read the model
+	/*
+	 * Whenever a button is pressed in our panel, we want to send a notification
+	 * so the button press can be handled by the HUDController (and possibly
+	 * elsewhere - the BoardController handles zoom in and zoom out). We've
+	 * wired things up so that each button sends a notification with the same
+	 * name as it's actionCommand.
+	 */
+	public void actionPerformed(ActionEvent e) {
+		NotificationManager.getInstance()
+				.sendNotification(e.getActionCommand());
+	}
+
+	// Notification Handlers
+
+	public void updateTileInHand(Notification n) {
+		Tile t = (Tile) n.argument();
+		curTileImage_.setImage(t.getImage());
+
+		this.invalidate();
 	}
 }

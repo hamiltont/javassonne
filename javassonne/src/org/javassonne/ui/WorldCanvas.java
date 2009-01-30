@@ -28,6 +28,8 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
@@ -61,9 +63,7 @@ public class WorldCanvas extends JLayeredPane {
 	 *            The amount of the screen that the map is allowed to use for
 	 *            rendering itself.
 	 */
-	public WorldCanvas(TileBoard board, Dimension screenSize) {
-		board_ = board;
-
+	public WorldCanvas(Dimension screenSize) {
 		// First create the map, allowing it to
 		// determine how large it needs to be
 		default_ = new MapLayer(screenSize);
@@ -84,6 +84,9 @@ public class WorldCanvas extends JLayeredPane {
 
 		add(default_, JLayeredPane.DEFAULT_LAYER);
 		add(palette_, JLayeredPane.PALETTE_LAYER);
+		
+		// Listen for notification setting our board model
+		NotificationManager.getInstance().addObserver(Notification.BOARD_SET, this, "setBoard");
 	}
 
 	/**
@@ -99,23 +102,17 @@ public class WorldCanvas extends JLayeredPane {
 		default_.shiftView(amount);
 	}
 
+	public void setBoard(Notification n)
+	{
+		board_ = (TileBoard)n.argument();
+		this.redraw();
+	}
 	/**
-	 * Redraw anything currently contailed within the WorldCanvas
+	 * Redraw anything currently contained within the WorldCanvas
 	 */
 	public void redraw() {
-		// Redraw the map, and the palette
+		// Redraw the map, and the p
 		this.invalidate();
-	}
-
-	/**
-	 * Sets the default action listener for anything contained in WorldCanvas
-	 * 
-	 * @param controller
-	 *            default action listener
-	 */
-	public void setDefaultActionListener(GameWindowController controller) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -137,17 +134,16 @@ public class WorldCanvas extends JLayeredPane {
 			map_ = new Map(screenSize);
 
 			setSize(screenSize);
-			
 
 			viewport_ = new JViewport();
 			viewport_.setExtentSize(screenSize);
 			viewport_.setLayout(null);
 			viewport_.setView(map_);
-			
+
 			// This layout allows the viewport to expand and take
 			// all available space
 			setLayout(new BorderLayout());
-			add(viewport_);//, BorderLayout.CENTER);
+			add(viewport_);// , BorderLayout.CENTER);
 
 		}
 
@@ -205,21 +201,22 @@ public class WorldCanvas extends JLayeredPane {
 				setSize(screenSize.width * 2, screenSize.height * 2);
 			}
 
-			
-			
-			
 			/**
 			 * Override of the default JPanel function to render the map, and
 			 * any grid.
 			 */
 			public void paintComponent(Graphics gra) {
 
+				if (board_ == null)
+					return;
+
 				// clear the graphics layer
 				gra.clearRect(0, 0, this.getWidth(), this.getHeight());
 
 				// get the starting tile
 				TileBoardIterator iter = board_.getUpperLeftCorner();
-				BufferedImage tileImage = board_.homeTile().current().getImage();
+				BufferedImage tileImage = board_.homeTile().current()
+						.getImage();
 
 				// get the dimensions of the tile image.
 				int tileWidth = (int) (tileImage.getWidth() * scale_);
@@ -232,12 +229,13 @@ public class WorldCanvas extends JLayeredPane {
 				int rows = this.getHeight() / tileHeight + 1;
 				int cols = this.getWidth() / tileWidth + 1;
 
+				for (int k = 0; k <= rows + 1; k++)
+					gra.drawLine(0, k * tileHeight, this.getWidth(), k
+							* tileHeight);
 
-				for (int k = 0; k <= rows+1; k++)
-					gra.drawLine(0, k * tileHeight, this.getWidth(), k * tileHeight);
-
-				for (int k = 0; k <= cols+1; k++)
-					gra.drawLine(k * tileWidth, 0, k * tileWidth, this.getHeight());
+				for (int k = 0; k <= cols + 1; k++)
+					gra.drawLine(k * tileWidth, 0, k * tileWidth, this
+							.getHeight());
 
 				// Place tile images by iterating through the board and wrapping
 				// when we

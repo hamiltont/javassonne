@@ -25,33 +25,34 @@ import javax.swing.JPanel;
 
 /**
  * This class forms a container to easily place images onto JPanels
+ * 
  * @author Adam Albright
- *
+ * 
  */
 public class JImagePanel extends JPanel {
 	BufferedImage image_;
 	int width_;
 	int height_;
-	
-//	Default constructor
-//	@params: image (BufferedImage) - the image to place into the container
-//			 width (int) - target width of the image and container
-//	 		 height (int) - target height of the image and container
-	public JImagePanel(BufferedImage image,int width, int height) {
+
+	// Default constructor
+	// @params: image (BufferedImage) - the image to place into the container
+	// width (int) - target width of the image and container
+	// height (int) - target height of the image and container
+	public JImagePanel(BufferedImage image, int width, int height) {
 		image_ = image;
 		width_ = width;
 		height_ = height;
 	}
 
-//  Protected method for drawing the image onto the JPanel
+	// Protected method for drawing the image onto the JPanel
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		this.setSize(width_,height_);
-		g.drawImage(image_,0,0,width_,height_,null);
+		this.setSize(width_, height_);
+		g.drawImage(image_, 0, 0, width_, height_, null);
 	}
-
-//	Redraws the image
-	void redraw(){
-		this.invalidate();
+	
+	public void setImage(BufferedImage image) {
+		image_ = image;
+		this.repaint();
 	}
 }

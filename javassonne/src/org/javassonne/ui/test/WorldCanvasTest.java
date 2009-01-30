@@ -46,7 +46,7 @@ public class WorldCanvasTest extends TestCase {
 		Tile t = set.tileWithUniqueIdentifier("tile_standard_1");
 		TileBoard model = new TileMapBoard(t);
 
-		wc_ = new WorldCanvas(model, new Dimension(100, 100));
+		wc_ = new WorldCanvas(new Dimension(100, 100));
 	}
 
 	protected void tearDown() throws Exception {
