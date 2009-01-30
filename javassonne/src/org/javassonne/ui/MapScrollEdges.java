@@ -55,12 +55,12 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		map_ = map;
 		mapShiftTimer_ = null;
 
-		navLeft_ = new Rectangle2D.Double(0, 0, 40, map_.getHeight());
-		navRight_ = new Rectangle2D.Double(map_.getWidth() - 40, 0, 40, map_
+		navLeft_ = new Rectangle2D.Double(0, 0, 10, map_.getHeight());
+		navRight_ = new Rectangle2D.Double(map_.getWidth() - 10, 0, 10, map_
 				.getHeight());
-		navTop_ = new Rectangle2D.Double(0, 0, map_.getWidth(), 40);
-		navBottom_ = new Rectangle2D.Double(0, map_.getHeight() - 40, map_
-				.getWidth(), 40);
+		navTop_ = new Rectangle2D.Double(0, 0, map_.getWidth(), 10);
+		navBottom_ = new Rectangle2D.Double(0, map_.getHeight() - 10, map_
+				.getWidth(), 10);
 
 		this.addMouseMotionListener(this);
 	}

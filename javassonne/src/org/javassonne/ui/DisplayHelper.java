@@ -150,15 +150,17 @@ public class DisplayHelper {
 		
 		// Check that the item is not already present
 		int checkAlreadyPresent = layeredPane_.getIndexOf(displayMe);
-		if (checkAlreadyPresent != 0)
+		if (checkAlreadyPresent != -1)
 		{
 			updateLayer(displayMe, displayLayer);
 			updateLocation(displayMe, startingLocation);
+		} else {
+			layeredPane_.add(displayMe, JLayeredPane.PALETTE_LAYER);
+
+			showOnTop(displayMe);
+			displayMe.setLocation(startingLocation);
+			displayMe.setVisible(true);
 		}
-		
-		layeredPane_.add(displayMe);
-		showOnTop(displayMe);
-		displayMe.setLocation(startingLocation);
 	}
 	
 	public void remove(JPanel removeMe) {

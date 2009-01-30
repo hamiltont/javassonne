@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import java.awt.Point;
+
 
 public class Main {
 
@@ -35,5 +37,9 @@ public class Main {
 		// set the display helper's layeredPane so that other controllers can add JPanels to 
 		// the window really easily.
 		DisplayHelper.getInstance().setLayeredPane(window.getDisplayLayeredPane());
+		
+		//TODO: We should be displaying the main menu instead of the HUD Panel
+		HUDPanel panel_ = new HUDPanel();
+		DisplayHelper.getInstance().add(panel_, DisplayHelper.Layer.PALETTE, new Point(10, 10));
 	}
 }
