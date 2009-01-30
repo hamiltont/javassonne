@@ -19,7 +19,6 @@
 package org.javassonne.ui.test;
 
 import junit.framework.TestCase;
-import org.javassonne.ui.*;
 
 public class ControlPanelTest extends TestCase {
 
