@@ -39,6 +39,9 @@ public class LayeredDisplayPane extends JLayeredPane {
 	 * it the only object on the default layer (because DisplayHelper does not
 	 * provide functionality to add items to the default layer)
 	 * 
+	 * It also creates the MapScrollEdges class that listens for mouse movement
+	 * and scrolls the view. This is added to the palette Layer.
+	 * 
 	 * @param screenSize
 	 *            The amount of the screen that the map is allowed to use for
 	 *            rendering itself.
@@ -47,10 +50,17 @@ public class LayeredDisplayPane extends JLayeredPane {
 		// Create the map layer
 		MapLayer map = new MapLayer(screenSize);
 
-		// Add the mapLayer. The DisplayHelper does
-		// not have functionality to draw on the
-		// default layer, so the MapLayer should be the
-		// only item on the Default Layer
+		// Add the mapLayer. The DisplayHelper does not have functionality to
+		// draw on the default layer, so the MapLayer should be the only item on
+		// the Default Layer
 		add(map, JLayeredPane.DEFAULT_LAYER);
+
+		// Create the edges of the map that trigger the scrolling behavior. We
+		// have to pass the map layer in so that the MapScrollEdges instance
+		// knows which map layer to scroll!
+		add(new MapScrollEdges(map), JLayeredPane.PALETTE_LAYER);
+
+		// NOTE: You should not add all of your layers here. Add them as needed
+		// using the functions in the singleton DisplayHelper.
 	}
 } // End WorldCanvas

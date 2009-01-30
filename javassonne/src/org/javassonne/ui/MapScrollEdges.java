@@ -18,8 +18,6 @@
 
 package org.javassonne.ui;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -31,13 +29,12 @@ import javax.swing.JPanel;
 
 class MapScrollEdges extends JPanel implements MouseMotionListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Rectangle2D navLeft_;
 	private Rectangle2D navRight_;
 	private Rectangle2D navTop_;
 	private Rectangle2D navBottom_;
-	private WorldCanvas mapController_;
-	private Dimension screenSize_; // Used to maintain this class' size
+	private MapLayer map_;
 
 	private Timer mapShiftTimer_;
 	private Point mapShift_;
@@ -45,42 +42,25 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 	/**
 	 * Constructor
 	 * 
-	 * @param screenSize
-	 *            The dimensions of the amount of screen realestate alotted to
-	 *            the world canvas
-	 * @param mapController
-	 *            The interface that allows this class to interact and request
-	 *            actions on the map
+	 * @param map
+	 *            The mapLayer that this MapScrollEdges instance should be
+	 *            responsible for scrolling. The mapScrollEdges will be placed
+	 *            directly on top of the given map.
 	 */
-	public MapScrollEdges(Dimension screenSize, WorldCanvas mapController) {
+	public MapScrollEdges(MapLayer map) {
 		setOpaque(false);
-		screenSize_ = screenSize;
-		int width = screenSize_.width;
-		int height = screenSize_.height;
 
-		mapController_ = mapController;
+		map_ = map;
 		mapShiftTimer_ = null;
 
-		navLeft_ = new Rectangle2D.Double(0, 0, 40, height);
-		navRight_ = new Rectangle2D.Double(width - 40, 0, 40, height);
-		navTop_ = new Rectangle2D.Double(0, 0, width, 40);
-		navBottom_ = new Rectangle2D.Double(0, height - 40, width, 40);
+		navLeft_ = new Rectangle2D.Double(0, 0, 40, map_.getHeight());
+		navRight_ = new Rectangle2D.Double(map_.getWidth() - 40, 0, 40, map_
+				.getHeight());
+		navTop_ = new Rectangle2D.Double(0, 0, map_.getWidth(), 40);
+		navBottom_ = new Rectangle2D.Double(0, map_.getHeight() - 40, map_
+				.getWidth(), 40);
 
 		this.addMouseMotionListener(this);
-	}
-
-	/**
-	 * Override of the default JPanel function to render the palette layer
-	 * controls to the world canvas
-	 */
-	public void paintComponent(Graphics g) {
-	}
-
-	/**
-	 * Redraw this layer
-	 */
-	public void redraw() {
-		// Redraw the board
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -90,10 +70,8 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
-	
+
 	public void mouseMoved(MouseEvent e) {
 		Point current = e.getPoint();
 		int dx = 0;
@@ -119,7 +97,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 			if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
 				WorldScrollTask task = new WorldScrollTask();
 				task.setOffset(newShift);
-				
+
 				mapShift_ = newShift;
 
 				if (mapShiftTimer_ != null)
@@ -145,7 +123,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		}
 
 		public void run() {
-			mapController_.shiftView(this.p_);
+			map_.shiftView(this.p_);
 		}
 	}
 }

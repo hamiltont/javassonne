@@ -26,8 +26,9 @@ public class Main {
 		GameController controller = new GameController();
 		
 		// create the game window and the log window
-		GameWindow window = new GameWindow();
+		DisplayWindow window = new DisplayWindow();
 		window.setVisible(true);
+		
 		LogWindow log = new LogWindow();
 		log.setVisible(true);
 	}
