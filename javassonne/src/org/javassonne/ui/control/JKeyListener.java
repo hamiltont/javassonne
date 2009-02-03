@@ -77,7 +77,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		// Notify the system
 		if (keyString.equalsIgnoreCase("Escape")) {
 			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_WARNING, "Exit Detected");
+					Notification.LOG_WARNING, "Exit Key Detected");
 			NotificationManager.getInstance().sendNotification(
 					Notification.EXIT_GAME);
 		}

@@ -18,6 +18,7 @@
 
 package org.javassonne.ui;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -35,11 +36,13 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.ui.control.JImagePanel;
+import org.javassonne.ui.control.JKeyListener;
 
 /**
  * The primary JPanel in the HUD
+ * 
  * @author bengotow
- *
+ * 
  */
 public class HUDPanel extends JPanel implements ActionListener {
 
@@ -64,11 +67,15 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private JImagePanel curTileImage_;
 	private TurnIndicator playerTurn_;
 	private BufferedImage background_;
+	private JKeyListener keyListener_;
 
 	public HUDPanel() {
 		setVisible(true);
 		setSize(140, 400);
-		
+
+		keyListener_ = new JKeyListener();
+		this.addKeyListener(keyListener_);
+
 		// Create all of the components that will be shown
 
 		newGameButton_ = new JButton(NEW_GAME);
@@ -159,5 +166,13 @@ public class HUDPanel extends JPanel implements ActionListener {
 		curTileImage_.setImage(t.getImage());
 
 		this.invalidate();
+	}
+
+	// Overloaded the add() method to bind a key listener to any elements placed
+	// within the JPanel
+	public Component add(Component comp) {
+		super.add(comp);
+		comp.addKeyListener(keyListener_);
+		return comp;
 	}
 }
