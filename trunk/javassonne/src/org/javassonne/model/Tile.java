@@ -18,6 +18,9 @@
 
 package org.javassonne.model;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 /**
@@ -243,28 +246,24 @@ public class Tile {
 		// move all of the features, farms, and farmWalls one position to the
 		// right by shifting them within their respective arrays
 		for (int i = 0; i < 4; i++) {
-			features_[(i + 1) % 4] = features_[i];
-			farms_[(i + 1) % 4] = farms_[i];
-			farmWalls_[(i + 1) % 4] = farmWalls_[i];
+			features_[(4 + i + direction) % 4] = features_[i];
+			farms_[(4 + i + direction) % 4] = farms_[i];
+			farmWalls_[(4 + i + direction) % 4] = farmWalls_[i];
 		}
+		
+		int angle = direction * 90; 
+		if(angle < 0)
+			angle += 360;
 
 		// rotate our image, if it exists
 		if (image_ != null) {
-			int width = image_.getWidth();
-			int height = image_.getHeight();
-
-			BufferedImage biFlip = new BufferedImage(height, width, image_
-					.getType());
-
-			for (int i = 0; i < width; i++)
-				for (int j = 0; j < height; j++)
-					if (direction == 1)
-						biFlip.setRGB(height - 1 - j, width - 1 - i, image_
-								.getRGB(i, j));
-					else
-						biFlip.setRGB(j, i, image_.getRGB(i, j));
-
-			image_ = biFlip;
+			AffineTransform test = new AffineTransform();
+			int w = image_.getWidth();  
+	        int h = image_.getHeight(); 
+	        test.rotate(Math.toRadians(angle),w/2,h/2);
+	        AffineTransformOp op = new AffineTransformOp(test, 
+	        	      AffineTransformOp.TYPE_BILINEAR);
+	        image_ = op.filter(image_, null);  
 		}
 	}
 
