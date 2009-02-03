@@ -38,6 +38,7 @@ public class LogPanel extends JPanel implements KeyListener {
 
 	public LogPanel() {
 		setLayout(new BorderLayout());
+		setSize(500,200);
 		
 		// create the scrolling text box
 		area_ = new TextArea();
@@ -87,10 +88,10 @@ public class LogPanel extends JPanel implements KeyListener {
 	}
 
 	public void keyReleased(KeyEvent e) {
-		
+
 	}
 
 	public void keyTyped(KeyEvent e) {
-	
+
 	}
 }
