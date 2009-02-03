@@ -18,11 +18,17 @@
 
 package org.javassonne.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author Hamilton Turner
@@ -57,7 +63,7 @@ import javax.swing.JPanel;
 public class DisplayHelper {
 
 	private static DisplayHelper INSTANCE;
-	private JLayeredPane layeredPane_ = null;
+	private JDesktopPane desktopPane_ = null;
 
 	/**
 	 * Predefined constants for Layers
@@ -97,18 +103,18 @@ public class DisplayHelper {
 	 * @param layeredDisplayPane
 	 *            The JLayeredPane to be operated on.
 	 */
-	protected void setLayeredPane(JLayeredPane layeredDisplayPane) {
+	protected void setDesktopPane(JDesktopPane layeredDisplayPane) {
 		// Only allow layered pane to be set once
 		if (!isLayeredPaneInvalid())
 			return;
 
-		layeredPane_ = layeredDisplayPane;
+		desktopPane_ = layeredDisplayPane;
 	}
-	
-	public Dimension getScreenSize(){
+
+	public Dimension getScreenSize() {
 		if (!isLayeredPaneInvalid())
 			return null;
-		return layeredPane_.getSize();
+		return desktopPane_.getSize();
 	}
 
 	/**
@@ -124,8 +130,8 @@ public class DisplayHelper {
 	 *            The appropriate layer to display this object on.
 	 * 
 	 */
-	public void add(JPanel displayMe, DisplayHelper.Layer displayLayer) {
-		add(displayMe, displayLayer, new Point(0,0));
+	public void add(JComponent displayMe, DisplayHelper.Layer displayLayer) {
+		add(displayMe, displayLayer, new Point(0, 0));
 	}
 
 	/**
@@ -142,45 +148,54 @@ public class DisplayHelper {
 	 * @param
 	 * 
 	 */
-	public void add(JPanel displayMe, DisplayHelper.Layer displayLayer,
+	public void add(JComponent displayMe, DisplayHelper.Layer displayLayer,
 			Point startingLocation) {
+
 		// Check that the layered pane is present
 		if (isLayeredPaneInvalid())
 			return;
-		
+
 		// Check that the item is not already present
-		int checkAlreadyPresent = layeredPane_.getIndexOf(displayMe);
-		if (checkAlreadyPresent != -1)
-		{
+		int checkAlreadyPresent = desktopPane_.getIndexOf(displayMe);
+		if (checkAlreadyPresent != -1) {
 			updateLayer(displayMe, displayLayer);
 			updateLocation(displayMe, startingLocation);
 		} else {
-			layeredPane_.add(displayMe, JLayeredPane.PALETTE_LAYER);
+			desktopPane_.add(displayMe, JLayeredPane.PALETTE_LAYER);
 
 			showOnTop(displayMe);
 			displayMe.setLocation(startingLocation);
 			displayMe.setVisible(true);
 		}
 	}
-	
-	public void remove(JPanel removeMe) {
-		layeredPane_.remove(removeMe);
+
+	public void addAsInternalFrame(JComponent displayMe, DisplayHelper.Layer displayLayer, Point startingLocation) {
+		
+		JInternalFrame f = new JInternalFrame("", false, false, false, false);
+		f.setContentPane(displayMe);
+		f.pack();
+
+		add(f, displayLayer, startingLocation);
 	}
 
-	public void updateLayer(JPanel updateMe, DisplayHelper.Layer displayLayer){
-		//TODO implement function
+	public void remove(JComponent removeMe) {
+		desktopPane_.remove(removeMe);
 	}
-	
-	public void updateLocation(JPanel updateMe, Point newLocation) {
-		//TODO  implement function
+
+	public void updateLayer(JComponent updateMe, DisplayHelper.Layer displayLayer) {
+		// TODO implement function
 	}
-	
-	public void showOnTop(JPanel showMe) {
-		layeredPane_.moveToFront(showMe);
+
+	public void updateLocation(JComponent updateMe, Point newLocation) {
+		// TODO implement function
 	}
-	
+
+	public void showOnTop(JComponent showMe) {
+		desktopPane_.moveToFront(showMe);
+	}
+
 	private boolean isLayeredPaneInvalid() {
-		boolean equalsNull = (layeredPane_ == null);
+		boolean equalsNull = (desktopPane_ == null);
 		return equalsNull;
 	}
 }

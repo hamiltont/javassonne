@@ -61,7 +61,7 @@ public class MapLayer extends JPanel {
 		// This layout allows the viewport to expand and take all available
 		// space
 		setLayout(new BorderLayout());
-		add(viewport_);// , BorderLayout.CENTER);
+		add(viewport_);
 
 		// Listen for notification setting our board model
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
@@ -142,27 +142,7 @@ public class MapLayer extends JPanel {
 		 */
 		public void paintComponent(Graphics gra) {
 
-			// clear the graphics layer
-			gra.clearRect(0, 0, this.getWidth(), this.getHeight());
-
 			// get the dimensions of the tile image.
-			int tileWidth = 30; // (int) (tileImage.getWidth() * scale_);
-			int tileHeight = 30; // (int) (tileImage.getHeight() * scale_);
-
-			// Compute how many rows and columns are visible. We add 1 so
-			// that
-			// tiles are drawn right up to the edge of the screen at the
-			// edges.
-			int rows = this.getHeight() / tileHeight + 1;
-			int cols = this.getWidth() / tileWidth + 1;
-
-			for (int k = 0; k <= rows + 1; k++)
-				gra
-						.drawLine(0, k * tileHeight, this.getWidth(), k
-								* tileHeight);
-
-			for (int k = 0; k <= cols + 1; k++)
-				gra.drawLine(k * tileWidth, 0, k * tileWidth, this.getHeight());
 
 			if (board_ == null)
 				return;
@@ -171,6 +151,11 @@ public class MapLayer extends JPanel {
 			TileBoardIterator iter = board_.getUpperLeftCorner();
 			BufferedImage tileImage = board_.homeTile().current().getImage();
 
+			int tileWidth = (int) (tileImage.getWidth() * scale_);
+			int tileHeight = (int) (tileImage.getHeight() * scale_);
+			
+			int rows = 20;
+			int cols = 20;
 			// Place tile images by iterating through the board and wrapping
 			// when we reach the end of a row.
 			try {

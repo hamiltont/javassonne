@@ -20,6 +20,7 @@ package org.javassonne.ui;
 
 import java.awt.Dimension;
 
+import javax.swing.JDesktopPane;
 import javax.swing.JLayeredPane;
 
 /**
@@ -31,7 +32,7 @@ import javax.swing.JLayeredPane;
  *         JPanels on the screen.
  * 
  */
-public class DisplayLayeredPane extends JLayeredPane {
+public class DisplayDesktopPane extends JDesktopPane {
 
 	/**
 	 * Constructor. Creates the MapLayer, passing it the screenSize. Also adds
@@ -46,7 +47,8 @@ public class DisplayLayeredPane extends JLayeredPane {
 	 *            The amount of the screen that the map is allowed to use for
 	 *            rendering itself.
 	 */
-	public DisplayLayeredPane(Dimension screenSize) {
+	public DisplayDesktopPane(Dimension screenSize) {
+
 		// Create the map layer
 		MapLayer map = new MapLayer(screenSize);
 

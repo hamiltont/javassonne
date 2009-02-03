@@ -22,7 +22,6 @@
 package org.javassonne.ui;
 
 import java.awt.Color;
-import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
@@ -41,35 +40,27 @@ public class DisplayWindow extends JFrame {
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static final Color WINDOW_BG_COLOR = Color.WHITE;
 
-	private DisplayLayeredPane displayPane_;
+	private DisplayDesktopPane displayPane_;
 
 	/**
 	 * Constructor. Sets application to full screen mode, adds the JLayeredPane
 	 * for display, and begins rendering (setVisible true)
 	 */
 	public DisplayWindow() {
-		// Do JFrame initialization
 		super();
-
+		
+		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		
 		// Set a few basic properties of our window
 		setTitle(WINDOW_TITLE);
+		setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight());
 		getContentPane().setBackground(WINDOW_BG_COLOR);
-
-		// Switching to full screen mode
-		// TODO read fullscreen javadocs to make this multiOS friendly
-		// http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html
-		GraphicsDevice d = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice();
-
-		// Make our window full screen
-		DisplayMode mode = d.getDisplayMode();
-		this.setSize(mode.getWidth(), mode.getHeight() - 20);
 
 		// Hide the bar at the top of the window and the window border
 		this.setUndecorated(true);
 
 		// Add the JLayeredPane to our contents
-		displayPane_ = new DisplayLayeredPane(this.getSize());
+		displayPane_ = new DisplayDesktopPane(this.getSize());
 		getContentPane().add(displayPane_);
 		
 		// Add the key listener
@@ -77,10 +68,12 @@ public class DisplayWindow extends JFrame {
 		
 		// Show the window
 		setVisible(true);
+		
+		// Make the window fullscreen
+		device.setFullScreenWindow(this);
 	}
-	
-	public DisplayLayeredPane getDisplayLayeredPane()
-	{
+
+	public DisplayDesktopPane getDisplayDesktopPane() {
 		return displayPane_;
 	}
 }
