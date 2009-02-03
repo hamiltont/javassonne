@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import java.awt.Point;
+
 import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
@@ -39,12 +41,15 @@ import org.javassonne.model.TileSet;
  * @author bengotow
  */
 public class GameController {
+	private static final String EXIT_WITHOUT_SAVING = "Exit without saving?";
+
 	private static final long serialVersionUID = 1L;
 
 	private BoardController boardController_;
 	private HUDController hudController_;
 
 	private Tile tileInHand_;
+	private HUDPanel panel_;
 
 	/**
 	 * The default constructor takes no arguments and assumes a GameWindow has
@@ -84,11 +89,18 @@ public class GameController {
 
 		TileBoard board = new TileMapBoard(deck.popRandomTile());
 
+		// Create an HUDPanel that will provide the end user with a control GUI
+		panel_ = new HUDPanel();
+		
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController(deck, board);
 		hudController_ = new HUDController(deck, board);
+
+		// Add HUD to main canvas
+		DisplayHelper.getInstance().add(panel_, DisplayHelper.Layer.PALETTE,
+				new Point(10, 10));
 	}
 
 	public void exitGame(Notification n) {
@@ -101,10 +113,11 @@ public class GameController {
 		boardController_ = null;
 		hudController_ = null;
 
-		int ans = JOptionPane.showConfirmDialog(null, "Exit without saving?",
+		int ans = JOptionPane.showConfirmDialog(null, EXIT_WITHOUT_SAVING,
 				null, JOptionPane.YES_NO_OPTION);
 		if (ans == JOptionPane.YES_OPTION) {
 			System.exit(0);
 		}
 	}
+
 }

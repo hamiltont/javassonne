@@ -18,28 +18,50 @@
 
 package org.javassonne.ui;
 
-import java.awt.Point;
+import javax.swing.JOptionPane;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 
 public class Main {
 
+	private static final String LOAD_SAVE_GAME = "Load Save Game";
+	private static final String START_NEW_GAME = "Start New Game";
+	private static final String WELCOME = "Welcome to Javassonne!";
+
 	public static void main(String args[]) {
-		// create the application controller. This will handle starting a new game, etc...
+		// create the application controller. This will handle starting a new
+		// game, etc...
 		GameController controller = new GameController();
-		
-		// create the game window and the log window
+
+		// create the game window
 		DisplayWindow window = new DisplayWindow();
 		window.setVisible(true);
-		
+
+		// set the display helper's layeredPane so that other controllers can
+		// add JPanels to
+		// the window really easily.
+		DisplayHelper.getInstance().setLayeredPane(
+				window.getDisplayLayeredPane());
+
+		// Display a prompt to determine if a new game should be started or if
+		// one should be loaded from a saved game file
+		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
+
+		int ans = JOptionPane.showOptionDialog(null, WELCOME, "Javassonne",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+				options, options[0]);
+
+		if (ans == JOptionPane.YES_OPTION || ans == JOptionPane.CLOSED_OPTION) {
+			NotificationManager.getInstance().sendNotification(
+					Notification.NEW_GAME);
+		} else if (ans == JOptionPane.NO_OPTION) {
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOAD_GAME);
+		}
+
+		// create the log window
 		LogWindow log = new LogWindow();
 		log.setVisible(true);
-		
-		// set the display helper's layeredPane so that other controllers can add JPanels to 
-		// the window really easily.
-		DisplayHelper.getInstance().setLayeredPane(window.getDisplayLayeredPane());
-		
-		//TODO: We should be displaying the main menu instead of the HUD Panel
-		HUDPanel panel_ = new HUDPanel();
-		DisplayHelper.getInstance().add(panel_, DisplayHelper.Layer.PALETTE, new Point(10, 10));
 	}
 }
