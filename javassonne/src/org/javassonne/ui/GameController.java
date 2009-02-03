@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import javax.swing.JOptionPane;
+
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
@@ -83,7 +85,8 @@ public class GameController {
 		TileBoard board = new TileMapBoard(deck.popRandomTile());
 
 		// Create a BoardController to do the heavy lifting during gameplay.
-		// These two objects handle notifications from the UI (like rotate tile).
+		// These two objects handle notifications from the UI (like rotate
+		// tile).
 		boardController_ = new BoardController(deck, board);
 		hudController_ = new HUDController(deck, board);
 	}
@@ -97,5 +100,11 @@ public class GameController {
 		// game.
 		boardController_ = null;
 		hudController_ = null;
+
+		int ans = JOptionPane.showConfirmDialog(null, "Exit without saving?",
+				null, JOptionPane.YES_NO_OPTION);
+		if (ans == JOptionPane.YES_OPTION) {
+			System.exit(0);
+		}
 	}
 }
