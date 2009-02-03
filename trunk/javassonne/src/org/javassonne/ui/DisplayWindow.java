@@ -28,6 +28,8 @@ import java.awt.GraphicsEnvironment;
 
 import javax.swing.JFrame;
 
+import org.javassonne.ui.control.JKeyListener;
+
 /**
  * @author Hamilton Turner
  * 
@@ -69,7 +71,10 @@ public class DisplayWindow extends JFrame {
 		// Add the JLayeredPane to our contents
 		displayPane_ = new DisplayLayeredPane(this.getSize());
 		getContentPane().add(displayPane_);
-
+		
+		// Add the key listener
+		this.addKeyListener(new JKeyListener());
+		
 		// Show the window
 		setVisible(true);
 	}
