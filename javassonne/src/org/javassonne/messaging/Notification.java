@@ -44,6 +44,7 @@ public class Notification {
 	public static final String NEW_GAME = "NotificationNewGame";
 	public static final String LOAD_GAME = "NotificationLoadGame";
 	public static final String EXIT_GAME = "NotificationExitGame";
+	public static final String DECK_CHANGED = "NotificationDeckChanged";
 
 	public static final String BOARD_SET = "NotificationSetBoard";
 

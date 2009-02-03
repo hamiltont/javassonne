@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
+import org.javassonne.model.TileDeck;
 import org.javassonne.ui.control.JImagePanel;
 import org.javassonne.ui.control.JKeyListener;
 
@@ -54,7 +55,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private static final String EXIT_GAME = "Exit Game";
 	private static final String LOAD_GAME = "Load Game";
 	private static final String NEW_GAME = "New Game";
-
+	private static final String TILES_LEFT = "Tiles Left";
+	
 	private JButton newGameButton_;
 	private JButton loadGameButton_;
 	private JButton exitGameButton_;
@@ -63,7 +65,7 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private JButton drawTile_;
 	private JButton rotateRight_;
 	private JButton rotateLeft_;
-
+	private JLabel tilesLeft_;
 	private JImagePanel curTileImage_;
 	private TurnIndicator playerTurn_;
 	private BufferedImage background_;
@@ -96,7 +98,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 		zoomOutButton_.setActionCommand(Notification.ZOOM_OUT);
 
 		drawTile_ = new JButton(DRAW_NEXT_TILE);
-
+		tilesLeft_ = new JLabel("0 " + TILES_LEFT);
+		
 		rotateRight_ = new JButton("=>");
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
 		rotateRight_.addActionListener(this);
@@ -108,7 +111,7 @@ public class HUDPanel extends JPanel implements ActionListener {
 		playerTurn_ = new TurnIndicator("Player " + 1 + "'s Turn");
 
 		curTileImage_ = new JImagePanel(null, 50, 50);
-
+		
 		// attach all of the components to the JFrame
 
 		add(playerTurn_);
@@ -122,11 +125,14 @@ public class HUDPanel extends JPanel implements ActionListener {
 		add(new JLabel("             "));
 		add(rotateRight_);
 		add(drawTile_);
+		add(tilesLeft_);
 
 		// Subscribe for notifications from the controller so we know when to
 		// update ourselves!
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
+		NotificationManager.getInstance().addObserver(
+				Notification.DECK_CHANGED, this, "updateDeck");
 	}
 
 	/*
@@ -164,7 +170,14 @@ public class HUDPanel extends JPanel implements ActionListener {
 	public void updateTileInHand(Notification n) {
 		Tile t = (Tile) n.argument();
 		curTileImage_.setImage(t.getImage());
-
+		
+		this.invalidate();
+	}
+	
+	public void updateDeck(Notification n) {
+		TileDeck deck = (TileDeck) n.argument();
+		tilesLeft_.setText(deck.tilesRemaining() + " "+ TILES_LEFT);
+		
 		this.invalidate();
 	}
 
@@ -175,4 +188,5 @@ public class HUDPanel extends JPanel implements ActionListener {
 		comp.addKeyListener(keyListener_);
 		return comp;
 	}
+
 }

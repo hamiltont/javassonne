@@ -42,7 +42,7 @@ public class HUDController {
 	 * The HUDController is created from the GameController when a new game is
 	 * started. The GameController passes the model objects so we can manipulate
 	 * them in response to changes in the view.
-	 *
+	 * 
 	 * @param d
 	 *            The TileDeck. This will never be changed once the game has
 	 *            begun.
@@ -56,7 +56,11 @@ public class HUDController {
 
 		// Draw the first tile!
 		tileInHand_ = deck_.popRandomTile();
-
+		
+		// Send notification that we've modified the deck
+		NotificationManager.getInstance().sendNotification(
+				Notification.DECK_CHANGED, deck_);
+		
 		// Send notifications to attach our tileInHand to the view
 		NotificationManager.getInstance().sendNotification(
 				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
