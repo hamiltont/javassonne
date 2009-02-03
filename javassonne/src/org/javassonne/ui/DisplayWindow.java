@@ -73,7 +73,7 @@ public class DisplayWindow extends JFrame {
 		getContentPane().add(displayPane_);
 		
 		// Add the key listener
-		this.addKeyListener(new JKeyListener());
+		this.addKeyListener(JKeyListener.getInstance());
 		
 		// Show the window
 		setVisible(true);

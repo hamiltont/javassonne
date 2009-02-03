@@ -36,10 +36,19 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 	 * system
 	 */
 	private static final long serialVersionUID = 1L;
+	private static JKeyListener instance_ = null;
 
-	public JKeyListener() {
+	protected JKeyListener() {
 	}
-
+	
+	// Provide access to singleton
+	public static JKeyListener getInstance() {
+		if (instance_ == null) {
+			instance_ = new JKeyListener();
+		}
+		return instance_;
+	}
+	
 	/** Capture key event */
 	public void keyTyped(KeyEvent e) {
 	}

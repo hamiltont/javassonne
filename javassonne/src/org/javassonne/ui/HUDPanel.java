@@ -69,14 +69,12 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private JImagePanel curTileImage_;
 	private TurnIndicator playerTurn_;
 	private BufferedImage background_;
-	private JKeyListener keyListener_;
 
 	public HUDPanel() {
 		setVisible(true);
 		setSize(140, 400);
 
-		keyListener_ = new JKeyListener();
-		this.addKeyListener(keyListener_);
+		this.addKeyListener(JKeyListener.getInstance());
 
 		// Create all of the components that will be shown
 
@@ -185,7 +183,7 @@ public class HUDPanel extends JPanel implements ActionListener {
 	// within the JPanel
 	public Component add(Component comp) {
 		super.add(comp);
-		comp.addKeyListener(keyListener_);
+		comp.addKeyListener(JKeyListener.getInstance());
 		return comp;
 	}
 
