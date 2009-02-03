@@ -25,7 +25,7 @@ import org.javassonne.messaging.NotificationManager;
 
 public class Main {
 
-	private static final String LOAD_SAVE_GAME = "Load Save Game";
+	private static final String LOAD_SAVE_GAME = "Load Saved Game";
 	private static final String START_NEW_GAME = "Start New Game";
 	private static final String WELCOME = "Welcome to Javassonne!";
 
@@ -41,21 +41,29 @@ public class Main {
 		// set the display helper's layeredPane so that other controllers can
 		// add JPanels to
 		// the window really easily.
-		DisplayHelper.getInstance().setLayeredPane(
-				window.getDisplayLayeredPane());
+		DisplayHelper.getInstance().setDesktopPane(
+				window.getDisplayDesktopPane());
 
 		// Display a prompt to determine if a new game should be started or if
 		// one should be loaded from a saved game file
 		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
 
-		int ans = JOptionPane.showOptionDialog(null, WELCOME, "Javassonne",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-				options, options[0]);
+		JOptionPane p = new JOptionPane();
+		p.setMessage(WELCOME);
+		p.setOptions(options);
+//		p.setOptionType(JOptionPane.YES_NO_OPTION);
+		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		p.setSize(300, 150);
 
-		if (ans == JOptionPane.YES_OPTION || ans == JOptionPane.CLOSED_OPTION) {
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL);
+
+		while (p.getValue() == JOptionPane.UNINITIALIZED_VALUE);
+		Object ans = p.getValue();
+		
+		if (ans == START_NEW_GAME) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.NEW_GAME);
-		} else if (ans == JOptionPane.NO_OPTION) {
+		} else if (ans == LOAD_SAVE_GAME) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOAD_GAME);
 		}

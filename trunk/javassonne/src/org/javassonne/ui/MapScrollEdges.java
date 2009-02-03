@@ -106,7 +106,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 				if (mapShiftTimer_ != null)
 					mapShiftTimer_.cancel();
 				mapShiftTimer_ = new Timer();
-				mapShiftTimer_.schedule(task, 0, 8);
+				mapShiftTimer_.schedule(task, 0, 10);
 			}
 
 		} else if (mapShiftTimer_ != null) {
