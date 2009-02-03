@@ -79,6 +79,13 @@ public class DisplayHelper {
 	}
 
 	/**
+	 * Predefined constants for Layers
+	 */
+	public static enum Positioning {
+		TOP_LEFT, TOP_RIGHT, CENTER;
+	}
+
+	/**
 	 * Private singleton constructor.
 	 */
 	private DisplayHelper() {
@@ -128,10 +135,22 @@ public class DisplayHelper {
 	 *            The object to be displayed on screen.
 	 * @param displayLayer
 	 *            The appropriate layer to display this object on.
-	 * 
+	 * @param position
+	 *            The area of the screen where you would like the object to
+	 *            appear.
 	 */
-	public void add(JComponent displayMe, DisplayHelper.Layer displayLayer) {
-		add(displayMe, displayLayer, new Point(0, 0));
+	public void add(JComponent displayMe, DisplayHelper.Layer displayLayer,
+			DisplayHelper.Positioning position) {
+
+		if (position == Positioning.TOP_LEFT)
+			add(displayMe, displayLayer, new Point(10, 10));
+		else if (position == Positioning.TOP_RIGHT)
+			add(displayMe, displayLayer, new Point(desktopPane_.getWidth() - 10
+					- displayMe.getWidth(), 10));
+		else
+			add(displayMe, displayLayer, new Point(
+					(desktopPane_.getWidth() - displayMe.getWidth()) / 2,
+					(desktopPane_.getHeight() - displayMe.getHeight()) / 2));
 	}
 
 	/**
@@ -145,11 +164,12 @@ public class DisplayHelper {
 	 *            The object to be displayed on screen.
 	 * @param displayLayer
 	 *            The appropriate layer to display this object on.
-	 * @param
+	 * @param location
+	 *            The location where the component will be placed.
 	 * 
 	 */
 	public void add(JComponent displayMe, DisplayHelper.Layer displayLayer,
-			Point startingLocation) {
+			Point location) {
 
 		// Check that the layered pane is present
 		if (isLayeredPaneInvalid())
@@ -159,18 +179,19 @@ public class DisplayHelper {
 		int checkAlreadyPresent = desktopPane_.getIndexOf(displayMe);
 		if (checkAlreadyPresent != -1) {
 			updateLayer(displayMe, displayLayer);
-			updateLocation(displayMe, startingLocation);
+			updateLocation(displayMe, location);
 		} else {
 			desktopPane_.add(displayMe, JLayeredPane.PALETTE_LAYER);
 
 			showOnTop(displayMe);
-			displayMe.setLocation(startingLocation);
+			displayMe.setLocation(location);
 			displayMe.setVisible(true);
 		}
 	}
 
-	public void addAsInternalFrame(JComponent displayMe, DisplayHelper.Layer displayLayer, Point startingLocation) {
-		
+	public void addAsInternalFrame(JComponent displayMe,
+			DisplayHelper.Layer displayLayer, Point startingLocation) {
+
 		JInternalFrame f = new JInternalFrame("", false, false, false, false);
 		f.setContentPane(displayMe);
 		f.pack();
@@ -182,7 +203,8 @@ public class DisplayHelper {
 		desktopPane_.remove(removeMe);
 	}
 
-	public void updateLayer(JComponent updateMe, DisplayHelper.Layer displayLayer) {
+	public void updateLayer(JComponent updateMe,
+			DisplayHelper.Layer displayLayer) {
 		// TODO implement function
 	}
 

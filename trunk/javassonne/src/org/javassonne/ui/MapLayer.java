@@ -19,16 +19,21 @@
 package org.javassonne.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.IntPair;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
 
@@ -40,6 +45,7 @@ public class MapLayer extends JPanel {
 	private JViewport viewport_;
 	private Map map_;
 	private TileBoard board_;
+	private BufferedImage backgroundTile_;
 
 	/**
 	 * Constructor
@@ -52,12 +58,14 @@ public class MapLayer extends JPanel {
 		map_ = new Map(screenSize);
 
 		setSize(screenSize);
-
+		
 		viewport_ = new JViewport();
 		viewport_.setExtentSize(screenSize);
 		viewport_.setLayout(null);
 		viewport_.setView(map_);
-
+		viewport_.setBackground(Color.black);
+		viewport_.setForeground(Color.black);
+		
 		// This layout allows the viewport to expand and take all available
 		// space
 		setLayout(new BorderLayout());
@@ -66,6 +74,14 @@ public class MapLayer extends JPanel {
 		// Listen for notification setting our board model
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "setBoard");
+		
+		// Load the background image from disk
+		try{
+		backgroundTile_ = ImageIO.read(new File("images/background_tile.jpg"));
+		} catch (Exception e) {
+			NotificationManager.getInstance().sendNotification(Notification.LOG_ERROR,
+					"The backgound tile could not be loaded from disk");
+		}
 	}
 
 	public void setBoard(Notification n) {
@@ -117,7 +133,7 @@ public class MapLayer extends JPanel {
 	 * construct that simply displays/renders the map. Currently no optimization
 	 * is provided. Map decides how much size is needed to render the map.
 	 */
-	private class Map extends JPanel {
+	private class Map extends JComponent {
 		private double scale_ = 0.3;
 
 		/**
@@ -141,41 +157,45 @@ public class MapLayer extends JPanel {
 		 * grid.
 		 */
 		public void paintComponent(Graphics gra) {
-
-			// get the dimensions of the tile image.
-
+			
 			if (board_ == null)
 				return;
 
-			// get the starting tile
-			TileBoardIterator iter = board_.getUpperLeftCorner();
-			BufferedImage tileImage = board_.homeTile().current().getImage();
-
-			int tileWidth = (int) (tileImage.getWidth() * scale_);
-			int tileHeight = (int) (tileImage.getHeight() * scale_);
-			
-			int rows = 20;
-			int cols = 20;
-			// Place tile images by iterating through the board and wrapping
-			// when we reach the end of a row.
 			try {
-				int i, x, y;
-				i = x = y = 0;
-				while (i < (rows * cols)) {
-					i++;
-					if (iter.current() != null) {
-						gra.drawImage(iter.current().getImage(), x, y,
-								tileWidth, tileHeight, null);
+				// paint the board background from the top left to the bottom
+				// right
+				IntPair topLeft = board_.getUpperLeftCorner().getLocation();
+				IntPair bottomRight = board_.getLowerRightCorner()
+						.getLocation();
+
+				int boardWidth = bottomRight.car() - topLeft.car();
+				int boardHeight = bottomRight.cdr() - topLeft.cdr();
+
+				BufferedImage tileImage = board_.homeTile().current()
+						.getImage();
+				int tileWidth = (int) (tileImage.getWidth() * scale_);
+				int tileHeight = (int) (tileImage.getHeight() * scale_);
+				
+				TileBoardIterator iter = board_.getUpperLeftCorner();
+
+				for (int x = 0; x < boardWidth; x++) {
+					for (int y = 0; y < boardHeight; y++) {
+
+						// paint the tile if it exists. Otherwise paint the
+						// background image
+						if (iter.current() != null) {
+							gra.drawImage(iter.current().getImage(), x
+									* tileWidth, y * tileHeight, tileWidth,
+									tileHeight, null);
+						} else {
+							gra.drawImage(backgroundTile_, x * tileWidth, y
+									* tileHeight, tileWidth, tileHeight, null);
+						}
+						iter.right();
 					}
-					x += tileWidth;
-					if (i % cols == 0) {
-						// Next row
-						x = 0;
-						y += tileHeight;
-						iter.nextRow();
-					}
-					iter.right();
+					iter.nextRow();
 				}
+
 			} catch (Exception e) {
 				System.out.println("Error displaying a tile image.");
 			}

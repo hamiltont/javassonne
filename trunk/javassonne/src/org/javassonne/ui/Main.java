@@ -44,6 +44,11 @@ public class Main {
 		DisplayHelper.getInstance().setDesktopPane(
 				window.getDisplayDesktopPane());
 
+		// Display the log panel. This is for debugging purposes.
+		LogPanel log = new LogPanel();
+		DisplayHelper.getInstance().add(log, DisplayHelper.Layer.PALETTE,
+				DisplayHelper.Positioning.TOP_RIGHT);
+
 		// Display a prompt to determine if a new game should be started or if
 		// one should be loaded from a saved game file
 		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
@@ -51,15 +56,15 @@ public class Main {
 		JOptionPane p = new JOptionPane();
 		p.setMessage(WELCOME);
 		p.setOptions(options);
-//		p.setOptionType(JOptionPane.YES_NO_OPTION);
 		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
-		p.setSize(300, 150);
+		p.setSize(400, 150);
 
-		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL);
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
 
 		while (p.getValue() == JOptionPane.UNINITIALIZED_VALUE);
 		Object ans = p.getValue();
-		
+
 		if (ans == START_NEW_GAME) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.NEW_GAME);

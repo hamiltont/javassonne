@@ -91,7 +91,7 @@ public class GameController {
 
 		// Create an HUDPanel that will provide the end user with a control GUI
 		panel_ = new HUDPanel();
-		
+
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
@@ -100,7 +100,7 @@ public class GameController {
 
 		// Add HUD to main canvas
 		DisplayHelper.getInstance().add(panel_, DisplayHelper.Layer.PALETTE,
-				new Point(10, 10));
+				DisplayHelper.Positioning.TOP_LEFT);
 	}
 
 	public void exitGame(Notification n) {
