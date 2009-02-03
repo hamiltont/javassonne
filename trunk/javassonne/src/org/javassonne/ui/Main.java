@@ -67,9 +67,6 @@ public class Main {
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOAD_GAME);
 		}
-
-		// create the log window
-		LogWindow log = new LogWindow();
-		log.setVisible(true);
+		DisplayHelper.getInstance().remove(p);
 	}
 }
