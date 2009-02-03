@@ -36,11 +36,12 @@ public class LogWindow extends JFrame {
 		setTitle("Log");
 		setSize(400, 200);
 		setVisible(true);
+		this.addKeyListener(JKeyListener.getInstance());
 		
 		// create the scrolling text box
 		area_ = new TextArea();
 		area_.setBounds(0, 0, this.getWidth(), this.getHeight());
-		area_.addKeyListener(new JKeyListener());
+		area_.addKeyListener(JKeyListener.getInstance());
 		
 		// create a stringBuilder to represent the contents
 		areaString_ = new StringBuilder();
