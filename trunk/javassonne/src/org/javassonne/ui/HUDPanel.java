@@ -21,6 +21,7 @@ package org.javassonne.ui;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,7 +38,6 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
-import org.javassonne.ui.control.JImagePanel;
 import org.javassonne.ui.control.JKeyListener;
 
 /**
@@ -53,12 +54,14 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private static final String ZOOM_OUT = "Zoom Out";
 	private static final String ZOOM_IN = "Zoom In";
 	private static final String EXIT_GAME = "Exit Game";
+	private static final String SAVE_GAME = "Save Game";
 	private static final String LOAD_GAME = "Load Game";
 	private static final String NEW_GAME = "New Game";
 	private static final String TILES_LEFT = "Tiles Left";
-	
+
 	private JButton newGameButton_;
 	private JButton loadGameButton_;
+	private JButton saveGameButton_;
 	private JButton exitGameButton_;
 	private JButton zoomInButton_;
 	private JButton zoomOutButton_;
@@ -66,7 +69,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 	private JButton rotateRight_;
 	private JButton rotateLeft_;
 	private JLabel tilesLeft_;
-	private JImagePanel curTileImage_;
+	private JLabel imageHolder_;
+	private JPanel rotateButtonsPanel_;
 	private TurnIndicator playerTurn_;
 	private BufferedImage background_;
 
@@ -86,6 +90,10 @@ public class HUDPanel extends JPanel implements ActionListener {
 		loadGameButton_.setActionCommand(Notification.LOAD_GAME);
 		loadGameButton_.addActionListener(this);
 
+		saveGameButton_ = new JButton(SAVE_GAME);
+		saveGameButton_.setActionCommand(Notification.SAVE_GAME);
+		saveGameButton_.addActionListener(this);
+
 		exitGameButton_ = new JButton(EXIT_GAME);
 		exitGameButton_.setActionCommand(Notification.EXIT_GAME);
 		exitGameButton_.addActionListener(this);
@@ -101,7 +109,7 @@ public class HUDPanel extends JPanel implements ActionListener {
 		drawTile_.addActionListener(this);
 		
 		tilesLeft_ = new JLabel("0 " + TILES_LEFT);
-		
+
 		rotateRight_ = new JButton("=>");
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
 		rotateRight_.addActionListener(this);
@@ -112,20 +120,24 @@ public class HUDPanel extends JPanel implements ActionListener {
 
 		playerTurn_ = new TurnIndicator("Player " + 1 + "'s Turn");
 
-		curTileImage_ = new JImagePanel(null, 50, 50);
-		
+		imageHolder_ = new JLabel(new ImageIcon());
+
+		rotateButtonsPanel_ = new JPanel();
+		rotateButtonsPanel_.setOpaque(false);
+		rotateButtonsPanel_.add(rotateLeft_);
+		rotateButtonsPanel_.add(rotateRight_);
+
 		// attach all of the components to the JFrame
 
 		add(playerTurn_);
 		add(newGameButton_);
 		add(loadGameButton_);
+		add(saveGameButton_);
 		add(exitGameButton_);
 		add(zoomInButton_);
 		add(zoomOutButton_);
-		add(rotateLeft_);
-		add(curTileImage_);
-		add(new JLabel("             "));
-		add(rotateRight_);
+		add(imageHolder_);
+		add(rotateButtonsPanel_);
 		add(drawTile_);
 		add(tilesLeft_);
 
@@ -171,15 +183,15 @@ public class HUDPanel extends JPanel implements ActionListener {
 
 	public void updateTileInHand(Notification n) {
 		Tile t = (Tile) n.argument();
-		curTileImage_.setImage(t.getImage());
-		
+		Image temp = t.getImage().getScaledInstance(50, 50, 0);
+		imageHolder_.setIcon(new ImageIcon(temp));
 		this.invalidate();
 	}
-	
+
 	public void updateDeck(Notification n) {
 		TileDeck deck = (TileDeck) n.argument();
-		tilesLeft_.setText(deck.tilesRemaining() + " "+ TILES_LEFT);
-		
+		tilesLeft_.setText(deck.tilesRemaining() + " " + TILES_LEFT);
+
 		playerTurn_.nextPlayer();
 		playerTurn_.setText("Player " + playerTurn_.getPlayerTurn() + "'s Turn");
 		
