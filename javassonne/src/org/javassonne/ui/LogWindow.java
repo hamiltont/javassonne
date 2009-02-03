@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.control.JKeyListener;
 
 public class LogWindow extends JFrame {
 
@@ -35,11 +36,12 @@ public class LogWindow extends JFrame {
 		setTitle("Log");
 		setSize(400, 200);
 		setVisible(true);
-
+		
 		// create the scrolling text box
 		area_ = new TextArea();
 		area_.setBounds(0, 0, this.getWidth(), this.getHeight());
-
+		area_.addKeyListener(new JKeyListener());
+		
 		// create a stringBuilder to represent the contents
 		areaString_ = new StringBuilder();
 		
@@ -57,7 +59,7 @@ public class LogWindow extends JFrame {
 
 	public void log(Notification n)
 	{
-		areaString_.append(String.format("\r%s: %s", new Date().toString(), n.argument().toString()));
+		areaString_.append(String.format("\r%s: %s", new Date().toString(), n.argument().toString()) + "\n");
 		area_.setText(areaString_.toString());
 	}
 }
