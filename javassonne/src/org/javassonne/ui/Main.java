@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
@@ -54,11 +56,12 @@ public class Main {
 		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
 
 		JOptionPane p = new JOptionPane();
-		p.setMessage(WELCOME);
 		p.setOptions(options);
+		p.setIcon(new ImageIcon("images/logo.jpg",""));
 		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
-		p.setSize(400, 150);
-
+		p.setSize(420, 170);
+		p.validate();
+		
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 
