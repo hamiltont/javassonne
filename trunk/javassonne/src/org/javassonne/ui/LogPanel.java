@@ -55,7 +55,7 @@ public class LogPanel extends JPanel implements KeyListener {
 		field_ = new TextField();
 		field_.setSize(500, 20);
 		field_.addKeyListener(this);
-		field_.setFocusable(false);
+		field_.setFocusable(true);
 
 		// add the area to our JPanel
 		add(field_, BorderLayout.SOUTH);
