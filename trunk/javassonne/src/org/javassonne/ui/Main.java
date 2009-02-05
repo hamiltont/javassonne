@@ -52,7 +52,8 @@ public class Main {
 		
 		// Display a prompt to determine if a new game should be started or if
 		// one should be loaded from a saved game file
-		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
+		Object[] options = { START_NEW_GAME };//, LOAD_SAVE_GAME };
+		//Load Game not ready yet
 
 		JOptionPane p = new JOptionPane();
 		p.setOptions(options);
@@ -67,13 +68,13 @@ public class Main {
 		dialog.show();
 	    Object ans = p.getValue();
 
-		if (ans == LOAD_SAVE_GAME) {
+		if (ans == START_NEW_GAME) {
 			NotificationManager.getInstance().sendNotification(
-					Notification.LOAD_GAME);
+					Notification.NEW_GAME);
 		} else{
 			//Default action -> Start New Game
 			NotificationManager.getInstance().sendNotification(
-					Notification.NEW_GAME);
+					Notification.EXIT_GAME);
 			
 		}
 	}
