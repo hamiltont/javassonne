@@ -8,7 +8,7 @@ TileMapBoard uses the TileBoard interface and stores tile by hashing them into a
 
 = Details =
 
-== IntPairs ==
+== IntPair ==
 
 (0,0) is the homeTile - the first Tile placed in the board when it is constructed.
 (x,y): a negative x is a location to the left of the homeTile. A negative y is a location above the homeTile. Conversely, a positive x is a location to the right of the homeTile and a positive y is a location below the homeTile.
@@ -26,6 +26,4 @@ upperLeft__ points to an empty location one space left and one space up from the
 lowerRight__ points to an empty location one space right and one space down from the lower-right-most filled position in the board. So, with just the homeTile at (0,0), lR__ points to (1,1).
 
 getters for these iterators return a copy of the iterator since function calls on iterators modify the location stored in the iterator. *Important:* If you need to make a lot of comparisons to the corner iterators, call the getter once and save it locally, then compare with that iterator.
-
-
 
