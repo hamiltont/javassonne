@@ -22,12 +22,12 @@ In addition, we need a way to calculate farm regions. We settled on dividing a t
 
 A tabular and image view of some sample tiles appear below. Foreground and background views have been laid on top of one another - 4 sides and middle are foreground; 4 corners and "walls" are background.
 
-<img src="http://javassonne.googlecode.com/svn/trunk/javassonne/tilesets/standard/tile_standard_26.jpg" height="100px" width="100px">
-|| 0 || R || 1 ||          
-|| R || R || F,,c,, ||
-|| 1 || N || 1 ||
+<img src="http://javassonne.googlecode.com/svn/trunk/javassonne/tilesets/standard/tile_standard_4.jpg" height="100px" width="100px">
+|| 0 || F,,c,, || 1 ||          
+|| N || R || R ||
+|| 1 || R || 1 ||
 
-with "wall" on right edge
+with "wall" on top edge
 
 ----
 
