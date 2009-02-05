@@ -148,7 +148,9 @@ public class MapLayer extends JPanel {
 			scale_ += 0.1;
 			renderBoard();
 			repaint();
+			NotificationManager.getInstance().sendNotification(Notification.ZOOM_CHANGED,this);
 		}
+		System.out.println(scale_);
 	}
 
 	/**
@@ -162,9 +164,20 @@ public class MapLayer extends JPanel {
 			scale_ -= 0.1;
 			renderBoard();
 			repaint();
+			NotificationManager.getInstance().sendNotification(Notification.ZOOM_CHANGED,this);
 		}
+		System.out.println(scale_);
 	}
-
+	
+	// Zoomed all the way in?
+	public boolean zoomedMax(){
+		return (scale_ > 1);
+	}
+	
+	// Zoomed all the way out?
+	public boolean zoomedMin(){
+		return (scale_ < .6);
+	}
 	public void paint(Graphics gra) {
 
 		int w = this.getWidth();
