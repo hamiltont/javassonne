@@ -51,7 +51,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		setOpaque(false);
 		setVisible(true);
 		setSize(map.getSize());
-		
+
 		map_ = map;
 		mapShiftTimer_ = null;
 
@@ -62,10 +62,14 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		navBottom_ = new Rectangle2D.Double(0, map_.getHeight() - 10, map_
 				.getWidth(), 10);
 
+		// our layer completely covers the map layer, so in order for the map to
+		// be clickable, we have to pass the click events through ourselves.
+		this.addMouseListener(map);
+		
+		// add the mouse motion listener to enable the scroll hotspots
 		this.addMouseMotionListener(this);
 	}
 
-	
 	public void mouseEntered(MouseEvent e) {
 	}
 
