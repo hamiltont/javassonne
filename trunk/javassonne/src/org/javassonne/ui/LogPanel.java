@@ -29,34 +29,37 @@ import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.control.JKeyListener;
 
 public class LogPanel extends JPanel implements KeyListener {
 
 	private TextArea area_ = null;
 	private TextField field_ = null;
 	private StringBuilder areaString_ = null;
-
-	public LogPanel() {
+	private static LogPanel instance_;
+	
+	protected LogPanel() {
+		setVisible(false);
 		setLayout(new BorderLayout());
-		setSize(500,200);
+		setSize(500, 200);
 		
 		// create the scrolling text box
 		area_ = new TextArea();
 		area_.setSize(500, 200);
 		area_.setFocusable(false);
-		
+
 		// add the area to our JPanel
 		add(area_, BorderLayout.NORTH);
-		
+
 		// create the send notification text box
 		field_ = new TextField();
-		field_.setSize(500,20);
+		field_.setSize(500, 20);
 		field_.addKeyListener(this);
 		field_.setFocusable(false);
-		
+
 		// add the area to our JPanel
 		add(field_, BorderLayout.SOUTH);
-		
+
 		// create a stringBuilder to represent the contents
 		areaString_ = new StringBuilder();
 
@@ -71,20 +74,34 @@ public class LogPanel extends JPanel implements KeyListener {
 				Notification.LOG_WARNING,
 				"Log window listening for notifications...");
 	}
-
+	
+	// Provide access to singleton
+	public static LogPanel getInstance() {
+		if (instance_ == null) {
+			instance_ = new LogPanel();
+		}
+		return instance_;
+	}
+	
 	public void log(Notification n) {
 		areaString_.append(String.format("\r%s: %s", new Date().toString(), n
-				.argument().toString()) + "\n");
+				.argument().toString())
+				+ "\n");
 		area_.setText(areaString_.toString());
+		DisplayHelper.getInstance().add(this, DisplayHelper.Layer.PALETTE,
+				DisplayHelper.Positioning.TOP_RIGHT);
+		setVisible(true);
 	}
+	
+
 
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == KeyEvent.VK_ENTER){
-			NotificationManager.getInstance().sendNotification(field_.getText());
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			NotificationManager.getInstance()
+					.sendNotification(field_.getText());
 			field_.setText("");
 		}
-			
 	}
 
 	public void keyReleased(KeyEvent e) {

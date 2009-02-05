@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.LogPanel;
 
 public class JKeyListener extends JFrame implements KeyListener, ActionListener {
 
@@ -85,10 +86,16 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 
 		// Notify the system
 		if (keyString.equalsIgnoreCase("Escape")) {
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_WARNING, "Exit Key Detected");
+			// Close the the log panel if it's open
+			if(LogPanel.getInstance().isVisible() == true){
+				LogPanel.getInstance().setVisible(false);
+			}
+			
+			// User is trying to stop game play
+			else{
 			NotificationManager.getInstance().sendNotification(
 					Notification.EXIT_GAME);
+			}
 		}
 
 	}
