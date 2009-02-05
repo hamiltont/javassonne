@@ -215,6 +215,11 @@ public class DisplayHelper {
 	public void showOnTop(JComponent showMe) {
 		desktopPane_.moveToFront(showMe);
 	}
+	
+	public void hide(JComponent showMe) {
+		
+		
+	}
 
 	private boolean isLayeredPaneInvalid() {
 		boolean equalsNull = (desktopPane_ == null);

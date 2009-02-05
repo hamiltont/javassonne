@@ -48,10 +48,8 @@ public class Main {
 				window.getDisplayDesktopPane());
 
 		// Display the log panel. This is for debugging purposes.
-		LogPanel log = new LogPanel();
-		DisplayHelper.getInstance().add(log, DisplayHelper.Layer.PALETTE,
-				DisplayHelper.Positioning.TOP_RIGHT);
-
+		LogPanel.getInstance().setVisible(false);
+		
 		// Display a prompt to determine if a new game should be started or if
 		// one should be loaded from a saved game file
 		Object[] options = { START_NEW_GAME, LOAD_SAVE_GAME };
