@@ -9,14 +9,14 @@
 
 == 3rd Build (Jan. 22 - Jan. 30) ==
 
-Game:
- * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names. (David)
+Game Team:
+ * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * Add HUD Panel to show the number of each type of remaining tile. (Ben)
  * Add HUD Panel to show game stats and more advanced turn information. (Ben)
  * User can place the tile in their hand in a valid location during their turn. (Kyle)
  * User sees dialogs in the correct place on the screen that do not cause the game window to minimize. (Adam)
 
-Networking:
+Networking Team:
 
  * User can search for and see other people (IP addresses) running the Javassonne application on the local network. (Hamy, Brian)
 
