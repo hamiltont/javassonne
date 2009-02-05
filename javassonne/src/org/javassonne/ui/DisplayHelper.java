@@ -18,17 +18,13 @@
 
 package org.javassonne.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
 /**
  * @author Hamilton Turner
