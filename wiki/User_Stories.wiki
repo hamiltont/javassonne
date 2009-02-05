@@ -12,7 +12,7 @@
  * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
  * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. (Ben)
  * User sees heads up display floating on top of the map, rather than at the bottom of the screen. (Hamy)
- * User sees the number of each type of tile remaining in part of the H.U.D. (Brian, Adam)
+ * User sees the number of tiles remaining in part of the H.U.D. (Brian, Adam)
  * User can rotate the tile in their hand. (Brian, David)
  * User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles. (David)
  * User can open the main menu and see options like "New Game", "Quit", etc... (Kyle, Adam)
