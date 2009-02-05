@@ -2,8 +2,8 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
- * @date Jan 30, 2009
+ * @author Hamilton. Modified by Ben
+ * @date Feb 4, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,12 @@
 
 package org.javassonne.ui;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -39,12 +40,13 @@ import org.javassonne.model.TileBoardIterator;
  * The default panel, displayed below all others. This panel is responsible for
  * rendering the map.
  */
-public class MapLayer extends JPanel {
+public class MapLayer extends JPanel implements MouseListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 	private BufferedImage buffer_ = null;
 	private Point paintOffset_ = new Point(0, 0);
 	private Point renderOffset_ = new Point(0, 0);
+	private Point renderCenteringOffset_ = new Point(0, 0);
 
 	// To improve performance, the offscreen buffer image containing the map is
 	// larger than the map view. That way, when you scroll, you can go a certain
@@ -226,9 +228,8 @@ public class MapLayer extends JPanel {
 
 			// determine what the offset should be to center the game board in
 			// the image we'll create.
-			Point centerOffset = new Point(0, 0);
-			centerOffset.x = (bufferWidth - boardWidth * tileWidth) / 2;
-			centerOffset.y = (bufferHeight - boardHeight * tileHeight) / 2;
+			renderCenteringOffset_.x = (bufferWidth - boardWidth * tileWidth) / 2;
+			renderCenteringOffset_.y = (bufferHeight - boardHeight * tileHeight) / 2;
 
 			// create the buffered image if it doesn't already exist.
 			if (buffer_ == null) {
@@ -256,9 +257,9 @@ public class MapLayer extends JPanel {
 					// the map that is being rendered into the buffer, and any
 					// movement we're doing to center it.
 					int drawX = x * tileWidth - renderOffset_.x
-							+ centerOffset.x;
+							+ renderCenteringOffset_.x;
 					int drawY = y * tileHeight - renderOffset_.y
-							+ centerOffset.y;
+							+ renderCenteringOffset_.y;
 
 					// paint the tile if it exists. Otherwise paint the
 					// background image
@@ -278,4 +279,49 @@ public class MapLayer extends JPanel {
 			System.out.println("Error displaying a tile image.");
 		}
 	}
+
+	public void mouseClicked(MouseEvent e) {
+
+		// determine which tile was clicked! First, get the width and height of
+		// a tile.
+		int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
+		int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
+
+		// find out what the absolute location of the click was. This involves
+		// modifying the coordinates we received so that the location is
+		// relative to the buffer image. Once we know which pixel of the
+		// buffered image was clicked, we can get a tile.
+		Point p = e.getPoint();
+		p.x += -renderCenteringOffset_.x + bufferMaxOffsetX_;
+		p.x += paintOffset_.x + renderOffset_.x;
+		p.y += -renderCenteringOffset_.y + bufferMaxOffsetY_;
+		p.y += paintOffset_.y + renderOffset_.y;
+
+		// get the tile index by dividing by the tile width and height
+		int tileX = (int) Math.floor(p.x / tileWidth);
+		int tileY = (int) Math.floor(p.y / tileHeight);
+
+		// that tile index is relative to the top left. We need to make the
+		// index relative to the home tile for it to be useful.
+		tileX += board_.getUpperLeftCorner().getLocation().car();
+		tileY += board_.getUpperLeftCorner().getLocation().cdr();
+
+		// send a notification!
+		String text = String.format("You clicked tile %d,%d", tileX, tileY);
+		NotificationManager.getInstance().sendNotification(
+				Notification.LOG_WARNING, text);
+	}
+
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	public void mouseExited(MouseEvent e) {
+	}
+
+	public void mousePressed(MouseEvent e) {
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	}
+
 }
