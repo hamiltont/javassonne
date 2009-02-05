@@ -100,9 +100,11 @@ public class HUDPanel extends JPanel implements ActionListener {
 
 		zoomInButton_ = new JButton(ZOOM_IN);
 		zoomInButton_.setActionCommand(Notification.ZOOM_IN);
-		
+		zoomInButton_.addActionListener(this);
+
 		zoomOutButton_ = new JButton(ZOOM_OUT);
 		zoomOutButton_.setActionCommand(Notification.ZOOM_OUT);
+		zoomOutButton_.addActionListener(this);
 
 		drawTile_ = new JButton(DRAW_NEXT_TILE);
 		drawTile_.setActionCommand(Notification.DRAW_TILE);

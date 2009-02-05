@@ -20,7 +20,6 @@ package org.javassonne.ui;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
@@ -33,6 +32,7 @@ public class Main {
 	private static final String WELCOME = "Welcome to Javassonne!";
 
 	public static void main(String args[]) {
+			
 		// create the application controller. This will handle starting a new
 		// game, etc...
 		GameController controller = new GameController();
@@ -62,7 +62,7 @@ public class Main {
 		p.setSize(420, 170);
 		p.validate();
 		
-		JDialog dialog = p.createDialog(WELCOME);
+		JDialog dialog = p.createDialog(window.getDisplayDesktopPane(), WELCOME);
 		dialog.setAlwaysOnTop(true);
 		dialog.show();
 	    Object ans = p.getValue();

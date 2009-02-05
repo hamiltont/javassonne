@@ -18,8 +18,6 @@
 
 package org.javassonne.ui;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -130,7 +128,7 @@ public class GameController {
 		p.setSize(420, 170);
 		p.validate();
 		
-		JDialog dialog = p.createDialog(EXIT_GAME);
+		JDialog dialog = p.createDialog(null, EXIT_GAME);
 		dialog.setAlwaysOnTop(true);
 		dialog.show();
 	    Object ans = p.getValue();
