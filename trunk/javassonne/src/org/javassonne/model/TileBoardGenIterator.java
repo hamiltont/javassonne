@@ -133,12 +133,14 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	 * @see org.javassonne.model.TileBoardIterator#outOfBounds()
 	 */
 	public boolean outOfBounds() {
-		if (location_.car() < data_.getUpperLeftCorner().getLocation().car()
-				|| location_.cdr() < data_.getUpperLeftCorner().getLocation().cdr()
-				|| location_.car() > data_.getLowerRightCorner().getLocation().car()
-				|| location_.cdr() > data_.getLowerRightCorner().getLocation().cdr()
-				|| this == data_.getUpperLeftCorner() 
-				|| this == data_.getLowerRightCorner())
+		IntPair upLeft = data_.getUpperLeftCorner().getLocation();
+		IntPair lowRight = data_.getLowerRightCorner().getLocation();
+		if (location_.car() < upLeft.car()
+				|| location_.cdr() < upLeft.cdr()
+				|| location_.car() > lowRight.car()
+				|| location_.cdr() > lowRight.cdr()
+				|| location_ == upLeft 
+				|| location_ == lowRight)
 			return true;
 		return false;
 	}
