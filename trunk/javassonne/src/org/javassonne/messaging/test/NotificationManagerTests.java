@@ -18,10 +18,10 @@
 
 package org.javassonne.messaging.test;
 
+import junit.framework.TestCase;
+
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-
-import junit.framework.TestCase;
 
 public class NotificationManagerTests extends TestCase {
 

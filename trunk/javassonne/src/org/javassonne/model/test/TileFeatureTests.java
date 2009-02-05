@@ -18,9 +18,9 @@
 
 package org.javassonne.model.test;
 
-import org.javassonne.model.TileFeature;
-
 import junit.framework.TestCase;
+
+import org.javassonne.model.TileFeature;
 
 public class TileFeatureTests extends TestCase {
 

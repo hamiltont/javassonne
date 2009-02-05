@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.control.JKeyListener;
 
 public class LogPanel extends JPanel implements KeyListener {
 
