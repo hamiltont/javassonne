@@ -9,28 +9,28 @@
 
 == 2nd Build (Jan. 22 - Jan. 29) == 
 
- * User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
- * User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. (Ben)
- * User sees heads up display floating on top of the map, rather than at the bottom of the screen. (Hamy)
- * User sees the number of tiles remaining in part of the H.U.D. (Brian, Adam)
- * User can rotate the tile in their hand. (Brian, David)
- * User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles. (David)
- * User can open the main menu and see options like "New Game", "Quit", etc... (Kyle, Adam)
- * User can press escape to exit the game. (Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees heads up display floating on top of the map, rather than at the bottom of the screen. (Hamy)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the number of tiles remaining in part of the H.U.D. (Brian, Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can rotate the tile in their hand. (Brian, David)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees a single "starting" tile on the board at the beginning of the game, rather than a collection of randomly placed tiles. (David)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can open the main menu and see options like "New Game", "Quit", etc... (Kyle, Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can press escape to exit the game. (Adam)
 
 == 1st Build (Jan. 13 - Jan. 22) == 
 
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif' height='15' width='15'  />User sees UI Grid in scrollable inline frame
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>User sees UI Grid in scrollable inline frame
   * Hamy, David
  * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' />~~User sees UI Grid navigation Buttons in sidebar (Zoom, Pan)~~ <br />Completed Pan by embedding into game window rather than as buttons in sidebar. Zoom remains in sidebar for now
   * Hamy, David
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees UI control buttons in sidebar (New Game, Load Game, Exit)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>User sees UI control buttons in sidebar (New Game, Load Game, Exit)
   * Brian
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>User sees UI game status in sidebar (Turn Indicator, Draw Terrain Tile, Drawn Card Display, Card Rotator)
   * Brian, David
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees saved game tiles loaded
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>User sees saved game tiles loaded
   * Ben, Adam, Kyle, Hamy
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'  height='15' width='15' />User sees terrain*tile generator utility
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>User sees terrain*tile generator utility
   * Ben, Adam, Kyle
 
 ----
