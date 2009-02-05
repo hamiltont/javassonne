@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import java.util.HashMap;
+
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -109,31 +111,41 @@ public class GameController {
 	}
 
 	public void exitGame(Notification n) {
+		// TODO: Allow for no argument to be passed
+		HashMap config = (HashMap) n.argument();
 
 		// TODO: Make the interface disappear and show the menu here.
 
-		// The board controller and HUD controller that we created during
-		// gameplay should be deleted. We'll create two more if we start another
-		// game.
-		boardController_ = null;
-		hudController_ = null;
-		
 		Object[] options = { YES_PLEASE, CANCEL };
-		
-		JOptionPane p = new JOptionPane();
-		p.setOptions(options);
-		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
-		p.setMessage(EXIT_WITHOUT_SAVING);
-		p.setOptionType(JOptionPane.YES_NO_OPTION);
-		p.setSize(420, 170);
-		p.validate();
-		
-		JDialog dialog = p.createDialog(null, EXIT_GAME);
-		dialog.setAlwaysOnTop(true);
-		dialog.show();
-	    Object ans = p.getValue();
+		Object ans = CANCEL;
+
+		if (config != null
+				&& (Boolean) config.get("hideConfirm")) {
+			ans = YES_PLEASE;
+		} else {
+			JOptionPane p = new JOptionPane();
+			p.setOptions(options);
+			p.setMessageType(JOptionPane.QUESTION_MESSAGE);
+			p.setMessage(EXIT_WITHOUT_SAVING);
+			p.setOptionType(JOptionPane.YES_NO_OPTION);
+			p.setSize(420, 170);
+			p.validate();
+
+			JDialog dialog = p.createDialog(null, EXIT_GAME);
+			dialog.setAlwaysOnTop(true);
+			dialog.show();
+			ans = p.getValue();
+		}
 
 		if (ans == YES_PLEASE) {
+
+			// The board controller and HUD controller that we created during
+			// gameplay should be deleted.
+
+			boardController_ = null;
+			hudController_ = null;
+
+			// Return control to final shutdown process
 			System.exit(0);
 		}
 	}
