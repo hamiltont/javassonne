@@ -115,10 +115,12 @@ public class HUDPanel extends JPanel implements ActionListener {
 		rotateRight_ = new JButton("=>");
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
 		rotateRight_.addActionListener(this);
-
+		rotateRight_.addKeyListener(JKeyListener.getInstance());
+		
 		rotateLeft_ = new JButton("<=");
 		rotateLeft_.setActionCommand(Notification.TILE_ROTATE_LEFT);
 		rotateLeft_.addActionListener(this);
+		rotateLeft_.addKeyListener(JKeyListener.getInstance());
 
 		playerTurn_ = new TurnIndicator("Player " + 1 + "'s Turn");
 
@@ -149,6 +151,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
 		NotificationManager.getInstance().addObserver(
 				Notification.DECK_CHANGED, this, "updateDeck");
+		NotificationManager.getInstance().addObserver(
+				Notification.ZOOM_CHANGED, this, "updateZoomButtons");
 	}
 
 	/*
@@ -199,6 +203,21 @@ public class HUDPanel extends JPanel implements ActionListener {
 		
 		this.invalidate();
 	}
+	public void updateZoomButtons(Notification n){
+		MapLayer m = (MapLayer) n.argument();
+
+		if(m.zoomedMax()){
+			zoomInButton_.setEnabled(false);
+			zoomOutButton_.setEnabled(true);
+		}else if(m.zoomedMin()){
+			zoomInButton_.setEnabled(true);
+			zoomOutButton_.setEnabled(false);
+		}else{
+			zoomInButton_.setEnabled(true);
+			zoomOutButton_.setEnabled(true);
+		}
+	}
+
 
 	// Overloaded the add() method to bind a key listener to any elements placed
 	// within the JPanel
