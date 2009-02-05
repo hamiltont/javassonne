@@ -21,7 +21,6 @@
 
 package org.javassonne.ui;
 
-import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
@@ -50,12 +49,27 @@ public class DisplayWindow extends JFrame {
 		super();
 		
 		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		boolean fakeFullscreen = false;
+		
+		// determine whether we need to fake full screen.
+		 try{
+			   String os = System.getProperty("os.name");
+			   if (os.equals("Mac OS X"))
+				   fakeFullscreen = true;
+			   
+		 }catch (Exception e) {
+			 // who cares?
+		 }
 		
 		// Set a few basic properties of our window
 		setTitle(WINDOW_TITLE);
 		
 		if (FULL_SCREEN){
-			setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight());
+			if (fakeFullscreen){
+				setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight()-20);
+			}else
+				setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight());
+			
 		} else {
 			setSize(1024, 768);
 			setLocation((device.getDisplayMode().getWidth()-1024)/2, (device.getDisplayMode().getHeight()-768)/2);
@@ -75,7 +89,7 @@ public class DisplayWindow extends JFrame {
 		setVisible(true);
 		
 		// Make the window fullscreen
-		if (FULL_SCREEN) device.setFullScreenWindow(this);
+		if ((FULL_SCREEN) && (!fakeFullscreen)) device.setFullScreenWindow(this);
 	}
 
 	public DisplayDesktopPane getDisplayDesktopPane() {
