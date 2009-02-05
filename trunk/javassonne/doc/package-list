@@ -1,4 +1,8 @@
+org.javassonne.messaging
+org.javassonne.messaging.test
 org.javassonne.model
 org.javassonne.model.test
 org.javassonne.tilesetcreator
 org.javassonne.ui
+org.javassonne.ui.control
+org.javassonne.ui.test
