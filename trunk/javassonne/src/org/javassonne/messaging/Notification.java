@@ -40,6 +40,7 @@ public class Notification {
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
 	public static final String ZOOM_IN = "NotificationGameZoomIn";
 	public static final String ZOOM_OUT = "NotificationGameZoomOut";
+	public static final String ZOOM_CHANGED = "NotificationGameZoomChanged";
 	public static final String DRAW_TILE = "NotificationDrawTile";
 
 	public static final String NEW_GAME = "NotificationNewGame";
