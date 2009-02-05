@@ -19,6 +19,7 @@
 package org.javassonne.ui;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -59,22 +60,23 @@ public class Main {
 		p.setOptions(options);
 		p.setIcon(new ImageIcon("images/logo.jpg",""));
 		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		p.setMessage(null);
 		p.setSize(420, 170);
 		p.validate();
 		
-		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
-				DisplayHelper.Positioning.CENTER);
+		JDialog dialog = p.createDialog(WELCOME);
+		dialog.setAlwaysOnTop(true);
+		dialog.show();
+	    Object ans = p.getValue();
 
-		while (p.getValue() == JOptionPane.UNINITIALIZED_VALUE);
-		Object ans = p.getValue();
-
-		if (ans == START_NEW_GAME) {
-			NotificationManager.getInstance().sendNotification(
-					Notification.NEW_GAME);
-		} else if (ans == LOAD_SAVE_GAME) {
+		if (ans == LOAD_SAVE_GAME) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOAD_GAME);
+		} else{
+			//Default action -> Start New Game
+			NotificationManager.getInstance().sendNotification(
+					Notification.NEW_GAME);
+			
 		}
-		DisplayHelper.getInstance().remove(p);
 	}
 }

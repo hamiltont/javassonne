@@ -18,8 +18,9 @@
 
 package org.javassonne.ui;
 
-import java.awt.Point;
-
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
@@ -41,6 +42,12 @@ import org.javassonne.model.TileSet;
  * @author bengotow
  */
 public class GameController {
+	private static final String EXIT_GAME = "Exit Game";
+
+	private static final String YES_PLEASE = "Yes, please";
+
+	private static final String CANCEL = "Cancel!";
+
 	private static final String EXIT_WITHOUT_SAVING = "Exit without saving?";
 
 	private static final long serialVersionUID = 1L;
@@ -112,12 +119,24 @@ public class GameController {
 		// game.
 		boardController_ = null;
 		hudController_ = null;
+		
+		Object[] options = { YES_PLEASE, CANCEL };
+		
+		JOptionPane p = new JOptionPane();
+		p.setOptions(options);
+		p.setMessageType(JOptionPane.QUESTION_MESSAGE);
+		p.setMessage(EXIT_WITHOUT_SAVING);
+		p.setOptionType(JOptionPane.YES_NO_OPTION);
+		p.setSize(420, 170);
+		p.validate();
+		
+		JDialog dialog = p.createDialog(EXIT_GAME);
+		dialog.setAlwaysOnTop(true);
+		dialog.show();
+	    Object ans = p.getValue();
 
-		int ans = JOptionPane.showConfirmDialog(null, EXIT_WITHOUT_SAVING,
-				null, JOptionPane.YES_NO_OPTION);
-		if (ans == JOptionPane.YES_OPTION) {
+		if (ans == YES_PLEASE) {
 			System.exit(0);
 		}
 	}
-
 }

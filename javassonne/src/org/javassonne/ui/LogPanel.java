@@ -74,7 +74,7 @@ public class LogPanel extends JPanel implements KeyListener {
 
 	public void log(Notification n) {
 		areaString_.append(String.format("\r%s: %s", new Date().toString(), n
-				.argument().toString()));
+				.argument().toString()) + "\n");
 		area_.setText(areaString_.toString());
 	}
 
