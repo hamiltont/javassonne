@@ -7,6 +7,19 @@
  * User can see possible locations where the tile is allowed to be placed.
  * User sees a decorative background pattern behind the map.
 
+== 3rd Build (Jan. 22 - Jan. 30) ==
+
+Game:
+ * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names. (David)
+ * Add HUD Panel to show the number of each type of remaining tile. (Ben)
+ * Add HUD Panel to show game stats and more advanced turn information. (Ben)
+ * User can place the tile in their hand in a valid location during their turn. (Kyle)
+ * User sees dialogs in the correct place on the screen that do not cause the game window to minimize. (Adam)
+
+Networking:
+
+ * User can search for and see other people (IP addresses) running the Javassonne application on the local network. (Hamy, Brian)
+
 == 2nd Build (Jan. 22 - Jan. 29) == 
 
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
