@@ -41,7 +41,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 
 	protected JKeyListener() {
 	}
-	
+
 	// Provide access to singleton
 	public static JKeyListener getInstance() {
 		if (instance_ == null) {
@@ -49,7 +49,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		}
 		return instance_;
 	}
-	
+
 	/** Capture key event */
 	public void keyTyped(KeyEvent e) {
 	}
@@ -76,25 +76,24 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 	private void keyCheck(KeyEvent e, String keyStatus) {
 
 		// Determine what type of event occurred
-		int id = e.getID();
 		String keyString;
-		if (id == KeyEvent.KEY_TYPED) {
+		if (e.getID() == KeyEvent.KEY_TYPED) {
 			keyString = Character.toString(e.getKeyChar());
 		} else {
 			keyString = KeyEvent.getKeyText(e.getKeyCode());
 		}
 
 		// Notify the system
-		if (keyString.equalsIgnoreCase("Escape")) {
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			// Close the the log panel if it's open
-			if(LogPanel.getInstance().isVisible() == true){
+			if (LogPanel.getInstance().isVisible() == true) {
 				LogPanel.getInstance().setVisible(false);
 			}
-			
+
 			// User is trying to stop game play
-			else{
-			NotificationManager.getInstance().sendNotification(
-					Notification.EXIT_GAME);
+			else {
+				NotificationManager.getInstance().sendNotification(
+						Notification.EXIT_GAME);
 			}
 		}
 
