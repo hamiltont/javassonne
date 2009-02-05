@@ -18,7 +18,7 @@
 
 package org.javassonne.ui;
 
-import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -27,9 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JViewport;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -38,168 +36,233 @@ import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
 
 /**
- * The default panel, displayed below all others. This panel contains the
- * JViewport that displays the map, and the grid that is displayed
+ * The default panel, displayed below all others. This panel is responsible for
+ * rendering the map.
  */
 public class MapLayer extends JPanel {
-	private JViewport viewport_;
-	private Map map_;
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
+	private BufferedImage buffer_ = null;
+	private Point paintOffset_ = new Point(0, 0);
+	private Point renderOffset_ = new Point(0, 0);
+
+	// To improve performance, the offscreen buffer image containing the map is
+	// larger than the map view. That way, when you scroll, you can go a certain
+	// distance in any direction before the map needs to be redrawn into the
+	// buffer.
+	private static final int bufferMaxOffsetX_ = 500;
+	private static final int bufferMaxOffsetY_ = 500;
+
+	// The background color is drawn into the buffer_ and used as a background
+	// for the JPanel.
+	private static final Color backgroundColor_ = Color.darkGray;
+
+	// The scale the tiles are drawn at
+	private double scale_ = 0.7;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param screenSize
-	 *            The amount of screen the JViewport will have to display the
-	 *            map
+	 *            The size of the MapLayer.
 	 */
 	public MapLayer(Dimension screenSize) {
-		map_ = new Map(screenSize);
 
 		setSize(screenSize);
-		
-		viewport_ = new JViewport();
-		viewport_.setExtentSize(screenSize);
-		viewport_.setLayout(null);
-		viewport_.setView(map_);
-		viewport_.setBackground(Color.black);
-		viewport_.setForeground(Color.black);
-		
-		// This layout allows the viewport to expand and take all available
-		// space
-		setLayout(new BorderLayout());
-		add(viewport_);
+		setDoubleBuffered(false);
 
 		// Listen for notification setting our board model
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "setBoard");
-		
+
+		// Listen for notifications chaning the zoom
+		NotificationManager.getInstance().addObserver(Notification.ZOOM_IN,
+				this, "zoomIn");
+		NotificationManager.getInstance().addObserver(Notification.ZOOM_OUT,
+				this, "zoomOut");
+
 		// Load the background image from disk
-		try{
-		backgroundTile_ = ImageIO.read(new File("images/background_tile.jpg"));
+		try {
+			backgroundTile_ = ImageIO.read(new File(
+					"images/background_tile.jpg"));
 		} catch (Exception e) {
-			NotificationManager.getInstance().sendNotification(Notification.LOG_ERROR,
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR,
 					"The backgound tile could not be loaded from disk");
 		}
 	}
 
 	public void setBoard(Notification n) {
 		board_ = (TileBoard) n.argument();
-		this.repaint();
+		renderBoard();
+		repaint();
 	}
 
 	/**
-	 * Helper function that allows other layers to know the amount of room
-	 * needed to render the map. This allows the other layers to setSize without
-	 * accidentally rescaling the map
-	 * 
-	 * @return The width and height needed to render the full map (including any
-	 *         offscreen portion)
-	 */
-	public Dimension getMapSize() {
-		return map_.getSize();
-	}
-
-	/**
-	 * Helper function for setting the upper left and lower right tile
-	 * positions. Note that this is in the board coord's, so an upper left value
-	 * of -3,0 would indicate the current upper left tile on the board was 3
-	 * left, and 0 up. This allows the viewport to not scroll beyone the
-	 * currently visible map.
-	 */
-	public void setBoardConstraints(Point upperLeftTile, Point lowerRightTile) {
-		// TODO Implement setBoardConstraints function
-	}
-
-	/**
-	 * Shifts the internal JViewport so a different portion of the map is shown
+	 * ShiftView allows you to pan the map by passing a scroll amount. This
+	 * function is used by the MapScrollEdges to move the map when the user
+	 * moves the mouse into a hotspot.
 	 * 
 	 * @param amount
-	 *            The amount the view should be shifted. Values should be
-	 *            relative to position 0,0 on the normal cartesian plane. Ex:
-	 *            x/y of 3,-3 would shift the map to the right 3 units, and down
-	 *            3 units.
+	 *            Positive values for X and Y indicate left and down,
+	 *            respectively.
 	 */
 	public void shiftView(Point amount) {
-		Point current = viewport_.getViewPosition();
-		current.y += amount.y;
-		current.x += amount.x;
-		viewport_.setViewPosition(current);
+		paintOffset_.y += amount.y;
+		paintOffset_.x += amount.x;
+
+		// If we've scrolled far enough to reach part of the map not drawn into
+		// the buffer image, we need to push the paintOffset into the
+		// renderOffset and then re-render the board.
+		if ((paintOffset_.x < -bufferMaxOffsetX_)
+				|| (paintOffset_.x > bufferMaxOffsetX_)
+				|| (paintOffset_.y < -bufferMaxOffsetY_)
+				|| (paintOffset_.y > bufferMaxOffsetY_)) {
+
+			// Add the current paintOffset to the renderOffset.
+			renderOffset_.x += paintOffset_.x;
+			renderOffset_.y += paintOffset_.y;
+			paintOffset_ = new Point(0, 0);
+
+			// Notify the user that we've redrawn (for dev, anyway)
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_WARNING,
+					"Rerendering the board into offscreen buffer.");
+
+			// Rerender the board to "commit" or changes to the offset.
+			renderBoard();
+		}
+
+		// Paint the buffer to the screen at the pointOffset.
+		repaint();
 	}
 
 	/**
-	 * Because the JViewport needs to wrapper something, this class is a logical
-	 * construct that simply displays/renders the map. Currently no optimization
-	 * is provided. Map decides how much size is needed to render the map.
+	 * Handles the ZOOM_IN notification and re-renders the board at a higher
+	 * zoom level.
+	 * 
+	 * @param n
 	 */
-	private class Map extends JComponent {
-		private double scale_ = 0.3;
-
-		/**
-		 * Constructor
-		 * 
-		 * @param screenSize
-		 *            Useful in determining the initial size of the map. This
-		 *            param may be removed later.
-		 */
-		public Map(Dimension screenSize) {
-
-			// Note that you should never actually
-			// modify the value of screenSize here.
-			// Because is it pass-by-ref, this will
-			// propogate up and interfere with other classes
-			setSize(screenSize.width * 2, screenSize.height * 2);
+	public void zoomIn(Notification n) {
+		if (scale_ < 1) {
+			scale_ += 0.1;
+			renderBoard();
+			repaint();
 		}
+	}
 
-		/**
-		 * Override of the default JPanel function to render the map, and any
-		 * grid.
-		 */
-		public void paintComponent(Graphics gra) {
-			
-			if (board_ == null)
-				return;
+	/**
+	 * Handles the ZOOM_OUT notification and re-renders the board at a lower
+	 * zoom level.
+	 * 
+	 * @param n
+	 */
+	public void zoomOut(Notification n) {
+		if (scale_ > 0.5) {
+			scale_ -= 0.1;
+			renderBoard();
+			repaint();
+		}
+	}
 
-			try {
-				// paint the board background from the top left to the bottom
-				// right
-				IntPair topLeft = board_.getUpperLeftCorner().getLocation();
-				IntPair bottomRight = board_.getLowerRightCorner()
-						.getLocation();
+	public void paint(Graphics gra) {
 
-				int boardWidth = bottomRight.car() - topLeft.car();
-				int boardHeight = bottomRight.cdr() - topLeft.cdr();
+		int w = this.getWidth();
+		int h = this.getHeight();
 
-				BufferedImage tileImage = board_.homeTile().current()
-						.getImage();
-				int tileWidth = (int) (tileImage.getWidth() * scale_);
-				int tileHeight = (int) (tileImage.getHeight() * scale_);
-				
-				TileBoardIterator iter = board_.getUpperLeftCorner();
+		// paint a solid background color
+		gra.setColor(backgroundColor_);
+		gra.fillRect(0, 0, w, h);
 
-				for (int x = 0; x < boardWidth; x++) {
-					for (int y = 0; y < boardHeight; y++) {
+		// if we've rendered the board into the buffer image, draw the buffer
+		// image onto the screen using the "paintOffset_" to determine where it
+		// goes.
+		if (buffer_ != null) {
+			gra.drawImage(buffer_, 0, 0, w, h, paintOffset_.x
+					+ bufferMaxOffsetX_, paintOffset_.y + bufferMaxOffsetY_, w
+					+ paintOffset_.x + bufferMaxOffsetX_, h + paintOffset_.y
+					+ bufferMaxOffsetY_, null);
+		}
+	}
 
-						// paint the tile if it exists. Otherwise paint the
-						// background image
-						if (iter.current() != null) {
-							gra.drawImage(iter.current().getImage(), x
-									* tileWidth, y * tileHeight, tileWidth,
-									tileHeight, null);
-						} else {
-							gra.drawImage(backgroundTile_, x * tileWidth, y
-									* tileHeight, tileWidth, tileHeight, null);
-						}
-						iter.right();
-					}
-					iter.nextRow();
-				}
+	/**
+	 * renderBoard does the heavy lifting involved in redrawing the buffer
+	 * image. The buffer image contains the map graphics, and is drawn to the
+	 * screen repeatedly (without iterating through the tiles) when the user
+	 * scrolls. It must be re-rendered when a new tile is added, etc..
+	 */
+	public void renderBoard() {
+		if (board_ == null)
+			return;
 
-			} catch (Exception e) {
-				System.out.println("Error displaying a tile image.");
+		try {
+			// paint the board background from the top left to the bottom
+			// right
+			IntPair topLeft = board_.getUpperLeftCorner().getLocation();
+			IntPair bottomRight = board_.getLowerRightCorner().getLocation();
+
+			// Compute the size of the board, size of the tiles, etc...
+			int boardWidth = bottomRight.car() - topLeft.car() + 1;
+			int boardHeight = bottomRight.cdr() - topLeft.cdr() + 1;
+
+			int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
+			int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
+
+			int bufferWidth = this.getWidth() + bufferMaxOffsetX_ * 2;
+			int bufferHeight = this.getHeight() + bufferMaxOffsetY_ * 2;
+
+			// determine what the offset should be to center the game board in
+			// the image we'll create.
+			Point centerOffset = new Point(0, 0);
+			centerOffset.x = (bufferWidth - boardWidth * tileWidth) / 2;
+			centerOffset.y = (bufferHeight - boardHeight * tileHeight) / 2;
+
+			// create the buffered image if it doesn't already exist.
+			if (buffer_ == null) {
+				buffer_ = new BufferedImage(bufferWidth, bufferHeight,
+						BufferedImage.TYPE_INT_ARGB);
 			}
-		}
-	} // End Map
-} // End MapLayer
 
+			// clear the buffer to a dark gray
+			Graphics gra = buffer_.getGraphics();
+			gra.setColor(Color.darkGray);
+			gra.fillRect(0, 0, bufferWidth, bufferHeight);
+
+			// get the tile iterator.
+			TileBoardIterator iter = board_.getUpperLeftCorner();
+
+			// TODO: Right now, we're drawing every tile on the map, even if
+			// they are off to one side and not actually visible in the buffer.
+			// This is OK I think, but it is NOT efficient.
+
+			for (int x = 0; x < boardWidth; x++) {
+				for (int y = 0; y < boardHeight; y++) {
+
+					// determine where the tile should be drawn, taking into
+					// account the tile's position on the map, the portion of
+					// the map that is being rendered into the buffer, and any
+					// movement we're doing to center it.
+					int drawX = x * tileWidth - renderOffset_.x
+							+ centerOffset.x;
+					int drawY = y * tileHeight - renderOffset_.y
+							+ centerOffset.y;
+
+					// paint the tile if it exists. Otherwise paint the
+					// background image
+					if (iter.current() != null) {
+						gra.drawImage(iter.current().getImage(), drawX, drawY,
+								tileWidth, tileHeight, null);
+					} else {
+						gra.drawImage(backgroundTile_, drawX, drawY, tileWidth,
+								tileHeight, null);
+					}
+					iter.right();
+				}
+				iter.nextRow();
+			}
+
+		} catch (Exception e) {
+			System.out.println("Error displaying a tile image.");
+		}
+	}
+}

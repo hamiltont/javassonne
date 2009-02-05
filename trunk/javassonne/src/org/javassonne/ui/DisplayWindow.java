@@ -38,8 +38,8 @@ import org.javassonne.ui.control.JKeyListener;
 public class DisplayWindow extends JFrame {
 
 	private static final String WINDOW_TITLE = "Javassonne";
-	private static final Color WINDOW_BG_COLOR = Color.WHITE;
-
+	private static boolean FULL_SCREEN = true;
+	
 	private DisplayDesktopPane displayPane_;
 
 	/**
@@ -53,12 +53,17 @@ public class DisplayWindow extends JFrame {
 		
 		// Set a few basic properties of our window
 		setTitle(WINDOW_TITLE);
-		setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight());
-		getContentPane().setBackground(WINDOW_BG_COLOR);
-
+		
+		if (FULL_SCREEN){
+			setSize(device.getDisplayMode().getWidth(), device.getDisplayMode().getHeight());
+		} else {
+			setSize(1024, 768);
+			setLocation((device.getDisplayMode().getWidth()-1024)/2, (device.getDisplayMode().getHeight()-768)/2);
+		}	
+		
 		// Hide the bar at the top of the window and the window border
 		this.setUndecorated(true);
-
+		
 		// Add the JLayeredPane to our contents
 		displayPane_ = new DisplayDesktopPane(this.getSize());
 		getContentPane().add(displayPane_);
@@ -70,7 +75,7 @@ public class DisplayWindow extends JFrame {
 		setVisible(true);
 		
 		// Make the window fullscreen
-		device.setFullScreenWindow(this);
+		if (FULL_SCREEN) device.setFullScreenWindow(this);
 	}
 
 	public DisplayDesktopPane getDisplayDesktopPane() {

@@ -79,7 +79,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 		Point current = e.getPoint();
 		int dx = 0;
 		int dy = 0;
-		int delta = 3;
+		int delta = 1;
 
 		// are we inside one of the directional containers?
 		if (navRight_.contains(current))
@@ -106,7 +106,7 @@ class MapScrollEdges extends JPanel implements MouseMotionListener {
 				if (mapShiftTimer_ != null)
 					mapShiftTimer_.cancel();
 				mapShiftTimer_ = new Timer();
-				mapShiftTimer_.schedule(task, 0, 10);
+				mapShiftTimer_.schedule(task, 0, 5);
 			}
 
 		} else if (mapShiftTimer_ != null) {
