@@ -13,6 +13,7 @@ Game Team:
  * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * Add HUD Panel to show the number of each type of remaining tile. (Ben)
  * Add HUD Panel to show game stats and more advanced turn information. (Ben)
+ * User sees an expanded main menu with many of the options currently in the HUD left sidebar. The main menu can be brought up by pressing esc during gameplay or clicking a small menu icon.
  * User can place the tile in their hand in a valid location during their turn. (Kyle)
  * User sees dialogs in the correct place on the screen that do not cause the game window to minimize. (Adam)
 
