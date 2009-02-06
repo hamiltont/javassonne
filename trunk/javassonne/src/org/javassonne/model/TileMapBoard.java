@@ -20,6 +20,12 @@ package org.javassonne.model;
 
 import java.util.HashMap;
 
+import org.javassonne.model.Tile.Region;
+
+/**
+ * @author pretekr
+ *
+ */
 public class TileMapBoard implements TileBoard {
 
 	private HashMap<IntPair, Tile> data_;
@@ -54,10 +60,11 @@ public class TileMapBoard implements TileBoard {
 	/* (non-Javadoc)
 	 * @see org.javassonne.model.TileBoard#addTile(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile)
 	 */
-	public void addTile(TileBoardIterator iter, Tile tile) throws BoardPositionFilledException {
+	public void addTile(TileBoardIterator iter, Tile tile) throws BoardPositionFilledException, NotValidPlacementException {
 		if (positionFilled(iter))
 			throw new BoardPositionFilledException(iter.getLocation());
-		//TODO: Check for out of bounds?
+		else if(!isValidPlacement(iter, tile))
+			throw new NotValidPlacementException(iter.getLocation());
 		else
 		{
 			data_.put(iter.getLocation(), tile);
@@ -92,6 +99,34 @@ public class TileMapBoard implements TileBoard {
 	 */
 	public TileBoardIterator getUpperLeftCorner() {
 		return new TileBoardGenIterator(upperLeft_);
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#isValidPlacement(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile)
+	 */
+	public boolean isValidPlacement(TileBoardIterator iter, Tile tile) {
+		if(iter.outOfBounds())
+			return false;
+		else if(positionFilled(iter))
+			return false;
+		else {
+			TileBoardGenIterator localIter = new TileBoardGenIterator(iter);
+			Tile left = localIter.leftCopy().current();
+			if(left != null && left.featureIdentifierInRegion(Region.Right) != tile.featureIdentifierInRegion(Region.Left))
+				return false;
+			Tile top = localIter.upCopy().current();
+			if(top != null && top.featureIdentifierInRegion(Region.Bottom) != tile.featureIdentifierInRegion(Region.Top))
+				return false;
+			Tile right = localIter.rightCopy().current();
+			if(right != null && right.featureIdentifierInRegion(Region.Left) != tile.featureIdentifierInRegion(Region.Right))
+				return false;
+			Tile bottom = localIter.downCopy().current();
+			if(bottom != null && bottom.featureIdentifierInRegion(Region.Top) != tile.featureIdentifierInRegion(Region.Bottom))
+				return false;
+			//else
+			return true;
+		}
 	}
 
 }
