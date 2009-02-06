@@ -19,6 +19,7 @@
 package org.javassonne.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -33,12 +34,14 @@ import java.util.Random;
 public class TileDeck {
 
 	private ArrayList<Tile> tiles_;
-
+	private HashMap<Tile, Integer> tilesRemaining_;
+	
 	/**
 	 * A general purpose constructor that initializes an empty tile deck.
 	 */
 	public TileDeck() {
 		tiles_ = new ArrayList<Tile>();
+		tilesRemaining_ = new HashMap<Tile, Integer>();
 	}
 
 	// Adding Tiles
@@ -67,7 +70,11 @@ public class TileDeck {
 	 */
 	public void addTile(Tile t, int count) {
 		for (int ii = 0; ii < count; ii++)
-			tiles_.add(t);
+			tiles_.add(new Tile(t));
+			
+		Integer existing = tilesRemaining_.get(t);
+		if (existing == null) existing = 0;
+		tilesRemaining_.put(t, existing += count);
 	}
 
 	// Pulling Tiles
@@ -84,15 +91,20 @@ public class TileDeck {
 
 		Tile t = tiles_.get(index);
 		tiles_.remove(index);
-
+		tilesRemaining_.put(t,tilesRemaining_.get(t) - 1);
+		
 		return t;
 	}
 
 	/**
 	 * @return The number of tiles remaining in the deck. Should decrement when
-	 *         popRandomTile() is caled.
+	 *         popRandomTile() is called.
 	 */
 	public int tilesRemaining() {
 		return tiles_.size();
+	}
+
+	public HashMap<Tile, Integer> tilesRemainingByType() {
+		return tilesRemaining_;
 	}
 }

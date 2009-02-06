@@ -24,8 +24,12 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -40,7 +44,7 @@ import org.javassonne.model.TileBoardIterator;
  * The default panel, displayed below all others. This panel is responsible for
  * rendering the map.
  */
-public class MapLayer extends JPanel implements MouseListener {
+public class MapLayer extends JPanel implements MouseListener, MouseMotionListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 	private BufferedImage buffer_ = null;
@@ -62,6 +66,14 @@ public class MapLayer extends JPanel implements MouseListener {
 	// The scale the tiles are drawn at
 	private double scale_ = 0.7;
 
+	// For scrolling hotspots:
+	private Rectangle2D navLeft_;
+	private Rectangle2D navRight_;
+	private Rectangle2D navTop_;
+	private Rectangle2D navBottom_;
+	private Timer mapShiftTimer_;
+	private Point mapShift_;
+
 	/**
 	 * Constructor
 	 * 
@@ -77,7 +89,7 @@ public class MapLayer extends JPanel implements MouseListener {
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "setBoard");
 
-		// Listen for notifications chaning the zoom
+		// Listen for notifications changing the zoom
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_IN,
 				this, "zoomIn");
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_OUT,
@@ -92,6 +104,19 @@ public class MapLayer extends JPanel implements MouseListener {
 					Notification.LOG_ERROR,
 					"The backgound tile could not be loaded from disk");
 		}
+
+		// Setup the scroll hotspots
+		navLeft_ = new Rectangle2D.Double(0, 0, 10, screenSize.getHeight());
+		navRight_ = new Rectangle2D.Double(screenSize.getWidth() - 10, 0, 10,
+				screenSize.getHeight());
+		navTop_ = new Rectangle2D.Double(0, 0, screenSize.getWidth(), 10);
+		navBottom_ = new Rectangle2D.Double(0, screenSize.getHeight() - 10,
+				screenSize.getWidth(), 10);
+
+		// add the mouse motion listener to enable the scroll hotspots and the
+		// click listener so we can detect clicks.
+		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
 	}
 
 	public void setBoard(Notification n) {
@@ -150,7 +175,8 @@ public class MapLayer extends JPanel implements MouseListener {
 			scale_ += 0.1;
 			renderBoard();
 			repaint();
-			NotificationManager.getInstance().sendNotification(Notification.ZOOM_CHANGED,this);
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_CHANGED, this);
 		}
 		System.out.println(scale_);
 	}
@@ -166,20 +192,22 @@ public class MapLayer extends JPanel implements MouseListener {
 			scale_ -= 0.1;
 			renderBoard();
 			repaint();
-			NotificationManager.getInstance().sendNotification(Notification.ZOOM_CHANGED,this);
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_CHANGED, this);
 		}
 		System.out.println(scale_);
 	}
-	
+
 	// Zoomed all the way in?
-	public boolean zoomedMax(){
+	public boolean zoomedMax() {
 		return (scale_ > 1);
 	}
-	
+
 	// Zoomed all the way out?
-	public boolean zoomedMin(){
+	public boolean zoomedMin() {
 		return (scale_ < .6);
 	}
+
 	public void paint(Graphics gra) {
 
 		int w = this.getWidth();
@@ -323,5 +351,62 @@ public class MapLayer extends JPanel implements MouseListener {
 
 	public void mouseReleased(MouseEvent e) {
 	}
+	
+	public void mouseDragged(MouseEvent e) {
+	}
 
+	public void mouseMoved(MouseEvent e) {
+		Point current = e.getPoint();
+		int dx = 0;
+		int dy = 0;
+		int delta = 2;
+
+		// are we inside one of the directional containers?
+		if (navRight_.contains(current))
+			dx = delta;
+		if (navLeft_.contains(current))
+			dx = -delta;
+		if (navTop_.contains(current))
+			dy = -delta;
+		if (navBottom_.contains(current))
+			dy = delta;
+
+		// if we are within a container and we're not scrolling, create a
+		// task to fire the "shift" event over and over again, until we leave
+		// the container
+		if ((dx != 0) || (dy != 0)) {
+			Point newShift = new Point(dx, dy);
+
+			if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
+				WorldScrollTask task = new WorldScrollTask();
+				task.setOffset(newShift);
+
+				mapShift_ = newShift;
+
+				if (mapShiftTimer_ != null)
+					mapShiftTimer_.cancel();
+				mapShiftTimer_ = new Timer();
+				mapShiftTimer_.schedule(task, 0, 5);
+			}
+
+		} else if (mapShiftTimer_ != null) {
+			// if we have left a directional container and the timer still
+			// exists, cancel it so we stop sending "shift" events to the map
+			// view.
+			mapShiftTimer_.cancel();
+			mapShiftTimer_ = null;
+		}
+	}
+
+	class WorldScrollTask extends TimerTask {
+		private Point p_;
+
+		public void setOffset(Point p) {
+			this.p_ = p;
+		}
+
+		public void run() {
+			shiftView(this.p_);
+		}
+	}
 }

@@ -57,11 +57,6 @@ public class DisplayDesktopPane extends JDesktopPane {
 		// the Default Layer
 		add(map, JLayeredPane.DEFAULT_LAYER);
 
-		// Create the edges of the map that trigger the scrolling behavior. We
-		// have to pass the map layer in so that the MapScrollEdges instance
-		// knows which map layer to scroll!
-		add(new MapScrollEdges(map), JLayeredPane.PALETTE_LAYER);
-
 		// NOTE: You should not add all of your layers here. Add them as needed
 		// using the functions in the singleton DisplayHelper.
 	}
