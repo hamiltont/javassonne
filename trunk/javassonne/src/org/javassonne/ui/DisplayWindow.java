@@ -33,6 +33,8 @@ import org.javassonne.ui.control.JKeyListener;
  * 
  *         The Display serves only the purpose of wrapper-ing the
  *         LayeredDisplayPane so that it can be set to full-screen mode.
+ *         It takes the responsibility of creating the layeredDisplayPane, 
+ *         which creates both the map and the mapScrollEdges. 
  */
 public class DisplayWindow extends JFrame {
 
