@@ -6,6 +6,9 @@
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can see possible locations where the tile is allowed to be placed.
  * User sees a decorative background pattern behind the map.
+ * User able to navigate the map using the 4 directional keys
+ * User able to hit Esc(done), followed by Enter(not done) to exit the game
+ * User is able to see and/or navigate a minimap
 
 == 3rd Build (Jan. 22 - Jan. 30) ==
 
