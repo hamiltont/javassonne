@@ -26,6 +26,9 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
+
 /**
  * @author Hamilton Turner
  * 

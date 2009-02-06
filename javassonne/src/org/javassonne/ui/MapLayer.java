@@ -178,7 +178,6 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 			NotificationManager.getInstance().sendNotification(
 					Notification.ZOOM_CHANGED, this);
 		}
-		System.out.println(scale_);
 	}
 
 	/**
@@ -195,7 +194,6 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 			NotificationManager.getInstance().sendNotification(
 					Notification.ZOOM_CHANGED, this);
 		}
-		System.out.println(scale_);
 	}
 
 	// Zoomed all the way in?
