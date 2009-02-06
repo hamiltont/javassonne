@@ -92,6 +92,16 @@ public class Tile {
 
 	// FARMS: Getter and Setter Functionality
 
+	public Tile(Tile t) {
+		farms_ = t.farms_;
+		features_ = t.features_;
+		farmWalls_ = t.farmWalls_;
+		uniqueIdentifier_ = new String(t.getUniqueIdentifier());
+
+		BufferedImage other = t.getImage();
+		image_ = other.getSubimage(0, 0, other.getWidth(), other.getHeight());
+	}
+
 	/**
 	 * @param q
 	 *            The qudadrant you want the farm value for
@@ -249,21 +259,36 @@ public class Tile {
 			farms_[(4 + i + direction) % 4] = farms_[i];
 			farmWalls_[(4 + i + direction) % 4] = farmWalls_[i];
 		}
-		
-		int angle = direction * 90; 
-		if(angle < 0)
+
+		int angle = direction * 90;
+		if (angle < 0)
 			angle += 360;
 
 		// rotate our image, if it exists
 		if (image_ != null) {
 			AffineTransform test = new AffineTransform();
-			int w = image_.getWidth();  
-	        int h = image_.getHeight(); 
-	        test.rotate(Math.toRadians(angle),w/2,h/2);
-	        AffineTransformOp op = new AffineTransformOp(test, 
-	        	      AffineTransformOp.TYPE_BILINEAR);
-	        image_ = op.filter(image_, null);  
+			int w = image_.getWidth();
+			int h = image_.getHeight();
+			test.rotate(Math.toRadians(angle), w / 2, h / 2);
+			AffineTransformOp op = new AffineTransformOp(test,
+					AffineTransformOp.TYPE_BILINEAR);
+			image_ = op.filter(image_, null);
 		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other.getClass().equals(Tile.class)) {
+			Tile otherTile = (Tile) other;
+			return this.getUniqueIdentifier().equals(
+					otherTile.getUniqueIdentifier());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getUniqueIdentifier().hashCode();
 	}
 
 }

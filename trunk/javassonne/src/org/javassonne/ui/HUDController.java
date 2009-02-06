@@ -57,6 +57,12 @@ public class HUDController {
 		// Draw the first tile!
 		tileInHand_ = deck_.popRandomTile();
 
+		// Add HUD to main canvas
+		DisplayHelper.getInstance().add(new HUDPanel(), DisplayHelper.Layer.PALETTE,
+				DisplayHelper.Positioning.TOP_LEFT);
+		DisplayHelper.getInstance().add(new RemainingTilesPanel(), DisplayHelper.Layer.PALETTE,
+				DisplayHelper.Positioning.TOP_RIGHT);
+		
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
 				Notification.DECK_CHANGED, deck_);
@@ -108,5 +114,9 @@ public class HUDController {
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
 				Notification.DECK_CHANGED, deck_);
+		
+		// Send notification that we've changed the tile in hand
+		NotificationManager.getInstance().sendNotification(
+				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
 	}
 }

@@ -24,6 +24,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +48,7 @@ import org.javassonne.ui.control.JKeyListener;
  * @author bengotow
  * 
  */
-public class HUDPanel extends JPanel implements ActionListener {
+public class HUDPanel extends JPanel implements ActionListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -77,8 +79,8 @@ public class HUDPanel extends JPanel implements ActionListener {
 	public HUDPanel() {
 		setVisible(true);
 		setSize(140, 400);
-
-		this.addKeyListener(JKeyListener.getInstance());
+		addMouseListener(this);
+		addKeyListener(JKeyListener.getInstance());
 
 		// Create all of the components that will be shown
 
@@ -109,14 +111,14 @@ public class HUDPanel extends JPanel implements ActionListener {
 		drawTile_ = new JButton(DRAW_NEXT_TILE);
 		drawTile_.setActionCommand(Notification.DRAW_TILE);
 		drawTile_.addActionListener(this);
-		
+
 		tilesLeft_ = new JLabel("0 " + TILES_LEFT);
 
 		rotateRight_ = new JButton("=>");
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
 		rotateRight_.addActionListener(this);
 		rotateRight_.addKeyListener(JKeyListener.getInstance());
-		
+
 		rotateLeft_ = new JButton("<=");
 		rotateLeft_.setActionCommand(Notification.TILE_ROTATE_LEFT);
 		rotateLeft_.addActionListener(this);
@@ -199,25 +201,26 @@ public class HUDPanel extends JPanel implements ActionListener {
 		tilesLeft_.setText(deck.tilesRemaining() + " " + TILES_LEFT);
 
 		playerTurn_.nextPlayer();
-		playerTurn_.setText("Player " + playerTurn_.getPlayerTurn() + "'s Turn");
-		
+		playerTurn_
+				.setText("Player " + playerTurn_.getPlayerTurn() + "'s Turn");
+
 		this.invalidate();
 	}
-	public void updateZoomButtons(Notification n){
+
+	public void updateZoomButtons(Notification n) {
 		MapLayer m = (MapLayer) n.argument();
 
-		if(m.zoomedMax()){
+		if (m.zoomedMax()) {
 			zoomInButton_.setEnabled(false);
 			zoomOutButton_.setEnabled(true);
-		}else if(m.zoomedMin()){
+		} else if (m.zoomedMin()) {
 			zoomInButton_.setEnabled(true);
 			zoomOutButton_.setEnabled(false);
-		}else{
+		} else {
 			zoomInButton_.setEnabled(true);
 			zoomOutButton_.setEnabled(true);
 		}
 	}
-
 
 	// Overloaded the add() method to bind a key listener to any elements placed
 	// within the JPanel
@@ -225,6 +228,32 @@ public class HUDPanel extends JPanel implements ActionListener {
 		super.add(comp);
 		comp.addKeyListener(JKeyListener.getInstance());
 		return comp;
+	}
+
+	// We just want to implement these so they don't pass through to the map
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

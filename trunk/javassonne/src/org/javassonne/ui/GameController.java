@@ -56,7 +56,6 @@ public class GameController {
 	private HUDController hudController_;
 
 	private Tile tileInHand_;
-	private HUDPanel panel_;
 
 	/**
 	 * The default constructor takes no arguments and assumes a GameWindow has
@@ -96,18 +95,11 @@ public class GameController {
 
 		TileBoard board = new TileMapBoard(deck.popRandomTile());
 
-		// Create an HUDPanel that will provide the end user with a control GUI
-		panel_ = new HUDPanel();
-
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController(deck, board);
 		hudController_ = new HUDController(deck, board);
-
-		// Add HUD to main canvas
-		DisplayHelper.getInstance().add(panel_, DisplayHelper.Layer.PALETTE,
-				DisplayHelper.Positioning.TOP_LEFT);
 	}
 
 	public void exitGame(Notification n) {
