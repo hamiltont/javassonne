@@ -88,6 +88,7 @@ public class Tile {
 	// Constructor
 
 	public Tile() {
+		uniqueIdentifier_ = "not assigned";
 	}
 
 	// FARMS: Getter and Setter Functionality
@@ -98,8 +99,10 @@ public class Tile {
 		farmWalls_ = t.farmWalls_;
 		uniqueIdentifier_ = new String(t.getUniqueIdentifier());
 
-		BufferedImage other = t.getImage();
-		image_ = other.getSubimage(0, 0, other.getWidth(), other.getHeight());
+		if (t.getImage() != null){
+			BufferedImage other = t.getImage();
+			image_ = other.getSubimage(0, 0, other.getWidth(), other.getHeight());
+		}
 	}
 
 	/**
