@@ -20,20 +20,23 @@ package org.javassonne.ui;
 
 import javax.swing.JLabel;
 
+import org.javassonne.model.Player;
+
 public class TurnIndicator extends JLabel {
-	private int curPlayer_ = 0;
+	private Player curPlayer_;
 	private static int MAX_SIZE = 6;
 
 	public TurnIndicator(String text) {
 		super(text);
+		curPlayer_ = new Player();
 	}
 
 	public void nextPlayer() {
-		curPlayer_ = ((curPlayer_ + 1) % MAX_SIZE);
+		curPlayer_.setTurnNumber_((curPlayer_.getTurnNumber() + 1) % MAX_SIZE);
 	}
 
 	public int getPlayerTurn() {
-		return (curPlayer_+1);
+		return curPlayer_.getTurnNumber() + 1;
 	}
 
 }
