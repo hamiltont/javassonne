@@ -181,25 +181,15 @@ public class DisplayHelper {
 			updateLocation(displayMe, location);
 		} else {
 			desktopPane_.add(displayMe, JLayeredPane.PALETTE_LAYER);
-
-			showOnTop(displayMe);
 			displayMe.setLocation(location);
 			displayMe.setVisible(true);
+			showOnTop(displayMe);
 		}
-	}
-
-	public void addAsInternalFrame(JComponent displayMe,
-			DisplayHelper.Layer displayLayer, Point startingLocation) {
-
-		JInternalFrame f = new JInternalFrame("", false, false, false, false);
-		f.setContentPane(displayMe);
-		f.pack();
-
-		add(f, displayLayer, startingLocation);
 	}
 
 	public void remove(JComponent removeMe) {
 		desktopPane_.remove(removeMe);
+		desktopPane_.repaint();
 	}
 
 	public void updateLayer(JComponent updateMe,

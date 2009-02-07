@@ -51,6 +51,8 @@ public class Notification {
 
 	public static final String BOARD_SET = "NotificationSetBoard";
 	public static final String SHUTDOWN = "NotificationShutdown";
+	
+	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 
 	private String identifier_;
 	private Object argument_;

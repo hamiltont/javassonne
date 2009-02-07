@@ -42,19 +42,15 @@ import org.javassonne.model.TileSet;
  * @author bengotow
  */
 public class GameController {
-	private static final String EXIT_GAME = "Exit Game";
-
-	private static final String YES_PLEASE = "Yes, please";
-
-	private static final String CANCEL = "Cancel!";
-
-	private static final String EXIT_WITHOUT_SAVING = "Exit without saving?";
 
 	private static final long serialVersionUID = 1L;
 
 	private BoardController boardController_;
 	private HUDController hudController_;
 
+	private Boolean gameInProgress_ = false;
+
+	private MenuPanel menu_;
 	private Tile tileInHand_;
 
 	/**
@@ -64,11 +60,16 @@ public class GameController {
 	 */
 	public GameController() {
 
+		// create the menu panel
+		menu_ = new MenuPanel();
+
 		// register to receive events from the game window
 		NotificationManager.getInstance().addObserver(Notification.NEW_GAME,
 				this, "newGame");
 		NotificationManager.getInstance().addObserver(Notification.EXIT_GAME,
 				this, "exitGame");
+		NotificationManager.getInstance().addObserver(
+				Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 	}
 
 	/**
@@ -78,6 +79,8 @@ public class GameController {
 	 *            The notification object sent from the NotificationManager.
 	 */
 	public void newGame(Notification n) {
+
+		// TODO: Show player selection panel
 
 		// Load all possible tiles
 		TileSerializer s = new TileSerializer();
@@ -100,45 +103,31 @@ public class GameController {
 		// tile).
 		boardController_ = new BoardController(deck, board);
 		hudController_ = new HUDController(deck, board);
+
+		// And go!
+		gameInProgress_ = true;
+	}
+
+	public void toggleMainMenu(Notification n) {
+		// Determine whether the game is currently in progress
+		menu_.setGameInProgress(gameInProgress_);
+
+		if (menu_.isShowing()) {
+			if (gameInProgress_)
+				DisplayHelper.getInstance().remove(menu_);
+		} else
+			DisplayHelper.getInstance().add(menu_, DisplayHelper.Layer.MODAL,
+					DisplayHelper.Positioning.CENTER);
 	}
 
 	public void exitGame(Notification n) {
-		// TODO: Allow for no argument to be passed
-		HashMap config = (HashMap) n.argument();
+		// The board controller and HUD controller that we created during
+		// game play should be deleted.
+		boardController_ = null;
+		hudController_ = null;
+		gameInProgress_ = false;
 
-		// TODO: Make the interface disappear and show the menu here.
-
-		Object[] options = { YES_PLEASE, CANCEL };
-		Object ans = CANCEL;
-
-		if (config != null
-				&& (Boolean) config.get("hideConfirm")) {
-			ans = YES_PLEASE;
-		} else {
-			JOptionPane p = new JOptionPane();
-			p.setOptions(options);
-			p.setMessageType(JOptionPane.QUESTION_MESSAGE);
-			p.setMessage(EXIT_WITHOUT_SAVING);
-			p.setOptionType(JOptionPane.YES_NO_OPTION);
-			p.setSize(420, 170);
-			p.validate();
-
-			JDialog dialog = p.createDialog(null, EXIT_GAME);
-			dialog.setAlwaysOnTop(true);
-			dialog.show();
-			ans = p.getValue();
-		}
-
-		if (ans == YES_PLEASE) {
-
-			// The board controller and HUD controller that we created during
-			// gameplay should be deleted.
-
-			boardController_ = null;
-			hudController_ = null;
-
-			// Return control to final shutdown process
-			System.exit(0);
-		}
+		// Return control to final shutdown process
+		System.exit(0);
 	}
 }

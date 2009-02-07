@@ -308,6 +308,9 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 
 	public void mouseClicked(MouseEvent e) {
 
+		if (board_ == null)
+			return;
+		
 		// determine which tile was clicked! First, get the width and height of
 		// a tile.
 		int tileWidth = (int) (backgroundTile_.getWidth() * scale_);

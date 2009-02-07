@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Ben Gotow
  * @date Jan 28, 2009
  * 
  * Copyright 2009 Javassonne Team
