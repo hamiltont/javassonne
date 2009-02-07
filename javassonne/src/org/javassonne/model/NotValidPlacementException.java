@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author pretekr
  * @date Feb 5, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -22,20 +22,22 @@
 
 package org.javassonne.model;
 
+import java.awt.Point;
+
 /**
  * @author pretekr
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class NotValidPlacementException extends Exception {
-	private IntPair location_;
-	
-	public NotValidPlacementException(IntPair location) {
+	private Point location_;
+
+	public NotValidPlacementException(Point location) {
 		super("The selected position is not valid for placement");
 		location_ = location;
 	}
-	
-	public NotValidPlacementException(){
+
+	public NotValidPlacementException() {
 		super("The selected position is not valid for placement");
 	}
 

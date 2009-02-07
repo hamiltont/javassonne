@@ -35,7 +35,7 @@ public class TileDeck {
 
 	private ArrayList<Tile> tiles_;
 	private HashMap<Tile, Integer> tilesRemaining_;
-	
+
 	/**
 	 * A general purpose constructor that initializes an empty tile deck.
 	 */
@@ -71,9 +71,10 @@ public class TileDeck {
 	public void addTile(Tile t, int count) {
 		for (int ii = 0; ii < count; ii++)
 			tiles_.add(new Tile(t));
-			
+
 		Integer existing = tilesRemaining_.get(t);
-		if (existing == null) existing = 0;
+		if (existing == null)
+			existing = 0;
 		tilesRemaining_.put(t, existing += count);
 	}
 
@@ -86,13 +87,12 @@ public class TileDeck {
 	public Tile popRandomTile() {
 		if (tiles_.size() == 0)
 			return null;
-		Random generator = new Random(19580427);
+		Random generator = new Random();
 		int index = generator.nextInt(tiles_.size());
 
-		Tile t = tiles_.get(index);
-		tiles_.remove(index);
-		tilesRemaining_.put(t,tilesRemaining_.get(t) - 1);
-		
+		Tile t = tiles_.remove(index);
+		tilesRemaining_.put(t, tilesRemaining_.get(t) - 1);
+
 		return t;
 	}
 

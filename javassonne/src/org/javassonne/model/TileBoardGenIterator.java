@@ -18,24 +18,29 @@
 
 package org.javassonne.model;
 
+import java.awt.Point;
+
 public class TileBoardGenIterator implements TileBoardIterator {
 
 	private TileBoard data_;
-	private IntPair location_;
+	private Point location_;
 
-	// private IntPair previousLocation_;
+	
 
 	/**
-	 * @param data - reference to TileBoard where data is stored
-	 * @param intPair - IntPair location of current location
+	 * @param data
+	 *            - reference to TileBoard where data is stored
+	 * @param point
+	 *            - Point location of current location
 	 */
-	public TileBoardGenIterator(TileBoard data, IntPair intPair) {
+	public TileBoardGenIterator(TileBoard data, Point point) {
 		data_ = data;
-		location_ = intPair;
+		location_ = point;
 	}
 
 	/**
-	 * @param old - TileBoardIterator to copy from
+	 * @param old
+	 *            - TileBoardIterator to copy from
 	 */
 	public TileBoardGenIterator(TileBoardIterator old) {
 		data_ = old.getData();
@@ -53,11 +58,12 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - moves iterator down in board and returns reference to itself 
+	 * @return - moves iterator down in board and returns reference to itself
 	 */
 	public TileBoardIterator down() {
 		// previousLocation_ = location_;
-		location_ = new IntPair(location_.car() + 1, location_.cdr());
+		location_ = new Point((int) location_.getX(),
+				(int) (location_.getY() - 1));
 		return this;
 	}
 
@@ -69,11 +75,12 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - moves iterator left in board and returns reference to itself 
+	 * @return - moves iterator left in board and returns reference to itself
 	 */
 	public TileBoardIterator left() {
 		// previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() - 1);
+		location_ = new Point((int) (location_.getX() - 1), (int) (location_
+				.getY()));
 		return this;
 	}
 
@@ -84,12 +91,15 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return (new TileBoardGenIterator(this)).left();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.javassonne.model.TileBoardIterator#right()
 	 */
 	public TileBoardIterator right() {
 		// previousLocation_ = location_;
-		location_ = new IntPair(location_.car(), location_.cdr() + 1);
+		location_ = new Point((int) (location_.getX() + 1), (int) (location_
+				.getY()));
 		return this;
 	}
 
@@ -105,7 +115,8 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	 */
 	public TileBoardIterator up() {
 		// previousLocation_ = location_;
-		location_ = new IntPair(location_.car() - 1, location_.cdr());
+		location_ = new Point((int) (location_.getX()),
+				(int) (location_.getY() + 1));
 		return this;
 	}
 
@@ -116,14 +127,12 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return (new TileBoardGenIterator(this)).up();
 	}
 
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.javassonne.model.TileBoardIterator#getLocation()
 	 */
-	public IntPair getLocation() {
+	public Point getLocation() {
 		return location_;
 	}
 
@@ -133,44 +142,50 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	 * @see org.javassonne.model.TileBoardIterator#outOfBounds()
 	 */
 	public boolean outOfBounds() {
-		IntPair upLeft = data_.getUpperLeftCorner().getLocation();
-		IntPair lowRight = data_.getLowerRightCorner().getLocation();
-		if (location_.car() < upLeft.car()
-				|| location_.cdr() < upLeft.cdr()
-				|| location_.car() > lowRight.car()
-				|| location_.cdr() > lowRight.cdr()
-				|| location_ == upLeft 
+		Point upLeft = data_.getUpperLeftCorner().getLocation();
+		Point lowRight = data_.getLowerRightCorner().getLocation();
+		if (location_.getX() < upLeft.getX()
+				|| location_.getY() > upLeft.getY()
+				|| location_.getX() > lowRight.getX()
+				|| location_.getY() < lowRight.getY() || location_ == upLeft
 				|| location_ == lowRight)
 			return true;
 		return false;
 	}
 
 	// Advances iterator to start of next row
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.javassonne.model.TileBoardIterator#nextRow()
 	 */
 	public TileBoardIterator nextRow() {
 		// previousLocation_ = location_;
-		location_ = new IntPair(location_.car() + 1, data_.getUpperLeftCorner()
-				.getLocation().cdr());
+		location_ = new Point((int) (data_.getUpperLeftCorner().getLocation()
+				.getX()), (int) (location_.getY() - 1));
 		return this;
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved to start of next row
+	 * @return - returns reference to copy of iterator, moved to start of next
+	 *         row
 	 */
 	public TileBoardIterator nextRowCopy() {
 		return (new TileBoardGenIterator(this)).nextRow();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.javassonne.model.TileBoardIterator#getData()
 	 */
 	public TileBoard getData() {
 		return data_;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -178,11 +193,13 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		if (!(obj instanceof TileBoardIterator))
 			return false;
 		else
-			return (this.data_.equals(((TileBoardIterator) obj).getData()) && 
-					this.location_.equals(((TileBoardIterator) obj).getLocation()));
+			return (this.data_.equals(((TileBoardIterator) obj).getData()) && this.location_
+					.equals(((TileBoardIterator) obj).getLocation()));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -190,12 +207,14 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return this.toString().hashCode();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return String.format("%s:%s",data_.toString(),location_.toString());
+		return String.format("%s:%s", data_.toString(), location_.toString());
 	}
 
 }

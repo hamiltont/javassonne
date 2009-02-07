@@ -77,7 +77,7 @@ public class TileTests extends TestCase {
 		tile_.setFarmWallInRegion(Region.Left, true);
 		tile_.setFeatureIdentifierInRegion(Region.Left, "f");
 
-		tile_.rotateLeft();
+		tile_.rotateRight();
 
 		assertTrue(tile_.farmInQuadrant(Quadrant.TopRight) == 1);
 		assertTrue(tile_.farmWallInRegion(Region.Top));

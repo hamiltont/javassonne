@@ -22,10 +22,11 @@
 
 package org.javassonne.model;
 
+import java.awt.Point;
 
 @SuppressWarnings("serial")
 public class BoardPositionFilledException extends Exception {
-	private IntPair location_;
+	private Point location_;
 
 	/**
 	 * 
@@ -39,20 +40,20 @@ public class BoardPositionFilledException extends Exception {
 	 */
 	public BoardPositionFilledException(String message) {
 		super(message);
-		
+
 	}
 
-	public BoardPositionFilledException(String message, IntPair location){
+	public BoardPositionFilledException(String message, Point location) {
 		super(message);
 		location_ = location;
 	}
 
-	public BoardPositionFilledException(IntPair location){
+	public BoardPositionFilledException(Point location) {
 		super("The selected position is filled");
 		location_ = location;
 	}
-	
-	public IntPair getLocation(){
+
+	public Point getLocation() {
 		return location_;
 	}
 }

@@ -36,7 +36,6 @@ import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.model.IntPair;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
 
@@ -44,7 +43,8 @@ import org.javassonne.model.TileBoardIterator;
  * The default panel, displayed below all others. This panel is responsible for
  * rendering the map.
  */
-public class MapLayer extends JPanel implements MouseListener, MouseMotionListener {
+public class MapLayer extends JPanel implements MouseListener,
+		MouseMotionListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 	private BufferedImage buffer_ = null;
@@ -239,12 +239,12 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 		try {
 			// paint the board background from the top left to the bottom
 			// right
-			IntPair topLeft = board_.getUpperLeftCorner().getLocation();
-			IntPair bottomRight = board_.getLowerRightCorner().getLocation();
+			Point topLeft = board_.getUpperLeftCorner().getLocation();
+			Point bottomRight = board_.getLowerRightCorner().getLocation();
 
 			// Compute the size of the board, size of the tiles, etc...
-			int boardWidth = bottomRight.car() - topLeft.car() + 1;
-			int boardHeight = bottomRight.cdr() - topLeft.cdr() + 1;
+			int boardWidth = (int) (bottomRight.getX() - topLeft.getX() + 1);
+			int boardHeight = (int) (topLeft.getY() - bottomRight.getY() + 1);
 
 			int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
 			int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
@@ -332,13 +332,14 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 
 		// that tile index is relative to the top left. We need to make the
 		// index relative to the home tile for it to be useful.
-		tileX += board_.getUpperLeftCorner().getLocation().car();
-		tileY += board_.getUpperLeftCorner().getLocation().cdr();
+		tileX += board_.getUpperLeftCorner().getLocation().getX();
+		tileY += board_.getUpperLeftCorner().getLocation().getY();
 
 		// send a notification!
 		String text = String.format("You clicked tile %d,%d", tileX, tileY);
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_WARNING, text);
+
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -352,7 +353,7 @@ public class MapLayer extends JPanel implements MouseListener, MouseMotionListen
 
 	public void mouseReleased(MouseEvent e) {
 	}
-	
+
 	public void mouseDragged(MouseEvent e) {
 	}
 

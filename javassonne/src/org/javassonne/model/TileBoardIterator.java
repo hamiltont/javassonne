@@ -18,28 +18,30 @@
 
 package org.javassonne.model;
 
+import java.awt.Point;
+
 public interface TileBoardIterator {
 
 	/**
 	 * @return - Tile iterator current points to
 	 */
 	public abstract Tile current();
-	
+
 	/**
 	 * @return - reference to itself moved right in board
 	 */
 	public abstract TileBoardIterator right();
-	
+
 	/**
 	 * @return - reference to itself moved to start of next row
 	 */
 	public abstract TileBoardIterator nextRow();
 
 	/**
-	 * @return - IntPair denoting coordinates of current() in board
+	 * @return - Point denoting coordinates of current() in board
 	 */
-	public abstract IntPair getLocation();
-	
+	public abstract Point getLocation();
+
 	/**
 	 * @return - reference to TileBoard TileBoardIterator belongs to
 	 */
