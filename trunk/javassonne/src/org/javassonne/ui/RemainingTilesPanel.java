@@ -19,47 +19,37 @@
 package org.javassonne.ui;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
 
-public class RemainingTilesPanel extends JPanel implements MouseListener {
+public class RemainingTilesPanel extends AbstractHUDPanel{
 
 	private ArrayList<JLabel> tileCountLabels_;
 	private ArrayList<JLabel> tileImageLabels_;
 
-	private BufferedImage background_;
-
 	private static final int T_SIZE = 40;
 	private static final int T_PADDING = 5;
-	private static final int ROWS = 3;
+	private static final int COLS = 3;
 
 	private static final int UNIT_HEIGHT = (T_SIZE + T_PADDING * 3 + 12);
 	private static final int UNIT_WIDTH = (T_SIZE + T_PADDING * 2);
 
 	public RemainingTilesPanel() {
+		super();
+		
 		setVisible(true);
-		setSize(UNIT_WIDTH * ROWS, 5);
+		setBackgroundImagePath("images/hud_tiles_remaining_background.jpg");
+		setSize(UNIT_WIDTH * COLS, 5);
 		setLayout(null);
-		addMouseListener(this);
 
 		tileCountLabels_ = new ArrayList<JLabel>();
 		tileImageLabels_ = new ArrayList<JLabel>();
@@ -85,8 +75,8 @@ public class RemainingTilesPanel extends JPanel implements MouseListener {
 				imageLabel = new JLabel();
 				countLabel = new JLabel();
 
-				int x = ii % ROWS * UNIT_WIDTH;
-				int y = (int) Math.floor(ii / ROWS) * UNIT_HEIGHT;
+				int x = ii % COLS * UNIT_WIDTH;
+				int y = (int) Math.floor(ii / COLS) * UNIT_HEIGHT;
 
 				imageLabel.setLocation(x + T_PADDING, y + T_PADDING);
 				imageLabel.setSize(T_SIZE, T_SIZE);
@@ -110,53 +100,8 @@ public class RemainingTilesPanel extends JPanel implements MouseListener {
 			ii++;
 		}
 
-		this.setSize(ROWS * UNIT_WIDTH, (int) (Math.ceil((double) ii
-				/ (double) ROWS) * UNIT_HEIGHT));
+		this.setSize(COLS * UNIT_WIDTH, (int) (Math.ceil((double) ii
+				/ (double) COLS) * UNIT_HEIGHT));
 		this.invalidate();
-	}
-
-	/*
-	 * This function is responsible for painting the background image we have.
-	 */
-	public void paintComponent(Graphics g) {
-		if (background_ == null) {
-			try {
-				background_ = ImageIO.read(new File(
-						"images/hud_tiles_remaining_background.jpg"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Graphics2D g2 = (Graphics2D) g;
-		g2.drawImage(background_, 0, 0, this.getWidth(), this.getHeight(), 0,
-				0, background_.getWidth(), background_.getHeight(), null);
-	}
-
-	// We just want to implement these so the events don't pass through the
-	// panel.
-	public void mouseClicked(MouseEvent e) {
-		return;
-
-	}
-
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 }
