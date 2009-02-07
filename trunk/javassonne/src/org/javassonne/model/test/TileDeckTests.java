@@ -44,7 +44,7 @@ public class TileDeckTests extends TestCase {
 		Tile t = new Tile();
 		d.addTile(t, 1);
 		
-		assertTrue(d.popRandomTile() == t);
+		assertTrue(d.popRandomTile().equals(t));
 		assertTrue(d.tilesRemaining() == 0);
 	}
 	
