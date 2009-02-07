@@ -19,18 +19,10 @@
 package org.javassonne.ui;
 
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -48,23 +40,15 @@ import org.javassonne.ui.control.JKeyListener;
  * @author bengotow
  * 
  */
-public class HUDPanel extends JPanel implements ActionListener, MouseListener {
+public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final String DRAW_NEXT_TILE = "Draw";
 	private static final String ZOOM_OUT = "Zoom Out";
 	private static final String ZOOM_IN = "Zoom In";
-	private static final String EXIT_GAME = "Exit Game";
-	private static final String SAVE_GAME = "Save Game";
-	private static final String LOAD_GAME = "Load Game";
-	private static final String NEW_GAME = "New Game";
 	private static final String TILES_LEFT = "Tiles Left";
 
-	private JButton newGameButton_;
-	private JButton loadGameButton_;
-	private JButton saveGameButton_;
-	private JButton exitGameButton_;
 	private JButton zoomInButton_;
 	private JButton zoomOutButton_;
 	private JButton drawTile_;
@@ -74,31 +58,15 @@ public class HUDPanel extends JPanel implements ActionListener, MouseListener {
 	private JLabel imageHolder_;
 	private JPanel rotateButtonsPanel_;
 	private TurnIndicator playerTurn_;
-	private BufferedImage background_;
 
 	public HUDPanel() {
+		super();
+		
+		setBackgroundImagePath("images/bottom_bar_background.jpg");
 		setVisible(true);
 		setSize(140, 400);
-		addMouseListener(this);
-		addKeyListener(JKeyListener.getInstance());
 
 		// Create all of the components that will be shown
-
-		newGameButton_ = new JButton(NEW_GAME);
-		newGameButton_.setActionCommand(Notification.NEW_GAME);
-		newGameButton_.addActionListener(this);
-
-		loadGameButton_ = new JButton(LOAD_GAME);
-		loadGameButton_.setActionCommand(Notification.LOAD_GAME);
-		loadGameButton_.addActionListener(this);
-
-		saveGameButton_ = new JButton(SAVE_GAME);
-		saveGameButton_.setActionCommand(Notification.SAVE_GAME);
-		saveGameButton_.addActionListener(this);
-
-		exitGameButton_ = new JButton(EXIT_GAME);
-		exitGameButton_.setActionCommand(Notification.EXIT_GAME);
-		exitGameButton_.addActionListener(this);
 
 		zoomInButton_ = new JButton(ZOOM_IN);
 		zoomInButton_.setActionCommand(Notification.ZOOM_IN);
@@ -136,10 +104,6 @@ public class HUDPanel extends JPanel implements ActionListener, MouseListener {
 		// attach all of the components to the JFrame
 
 		add(playerTurn_);
-		add(newGameButton_);
-		add(loadGameButton_);
-		add(saveGameButton_);
-		add(exitGameButton_);
 		add(zoomInButton_);
 		add(zoomOutButton_);
 		add(imageHolder_);
@@ -155,24 +119,6 @@ public class HUDPanel extends JPanel implements ActionListener, MouseListener {
 				Notification.DECK_CHANGED, this, "updateDeck");
 		NotificationManager.getInstance().addObserver(
 				Notification.ZOOM_CHANGED, this, "updateZoomButtons");
-	}
-
-	/*
-	 * This function is responsible for painting the background image we have.
-	 */
-	public void paintComponent(Graphics g) {
-		if (background_ == null) {
-			try {
-				background_ = ImageIO.read(new File(
-						"images/bottom_bar_background.jpg"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Graphics2D g2 = (Graphics2D) g;
-		g2.drawImage(background_, 0, 0, this.getWidth(), this.getHeight(), 0,
-				0, background_.getWidth(), background_.getHeight(), null);
 	}
 
 	/*
@@ -229,31 +175,4 @@ public class HUDPanel extends JPanel implements ActionListener, MouseListener {
 		comp.addKeyListener(JKeyListener.getInstance());
 		return comp;
 	}
-
-	// We just want to implement these so they don't pass through to the map
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Ben Gotow
  * @date Jan 22, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -84,6 +84,22 @@ public class TileTests extends TestCase {
 		assertTrue(tile_.featureIdentifierInRegion(Region.Top) == "f");
 	}
 
+	public void testCopyConstructor() {
+		Tile t = new Tile(tile_);
+		assertTrue(tile_.equals(t));
+	}
+	
+	public void testEquals() {
+		Tile t1 = new Tile();
+		t1.setUniqueIdentifier("sample1");
+		
+		Tile t2 = new Tile();
+		t1.setUniqueIdentifier("sample2");
+		
+		assertTrue(t1.equals(t1));
+		assertFalse(t1.equals(t2));
+	}
+	
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}

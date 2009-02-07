@@ -93,7 +93,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 			// User is trying to stop game play
 			else {
 				NotificationManager.getInstance().sendNotification(
-						Notification.EXIT_GAME);
+						Notification.TOGGLE_MAIN_MENU);
 			}
 		}
 
