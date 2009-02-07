@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.control.JKeyListener;
 
 public class LogPanel extends JPanel implements KeyListener {
 
@@ -41,12 +42,13 @@ public class LogPanel extends JPanel implements KeyListener {
 		setVisible(false);
 		setLayout(new BorderLayout());
 		setSize(500, 200);
+		addKeyListener(JKeyListener.getInstance());
 		
 		// create the scrolling text box
 		area_ = new TextArea();
 		area_.setSize(500, 200);
 		area_.setFocusable(false);
-
+		
 		// add the area to our JPanel
 		add(area_, BorderLayout.NORTH);
 
@@ -55,6 +57,7 @@ public class LogPanel extends JPanel implements KeyListener {
 		field_.setSize(500, 20);
 		field_.addKeyListener(this);
 		field_.setFocusable(true);
+		field_.addKeyListener(JKeyListener.getInstance());
 
 		// add the area to our JPanel
 		add(field_, BorderLayout.SOUTH);
@@ -89,7 +92,7 @@ public class LogPanel extends JPanel implements KeyListener {
 		area_.append(areaString_.toString());
 		
 		DisplayHelper.getInstance().add(this, DisplayHelper.Layer.PALETTE,
-				DisplayHelper.Positioning.TOP_RIGHT);
+				DisplayHelper.Positioning.BOTTOM_LEFT);
 		setVisible(true);
 	}
 	

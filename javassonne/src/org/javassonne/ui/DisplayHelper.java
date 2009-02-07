@@ -81,7 +81,7 @@ public class DisplayHelper {
 	 * Predefined constants for Layers
 	 */
 	public static enum Positioning {
-		TOP_LEFT, TOP_RIGHT, CENTER;
+		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, CENTER;
 	}
 
 	/**
@@ -146,6 +146,8 @@ public class DisplayHelper {
 		else if (position == Positioning.TOP_RIGHT)
 			add(displayMe, displayLayer, new Point(desktopPane_.getWidth() - 10
 					- displayMe.getWidth(), 10));
+		else if (position == Positioning.BOTTOM_LEFT)
+			add(displayMe, displayLayer, new Point(10, desktopPane_.getHeight() - 10 - displayMe.getHeight()));
 		else
 			add(displayMe, displayLayer, new Point(
 					(desktopPane_.getWidth() - displayMe.getWidth()) / 2,
