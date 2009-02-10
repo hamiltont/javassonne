@@ -30,6 +30,7 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
+import org.javassonne.ui.AbstractHUDPanel;
 
 public class RemainingTilesPanel extends AbstractHUDPanel{
 
