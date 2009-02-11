@@ -243,8 +243,8 @@ public class MapLayer extends JPanel implements MouseListener,
 			Point bottomRight = board_.getLowerRightCorner().getLocation();
 
 			// Compute the size of the board, size of the tiles, etc...
-			int boardWidth = (int) (bottomRight.getX() - topLeft.getX() + 1);
-			int boardHeight = (int) (topLeft.getY() - bottomRight.getY() + 1);
+			int boardWidth = (int) (Math.abs(bottomRight.getX() - topLeft.getX()) + 1);
+			int boardHeight = (int) (Math.abs(topLeft.getY() - bottomRight.getY()) + 1);
 
 			int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
 			int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
@@ -275,8 +275,8 @@ public class MapLayer extends JPanel implements MouseListener,
 			// they are off to one side and not actually visible in the buffer.
 			// This is OK I think, but it is NOT efficient.
 
-			for (int x = 0; x < boardWidth; x++) {
-				for (int y = 0; y < boardHeight; y++) {
+			for (int y = 0; y < boardHeight; y++) {
+				for (int x = 0; x < boardWidth; x++) {
 
 					// determine where the tile should be drawn, taking into
 					// account the tile's position on the map, the portion of
@@ -333,12 +333,17 @@ public class MapLayer extends JPanel implements MouseListener,
 		// that tile index is relative to the top left. We need to make the
 		// index relative to the home tile for it to be useful.
 		tileX += board_.getUpperLeftCorner().getLocation().getX();
-		tileY += board_.getUpperLeftCorner().getLocation().getY();
+		tileY = (int) (board_.getUpperLeftCorner().getLocation().getY() - tileY);
 
 		// send a notification!
 		String text = String.format("You clicked tile %d,%d", tileX, tileY);
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_WARNING, text);
+		
+		Point location = new Point(tileX, tileY);
+		
+		NotificationManager.getInstance().sendNotification(
+				Notification.CLICK_ADD_TILE, location);
 
 	}
 
