@@ -68,7 +68,7 @@ public class Tile {
 	 * 
 	 */
 	public enum Quadrant {
-		TopLeft(0), TopRight(1), BottomLeft(2), BottomRight(3);
+		TopLeft(0), TopRight(1), BottomRight(2), BottomLeft(3);
 		private final int index;
 
 		Quadrant(int i) {
@@ -255,17 +255,28 @@ public class Tile {
 	 *            Direction that properties of the tile should be shifted
 	 */
 	private void rotate(int direction) {
+		//Make tempDir positive by rotating 360 until it is
+		while (direction < 0)
+			direction+=4;
+		
+		//Make tempArrays so contents aren't overwritten
+		String[] tempFeatures = features_.clone();
+		int[] tempFarms = farms_.clone();
+		boolean[] tempWalls = farmWalls_.clone();
+		
 		// move all of the features, farms, and farmWalls one position to the
 		// right by shifting them within their respective arrays
+		
 		for (int i = 0; i < 4; i++) {
-			features_[(4 + i + direction) % 4] = features_[i];
-			farms_[(4 + i + direction) % 4] = farms_[i];
-			farmWalls_[(4 + i + direction) % 4] = farmWalls_[i];
+			tempFeatures[(i + direction) % 4] = features_[i];
+			tempFarms[(i + direction) % 4] = farms_[i];
+			tempWalls[(i + direction) % 4] = farmWalls_[i];
 		}
+		features_ = tempFeatures;
+		farms_ = tempFarms;
+		farmWalls_ = tempWalls;
 
 		int angle = direction * 90;
-		if (angle < 0)
-			angle += 360;
 
 		// rotate our image, if it exists
 		if (image_ != null) {

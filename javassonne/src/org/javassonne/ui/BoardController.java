@@ -72,9 +72,15 @@ public class BoardController {
 				board_.addTemp(iter, tileInHandRef_);
 			} catch (BoardPositionFilledException ex) {
 				// Bury this exception?
+				NotificationManager.getInstance().logError(
+						new Notification("PositionFilled", here.toString()
+								+ " is filled"));
 				return;
 			} catch (NotValidPlacementException ex) {
 				// Bury this exception?
+				NotificationManager.getInstance().logError(
+						new Notification("InvalidPlacement", here.toString()
+								+ " is not valid"));
 				return;
 			}
 			// Add some kind of confirmation of click?
