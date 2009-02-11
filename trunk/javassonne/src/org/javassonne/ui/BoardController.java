@@ -65,21 +65,25 @@ public class BoardController {
 	}
 
 	public void addTile(Notification n) {
-		Point here = (Point) (n.argument());
-		TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
-		try {
-			board_.addTemp(iter, tileInHandRef_);
-		} catch (BoardPositionFilledException ex) {
-			// Bury this exception?
-		} catch (NotValidPlacementException ex) {
-			// Bury this exception?
+		if (tileInHandRef_ != null) {
+			Point here = (Point) (n.argument());
+			TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
+			try {
+				board_.addTemp(iter, tileInHandRef_);
+			} catch (BoardPositionFilledException ex) {
+				// Bury this exception?
+				return;
+			} catch (NotValidPlacementException ex) {
+				// Bury this exception?
+				return;
+			}
+			// Add some kind of confirmation of click?
+			board_.removeTempStatus(iter);
+			NotificationManager.getInstance().sendNotification(
+					Notification.BOARD_SET, board_);
+			NotificationManager.getInstance().sendNotification(
+					Notification.TILE_IN_HAND_CHANGED, null);
 		}
-		// Some kind of confirmation of click?
-		board_.removeTempStatus(iter);
-		NotificationManager.getInstance().sendNotification(
-				Notification.BOARD_SET, board_);
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, null);
 
 	}
 
