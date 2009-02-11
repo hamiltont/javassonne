@@ -378,10 +378,10 @@
     <Tile>
       <features__>
         <string>N</string>
-        <string>R</string>
+        <string>F</string>
         <string>N</string>
-        <string>R</string>
-        <string>R</string>
+        <string>F</string>
+        <string>F</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -391,9 +391,9 @@
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
-        <boolean>false</boolean>
-        <boolean>false</boolean>
+        <boolean>true</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_18</uniqueIdentifier__>
     </Tile>
