@@ -78,6 +78,8 @@ public class BoardController {
 		board_.removeTempStatus(iter);
 		NotificationManager.getInstance().sendNotification(
 				Notification.BOARD_SET, board_);
+		NotificationManager.getInstance().sendNotification(
+				Notification.TILE_IN_HAND_CHANGED, null);
 
 	}
 

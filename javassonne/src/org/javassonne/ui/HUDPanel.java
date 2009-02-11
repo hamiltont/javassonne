@@ -137,9 +137,14 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	public void updateTileInHand(Notification n) {
 		Tile t = (Tile) n.argument();
-		Image temp = t.getImage().getScaledInstance(50, 50, 0);
-		imageHolder_.setIcon(new ImageIcon(temp));
+		if(t != null){
+			Image temp = t.getImage().getScaledInstance(50, 50, 0);
+			imageHolder_.setIcon(new ImageIcon(temp));
+		} else {
+			imageHolder_.setIcon(null);
+		}
 		this.invalidate();
+		
 	}
 
 	public void updateDeck(Notification n) {
