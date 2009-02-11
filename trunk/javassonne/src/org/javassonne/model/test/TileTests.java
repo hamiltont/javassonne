@@ -21,18 +21,59 @@ package org.javassonne.model.test;
 import junit.framework.TestCase;
 
 import org.javassonne.model.Tile;
+import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileFeature;
+import org.javassonne.model.TileSerializer;
+import org.javassonne.model.TileSet;
 import org.javassonne.model.Tile.Quadrant;
 import org.javassonne.model.Tile.Region;
 
 public class TileTests extends TestCase {
 
 	Tile tile_;
+	TileDeck tileDeck_;
+	Tile tile2_;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		tile_ = new Tile();
+		TileSerializer s = new TileSerializer();
+		TileSet set = s.loadTileSet("tilesets/standard.xml");
+		if (set == null) {
+			System.err.println("Tile set could not be found.");
+			System.exit(0);
+		}
+		tileDeck_ = new TileDeck();
+		tileDeck_.addTileSet(set);
+	}
+
+	public void testRotate() {
+		while ((tile2_ = tileDeck_.popRandomTile()) != null) {
+			Tile temp = new Tile(tile2_);
+			tile2_.rotateRight();
+			tile2_.rotateRight();
+			tile2_.rotateRight();
+			tile2_.rotateRight();
+			assertTrue(checkEqual(tile2_, temp));
+			tile2_.rotateLeft();
+			tile2_.rotateLeft();
+			tile2_.rotateLeft();
+			tile2_.rotateLeft();
+			assertTrue(checkEqual(tile2_, temp));
+		}
+
+	}
+
+	private boolean checkEqual(Tile tile1, Tile tile2) {
+		return (tile1.featureIdentifierInRegion(Region.Bottom) == tile2
+						.featureIdentifierInRegion(Region.Bottom)
+				&& tile1.featureIdentifierInRegion(Region.Left) == tile2
+						.featureIdentifierInRegion(Region.Left)
+				&& tile1.featureIdentifierInRegion(Region.Top) == tile2
+						.featureIdentifierInRegion(Region.Top) 
+				&& tile1.featureIdentifierInRegion(Region.Right) == tile2
+						.featureIdentifierInRegion(Region.Right));
 	}
 
 	public void testSetFarm() {
@@ -88,18 +129,18 @@ public class TileTests extends TestCase {
 		Tile t = new Tile(tile_);
 		assertTrue(tile_.equals(t));
 	}
-	
+
 	public void testEquals() {
 		Tile t1 = new Tile();
 		t1.setUniqueIdentifier("sample1");
-		
+
 		Tile t2 = new Tile();
 		t1.setUniqueIdentifier("sample2");
-		
+
 		assertTrue(t1.equals(t1));
 		assertFalse(t1.equals(t2));
 	}
-	
+
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
