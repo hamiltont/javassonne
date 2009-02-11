@@ -18,15 +18,22 @@
 
 package org.javassonne.ui;
 
+import java.awt.Point;
+
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.BoardPositionFilledException;
+import org.javassonne.model.NotValidPlacementException;
+import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileDeck;
 
 public class BoardController {
 
 	TileDeck deck_;
 	TileBoard board_;
+	Tile tileInHandRef_;
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -44,10 +51,38 @@ public class BoardController {
 		deck_ = d;
 		board_ = b;
 
+		NotificationManager.getInstance().addObserver(
+				Notification.CLICK_ADD_TILE, this, "addTile");
+		NotificationManager.getInstance().addObserver(
+				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHandRef");
+
 		// Now that we have a board object, we want to update the interface to
 		// show the board. Share our board_ object in a notification so the
 		// views can get it and display it.
 		NotificationManager.getInstance().sendNotification(
 				Notification.BOARD_SET, board_);
+
 	}
+
+	public void addTile(Notification n) {
+		Point here = (Point) (n.argument());
+		TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
+		try {
+			board_.addTemp(iter, tileInHandRef_);
+		} catch (BoardPositionFilledException ex) {
+			// Bury this exception?
+		} catch (NotValidPlacementException ex) {
+			// Bury this exception?
+		}
+		// Some kind of confirmation of click?
+		board_.removeTempStatus(iter);
+		NotificationManager.getInstance().sendNotification(
+				Notification.BOARD_SET, board_);
+
+	}
+
+	public void updateTileInHandRef(Notification n) {
+		tileInHandRef_ = (Tile) n.argument();
+	}
+
 }

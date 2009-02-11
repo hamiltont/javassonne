@@ -44,6 +44,7 @@ public class TileMapBoard implements TileBoard {
 		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
 		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
 		data_.put(new Point(0, 0), homeTile);
+		tempTileLocations_ = new ArrayList<Point>();
 	}
 
 	/*
@@ -177,6 +178,22 @@ public class TileMapBoard implements TileBoard {
 		}
 	}
 
+	
+	/**
+	 * @param iter
+	 * @param tile
+	 * @param checkValid
+	 * @throws BoardPositionFilledException
+	 * @throws NotValidPlacementException
+	 */
+	public void addTemp(TileBoardIterator iter, Tile tile, boolean checkValid)
+			throws BoardPositionFilledException, NotValidPlacementException {
+
+		addTile(iter, tile, checkValid);
+		tempTileLocations_.add(iter.getLocation());
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -185,14 +202,8 @@ public class TileMapBoard implements TileBoard {
 	 * , org.javassonne.model.Tile)
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException {
-		try {
-			addTile(iter, tile, false);
-			tempTileLocations_.add(iter.getLocation());
-		} catch (NotValidPlacementException e) {
-			// we should not get here
-			e.printStackTrace();
-		}
+			throws BoardPositionFilledException, NotValidPlacementException {
+		addTemp(iter, tile, true);
 	}
 
 	/*

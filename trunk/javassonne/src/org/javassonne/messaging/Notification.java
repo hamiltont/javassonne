@@ -53,6 +53,7 @@ public class Notification {
 	public static final String SHUTDOWN = "NotificationShutdown";
 	
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
+	public static final String CLICK_ADD_TILE = "NotificationClickAddTile";
 
 	private String identifier_;
 	private Object argument_;

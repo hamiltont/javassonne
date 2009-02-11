@@ -25,6 +25,19 @@ public interface TileBoard {
 	 *         began with.
 	 */
 	public TileBoardIterator homeTile();
+	
+	/**
+	 * @param iter
+	 *            - where tile will be inserted in TileBoard
+	 * @param tile
+	 *            - what will be inserted in TileBoard
+	 * @throws BoardPositionFilledException
+	 *             - thrown if iter position is filled
+	 * @throws NotValidPlacementException
+	 *             - thrown if tile at iter is not a valid placement
+	 */
+	public void addTile(TileBoardIterator iter, Tile tile)
+			throws BoardPositionFilledException, NotValidPlacementException;
 
 	/**
 	 * @param iter
@@ -49,9 +62,10 @@ public interface TileBoard {
 	 *            - position where temp tile is to be added
 	 * @param tile
 	 *            - temp tile to be added
+	 * @throws NotValidPlacementException 
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException;
+			throws BoardPositionFilledException, NotValidPlacementException;
 
 	/**
 	 * removes all temp tiles from board
