@@ -49,6 +49,7 @@ public class TileSerializer {
 		xstream.alias("Tile", Tile.class);
 		xstream.alias("TileSet", TileSet.class);
 		xstream.alias("TileFeature", TileFeature.class);
+		xstream.alias("TileFeatureBindings", TileFeatureBindings.class);
 
 		// we don't want to serialize the images that have been cached in the
 		// tiles.
@@ -78,7 +79,6 @@ public class TileSerializer {
 				xml.append(line + "\n");
 
 			TileSet set = (TileSet) xstream.fromXML(xml.toString());
-
 			set.loadTileImages();
 			return set;
 

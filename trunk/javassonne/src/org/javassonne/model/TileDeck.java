@@ -35,6 +35,8 @@ public class TileDeck {
 
 	private ArrayList<Tile> tiles_;
 	private HashMap<Tile, Integer> tilesRemaining_;
+	private TileFeatureBindings tileFeatureBindings_;
+	private Tile homeTile_;
 
 	/**
 	 * A general purpose constructor that initializes an empty tile deck.
@@ -42,6 +44,8 @@ public class TileDeck {
 	public TileDeck() {
 		tiles_ = new ArrayList<Tile>();
 		tilesRemaining_ = new HashMap<Tile, Integer>();
+		tileFeatureBindings_ = new TileFeatureBindings();
+		homeTile_ = null;
 	}
 
 	// Adding Tiles
@@ -57,6 +61,9 @@ public class TileDeck {
 		for (int ii = 0; ii < set.tileCount(); ii++) {
 			addTile(set.tileAtIndex(ii), set.tileCountAtIndex(ii));
 		}
+		tileFeatureBindings_.addFeatureBindings(set.tileFeatureBindings());
+		if (homeTile_ == null)
+			homeTile_ = set.homeTile();
 	}
 
 	/**
@@ -76,6 +83,9 @@ public class TileDeck {
 		if (existing == null)
 			existing = 0;
 		tilesRemaining_.put(t, existing += count);
+		
+		if (homeTile_ == null)
+			homeTile_ = t;
 	}
 
 	// Pulling Tiles
@@ -106,5 +116,13 @@ public class TileDeck {
 
 	public HashMap<Tile, Integer> tilesRemainingByType() {
 		return tilesRemaining_;
+	}
+
+	public TileFeatureBindings tileFeatureBindings() {
+		return tileFeatureBindings_;
+	}
+
+	public Tile homeTile() {
+		return homeTile_;
 	}
 }

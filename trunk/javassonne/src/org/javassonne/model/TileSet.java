@@ -46,6 +46,7 @@ public class TileSet {
 	private ArrayList<TileFeature> tileFeatures_;
 
 	private String tileImagesFolder_;
+	public TileFeatureBindings tileFeatureBindings_;
 
 	/**
 	 * @param name
@@ -56,6 +57,7 @@ public class TileSet {
 		tiles_ = new ArrayList<Tile>();
 		tileCounts_ = new ArrayList<Integer>();
 		tileFeatures_ = new ArrayList<TileFeature>();
+		tileFeatureBindings_ = new TileFeatureBindings();
 	}
 
 	// Getter and Setter Functionality
@@ -145,5 +147,14 @@ public class TileSet {
 			if (f.identifier.equals(identifier))
 				return f;
 		return null;
+	}
+
+	public TileFeatureBindings tileFeatureBindings() {
+		return tileFeatureBindings_;
+	}
+	
+	public Tile homeTile()
+	{
+		return tiles_.get(0);
 	}
 }
