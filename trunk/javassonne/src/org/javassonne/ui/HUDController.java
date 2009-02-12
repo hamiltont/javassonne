@@ -58,11 +58,13 @@ public class HUDController {
 		tileInHand_ = deck_.popRandomTile();
 
 		// Add HUD to main canvas
-		DisplayHelper.getInstance().add(new HUDPanel(), DisplayHelper.Layer.PALETTE,
-				DisplayHelper.Positioning.TOP_LEFT);
-		DisplayHelper.getInstance().add(new RemainingTilesPanel(), DisplayHelper.Layer.PALETTE,
+		DisplayHelper.getInstance()
+				.add(new HUDPanel(), DisplayHelper.Layer.PALETTE,
+						DisplayHelper.Positioning.TOP_LEFT);
+		DisplayHelper.getInstance().add(new RemainingTilesPanel(),
+				DisplayHelper.Layer.PALETTE,
 				DisplayHelper.Positioning.TOP_RIGHT);
-		
+
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
 				Notification.DECK_CHANGED, deck_);
@@ -78,6 +80,8 @@ public class HUDController {
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
 		NotificationManager.getInstance().addObserver(Notification.DRAW_TILE,
 				this, "drawTile");
+		NotificationManager.getInstance().addObserver(
+				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
 	}
 
 	/**
@@ -86,9 +90,11 @@ public class HUDController {
 	 * views know that they should redraw the tile onscreen.
 	 */
 	public void rotateTileInHandLeft() {
-		tileInHand_.rotateLeft();
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		if (tileInHand_ != null) {
+			tileInHand_.rotateLeft();
+			NotificationManager.getInstance().sendNotification(
+					Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		}
 	}
 
 	/**
@@ -97,15 +103,18 @@ public class HUDController {
 	 * letting the views know that they should redraw the tile onscreen.
 	 */
 	public void rotateTileInHandRight() {
-		tileInHand_.rotateRight();
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		if (tileInHand_ != null) {
+			tileInHand_.rotateRight();
+			NotificationManager.getInstance().sendNotification(
+					Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		}
 	}
 
 	/**
-	 * This function is called when a DRAW_TILE notification is
-	 * received. We want to draw a tile, update the turn indicator and then send a notification back
-	 * letting the views know that they should redraw the tile onscreen.
+	 * This function is called when a DRAW_TILE notification is received. We
+	 * want to draw a tile, update the turn indicator and then send a
+	 * notification back letting the views know that they should redraw the tile
+	 * onscreen.
 	 */
 	public void drawTile() {
 		// Draw a tile
@@ -114,9 +123,14 @@ public class HUDController {
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
 				Notification.DECK_CHANGED, deck_);
-		
+
 		// Send notification that we've changed the tile in hand
 		NotificationManager.getInstance().sendNotification(
 				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+	}
+
+	public void updateTileInHand(Notification n) {
+		tileInHand_ = (Tile) n.argument();
+
 	}
 }
