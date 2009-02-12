@@ -64,7 +64,7 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		
 		setBackgroundImagePath("images/bottom_bar_background.jpg");
 		setVisible(true);
-		setSize(140, 400);
+		setSize(130, 250);
 
 		// Create all of the components that will be shown
 
