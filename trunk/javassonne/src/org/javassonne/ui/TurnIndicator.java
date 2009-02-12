@@ -32,11 +32,11 @@ public class TurnIndicator extends JLabel {
 	}
 
 	public void nextPlayer() {
-		curPlayer_.setTurnNumber_((curPlayer_.getTurnNumber() + 1) % MAX_SIZE);
+		curPlayer_.setTurnNumber_(curPlayer_.getTurnNumber() % MAX_SIZE + 1);
 	}
 
 	public int getPlayerTurn() {
-		return curPlayer_.getTurnNumber() + 1;
+		return curPlayer_.getTurnNumber();
 	}
 
 }
