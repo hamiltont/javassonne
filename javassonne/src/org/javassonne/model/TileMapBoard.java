@@ -173,6 +173,8 @@ public class TileMapBoard implements TileBoard {
 					&& bottom.featureIdentifierInRegion(Region.Top) != tile
 							.featureIdentifierInRegion(Region.Bottom))
 				return false;
+			if (left == null && top == null && right == null && bottom == null)
+				return false;
 			// else
 			return true;
 		}
