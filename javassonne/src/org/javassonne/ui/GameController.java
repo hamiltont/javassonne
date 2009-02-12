@@ -96,8 +96,8 @@ public class GameController {
 		deck.addTileSet(set);
 		deck.addTileSet(set);
 
-		TileBoard board = new TileMapBoard(deck.popRandomTile());
-
+		TileBoard board = new TileMapBoard(deck);
+		
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).

@@ -35,16 +35,29 @@ public class TileMapBoard implements TileBoard {
 	private TileBoardGenIterator lowerRight_;
 	private ArrayList<Point> tempTileLocations_;
 
+	private TileFeatureBindings tileFeatureBindings_;
+
 	/**
 	 * @param homeTile
 	 *            - Tile to insert at home location to start board
 	 */
 	public TileMapBoard(Tile homeTile) {
-		data_ = new HashMap<Point, Tile>();
 		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
 		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
-		data_.put(new Point(0, 0), homeTile);
 		tempTileLocations_ = new ArrayList<Point>();
+
+		data_ = new HashMap<Point, Tile>();
+		data_.put(new Point(0, 0), homeTile);
+	}
+
+	public TileMapBoard(TileDeck deck) {
+		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
+		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
+		tempTileLocations_ = new ArrayList<Point>();
+
+		data_ = new HashMap<Point, Tile>();
+		data_.put(new Point(0, 0), deck.homeTile());
+		tileFeatureBindings_ = deck.tileFeatureBindings();
 	}
 
 	/*
@@ -155,23 +168,27 @@ public class TileMapBoard implements TileBoard {
 			TileBoardGenIterator localIter = new TileBoardGenIterator(iter);
 			Tile left = localIter.leftCopy().current();
 			if (left != null
-					&& left.featureIdentifierInRegion(Region.Right) != tile
-							.featureIdentifierInRegion(Region.Left))
+					&& !tileFeatureBindings_.featuresBind(left
+							.featureIdentifierInRegion(Region.Right), tile
+							.featureIdentifierInRegion(Region.Left)))
 				return false;
 			Tile top = localIter.upCopy().current();
 			if (top != null
-					&& top.featureIdentifierInRegion(Region.Bottom) != tile
-							.featureIdentifierInRegion(Region.Top))
+					&& !tileFeatureBindings_.featuresBind(top
+							.featureIdentifierInRegion(Region.Bottom), tile
+							.featureIdentifierInRegion(Region.Top)))
 				return false;
 			Tile right = localIter.rightCopy().current();
 			if (right != null
-					&& right.featureIdentifierInRegion(Region.Left) != tile
-							.featureIdentifierInRegion(Region.Right))
+					&& !tileFeatureBindings_.featuresBind(right
+							.featureIdentifierInRegion(Region.Left), tile
+							.featureIdentifierInRegion(Region.Right)))
 				return false;
 			Tile bottom = localIter.downCopy().current();
 			if (bottom != null
-					&& bottom.featureIdentifierInRegion(Region.Top) != tile
-							.featureIdentifierInRegion(Region.Bottom))
+					&& !tileFeatureBindings_.featuresBind(bottom
+							.featureIdentifierInRegion(Region.Top), tile
+							.featureIdentifierInRegion(Region.Bottom)))
 				return false;
 			if (left == null && top == null && right == null && bottom == null)
 				return false;
@@ -180,7 +197,6 @@ public class TileMapBoard implements TileBoard {
 		}
 	}
 
-	
 	/**
 	 * @param iter
 	 * @param tile

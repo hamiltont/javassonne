@@ -3,6 +3,28 @@
   <tiles__>
     <Tile>
       <features__>
+        <string>N</string>
+        <string>R</string>
+        <string>FC</string>
+        <string>R</string>
+        <string>R</string>
+      </features__>
+      <farms__>
+        <int>0</int>
+        <int>1</int>
+        <int>0</int>
+        <int>1</int>
+      </farms__>
+      <farmWalls__>
+        <boolean>false</boolean>
+        <boolean>true</boolean>
+        <boolean>false</boolean>
+        <boolean>false</boolean>
+      </farmWalls__>
+      <uniqueIdentifier__>tile_standard_12</uniqueIdentifier__>
+    </Tile>
+    <Tile>
+      <features__>
         <string>R</string>
         <string>N</string>
         <string>R</string>
@@ -242,28 +264,6 @@
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_11</uniqueIdentifier__>
-    </Tile>
-    <Tile>
-      <features__>
-        <string>N</string>
-        <string>R</string>
-        <string>FC</string>
-        <string>R</string>
-        <string>R</string>
-      </features__>
-      <farms__>
-        <int>0</int>
-        <int>1</int>
-        <int>0</int>
-        <int>1</int>
-      </farms__>
-      <farmWalls__>
-        <boolean>false</boolean>
-        <boolean>true</boolean>
-        <boolean>false</boolean>
-        <boolean>false</boolean>
-      </farmWalls__>
-      <uniqueIdentifier__>tile_standard_12</uniqueIdentifier__>
     </Tile>
     <Tile>
       <features__>
@@ -687,4 +687,50 @@
     </TileFeature>
   </tileFeatures__>
   <tileImagesFolder__>tilesets/standard/</tileImagesFolder__>
+  <tileFeatureBindings__>
+    <bindings__>
+      <entry>
+        <string>R</string>
+        <list>
+          <string>R</string>
+        </list>
+      </entry>
+      <entry>
+        <string>F</string>
+        <list>
+          <string>F</string>
+          <string>FC</string>
+          <string>FM</string>
+        </list>
+      </entry>
+      <entry>
+        <string>FM</string>
+        <list>
+          <string>F</string>
+          <string>FC</string>
+          <string>FM</string>
+        </list>
+      </entry>
+      <entry>
+        <string>C</string>
+        <list>
+          <string>C</string>
+        </list>
+      </entry>
+      <entry>
+        <string>FC</string>
+        <list>
+          <string>F</string>
+          <string>FC</string>
+          <string>FM</string>
+        </list>
+      </entry>
+      <entry>
+        <string>N</string>
+        <list>
+          <string>N</string>
+        </list>
+      </entry>
+    </bindings__>
+  </tileFeatureBindings__>
 </TileSet>
