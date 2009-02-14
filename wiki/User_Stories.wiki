@@ -12,6 +12,9 @@
  * User is able to see and/or navigate a minimap
  * User sees the correct starting tile when the game begins.
  * User can run some sweet unit tests for networking. 
+ * User see's an end game menu when they run out of tiles
+ * User cannot click draw again unless they place their tile
+ * User sees and empty gray "J" box when their tile has been placed
 
 == 3rd Build (Jan. 22 - Jan. 30) ==
 
