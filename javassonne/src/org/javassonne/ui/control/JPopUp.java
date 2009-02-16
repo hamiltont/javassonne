@@ -76,8 +76,11 @@ public class JPopUp {
 				options, options[0]);
 
 		DisplayHelper.getInstance().remove(p);
-
-		return options[ans];
+		
+		if(ans == JOptionPane.CLOSED_OPTION)
+			return null;
+		else
+			return options[ans];
 	}
 
 	/**
