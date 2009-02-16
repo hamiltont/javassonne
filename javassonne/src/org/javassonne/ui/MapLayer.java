@@ -95,6 +95,10 @@ public class MapLayer extends JPanel implements MouseListener,
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_OUT,
 				this, "zoomOut");
 
+		// Listen for a notification from the tile being dragged
+		NotificationManager.getInstance().addObserver(Notification.TILE_DROPPED,
+				this, "tileDropped");
+		
 		// Load the background image from disk
 		try {
 			backgroundTile_ = ImageIO.read(new File(
@@ -306,10 +310,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		}
 	}
 
-	public void mouseClicked(MouseEvent e) {
-
-		if (board_ == null)
-			return;
+	public Point getTileAtPoint(Point p)
+	{
 		
 		// determine which tile was clicked! First, get the width and height of
 		// a tile.
@@ -320,7 +322,6 @@ public class MapLayer extends JPanel implements MouseListener,
 		// modifying the coordinates we received so that the location is
 		// relative to the buffer image. Once we know which pixel of the
 		// buffered image was clicked, we can get a tile.
-		Point p = e.getPoint();
 		p.x += -renderCenteringOffset_.x + bufferMaxOffsetX_;
 		p.x += paintOffset_.x + renderOffset_.x;
 		p.y += -renderCenteringOffset_.y + bufferMaxOffsetY_;
@@ -341,10 +342,26 @@ public class MapLayer extends JPanel implements MouseListener,
 				Notification.LOG_WARNING, text);
 		
 		Point location = new Point(tileX, tileY);
+		return location;
+	}
+	
+	public void tileDropped(Notification n) {
+		if (board_ == null)
+			return;
 		
+		Point p = this.getTileAtPoint((Point)n.argument());
 		NotificationManager.getInstance().sendNotification(
-				Notification.CLICK_ADD_TILE, location);
+				Notification.CLICK_ADD_TILE, p);
+	}
+	
+	public void mouseClicked(MouseEvent e) {
 
+		if (board_ == null)
+			return;
+		
+		Point p = this.getTileAtPoint(e.getPoint());
+		NotificationManager.getInstance().sendNotification(
+				Notification.CLICK_ADD_TILE, p);
 	}
 
 	public void mouseEntered(MouseEvent e) {

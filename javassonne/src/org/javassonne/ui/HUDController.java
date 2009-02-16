@@ -18,6 +18,8 @@
 
 package org.javassonne.ui;
 
+import java.awt.Point;
+
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
@@ -57,13 +59,20 @@ public class HUDController {
 		// Draw the first tile!
 		tileInHand_ = deck_.popRandomTile();
 
-		// Add HUD to main canvas
-		DisplayHelper.getInstance()
-				.add(new HUDPanel(), DisplayHelper.Layer.PALETTE,
-						DisplayHelper.Positioning.TOP_LEFT);
+		// Attach the remaining tiles panel to the top right
 		DisplayHelper.getInstance().add(new RemainingTilesPanel(),
 				DisplayHelper.Layer.PALETTE,
 				DisplayHelper.Positioning.TOP_RIGHT);
+
+		// Attach the buttons (Menu, zoom in ,zoom out) to the top left
+		DisplayHelper.getInstance().add(new HUDButtonsPanel(),
+				DisplayHelper.Layer.PALETTE,
+				new Point(10,10));
+
+		// Attach the tile drawing panel to the top left
+		DisplayHelper.getInstance().add(new HUDPanel(),
+				DisplayHelper.Layer.PALETTE,
+				new Point(10,40));
 
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
