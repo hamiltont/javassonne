@@ -1,0 +1,42 @@
+#summary The JPopUp class displays pop-up boxes
+
+= Introduction =
+
+The JPopUp class displays a message to the user (and receives an optional user response)
+
+
+= Details =
+
+==Informational Messages==
+This displays a pop-up box with just an OK button and an information icon.
+
+*Usage:*
+{{{
+JPopUp msgBox = new JPopUp("This is a test");
+msgBox.showMsg();
+}}}
+
+===Special Icon===
+To change the icon, use the overloaded showMsg() method indicating the message type.
+Possible types are:
+  * JOptionPane.INFORMATION_MESSAGE
+  * JOptionPane.ERROR_MESSAGE
+  * JOptionPane.PLAIN_MESSAGE 
+  * JOptionPane.QUESTION_MESSAGE
+  * JOptionPane.WARNING_MESSAGE
+
+*Usage:*
+{{{
+JPopUp msgBox = new JPopUp("This is a warning");
+msgBox.showMsg(JOptionPane.WARNING_MESSAGE);
+}}}
+
+==Dialog Messages==
+This displays a pop-up box with a button for each option passed in. The button clicked is returned by the function (unless the dialog was closed in which case NULL is returned)
+
+*Usage:*
+{{{
+JPopUp dialogBox = new JPopUp("Are you sure?");
+String[] options = {"Yes I am","No I'm not","Maybe"};
+dialogBox.promptUser(options);
+}}}
