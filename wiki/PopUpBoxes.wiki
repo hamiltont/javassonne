@@ -36,7 +36,16 @@ This displays a pop-up box with a button for each option passed in. The button c
 
 *Usage:*
 {{{
+private static final String MAYBE = "Maybe";
+private static final String NO = "No I'm not";
+private static final String YES = "Yes I am";
+
+String[] options = {YES,NO,MAYBE};
+
 JPopUp dialogBox = new JPopUp("Are you sure?");
-String[] options = {"Yes I am","No I'm not","Maybe"};
-dialogBox.promptUser(options);
+String ans = dialogBox.promptUser(options);
+
+if(ans == MAYBE) 
+  System.out.println("Maybe");
+  
 }}}
