@@ -82,9 +82,12 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		} else {
 			keyString = KeyEvent.getKeyText(e.getKeyCode());
 		}
+		
+		int code = e.getKeyCode();
 
 		// Notify the system
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		// ESCAPE
+		if (code == KeyEvent.VK_ESCAPE) {
 			// Close the the log panel if it's open
 			if (LogPanel.getInstance().isVisible() == true) {
 				LogPanel.getInstance().setVisible(false);
@@ -95,6 +98,20 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 				NotificationManager.getInstance().sendNotification(
 						Notification.TOGGLE_MAIN_MENU);
 			}
+		}
+		
+		
+		// +/= (Zoom In) 
+		else if(code == KeyEvent.VK_EQUALS){
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_IN);
+		}
+		
+		
+		// = (Zoom Out) 
+		else if(code == KeyEvent.VK_MINUS){
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_OUT);
 		}
 
 	}
