@@ -54,6 +54,7 @@ public class Notification {
 	
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String CLICK_ADD_TILE = "NotificationClickAddTile";
+	public static final String TILE_DROPPED = "NotificationTileDropped";
 
 	private String identifier_;
 	private Object argument_;
