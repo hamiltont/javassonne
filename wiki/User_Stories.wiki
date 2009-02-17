@@ -5,7 +5,6 @@
 == Potential Stories ==
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can see possible locations where the tile is allowed to be placed.
- * User can drag and drop their tile onto the map in the desired position.
  * User can save a local (not network) game to an XML file and load it later to resume play.
  * User able to navigate the map using the 4 directional keys
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
@@ -19,6 +18,7 @@
 == 3rd Build (Jan. 22 - Jan. 30) ==
 
 Game Team:
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can drag and drop their tile onto the map in the desired position. (Ben, Kyle)
  * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Add HUD Panel to show the number of each type of remaining tile. (Ben)
  * Add HUD Panel to show game stats and more advanced turn information. (Ben)
