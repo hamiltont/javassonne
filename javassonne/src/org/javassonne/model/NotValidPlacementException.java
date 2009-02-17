@@ -40,5 +40,9 @@ public class NotValidPlacementException extends Exception {
 	public NotValidPlacementException() {
 		super("The selected position is not valid for placement");
 	}
+	
+	public Point getLocation() {
+		return location_;
+	}
 
 }

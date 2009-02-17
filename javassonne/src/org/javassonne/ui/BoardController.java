@@ -31,7 +31,6 @@ import org.javassonne.model.TileDeck;
 
 public class BoardController {
 
-	TileDeck deck_;
 	TileBoard board_;
 	Tile tileInHandRef_;
 
@@ -40,15 +39,12 @@ public class BoardController {
 	 * board views in the interface. For instance, clicking the board, placing
 	 * meeple, zooming in and out will be handled here.
 	 * 
-	 * @param d
-	 *            The TileDeck. This will never be changed once the game has
-	 *            begun.
 	 * @param b
 	 *            The TileBoard. This will never be changed once the game has
 	 *            begun.
 	 */
-	public BoardController(TileDeck d, TileBoard b) {
-		deck_ = d;
+	public BoardController( TileBoard b) {
+
 		board_ = b;
 
 		NotificationManager.getInstance().addObserver(
