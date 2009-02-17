@@ -101,8 +101,8 @@ public class GameController {
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
-		boardController_ = new BoardController(deck, board);
-		hudController_ = new HUDController(deck, board);
+		boardController_ = new BoardController(board);
+		hudController_ = new HUDController(deck);
 
 		// And go!
 		gameInProgress_ = true;

@@ -37,7 +37,7 @@ import org.javassonne.model.TileDeck;
 public class HUDController {
 
 	TileDeck deck_;
-	TileBoard board_;
+	
 	Tile tileInHand_;
 
 	/**
@@ -48,13 +48,9 @@ public class HUDController {
 	 * @param d
 	 *            The TileDeck. This will never be changed once the game has
 	 *            begun.
-	 * @param b
-	 *            The TileBoard. This will never be changed once the game has
-	 *            begun.
 	 */
-	public HUDController(TileDeck d, TileBoard b) {
+	public HUDController(TileDeck d) {
 		deck_ = d;
-		board_ = b;
 
 		// Draw the first tile!
 		tileInHand_ = deck_.popRandomTile();
