@@ -98,6 +98,13 @@ public class GameController {
 
 		TileBoard board = new TileMapBoard(deck);
 		
+		//TODO: Make this cleanup better
+		
+		if(boardController_ != null)
+			NotificationManager.getInstance().removeObserver(boardController_);
+		if(hudController_ != null)
+			NotificationManager.getInstance().removeObserver(hudController_);
+		
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
