@@ -28,7 +28,7 @@ Game Team:
 
 Networking Team:
 
- * User can search for and see other people (IP addresses) running the Javassonne application on the local network. (Hamy, Brian)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can search for and see other people (IP addresses) running the Javassonne application on the local network. (user has to run the server / client builds in eclipse )(Hamy, Brian)
 
 == 2nd Build (Jan. 22 - Jan. 29) == 
 
