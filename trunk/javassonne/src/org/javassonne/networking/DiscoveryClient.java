@@ -52,7 +52,7 @@ public class DiscoveryClient implements DiscoveryListener {
 	 * loop forever attempting to discover advertisements every minute
 	 */
 	public void start() {
-		long waittime = 60 * 1000L;
+		long waittime = 6 * 1000L;
 		try {
 			// Add ourselves as a DiscoveryListener for DiscoveryResponse events
 			discovery.addDiscoveryListener(this);

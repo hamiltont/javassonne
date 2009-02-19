@@ -59,7 +59,7 @@ public class DiscoveryServer implements DiscoveryListener {
 	public void start() {
 		long lifetime = 60 * 2 * 1000L;
 		long expiration = 60 * 2 * 1000L;
-		long waittime = 60 * 3 * 1000L;
+		long waittime = 60 * 1 * 1000L;
 		try {
 			while (true) {
 				PipeAdvertisement pipeAdv = getPipeAdvertisement();
