@@ -40,6 +40,8 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	private Point resetLocation_ = null;
 	private Timer resetTimer_;
 
+	private Boolean respondToClick_ = true;
+	
 	private BufferedImage translucentImage_;
 	private BufferedImage opaqueImage_;
 
@@ -82,12 +84,15 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		if (mouseOffset_ == null)
-			mouseOffset_ = new Point(e.getX(), e.getY());
-		else {
-			Point c = this.getLocation();
-			this.setLocation(c.x + e.getX() - mouseOffset_.x, c.y + e.getY()
-					- mouseOffset_.y);
+		setBackgroundImage(translucentImage_);
+		if (respondToClick_){
+			if (mouseOffset_ == null)
+				mouseOffset_ = new Point(e.getX(), e.getY());
+			else {
+				Point c = this.getLocation();
+				this.setLocation(c.x + e.getX() - mouseOffset_.x, c.y + e.getY()
+						- mouseOffset_.y);
+			}
 		}
 	}
 
@@ -112,23 +117,29 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	}
 
 	public void mousePressed(MouseEvent e) {
-		resetLocation_ = this.getLocation();
-		setBackgroundImage(translucentImage_);
-		repaint();
+		if (respondToClick_){
+			if (resetTimer_ != null) resetTimer_.cancel();
+			resetLocation_ = this.getLocation();
+			repaint();
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		// see if we can place the tile on the map.
-		Point clickLocation = this.getLocation();
-		clickLocation.x += this.getWidth() / 2;
-		clickLocation.y += this.getHeight() / 2;
-
-		// slide the tile back to it's starting location on the sidebar
-		resetTimer_ = new Timer();
-		resetTimer_.scheduleAtFixedRate(new ResetSlideTask(), 0, 5);
-
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_DROPPED, clickLocation);
+		if (respondToClick_){
+			// see if we can place the tile on the map.
+			Point clickLocation = this.getLocation();
+			clickLocation.x += this.getWidth() / 2;
+			clickLocation.y += this.getHeight() / 2;
+	
+			// slide the tile back to it's starting location on the sidebar
+			if (resetTimer_ != null) resetTimer_.cancel();
+			resetTimer_ = new Timer();
+			resetTimer_.scheduleAtFixedRate(new ResetSlideTask(), 0, 5);
+			respondToClick_ = false;
+			
+			NotificationManager.getInstance().sendNotification(
+					Notification.TILE_DROPPED, clickLocation);
+		}
 	}
 
 	protected class ResetSlideTask extends TimerTask {
@@ -152,10 +163,12 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 			// if we are now in the starting location, make us opaque again and
 			// stop the timer from firing. Also set the location to the exact
 			// one, just in case.
-			if (x <= resetLocation_.x && y <= resetLocation_.y) {
+			if (x <= resetLocation_.x || y <= resetLocation_.y) {
 				setLocation(resetLocation_);
 				setBackgroundImage(opaqueImage_);
 				resetTimer_.cancel();
+				
+				respondToClick_ = true;
 			}
 		}
 	}
