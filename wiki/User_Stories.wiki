@@ -9,19 +9,19 @@
  * User able to navigate the map using the 4 directional keys
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
  * User is able to see and/or navigate a minimap
- * User sees the correct starting tile when the game begins.
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the correct starting tile when the game begins. (Ben)
  * User can run some sweet unit tests for networking. 
  * User see's an end game menu when they run out of tiles
- * User cannot click draw again unless they place their tile
- * User sees and empty gray "J" box when their tile has been placed
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User cannot click draw again unless they place their tile. (Kyle)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees and empty gray box when their tile has been placed. (Ben)
 
 == 3rd Build (Jan. 22 - Jan. 30) ==
 
 Game Team:
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can drag and drop their tile onto the map in the desired position. (Ben, Kyle)
- * Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
+ * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Add HUD Panel to show the number of each type of remaining tile. (Ben)
- * Add HUD Panel to show game stats and more advanced turn information. (Ben)
+ * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Add HUD Panel to show game stats and more advanced turn information. [Model not ready] (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an expanded main menu with many of the options currently in the HUD left sidebar. The main menu can be brought up by pressing esc during gameplay or clicking a small menu icon. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can place the tile in their hand in a valid location during their turn. (Kyle)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees dialogs in the correct place on the screen that do not cause the game window to minimize. (Adam)
