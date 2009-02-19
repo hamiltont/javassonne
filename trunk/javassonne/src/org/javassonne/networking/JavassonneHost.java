@@ -17,44 +17,87 @@
  */
 package org.javassonne.networking;
 
-import net.jxta.discovery.DiscoveryEvent;
-import net.jxta.discovery.DiscoveryListener;
-import net.jxta.discovery.DiscoveryService;
-import net.jxta.document.Advertisement;
-import net.jxta.document.AdvertisementFactory;
+import java.io.File;
+import java.io.IOException;
+import java.net.SocketException;
+
+import net.jxta.endpoint.Message;
+import net.jxta.endpoint.MessageElement;
 import net.jxta.id.ID;
-import net.jxta.id.IDFactory;
 import net.jxta.peergroup.PeerGroup;
-import net.jxta.peergroup.PeerGroupID;
 import net.jxta.pipe.PipeService;
 import net.jxta.platform.NetworkManager;
-import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PipeAdvertisement;
-import net.jxta.impl.util.BidirectionalPipeService;
-import net.jxta.impl.util.*;
-import java.io.File;
-import java.util.Enumeration;
+import net.jxta.util.JxtaBiDiPipe;
+import net.jxta.util.JxtaServerPipe;
 
 
 public class JavassonneHost {
 	public boolean activelyPlaying_;
 	public ID[] clientIds_; // the JXTA unique ids
+	private NetworkManager manager_;
+	private PeerGroup peerGroup_;
+	private PipeService pipeService_;
+	private JxtaServerPipe pipeServer_; 
+	private PipeAdvertisement pipeAdv_;
+	private static String TAG = "element";
+	
+	public static void main(String[] args) {
+		JavassonneHost jh = new JavassonneHost();
+		jh.start();
+	}
+	
+	public JavassonneHost() {
+		try {
+			manager_ = new net.jxta.platform.NetworkManager(
+					NetworkManager.ConfigMode.ADHOC, "JavassonnePlayerClient", new File(
+							new File(".cache"), "JavassonnePlayerClient").toURI());
+			manager_.startNetwork();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 
-	public void setID(){}
+		peerGroup_ = manager_.getNetPeerGroup();
+		pipeService_ = peerGroup_.getPipeService();
+		pipeAdv_ = PipeAdvertisementCreator.getPipeAdvertisement();
+		
+		try {
+			pipeServer_ = new JxtaServerPipe(peerGroup_,pipeAdv_);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		try {
+			// Leave the communication channel open
+			pipeServer_.setPipeTimeout(0);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-	public void setIP(String ip){}
-
-	public void connect(){
-	        NetworkManager manager = new NetworkManager(NetworkManager.ConfigMode.EDGE,
-	                        "JavassonneHost", new File(new File(".cache"),
-	                                "JavassonneHost").toURI());
-	          
-	        manager.startNetwork();
-	        PeerGroup defaultPeerGroup = manager.getNetPeerGroup();
-	        BidirectionalPipeService bps = new BidirectionalPipeService(defaultPeerGroup);
-	        BidirectionalPipeService.AcceptPipe acceptPipe = bps.bind("hpipe");
-	        PipeAdvertisement adv = acceptPipe.getAdvertisement();
-	        BidirectionalPipeService.Pipe hpipe = acceptPipe.accept(30 * 1000);
-	    }
+	private void start(){
+		JxtaBiDiPipe biDiPipe = null;
+		try {
+			biDiPipe = pipeServer_.accept();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Message m = null;
+		try {
+			m = biDiPipe.getMessage(0);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
+		MessageElement me = m.getMessageElement(TAG);
+		System.out.println("Host received: " + me.toString());
+	}
 
 }
