@@ -1,6 +1,10 @@
 #labels Featured
-Download the zip file from the downloads section of the Javassonne site to a location on your computer. Double-click it to uncompress the download, and then double-click "Javassonne.jar" to test the file. 
+Download the Featured zip file from the downloads section of the Javassonne site to a location on your computer.
+ 
+Double-click it to uncompress the download (extracting all files and folders into the same directory). 
 
-If you have the current JRE installed for your machine, the app will run and display correctly.
+Double-click "Javassonne.jar" to run the application.
+
+If you have the latest JRE installed for your machine, Javassonne will run correctly.
 
 Please post any issues to the [http://code.google.com/p/javassonne/issues/list Issues] section of the site.
