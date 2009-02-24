@@ -3,7 +3,6 @@
 = User Stories = 
 
 == Potential Stories ==
- * User can see possible locations where the tile is allowed to be placed.
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
  * User is able to see and/or navigate a minimap
  * User can run some sweet unit tests for networking. 
@@ -14,7 +13,8 @@
 Game Team:
  * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Add HUD Panel to show game stats and more advanced turn information. (Ben)
- * User able to navigate the map using the 4 directional keys.
+ * User can see possible locations where the tile is allowed to be placed. (Kyle and Ben)
+ * User able to navigate the map using the 4 directional keys. (Kyle)
  * User see's an end game menu when they run out of tiles.
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can zoom in smoothly - instead of jumping from one zoom level to the next. (Ben)
