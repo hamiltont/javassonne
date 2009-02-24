@@ -16,7 +16,9 @@ Game Team:
  * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Add HUD Panel to show game stats and more advanced turn information. (Ben)
  * User can see possible locations where the tile is allowed to be placed. (Kyle and Ben)
  * User able to navigate the map using the 4 directional keys. (Kyle)
- * User see's an end game menu when they run out of tiles.
+ * User see's an end game menu when they run out of tiles. (Adam)
+ * User will see a 'Game In Progress' dialog when trying to start a new game  (Adam)
+ * User will be able to save their game (Adam)
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can zoom in smoothly - instead of jumping from one zoom level to the next. (Ben)
  * User can save a local (not network) game to an XML file and load it later to resume play.
