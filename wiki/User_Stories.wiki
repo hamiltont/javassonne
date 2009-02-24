@@ -1,4 +1,4 @@
-#summary The Javassonne user stories.
+#summary Our team chooses user stories for each two-week build cycle.
 
 = User Stories = 
 
