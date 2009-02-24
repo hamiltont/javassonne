@@ -18,7 +18,7 @@ Game Team:
  * User able to navigate the map using the 4 directional keys. (Kyle)
  * User see's an end game menu when they run out of tiles. (Adam)
  * User will see a 'Game In Progress' dialog when trying to start a new game  (Adam)
- * User will be able to save their game (Adam)
+ * User will be able to see a save game dialog (Adam)
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can zoom in smoothly - instead of jumping from one zoom level to the next. (Ben)
  * User can save a local (not network) game to an XML file and load it later to resume play.
