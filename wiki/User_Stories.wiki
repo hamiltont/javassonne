@@ -3,34 +3,43 @@
 = User Stories = 
 
 == Potential Stories ==
- * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can see possible locations where the tile is allowed to be placed.
- * User can save a local (not network) game to an XML file and load it later to resume play.
- * User able to navigate the map using the 4 directional keys
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
  * User is able to see and/or navigate a minimap
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the correct starting tile when the game begins. (Ben)
  * User can run some sweet unit tests for networking. 
- * User see's an end game menu when they run out of tiles
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User cannot click draw again unless they place their tile. (Kyle)
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees and empty gray box when their tile has been placed. (Ben)
+ * User can place meeple on the tile they lay down during their turn.
 
-== 3rd Build (Jan. 22 - Jan. 30) ==
+== 4th Build (Feb. 24 - Mar. 12) ==
+
+Game Team:
+ * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
+ * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Add HUD Panel to show game stats and more advanced turn information. (Ben)
+ * User able to navigate the map using the 4 directional keys.
+ * User see's an end game menu when they run out of tiles.
+ * User sees the number of game "meeple" they have remaining in part of the H.U.D.
+ * User can zoom in smoothly - instead of jumping from one zoom level to the next. (Ben)
+ * User can save a local (not network) game to an XML file and load it later to resume play.
+
+Networking Team:
+ <TBD>
+
+== 3rd Build (Feb. 10 - Feb. 19) ==
 
 Game Team:
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can drag and drop their tile onto the map in the desired position. (Ben, Kyle)
- * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Add HUD Panel to show the number of each type of remaining tile. (Ben)
- * <img src='http://pvalet.com/Yellow%20Check%20Mark.gif' height='15' width='15' /> Add HUD Panel to show game stats and more advanced turn information. [Model not ready] (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an expanded main menu with many of the options currently in the HUD left sidebar. The main menu can be brought up by pressing esc during gameplay or clicking a small menu icon. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can place the tile in their hand in a valid location during their turn. (Kyle)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees dialogs in the correct place on the screen that do not cause the game window to minimize. (Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the correct starting tile when the game begins. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User cannot click draw again unless they place their tile. (Kyle)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees and empty gray box when their tile has been placed. (Ben)
 
 Networking Team:
 
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can search for and see other people (IP addresses) running the Javassonne application on the local network. (user has to run the server / client builds in eclipse )(Hamy, Brian)
 
-== 2nd Build (Jan. 22 - Jan. 29) == 
+== 2nd Build (Jan. 27 - Feb. 5) == 
 
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see class diagrams representing our model-view-controller architecture and the notifications being sent to different parts of the application via a PubSub mechanism. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an alert window or log window when an exception or error occurs in the app, rather than something printed to the console. (Ben)
