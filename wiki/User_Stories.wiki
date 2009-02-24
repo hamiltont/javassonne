@@ -3,6 +3,7 @@
 = User Stories = 
 
 == Potential Stories ==
+ * User sees tile in hand shrink to same size as tiles in board when user drags it over the board.
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
  * User is able to see and/or navigate a minimap
  * User can run some sweet unit tests for networking. 
