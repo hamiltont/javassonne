@@ -1,4 +1,6 @@
+#summary Instructions for running Javassonne builds
 #labels Featured
+
 Download the Featured zip file from the downloads section of the Javassonne site to a location on your computer.
  
 Double-click it to uncompress the download (extracting all files and folders into the same directory). 
