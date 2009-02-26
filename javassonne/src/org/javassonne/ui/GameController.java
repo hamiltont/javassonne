@@ -18,13 +18,12 @@
 
 package org.javassonne.ui;
 
-import java.util.HashMap;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileDeck;
@@ -53,6 +52,9 @@ public class GameController {
 	private MenuPanel menu_;
 	private Tile tileInHand_;
 
+	private InputPlayerDataPanel playerData_;
+	private List<Player> players_;
+
 	/**
 	 * The default constructor takes no arguments and assumes a GameWindow has
 	 * been created and is onscreen. It adds itself to the notification manager
@@ -66,10 +68,14 @@ public class GameController {
 		// register to receive events from the game window
 		NotificationManager.getInstance().addObserver(Notification.NEW_GAME,
 				this, "newGame");
+		NotificationManager.getInstance().addObserver(Notification.START_GAME,
+				this, "startGame");
 		NotificationManager.getInstance().addObserver(Notification.EXIT_GAME,
 				this, "exitGame");
 		NotificationManager.getInstance().addObserver(
 				Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
+		NotificationManager.getInstance().addObserver(
+				Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 	}
 
 	/**
@@ -80,7 +86,27 @@ public class GameController {
 	 */
 	public void newGame(Notification n) {
 
-		// TODO: Show player selection panel
+		InputPlayerDataPanel p = new InputPlayerDataPanel();
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
+	}
+
+	/**
+	 * Called when a START_GAME notification is received.
+	 * 
+	 * @param n
+	 *            The notification object sent from the NotificationManager.
+	 */
+	public void startGame(Notification n) {
+		// Game in progress!
+		gameInProgress_ = true;
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_MAIN_MENU);
+
+		playerData_ = (InputPlayerDataPanel) n.argument();
+		loadPlayerData();
+
+		DisplayHelper.getInstance().remove(playerData_);
 
 		// Load all possible tiles
 		TileSerializer s = new TileSerializer();
@@ -97,7 +123,7 @@ public class GameController {
 		deck.addTileSet(set);
 
 		TileBoard board = new TileMapBoard(deck);
-		
+
 		//TODO: Make this cleanup better
 		
 		if(boardController_ != null)
@@ -110,9 +136,6 @@ public class GameController {
 		// tile).
 		boardController_ = new BoardController(board);
 		hudController_ = new HUDController(deck);
-
-		// And go!
-		gameInProgress_ = true;
 	}
 
 	public void toggleMainMenu(Notification n) {
@@ -136,5 +159,18 @@ public class GameController {
 
 		// Return control to final shutdown process
 		System.exit(0);
+	}
+
+	private void loadPlayerData() {
+		players_ = new ArrayList<Player>();
+
+		for (String s : playerData_.getPlayerData()) {
+			Player player = new Player(s);
+			players_.add(player);
+		}
+	}
+
+	public void playerDataReset(Notification n) {
+		players_.clear();
 	}
 }

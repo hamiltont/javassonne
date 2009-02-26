@@ -32,6 +32,7 @@ public class Player {
 	private int turnNumber_;
 	private int score_;
 
+	//ctors
 	public Player() {
 		name_ = DEFAULT_NAME;
 		meepleColor_ = DEFAULT_MEEPLE_COLOR;
@@ -45,6 +46,15 @@ public class Player {
 		meepleColor_ = meepleColor;
 		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
 		turnNumber_ = turnNumber;
+		score_ = 0;
+	}
+	
+	public Player(String name)
+	{
+		name_ = name;
+		meepleColor_ = DEFAULT_MEEPLE_COLOR;
+		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
+		turnNumber_ = 0;
 		score_ = 0;
 	}
 
