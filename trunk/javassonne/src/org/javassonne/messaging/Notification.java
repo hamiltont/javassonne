@@ -44,6 +44,7 @@ public class Notification {
 	public static final String DRAW_TILE = "NotificationDrawTile";
 
 	public static final String NEW_GAME = "NotificationNewGame";
+	public static final String START_GAME = "NotificationStartGame";
 	public static final String LOAD_GAME = "NotificationLoadGame";
 	public static final String SAVE_GAME = "NotificationSaveGame";
 	public static final String EXIT_GAME = "NotificationExitGame";
@@ -55,6 +56,9 @@ public class Notification {
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String CLICK_ADD_TILE = "NotificationClickAddTile";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
+	
+	public static final String PLAYER_DATA_CHANGED = "NotificationPlayerDataChanged";
+	public static final String PLAYER_DATA_RESET = "NotificationPlayerDataReset";
 
 	private String identifier_;
 	private Object argument_;

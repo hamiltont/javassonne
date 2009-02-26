@@ -68,8 +68,7 @@ public class AbstractHUDPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		if (background_ != null) {
 			Graphics2D g2 = (Graphics2D) g;
-			g2
-					.drawImage(background_, 0, 0, this.getWidth(), this
+			g2.drawImage(background_, 0, 0, this.getWidth(), this
 							.getHeight(), 0, 0, background_.getWidth(),
 							background_.getHeight(), null);
 		}
