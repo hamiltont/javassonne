@@ -7,7 +7,26 @@
  * User able to hit Esc(already done), followed by Enter(not done) to exit the game
  * User is able to see and/or navigate a minimap
  * User can run some sweet unit tests for networking. 
- * User can place meeple on the tile they lay down during their turn.
+
+== 6th Build (Mar. 30 - Apr. 9) ==
+
+Game Team:
+ * User's meeple are scored at the end of the game (includes partially completed features and farms).
+ * User can see an end-game screen that shows game statistics
+ * User can save a local (not network) game to an XML file and load it later to resume play.
+ * User can hear in-game sound effects. SoundManager listens for specific notifications and plays sounds for notifications.
+
+== 5th Build (Mar. 16 - Mar. 26) ==
+
+Game Team:
+ * User can place meeple on the board during their turn in an acceptable place on their tile.
+ * User's meeple on cities, roads and cloisters are scored as the game progresses and features are finished.
+ * User's current score is displayed in the HUD on the bottom right along with turn information.
+ * User can view game rules from the main menu.
+
+Networking Team:
+ * In addition to looking at users on the local network, user can type in IP address of a game server to join a game.
+ * User can chat with others playing the same game by typing onto the game canvas. Text appears transparently and pressing enter sends it to the other players.
 
 == 4th Build (Feb. 24 - Mar. 12) ==
 
@@ -21,10 +40,10 @@ Game Team:
  * User will be able to see a save game dialog (Adam)
  * User sees the number of game "meeple" they have remaining in part of the H.U.D.
  * User can zoom in smoothly - instead of jumping from one zoom level to the next. (Ben)
- * User can save a local (not network) game to an XML file and load it later to resume play.
 
 Networking Team:
- <TBD>
+ * Get DNS-SD working, and allow user to see show all network games in the GUI, even if they are ongoing.
+ * User can send a notification across the network and receive it.
 
 == 3rd Build (Feb. 10 - Feb. 19) ==
 
