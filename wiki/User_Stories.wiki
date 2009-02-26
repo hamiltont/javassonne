@@ -8,6 +8,9 @@
  * User is able to see and/or navigate a minimap
  * User can run some sweet unit tests for networking. 
 
+== 7th Build (Apr. 13 - Apr. 23) ==
+ * Fix bugs, and create www.javassonne.com
+
 == 6th Build (Mar. 30 - Apr. 9) ==
 
 Game Team:
