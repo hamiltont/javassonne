@@ -20,8 +20,13 @@ package org.javassonne.networking;
 
 public class TestLauncher {
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
+		
 		HostImpl h = new HostImpl();
-		h.start();
+		String localHostURI = h.start();
+		
+		ClientImpl cl = new ClientImpl(localHostURI);
+		cl.connectToLocalHost();
+		cl.sendMessageToHost("hello there");
 	}
 }

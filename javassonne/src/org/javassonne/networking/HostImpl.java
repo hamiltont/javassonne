@@ -30,6 +30,7 @@ import org.javassonne.networking.impl.RemotingUtils;
 
 
 public class HostImpl implements Host {
+	private static final String SERVICENAME = "JavassonneHost";
 	
 	/**
 	 * Attempts to create the RMI host service, and then
@@ -38,12 +39,11 @@ public class HostImpl implements Host {
 	 * used. we need to try and implement a smart export
 	 */
 	public String start() {
-		HostImpl server = new HostImpl();
-		String uri = null;
+		ServiceInfo info = null;
 		
 		// Create the RMI service
 		try {
-			uri = RemotingUtils.exportRMIService(server, Host.class, "Jsonne_Host");
+			info = RemotingUtils.exportRMIService(this, Host.class, SERVICENAME);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class HostImpl implements Host {
 		}
 		
 		
-		System.out.println("Clients can connect to: "+uri);
+		
 		// Broadcast the created service
 		System.out.println("Opening JmDNS");
         JmDNS jmdns = null;
@@ -63,36 +63,22 @@ public class HostImpl implements Host {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-           
+   
         System.out.println("Opened JmDNS");
-        ServiceInfo info = ServiceInfo.create("_rmi._tcp.local.", "JavassonneHost", 1268, 0, 0, "path=index.html");
         try {
 			jmdns.registerService(info);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-        
-        System.out.println("Registered Service as "+info);
-        System.out.println("ServiceInfo info = ServiceInfo.create(\"_http._tcp.local.\", \"JSonne_Host\", 1268, 0, 0, \"path=index.html\");");
-        System.out.println("hostaddress:" + info.getHostAddress());
-        System.out.println("name:" + info.getName());
-        System.out.println("nicetextstring:" + info.getNiceTextString());
-        System.out.println("port:" + info.getPort());
-        System.out.println("priority:" + info.getPriority());
-        System.out.println("qualified_name:" + info.getQualifiedName());
-        System.out.println("server:" + info.getServer());
-        System.out.println("textstring:" + info.getTextString());
-        System.out.println("type:" + info.getType());
-        System.out.println("url:" + info.getURL());
-        System.out.println("path property string:" + info.getPropertyString("path"));
-        
-        
+		
+		String uri = "rmi://"+ info.getHostAddress() + ":" 
+				+ info.getPort() + "/" + info.getName();
+		System.out.println("Clients can connect to: " + uri);
         return uri;
 	}
 	
-	public void acceptClientConnection() {
+	public void addClient(String clientURI) {
 		// TODO Auto-generated method stub
 
 	}
@@ -104,8 +90,11 @@ public class HostImpl implements Host {
 	}
 
 	
-	public void receiveMessage() {
-		// TODO Auto-generated method stub
+	public void receiveMessage(String msg, String clientURI_) {
+		System.out.println("Host: Received message " + msg);
+		
+		// TODO Check that that client is in list of conencted cleitns,
+		//		then send the message out to everyone else but that guy
 
 	}
 

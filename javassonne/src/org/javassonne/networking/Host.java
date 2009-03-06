@@ -21,9 +21,10 @@ package org.javassonne.networking;
 public interface Host {
 
 	/**
-	 * Accept a connection from a client
+	 * Add a client to a list of internal "connected" clients. 
+	 * @param clientURI the URI where this client can be reached
 	 */
-	public void acceptClientConnection();
+	public void addClient(String clientURI);
 	
 	/**
 	 * Returns true if all clients have connected, 
@@ -31,9 +32,9 @@ public interface Host {
 	 */
 	public boolean canGameStart();
 	/**
-	 * Receives a message from a client, and 
+	 * Receives a message from a specified client, and 
 	 * automatically sends it to all clients (besides the 
 	 * one it was just contacted by)
 	 */
-	public void receiveMessage();
+	public void receiveMessage(String msg, String clientURI);
 }
