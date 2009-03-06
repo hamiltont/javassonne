@@ -1,10 +1,8 @@
-// %Z%%M%, %I%, %G%
-//
-
 //Licensed under Apache License version 2.0
 //Original license LGPL
 
-
+// %Z%%M%, %I%, %G%
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -19,51 +17,33 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-package org.javassonne.networking;
+package org.javassonne.networking.examples;
 
 import java.io.IOException;
 
 import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
 
 /**
- * Sample Code for Listing Services using JmDNS.
+ * Sample Code that opens JmDNS in debug mode.
  * <p>
- * Run the main method of this class. This class prints a list of available HTTP
- * services every 5 seconds.
+ * Run the main method of this class. 
  *
  * @author  Werner Randelshofer
  * @version 	%I%, %G%
  */
-public class ListServices {
-    
+public class OpenJmDNS {
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        /* Activate these lines to see log messages of JmDNS
-        Logger logger = Logger.getLogger(JmDNS.class.getName());
-        ConsoleHandler handler = new ConsoleHandler();
-        logger.addHandler(handler);
-        logger.setLevel(Level.FINER);
-        handler.setLevel(Level.FINER);
-        */
-        
         try {
+            System.setProperty("jmdns.debug", "2");
             JmDNS jmdns = JmDNS.create();
-            while (true) {
-                ServiceInfo[] infos = jmdns.list("_http._tcp.local.");
-                for (int i=0; i < infos.length; i++) {
-                    System.out.println(infos[i]);
-                }
-                System.out.println();
-                
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
+            
+            System.out.println("Press q and Enter, to quit");
+            int b;
+            while ((b = System.in.read()) != -1 && (char) b != 'q'); 
+            jmdns.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
