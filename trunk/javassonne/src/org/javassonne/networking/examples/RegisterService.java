@@ -17,9 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-package org.javassonne.networking;
+package org.javassonne.networking.examples;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -65,11 +66,13 @@ public class RegisterService {
         try {
             System.out.println("Opening JmDNS");
             JmDNS jmdns = JmDNS.create();
+               
             System.out.println("Opened JmDNS");
             System.out.println("\nPress r and Enter, to register HTML service 'foo'");
             int b;
-            while ((b = System.in.read()) != -1 && (char) b != 'r');
-            ServiceInfo info = ServiceInfo.create("_http._tcp.local.", "foo", 1268, 0, 0, "path=index.html");
+            //while ((b = System.in.read()) != -1 && (char) b != 'r');
+            //ServiceInfo info = ServiceInfo.create("_http._tcp.local.", "foo", 1268, 0, 0, "path=index.html");
+            ServiceInfo info = ServiceInfo.create("_http._tcp.local.", "handy", 1050, "A handy service");
             jmdns.registerService(info);
             
             System.out.println("\nRegistered Service as "+info);
@@ -82,6 +85,7 @@ public class RegisterService {
             System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Looks like there is no inetaddr");
         }
     }
 }

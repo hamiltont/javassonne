@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.examples;
 
 //Licensed under Apache License version 2.0
 //Original license LGPL
@@ -70,13 +70,6 @@ public class DiscoverServices {
    */
   public static void main(String[] args) {
       try {
-          /* Activate these lines to see log messages of JmDNS
-          Logger logger = Logger.getLogger(JmDNS.class.getName());
-          ConsoleHandler handler = new ConsoleHandler();
-          logger.addHandler(handler);
-          logger.setLevel(Level.FINER);
-          handler.setLevel(Level.FINER);
-          */
           JmDNS jmdns = JmDNS.create();
           jmdns.addServiceListener("_http._tcp.local.", new SampleListener());
           

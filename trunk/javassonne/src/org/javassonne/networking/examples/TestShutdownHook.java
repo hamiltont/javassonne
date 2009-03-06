@@ -1,7 +1,7 @@
 //Licensed under Apache License version 2.0
 //Original license LGPL
 
-package org.javassonne.networking;
+package org.javassonne.networking.examples;
 
 import java.io.*;
 /**
