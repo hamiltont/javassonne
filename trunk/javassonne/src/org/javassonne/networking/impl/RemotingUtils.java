@@ -15,6 +15,8 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jmdns.ServiceInfo;
+
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.remoting.rmi.RmiServiceExporter;
 
@@ -49,7 +51,7 @@ public class RemotingUtils {
 	 * @throws RemoteException
 	 * @throws UnknownHostException
 	 */
-	public static String exportRMIService(Object svc, Class svcinterface, String name) throws RemoteException, UnknownHostException{
+	public static ServiceInfo exportRMIService(Object svc, Class svcinterface, String name) throws RemoteException, UnknownHostException{
 		return exportRMIService(svc, svcinterface, DEFAULT_PORT, name);
 	}
 	
@@ -69,7 +71,7 @@ public class RemotingUtils {
 	 * @throws RemoteException
 	 * @throws UnknownHostException
 	 */
-	public static String exportRMIService(Object svc, Class svcinterface, int port, String name) throws RemoteException, UnknownHostException{
+	public static ServiceInfo exportRMIService(Object svc, Class svcinterface, int port, String name) throws RemoteException, UnknownHostException{
 		RmiServiceExporter exporter = new RmiServiceExporter();
 		exporter.setRegistryPort(port);
 		exporter.setServiceInterface(svcinterface);
@@ -79,7 +81,11 @@ public class RemotingUtils {
 		exporter.prepare();
 		serviceMap_.put(name,exporter);
 		
-		return "rmi://"+LOCAL_HOST+":"+port+"/"+name;
+		
+		ServiceInfo info = ServiceInfo.create("_rmi._tcp.local.", name, port, "path=index.html");
+		
+		//return "rmi://"+LOCAL_HOST+":"+port+"/"+name;
+		return info;
 	}
 	
 	/**
