@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 5, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,19 +18,30 @@
 
 package org.javassonne.networking;
 
+/**
+ * This is the networking only interface of the client. Only put functions here that
+ * a remote host or client should be able to call. 
+ * 
+ * @author Hamilton Turner
+ */
 public interface Client {
-	/**
-	 * Send a message to the host. This will eventually
-	 * change to a notification
-	 * @param msg the message
-	 */
-	public void sendMessageToHost(String msg);
-	
 	/**
 	 * Receive a message from the host. This will eventually
 	 * change to a notification
 	 * @param msg - the message
 	 */
 	public void receiveMessageFromHost(String msg);
+
+	/**
+	 * Allows an arbitrary host to get the clients current URI. 
+	 * 
+	 * @return client URI
+	 */
+	public String getURI();
 	
+	/**
+	 * Query for what name this player has chosen
+	 * @return the name of this player in the game
+	 */
+	public String getName();
 }

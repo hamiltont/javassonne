@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 5, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,13 +18,20 @@
 
 package org.javassonne.networking;
 
+/**
+ * This is the networking only interface of the host. Only put functions here that
+ * a remote host or client should be able to call. 
+ * 
+ * @author Hamilton Turner
+ */
 public interface Host {
 
 	/**
 	 * Add a client to a list of internal "connected" clients. 
-	 * @param clientURI the URI where this client can be reached
+	 * @param The URI of the client we would like to add
+	 * @return True if the client was added, false otherwise
 	 */
-	public void addClient(String clientURI);
+	public boolean addClient(String clientURI);
 	
 	/**
 	 * Returns true if all clients have connected, 
@@ -37,4 +44,10 @@ public interface Host {
 	 * one it was just contacted by)
 	 */
 	public void receiveMessage(String msg, String clientURI);
+	
+	/**
+	 * Asks the host if it is ready to accept client connections
+	 * @return true if clients can connect, false otherwise
+	 */
+	public boolean canClientsConnect();
 }

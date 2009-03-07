@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 5, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,6 +18,7 @@
 
 package org.javassonne.networking;
 
+
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 
@@ -25,34 +26,54 @@ import javax.jmdns.ServiceInfo;
 
 import org.javassonne.networking.impl.RemotingUtils;
 
-
+/**
+ * The implementation of our client. Note that although the functions here can
+ * be called by the code running on this machine, only the functions 
+ * declared in the Client interface can be called remotely. 
+ * 
+ * @author Hamilton Turner
+ */
 public class ClientImpl implements Client {
 	private static final String SERVICENAME = "JavassonneClient";
 	private boolean connected_ = false;			// Lets this client know if it is
 												//   currently connected to a host
-	private String localHost_;					// The address of the local host. Used
+	private String localHostURI_;				// The address of the local host. Used
 												//   for when this computer is the host
 	private ServiceInfo service_;				// The serviceInfo associated with this 
 												//    clients RMI service
 	private Host host_;							// The host we are currently connected to, 
 												//    if any
 	private String clientURI_;					// The URI of this client
+	private String name_;						// The player name of the client
 	
+	/**
+	 * Do not allow the client to be constructed without
+	 * a localHost URI
+	 */
 	private ClientImpl() {}
 	
-	
-	
-	public ClientImpl(String localHost) {
-		localHost_ = localHost;
+	/**
+	 * Create the RMI service
+	 * @param localHostURI The URI of the host local to this machine, in case this
+	 * 					   machine ends up hosting a game
+	 * @param name The name the player would like to have
+	 */
+	public ClientImpl(String localHostURI, String name) {
+		localHostURI_ = localHostURI;
+		name_ = name;
 		
 		// Create the RMI service
 		try {
-			service_ = RemotingUtils.exportRMIService(this, Client.class, SERVICENAME);
+			// TODO If we want to run multiplayer by using networking, ensure that 
+			// there are no duplicate names
+			service_ = RemotingUtils.exportRMIService(this, Client.class, SERVICENAME + "_" + name);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			log("A RemoteException occurred while creating the RMI");
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
+			log("A UnknownHostException occurrec while creating the RMI");
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		
@@ -66,16 +87,21 @@ public class ClientImpl implements Client {
 		
 	}
 	
+	/**
+	 * Receive a message from the host of the game
+	 */
 	public void receiveMessageFromHost(String msg) {
-		// TODO Auto-generated method stub
-
+		log("Received msg - " + msg);
 	}
 
 	
+	/**
+	 * Send a message to the host of the game
+	 */
 	public void sendMessageToHost(String msg) {
 		if (connected_ == false)
 			throw new IllegalArgumentException();
-		System.out.println("Client: sending message " + msg + " to host");
+		log("Sending message " + msg + " to host");
 		host_.receiveMessage(msg, clientURI_);
 	}
 	
@@ -97,12 +123,19 @@ public class ClientImpl implements Client {
 	}
 	
 	/**
+	 * Return the URI that this client can be reached at
+	 */
+	public String getURI() {
+		return clientURI_;
+	}
+	
+	/**
 	 * Function called by this clients host that allows
 	 * this client to connect to the local host. This effectively
 	 * helps us start a game that we are hosting ourselves
 	 */
 	public void connectToLocalHost() {
-		connectToHost(localHost_);
+		connectToHost(localHostURI_);
 	}
 	
 	/**
@@ -112,7 +145,24 @@ public class ClientImpl implements Client {
 	 * @return list of host URI's
 	 */
 	public String[] listAllHosts() {
+		//TODO implement me
 		return null;
 	}
+	
+	/**
+	 * A very simple logger
+	 * @param msg
+	 */
+	private void log(String msg) {
+		System.out.println("Client " + name_ + ": " + msg);
+	}
+
+	/**
+	 * Return the name this player is using in the game
+	 */
+	public String getName() {
+		return name_;
+	}
+
 
 }

@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 6, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,15 +18,27 @@
 
 package org.javassonne.networking;
 
+
+/** 
+ * A bootstrapper used to very simply test the networking
+ * 
+ * @author Hamilton Turner
+ */
 public class TestLauncher {
 
+	
 	public static void main(String[] args) {
 		
 		HostImpl h = new HostImpl();
-		String localHostURI = h.start();
+		String localHostURI = h.getURI();
+		h.startAcceptingConnections();
 		
-		ClientImpl cl = new ClientImpl(localHostURI);
+		ClientImpl cl = new ClientImpl(localHostURI, "a");
 		cl.connectToLocalHost();
-		cl.sendMessageToHost("hello there");
+		cl.sendMessageToHost("hello from a");
+		
+		ClientImpl clb = new ClientImpl(localHostURI, "b");
+		clb.connectToLocalHost();
+		clb.sendMessageToHost("hello from b");
 	}
 }
