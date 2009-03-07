@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (c) 2007 Jules White. All rights reserved.
  * This program and the accompanying materials are made available under the
@@ -6,6 +5,7 @@
  * and is available at http://www.eclipse.org/legal/cpl-v10.html
  * 
  * Contributors: Jules White - initial API and implementation
+ * 				 Hamilton Turner - refactoring to fit Javassonne better
  ******************************************************************************/
 package org.javassonne.networking.impl;
 
@@ -52,6 +52,8 @@ public class RemotingUtils {
 	 * @throws UnknownHostException
 	 */
 	public static ServiceInfo exportRMIService(Object svc, Class svcinterface, String name) throws RemoteException, UnknownHostException{
+		//TODO - this will fail if the default RMI port is being
+		//       used. we need to try and implement a smart export
 		return exportRMIService(svc, svcinterface, DEFAULT_PORT, name);
 	}
 	
