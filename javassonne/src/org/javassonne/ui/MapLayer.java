@@ -22,6 +22,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -44,7 +48,7 @@ import org.javassonne.model.TileBoardIterator;
  * rendering the map.
  */
 public class MapLayer extends JPanel implements MouseListener,
-		MouseMotionListener {
+		MouseMotionListener, KeyListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 	private BufferedImage buffer_ = null;
@@ -121,6 +125,10 @@ public class MapLayer extends JPanel implements MouseListener,
 		// click listener so we can detect clicks.
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		
+		this.addKeyListener(this);
+		this.setFocusable(true);
+		
 	}
 
 	public void setBoard(Notification n) {
@@ -359,6 +367,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		if (board_ == null)
 			return;
 		
+		this.requestFocusInWindow();
+		
 		Point p = this.getTileAtPoint(e.getPoint());
 		NotificationManager.getInstance().sendNotification(
 				Notification.CLICK_ADD_TILE, p);
@@ -399,19 +409,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		// task to fire the "shift" event over and over again, until we leave
 		// the container
 		if ((dx != 0) || (dy != 0)) {
-			Point newShift = new Point(dx, dy);
-
-			if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
-				WorldScrollTask task = new WorldScrollTask();
-				task.setOffset(newShift);
-
-				mapShift_ = newShift;
-
-				if (mapShiftTimer_ != null)
-					mapShiftTimer_.cancel();
-				mapShiftTimer_ = new Timer();
-				mapShiftTimer_.schedule(task, 0, 5);
-			}
+			facilitateShift(dx, dy);
 
 		} else if (mapShiftTimer_ != null) {
 			// if we have left a directional container and the timer still
@@ -421,6 +419,67 @@ public class MapLayer extends JPanel implements MouseListener,
 			mapShiftTimer_ = null;
 		}
 	}
+	
+	void facilitateShift(int dx, int dy)
+	{
+		Point newShift = new Point(dx, dy);
+
+		if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
+			WorldScrollTask task = new WorldScrollTask();
+			task.setOffset(newShift);
+
+			mapShift_ = newShift;
+
+			if (mapShiftTimer_ != null)
+				mapShiftTimer_.cancel();
+			mapShiftTimer_ = new Timer();
+			mapShiftTimer_.schedule(task, 0, 5);
+		}
+	}
+		
+	public void keyPressed(KeyEvent e) {
+		int dir = e.getKeyCode();
+		int dx = 0;
+		int dy = 0;
+		int delta = 2;
+
+		// is the user pressing a direction key?
+		if (dir == KeyEvent.VK_RIGHT)
+			dx = delta;
+		if (dir == KeyEvent.VK_LEFT)
+			dx = -delta;
+		if (dir == KeyEvent.VK_UP)
+			dy = -delta;
+		if (dir == KeyEvent.VK_DOWN)
+			dy = delta;
+		
+		if ((dx != 0) || (dy != 0))
+			facilitateShift(dx, dy);
+		
+		
+
+	}
+
+	public void keyReleased(KeyEvent e) {
+		int dir = e.getKeyCode();
+		if (dir == KeyEvent.VK_RIGHT || dir == KeyEvent.VK_LEFT ||
+				dir == KeyEvent.VK_UP || dir == KeyEvent.VK_DOWN)
+			if(mapShiftTimer_ != null) {
+				// if we have stopped pressing a directional key and the timer still
+				// exists, cancel it so we stop sending "shift" events to the map
+				// view.
+				mapShiftTimer_.cancel();
+				mapShiftTimer_ = null;
+			}		
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 
 	class WorldScrollTask extends TimerTask {
 		private Point p_;
@@ -433,4 +492,7 @@ public class MapLayer extends JPanel implements MouseListener,
 			shiftView(this.p_);
 		}
 	}
+
+	
+	
 }
