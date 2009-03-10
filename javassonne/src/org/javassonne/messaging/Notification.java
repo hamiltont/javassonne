@@ -34,6 +34,7 @@ public class Notification {
 
 	public static final String LOG_WARNING = "NotificationLogWarning";
 	public static final String LOG_ERROR = "NotificationLogError";
+	public static final String MAX = "NotificationMaximize";
 
 	public static final String TILE_IN_HAND_CHANGED = "NotificationGameDrawTile";
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
@@ -48,6 +49,7 @@ public class Notification {
 	public static final String START_GAME = "NotificationStartGame";
 	public static final String LOAD_GAME = "NotificationLoadGame";
 	public static final String SAVE_GAME = "NotificationSaveGame";
+	public static final String ATTEMPT_END_GAME = "NotificationAttemptEndGame";
 	public static final String END_GAME = "NotificationEndGame";
 	public static final String DECK_CHANGED = "NotificationDeckChanged";
 

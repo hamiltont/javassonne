@@ -20,11 +20,16 @@
  * 
  */
 
+
 package org.javassonne.ui.control;
+
+import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.ui.DisplayHelper;
 
 /**
@@ -67,14 +72,16 @@ public class JPopUp {
 	public String promptUser(String[] options) {
 
 		JPanel p = new JPanel();
+		//p.addKeyListener(null);
+		//p.addMouseListener(null);
 
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
-
+		
 		int ans = JOptionPane.showOptionDialog(p, message_, title_,
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 				options, options[0]);
-
+		
 		DisplayHelper.getInstance().remove(p);
 		
 		if(ans == JOptionPane.CLOSED_OPTION)
