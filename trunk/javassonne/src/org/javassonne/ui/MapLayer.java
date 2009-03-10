@@ -42,6 +42,7 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
+import org.javassonne.ui.DragTilePanel.ResetSlideTask;
 
 /**
  * The default panel, displayed below all others. This panel is responsible for
@@ -69,7 +70,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	// The scale the tiles are drawn at
 	private double scale_ = 0.7;
-
+	
 	// For scrolling hotspots:
 	private Rectangle2D navLeft_;
 	private Rectangle2D navRight_;
@@ -92,6 +93,10 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Listen for notification setting our board model
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "setBoard");
+		
+		// Listen for the end-game notification so we know if we need to clear the board.
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
 
 		// Listen for notifications changing the zoom
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_IN,
@@ -137,6 +142,16 @@ public class MapLayer extends JPanel implements MouseListener,
 		repaint();
 	}
 
+	public void endGame(Notification n) {
+		// let go of the board. It should not be used once this notification
+		// is received and setting to null allows us to make sure this is followed.
+		board_ = null;
+		buffer_ = null;
+		
+		renderBoard();
+		repaint();
+	}
+	
 	/**
 	 * ShiftView allows you to pan the map by passing a scroll amount. This
 	 * function is used by the MapScrollEdges to move the map when the user
@@ -183,8 +198,9 @@ public class MapLayer extends JPanel implements MouseListener,
 	 * @param n
 	 */
 	public void zoomIn(Notification n) {
-		if (scale_ < 1) {
+		if (!zoomedMax()) {
 			scale_ += 0.1;
+			
 			renderBoard();
 			repaint();
 			NotificationManager.getInstance().sendNotification(
@@ -199,8 +215,9 @@ public class MapLayer extends JPanel implements MouseListener,
 	 * @param n
 	 */
 	public void zoomOut(Notification n) {
-		if (scale_ > 0.5) {
+		if (!zoomedMin()) {
 			scale_ -= 0.1;
+			
 			renderBoard();
 			repaint();
 			NotificationManager.getInstance().sendNotification(
@@ -231,10 +248,14 @@ public class MapLayer extends JPanel implements MouseListener,
 		// image onto the screen using the "paintOffset_" to determine where it
 		// goes.
 		if (buffer_ != null) {
-			gra.drawImage(buffer_, 0, 0, w, h, paintOffset_.x
-					+ bufferMaxOffsetX_, paintOffset_.y + bufferMaxOffsetY_, w
-					+ paintOffset_.x + bufferMaxOffsetX_, h + paintOffset_.y
-					+ bufferMaxOffsetY_, null);
+			int bufferRegionX = (int)((paintOffset_.x + bufferMaxOffsetX_));
+			int bufferRegionY = (int)((paintOffset_.y + bufferMaxOffsetY_));
+
+			int bufferRegionWidth = (int)((w + paintOffset_.x + bufferMaxOffsetX_));
+			int bufferRegionHeight = (int)((h + paintOffset_.y + bufferMaxOffsetY_));
+			
+			gra.drawImage(buffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
+					bufferRegionWidth, bufferRegionHeight, null);
 		}
 	}
 
@@ -478,9 +499,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		
 	}
 
-
-
-
+	// TIMERS 
+	// ---------------------------------------------------------------------
 	class WorldScrollTask extends TimerTask {
 		private Point p_;
 
@@ -492,7 +512,4 @@ public class MapLayer extends JPanel implements MouseListener,
 			shiftView(this.p_);
 		}
 	}
-
-	
-	
 }

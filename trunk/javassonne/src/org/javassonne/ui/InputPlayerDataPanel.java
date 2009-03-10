@@ -68,7 +68,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 				420), generalButtons_);
 		addButtonToPanel("Reset Fields", Notification.PLAYER_DATA_RESET,
 				new Point(250, 465), generalButtons_);
-		addButtonToPanel("Quit and Exit", Notification.EXIT_GAME, new Point(
+		addButtonToPanel("Quit and Exit", Notification.QUIT, new Point(
 				250, 510), generalButtons_);
 
 		// add the text boxes to the textFields_ panel

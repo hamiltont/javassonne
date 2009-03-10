@@ -70,8 +70,10 @@ public class GameController {
 				this, "newGame");
 		NotificationManager.getInstance().addObserver(Notification.START_GAME,
 				this, "startGame");
-		NotificationManager.getInstance().addObserver(Notification.EXIT_GAME,
-				this, "exitGame");
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
+		NotificationManager.getInstance().addObserver(Notification.QUIT,
+				this, "quitGame");
 		NotificationManager.getInstance().addObserver(
 				Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		NotificationManager.getInstance().addObserver(
@@ -137,7 +139,32 @@ public class GameController {
 		boardController_ = new BoardController(board);
 		hudController_ = new HUDController(deck);
 	}
+	
+	/**
+	 * Called when an END_GAME notification is received. This notification used to
+	 * be called EXIT_GAME, but it is now possible to end a game without quitting the
+	 * app, so we've broken EXIT_GAME into END_GAME and QUIT. The game controller
+	 * should clean up any resources related to the game to make sure they are destroyed.
+	 * 
+	 * @param n
+	 *            The notification object sent from the NotificationManager.
+	 */
+	public void endGame(Notification n) {
+		// reset game-related state variables. The board controller and hud controller
+		// also receive this notification, and they will remove their views from the screen.
+		boardController_ = null;
+		hudController_ = null;
+		gameInProgress_ = false;
+		tileInHand_ = null;
+		
+		playerData_ = null;
+		players_ = null;
 
+		// show the main menu again, but this time with gameInProgress = false
+		toggleMainMenu(null);
+	}
+	
+	
 	public void toggleMainMenu(Notification n) {
 		// Determine whether the game is currently in progress
 		menu_.setGameInProgress(gameInProgress_);
@@ -150,7 +177,7 @@ public class GameController {
 					DisplayHelper.Positioning.CENTER);
 	}
 
-	public void exitGame(Notification n) {
+	public void quitGame(Notification n) {
 		// The board controller and HUD controller that we created during
 		// game play should be deleted.
 		boardController_ = null;
