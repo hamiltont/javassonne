@@ -27,10 +27,23 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
+import javax.swing.SwingUtilities;
 
 import org.javassonne.networking.impl.RemotingUtils;
 
 public class HostMonitor {
+
+	private class ServiceRequestor implements Runnable {
+		private ServiceEvent event_;
+
+		public ServiceRequestor(ServiceEvent e) {
+			event_ = e;
+		}
+
+		public void run() {
+			jmdns_.requestServiceInfo(event_.getType(), event_.getName());
+		}
+	}
 
 	private class HostMonitorListener implements ServiceListener {
 		// TODO bad practice that I am accessing private parent members...
@@ -38,7 +51,7 @@ public class HostMonitor {
 			log("found service " + e.getName());
 
 			if (e.getName().equals(HostImpl.SERVICENAME)) {
-				jmdns_.requestServiceInfo(e.getType(), e.getName());
+				SwingUtilities.invokeLater(new ServiceRequestor(e));
 			}
 		}
 
