@@ -28,15 +28,21 @@ import org.javassonne.model.Tile.Region;
  * @author pretekr
  * 
  */
+// TODO A class description is really required here. It would also be REALLY
+// 		useful to have some example code here, or how you expect this class to be 
+//		used
 public class TileMapBoard implements TileBoard {
 
-	private HashMap<Point, Tile> data_;
-	private TileBoardGenIterator upperLeft_;
-	private TileBoardGenIterator lowerRight_;
-	private ArrayList<Point> tempTileLocations_;
+	// TODO I changed the format here to make this easier to read
+	//		Some descriptions on the members would be helpful (what is tempTileLocations for, without reading the code?)
+	private HashMap<Point, Tile> 	data_;
+	private TileBoardGenIterator 	upperLeft_;
+	private TileBoardGenIterator 	lowerRight_;
+	private ArrayList<Point> 		tempTileLocations_;
+	private TileFeatureBindings 	tileFeatureBindings_;
 
-	private TileFeatureBindings tileFeatureBindings_;
-
+	// TODO If you want this to be the only ctor avail, perhaps make the 
+	//  	default ctor private?
 	/**
 	 * @param homeTile
 	 *            - Tile to insert at home location to start board
@@ -47,6 +53,7 @@ public class TileMapBoard implements TileBoard {
 		tempTileLocations_ = new ArrayList<Point>();
 
 		data_ = new HashMap<Point, Tile>();
+		// TODO a comment showing what this line is for would be good
 		data_.put(new Point(0, 0), homeTile);
 	}
 
@@ -84,9 +91,9 @@ public class TileMapBoard implements TileBoard {
 	 * @param tile
 	 *            - what will be inserted in TileBoard
 	 * @throws BoardPositionFilledException
-	 *             - thrown if iter position is filled
+	 *            - thrown if iter position is filled
 	 * @throws NotValidPlacementException
-	 *             - thrown if tile at iter is not a valid placement
+	 *            - thrown if tile at iter is not a valid placement
 	 */
 	public void addTile(TileBoardIterator iter, Tile tile)
 			throws BoardPositionFilledException, NotValidPlacementException {
@@ -120,6 +127,7 @@ public class TileMapBoard implements TileBoard {
 			else if (iter.getLocation().getY() == lowerRight_.getLocation()
 					.getY())
 				lowerRight_.down();
+			//TODO add an else clause and log that some sort of bad stuff happened
 		}
 	}
 
@@ -159,6 +167,7 @@ public class TileMapBoard implements TileBoard {
 	 * org.javassonne.model.TileBoard#isValidPlacement(org.javassonne.model.
 	 * TileBoardIterator, org.javassonne.model.Tile)
 	 */
+	// TODO put some mofin comments here
 	public boolean isValidPlacement(TileBoardIterator iter, Tile tile) {
 		if (iter.outOfBounds())
 			return false;
@@ -236,6 +245,7 @@ public class TileMapBoard implements TileBoard {
 		fixBoundaries();
 	}
 
+	// TODO comments
 	private void fixBoundaries() {
 		fixLeft();
 		fixTop();
@@ -243,6 +253,7 @@ public class TileMapBoard implements TileBoard {
 		fixRight();
 	}
 
+	// TODO comments
 	private void fixRight() {
 		TileBoardGenIterator temp = (TileBoardGenIterator) lowerRight_
 				.leftCopy();
