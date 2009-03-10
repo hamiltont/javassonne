@@ -51,6 +51,8 @@ public class BoardController {
 				Notification.CLICK_ADD_TILE, this, "addTile");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHandRef");
+		NotificationManager.getInstance().addObserver(
+				Notification.END_GAME, this, "endGame");
 
 		// Now that we have a board object, we want to update the interface to
 		// show the board. Share our board_ object in a notification so the
@@ -59,7 +61,18 @@ public class BoardController {
 				Notification.BOARD_SET, board_);
 
 	}
-
+	
+	public void endGame(Notification n) {
+		// Unsubscribe from notifications once the game has ended
+		NotificationManager.getInstance().removeObserver(this);
+		
+		// let go of the board and the tileInhand. They should not be used
+		// once this notification is received and setting to null allows
+		// us to make sure this is followed.
+		board_ = null;
+		tileInHandRef_ = null;
+	}
+	
 	public void addTile(Notification n) {
 		if (tileInHandRef_ != null) {
 			Point here = (Point) (n.argument());

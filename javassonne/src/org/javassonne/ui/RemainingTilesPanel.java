@@ -57,8 +57,18 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 
 		NotificationManager.getInstance().addObserver(
 				Notification.DECK_CHANGED, this, "updateDeck");
+		NotificationManager.getInstance().addObserver(
+				Notification.END_GAME, this, "endGame");
 	}
 
+	public void endGame(Notification n) {
+		// Unsubscribe from notifications once the game has ended
+		NotificationManager.getInstance().removeObserver(this);
+
+		// remove ourselves from the displayHelper
+		DisplayHelper.getInstance().remove(this);
+	}
+	
 	public void updateDeck(Notification n) {
 		TileDeck deck = (TileDeck) n.argument();
 		HashMap<Tile, Integer> remaining = deck.tilesRemainingByType();

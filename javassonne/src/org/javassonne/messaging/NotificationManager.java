@@ -134,8 +134,12 @@ public class NotificationManager {
 		ArrayList<NotificationCallback> observers = bindings_.get(identifier);
 
 		if (observers != null) {
-			for (NotificationCallback callback : observers) {
-				callback.fire(n);
+			// we have to do it this way in case any of the observers remove
+			// themselves from the observers list as we're iterating through the 
+			// array. The nice clean for loops require that the list is not 
+			// modified during iteration.
+			for (int ii = observers.size()-1; ii>=0; ii--) {
+				observers.get(ii).fire(n);
 			}
 		} else {
 			String msg = String.format("Notification with "

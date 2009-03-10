@@ -84,8 +84,19 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		// update ourselves!
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
+		NotificationManager.getInstance().addObserver(
+				Notification.END_GAME, this, "endGame");
 	}
 
+	public void endGame(Notification n) {
+		// Unsubscribe from notifications once the game has ended
+		NotificationManager.getInstance().removeObserver(this);
+		
+		// remove ourselves from the displayHelper
+		DisplayHelper.getInstance().remove(this);
+		DisplayHelper.getInstance().remove(tilePanel_);
+	}
+	
 	/*
 	 * Whenever a button is pressed in our panel, we want to send a notification
 	 * so the button press can be handled by the HUDController (and possibly
