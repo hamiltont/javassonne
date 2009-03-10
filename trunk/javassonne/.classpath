@@ -15,9 +15,9 @@
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-benchmark-1.3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/bengotow/Programming/Java/Javassonne/lib/spring/spring.jar"/>
-	<classpathentry kind="lib" path="/Users/bengotow/Programming/Java/Javassonne/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="/Users/bengotow/Programming/Java/Javassonne/lib/jmdns-2.1/lib/jmdns.jar"/>
+	<classpathentry kind="lib" path="lib/jmdns.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
