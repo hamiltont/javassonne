@@ -168,10 +168,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		// If we've scrolled far enough to reach part of the map not drawn into
 		// the buffer image, we need to push the paintOffset into the
 		// renderOffset and then re-render the board.
-		if ((paintOffset_.x < -bufferMaxOffsetX_)
-				|| (paintOffset_.x > bufferMaxOffsetX_)
-				|| (paintOffset_.y < -bufferMaxOffsetY_)
-				|| (paintOffset_.y > bufferMaxOffsetY_)) {
+		if ((Math.abs(paintOffset_.x) > bufferMaxOffsetX_)
+				|| (Math.abs(paintOffset_.y) > bufferMaxOffsetY_)) {
 
 			// Add the current paintOffset to the renderOffset.
 			renderOffset_.x += paintOffset_.x;
