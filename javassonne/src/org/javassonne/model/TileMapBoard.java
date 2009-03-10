@@ -41,22 +41,6 @@ public class TileMapBoard implements TileBoard {
 	private ArrayList<Point> 		tempTileLocations_;
 	private TileFeatureBindings 	tileFeatureBindings_;
 
-	// TODO If you want this to be the only ctor avail, perhaps make the 
-	//  	default ctor private?
-	/**
-	 * @param homeTile
-	 *            - Tile to insert at home location to start board
-	 */
-	public TileMapBoard(Tile homeTile) {
-		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
-		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
-		tempTileLocations_ = new ArrayList<Point>();
-
-		data_ = new HashMap<Point, Tile>();
-		// TODO a comment showing what this line is for would be good
-		data_.put(new Point(0, 0), homeTile);
-	}
-
 	public TileMapBoard(TileDeck deck) {
 		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
 		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
@@ -78,8 +62,8 @@ public class TileMapBoard implements TileBoard {
 
 	/**
 	 * @param iter
-	 *            - TileBoardIterator pointing to location queried
-	 * @return - true if TileBoardIterator location is filled in TileBoard
+	 *            TileBoardIterator pointing to location queried
+	 * @return true if TileBoardIterator location is filled in TileBoard
 	 */
 	public boolean positionFilled(TileBoardIterator iter) {
 		return data_.containsKey(iter.getLocation());
@@ -87,13 +71,13 @@ public class TileMapBoard implements TileBoard {
 
 	/**
 	 * @param iter
-	 *            - where tile will be inserted in TileBoard
+	 *            where tile will be inserted in TileBoard
 	 * @param tile
-	 *            - what will be inserted in TileBoard
+	 *            what will be inserted in TileBoard
 	 * @throws BoardPositionFilledException
-	 *            - thrown if iter position is filled
+	 *            thrown if iter position is filled
 	 * @throws NotValidPlacementException
-	 *            - thrown if tile at iter is not a valid placement
+	 *            thrown if tile at iter is not a valid placement
 	 */
 	public void addTile(TileBoardIterator iter, Tile tile)
 			throws BoardPositionFilledException, NotValidPlacementException {
@@ -127,7 +111,7 @@ public class TileMapBoard implements TileBoard {
 			else if (iter.getLocation().getY() == lowerRight_.getLocation()
 					.getY())
 				lowerRight_.down();
-			//TODO add an else clause and log that some sort of bad stuff happened
+			//else, no bounds extension occurs
 		}
 	}
 
@@ -167,7 +151,6 @@ public class TileMapBoard implements TileBoard {
 	 * org.javassonne.model.TileBoard#isValidPlacement(org.javassonne.model.
 	 * TileBoardIterator, org.javassonne.model.Tile)
 	 */
-	// TODO put some mofin comments here
 	public boolean isValidPlacement(TileBoardIterator iter, Tile tile) {
 		if (iter.outOfBounds())
 			return false;
@@ -175,30 +158,35 @@ public class TileMapBoard implements TileBoard {
 			return false;
 		else {
 			TileBoardGenIterator localIter = new TileBoardGenIterator(iter);
+			//iterate left and check if features match
 			Tile left = localIter.leftCopy().current();
 			if (left != null
 					&& !tileFeatureBindings_.featuresBind(left
 							.featureIdentifierInRegion(Region.Right), tile
 							.featureIdentifierInRegion(Region.Left)))
 				return false;
+			//iterate up and check if features match
 			Tile top = localIter.upCopy().current();
 			if (top != null
 					&& !tileFeatureBindings_.featuresBind(top
 							.featureIdentifierInRegion(Region.Bottom), tile
 							.featureIdentifierInRegion(Region.Top)))
 				return false;
+			//iterate right and check if features match
 			Tile right = localIter.rightCopy().current();
 			if (right != null
 					&& !tileFeatureBindings_.featuresBind(right
 							.featureIdentifierInRegion(Region.Left), tile
 							.featureIdentifierInRegion(Region.Right)))
 				return false;
+			//iterate down and check if features match
 			Tile bottom = localIter.downCopy().current();
 			if (bottom != null
 					&& !tileFeatureBindings_.featuresBind(bottom
 							.featureIdentifierInRegion(Region.Top), tile
 							.featureIdentifierInRegion(Region.Bottom)))
 				return false;
+			//make sure at least one of the adjacent tiles exists
 			if (left == null && top == null && right == null && bottom == null)
 				return false;
 			// else
@@ -244,6 +232,14 @@ public class TileMapBoard implements TileBoard {
 		tempTileLocations_.clear();
 		fixBoundaries();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#removeTempStatus(org.javassonne.model.TileBoardIterator)
+	 */
+	public void removeTempStatus(TileBoardIterator iter) {
+		tempTileLocations_.remove(iter.getLocation());
+	}
+
 
 	// TODO comments
 	private void fixBoundaries() {
@@ -318,8 +314,5 @@ public class TileMapBoard implements TileBoard {
 			upperLeft_.right();
 	}
 
-	public void removeTempStatus(TileBoardIterator iter) {
-		tempTileLocations_.remove(iter.getLocation());
-	}
 
 }
