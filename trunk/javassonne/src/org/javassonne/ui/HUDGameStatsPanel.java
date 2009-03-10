@@ -18,6 +18,7 @@
 
 package org.javassonne.ui;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import javax.swing.JLabel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
+import org.javassonne.ui.control.JKeyListener;
 
 public class HUDGameStatsPanel extends AbstractHUDPanel {
 	
@@ -43,7 +45,7 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		setLayout(null);
 		setBackgroundImagePath("images/hud_stats_background.jpg");
 		setBackgroundScaleToFit(false);
-
+		
 		// store the array of players locally
 		players_ = players;
 		
@@ -83,5 +85,13 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		
 		// reset the players array to make sure it is not references
 		players_ = null;
+	}
+	
+	// Overloaded the add() method to bind a key listener to any elements placed
+	// within the JPanel
+	public Component add(Component comp) {
+		super.add(comp);
+		comp.addKeyListener(JKeyListener.getInstance());
+		return comp;
 	}
 }
