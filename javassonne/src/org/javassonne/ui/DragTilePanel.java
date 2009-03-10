@@ -18,9 +18,6 @@
 
 package org.javassonne.ui;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -41,9 +38,6 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	private Timer resetTimer_;
 
 	private Boolean respondToClick_ = true;
-	
-	private BufferedImage translucentImage_;
-	private BufferedImage opaqueImage_;
 
 	public DragTilePanel(Tile t) {
 		setSize(120, 120);
@@ -55,36 +49,12 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	}
 
 	public void setTile(Tile t) {
-		opaqueImage_ = t.getImage();
-
-		int w = opaqueImage_.getWidth();
-		int h = opaqueImage_.getHeight();
-
-		// create a semi-transparent version of the image that we'll use when we
-		// are dragging.
-		BufferedImage mask = new BufferedImage(w, h,
-				BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D maskG = mask.createGraphics();
-		maskG.setColor(new Color(0f, 0f, 0f, 0.6f));
-		maskG.fillRect(0, 0, w, h);
-		maskG.dispose();
-
-		translucentImage_ = new BufferedImage(w, h,
-				BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D g2 = translucentImage_.createGraphics();
-		g2.drawImage(t.getImage(), 0, 0, null);
-		AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_IN,
-				1.0F);
-		g2.setComposite(ac);
-		g2.drawImage(mask, 0, 0, null);
-		g2.dispose();
-
-		setBackgroundImage(opaqueImage_);
-		repaint();
+		setBackgroundImage(t.getImage());
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		setBackgroundImage(translucentImage_);
+		setBackgroundAlpha(0.6f);
+		
 		if (respondToClick_){
 			if (mouseOffset_ == null)
 				mouseOffset_ = new Point(e.getX(), e.getY());
@@ -165,9 +135,9 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 			// one, just in case.
 			if (x <= resetLocation_.x || y <= resetLocation_.y) {
 				setLocation(resetLocation_);
-				setBackgroundImage(opaqueImage_);
-				resetTimer_.cancel();
+				setBackgroundAlpha(1.0f);
 				
+				resetTimer_.cancel();
 				respondToClick_ = true;
 			}
 		}

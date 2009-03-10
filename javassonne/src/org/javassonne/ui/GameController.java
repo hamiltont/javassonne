@@ -177,7 +177,7 @@ public class GameController {
 	public void toggleMainMenu(Notification n) {
 		// Determine whether the game is currently in progress
 		menu_.setGameInProgress(gameInProgress_);
-
+		
 		if (menu_.isShowing()) {
 			if (gameInProgress_)
 				DisplayHelper.getInstance().remove(menu_);
