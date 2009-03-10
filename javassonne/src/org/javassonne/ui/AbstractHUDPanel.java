@@ -41,11 +41,17 @@ import org.javassonne.ui.control.JKeyListener;
 public class AbstractHUDPanel extends JPanel {
 
 	private BufferedImage background_ = null;
+	private boolean scaleToFit_ = true;
 
 	public AbstractHUDPanel() {
 		super();
-		
+
 		addKeyListener(JKeyListener.getInstance());
+	}
+
+	public void setBackgroundScaleToFit(Boolean scale) {
+		scaleToFit_ = scale;
+		repaint();
 	}
 
 	public void setBackgroundImagePath(String s) {
@@ -66,9 +72,15 @@ public class AbstractHUDPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		if (background_ != null) {
 			Graphics2D g2 = (Graphics2D) g;
-			g2.drawImage(background_, 0, 0, this.getWidth(), this
-							.getHeight(), 0, 0, background_.getWidth(),
-							background_.getHeight(), null);
+			if (scaleToFit_)
+				g2.drawImage(background_, 0, 0, this.getWidth(), this
+						.getHeight(), 0, 0, background_.getWidth(), background_
+						.getHeight(), null);
+			else
+				g2.drawImage(background_, 0, 0, background_.getWidth(),
+						background_.getHeight(), 0, 0, background_.getWidth(),
+						background_.getHeight(), null);
+
 		}
 	}
 
