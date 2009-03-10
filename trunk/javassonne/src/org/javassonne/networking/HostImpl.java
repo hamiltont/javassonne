@@ -38,7 +38,7 @@ import org.javassonne.networking.impl.RemotingUtils;
  * @author Hamilton Turner
  */
 public class HostImpl implements Host {
-	private static final String SERVICENAME = "JavassonneHost";
+	public static final String SERVICENAME = "JavassonneHost";
 
 	/**
 	 * The possible modes the host is currently in. Anyone using the HostImpl is
@@ -184,6 +184,11 @@ public class HostImpl implements Host {
 	public boolean canGameStart() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	// TODO - bootstrapped for the moment, totally wrong :)
+	public String getName() {
+		return this.uri_;
 	}
 
 	/**

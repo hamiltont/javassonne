@@ -31,11 +31,11 @@ public class TestLauncher {
 		String localHostURI = h.getURI();
 		h.startAcceptingConnections();
 
-		ClientImpl cl = new ClientImpl(localHostURI, "a");
+		ClientImpl cl = new ClientImpl("a");
 		cl.connectToLocalHost();
 		cl.sendMessageToHost("hello from a");
 
-		ClientImpl clb = new ClientImpl(localHostURI, "b");
+		ClientImpl clb = new ClientImpl("b");
 		clb.connectToLocalHost();
 		clb.sendMessageToHost("hello from b");
 	}
