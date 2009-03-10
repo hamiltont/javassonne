@@ -36,7 +36,7 @@ public class ClientImpl implements Client {
 	private static final String SERVICENAME = "JavassonneClient";
 	private boolean connected_ = false; // Lets this client know if it is
 	// currently connected to a host
-	private String localHostURI_; // The address of the local host. Used
+	//private String localHostURI_; // The address of the local host. Used
 	// for when this computer is the host
 	private ServiceInfo service_; // The serviceInfo associated with this
 	// clients RMI service
@@ -60,8 +60,8 @@ public class ClientImpl implements Client {
 	 * @param name
 	 *            The name the player would like to have
 	 */
-	public ClientImpl(String localHostURI, String name) {
-		localHostURI_ = localHostURI;
+	public ClientImpl(String name) {
+		//localHostURI_ = localHostURI;
 		name_ = name;
 
 		// Create the RMI service
@@ -88,6 +88,7 @@ public class ClientImpl implements Client {
 		clientURI_ = "rmi://" + RemotingUtils.LOCAL_HOST + ":"
 				+ service_.getPort() + "/" + service_.getName();
 
+		
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class ClientImpl implements Client {
 	 * hosting ourselves
 	 */
 	public void connectToLocalHost() {
-		connectToHost(localHostURI_);
+		//connectToHost(localHostURI_);
 	}
 
 	/**
@@ -149,7 +150,8 @@ public class ClientImpl implements Client {
 	 * @return list of host URI's
 	 */
 	public String[] listAllHosts() {
-		// TODO implement me
+		
+		
 		return null;
 	}
 

@@ -52,4 +52,6 @@ public interface Host {
 	 * @return true if clients can connect, false otherwise
 	 */
 	public boolean canClientsConnect();
+	
+	public String getName();
 }

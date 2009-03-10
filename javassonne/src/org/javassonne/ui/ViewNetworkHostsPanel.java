@@ -21,7 +21,10 @@ package org.javassonne.ui;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
@@ -29,15 +32,22 @@ import javax.swing.OverlayLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.javassonne.networking.HostMonitor;
 import org.javassonne.ui.control.JKeyListener;
 
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, ListSelectionListener {
 	private JPanel hostsList_;
+	private HostMonitor hostMonitor_;
 
-	public ViewNetworkHostsPanel() {
+	// Do not allow a default constructor
+	private ViewNetworkHostsPanel() {
+	}
+
+	public ViewNetworkHostsPanel(HostMonitor hm) {
 		super();
 
+		hostMonitor_ = hm;
 		addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/menu_background.jpg");
 		setVisible(true);
@@ -53,19 +63,23 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		add(hostsList_);
 
 		// Add list items to the hostsList_ panel
-		String[] listItems = { "one", "two", "three" };
-		addListToPanel(new Point(100,180), listItems, hostsList_);
-		
-	}
 
-	private void addListToPanel(Point location, String[] items, JPanel panel) {
+		String[] items = hm.getHostNames();
 		JList l = new JList();
 		l.addListSelectionListener(this);
 		l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		l.setLocation(location);
+		l.setLocation(new Point(100, 180));
 		l.setListData(items);
 		l.setSize(600, 350);
-		panel.add(l);
+		hostsList_.add(l);
+
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(new GetNewHosts(l, hm), 0, 1000);
+
+	}
+
+	private void addListToPanel(Point location, String[] items, JPanel panel) {
+
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
@@ -75,6 +89,30 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	public void valueChanged(ListSelectionEvent arg0) {
 		// TODO Auto-generated method stub
+
+	}
+
+	protected class GetNewHosts extends TimerTask {
+		private JList hostList_;
+		private DefaultListModel listModel_;
+		private HostMonitor hostMonitor_;
+
+		public GetNewHosts(JList l, HostMonitor hm) {
+			hostList_ = l;
+			listModel_ = new DefaultListModel();
+			hostList_.setModel(listModel_);
+			hostMonitor_ = hm;
+		}
+
+		public void run() {
+			String[] hosts = hostMonitor_.getHostNames();
+			
+			listModel_.clear();
+			
+			for (int pos = 0; pos < hosts.length; pos++) {
+				listModel_.add(pos, hosts[pos]);
+			}
+		}
 
 	}
 
