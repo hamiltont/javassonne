@@ -31,9 +31,9 @@ import javax.jmdns.ServiceInfo;
 import org.javassonne.networking.impl.RemotingUtils;
 
 /**
- * The implementation of our host. Note that although the functions here can
- * be called by the code running on this machine, only the functions 
- * declared in the Host interface can be called remotely. 
+ * The implementation of our host. Note that although the functions here can be
+ * called by the code running on this machine, only the functions declared in
+ * the Host interface can be called remotely.
  * 
  * @author Hamilton Turner
  */
@@ -54,7 +54,7 @@ public class HostImpl implements Host {
 	};
 
 	private List<Client> clients_ = new ArrayList<Client>(); // The URI's of the
-																// currently
+	// currently
 	// connected clients
 	private Mode currentMode_ = Mode.OPEN; // The current mode of the host
 	private JmDNS jmdns_; // Instance of JmDNS
@@ -157,7 +157,7 @@ public class HostImpl implements Host {
 				break;
 			}
 		}
-		if (knownClient == false){
+		if (knownClient == false) {
 			log("Received message from unknown client");
 			return;
 		}

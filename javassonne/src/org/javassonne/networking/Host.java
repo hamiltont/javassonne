@@ -19,34 +19,36 @@
 package org.javassonne.networking;
 
 /**
- * This is the networking only interface of the host. Only put functions here that
- * a remote host or client should be able to call. 
+ * This is the networking only interface of the host. Only put functions here
+ * that a remote host or client should be able to call.
  * 
  * @author Hamilton Turner
  */
 public interface Host {
 
 	/**
-	 * Add a client to a list of internal "connected" clients. 
-	 * @param The URI of the client we would like to add
+	 * Add a client to a list of internal "connected" clients.
+	 * 
+	 * @param The
+	 *            URI of the client we would like to add
 	 * @return True if the client was added, false otherwise
 	 */
 	public boolean addClient(String clientURI);
-	
+
 	/**
-	 * Returns true if all clients have connected, 
-	 * false otherwise
+	 * Returns true if all clients have connected, false otherwise
 	 */
 	public boolean canGameStart();
+
 	/**
-	 * Receives a message from a specified client, and 
-	 * automatically sends it to all clients (besides the 
-	 * one it was just contacted by)
+	 * Receives a message from a specified client, and automatically sends it to
+	 * all clients (besides the one it was just contacted by)
 	 */
 	public void receiveMessage(String msg, String clientURI);
-	
+
 	/**
 	 * Asks the host if it is ready to accept client connections
+	 * 
 	 * @return true if clients can connect, false otherwise
 	 */
 	public boolean canClientsConnect();
