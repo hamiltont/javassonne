@@ -30,6 +30,7 @@ import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
+import org.javassonne.model.Player.MeepleColor;
 
 /**
  * The GameController is the primary controller in the application. It is
@@ -122,7 +123,7 @@ public class GameController {
 
 		playerData_ = (InputPlayerDataPanel) n.argument();
 		loadPlayerData();
-
+		
 		DisplayHelper.getInstance().remove(playerData_);
 
 		// Load all possible tiles
@@ -141,18 +142,11 @@ public class GameController {
 
 		TileBoard board = new TileMapBoard(deck);
 
-		//TODO: Make this cleanup better
-		
-		if(boardController_ != null)
-			NotificationManager.getInstance().removeObserver(boardController_);
-		if(hudController_ != null)
-			NotificationManager.getInstance().removeObserver(hudController_);
-		
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController(board);
-		hudController_ = new HUDController(deck);
+		hudController_ = new HUDController(deck, players_);
 	}
 	
 	/**
@@ -206,9 +200,16 @@ public class GameController {
 	private void loadPlayerData() {
 		players_ = new ArrayList<Player>();
 
+		// TODO: player colors should be passed in from the InputPlayerDataPanel.
+		// In the future, maybe this entire function should be in the panel, and
+		// then the gameController can just get a list of player objects?
+		int ii = 0;
 		for (String s : playerData_.getPlayerData()) {
-			Player player = new Player(s);
-			players_.add(player);
+			if (s.length() > 0){
+				Player player = new Player(s);
+				player.setMeepleColor(MeepleColor.values()[ii++]);
+				players_.add(player);
+			}
 		}
 	}
 

@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.LogPanel;
 
 public class JKeyListener extends JFrame implements KeyListener, ActionListener {
@@ -112,7 +113,10 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		else if(code == KeyEvent.VK_MINUS){
 			NotificationManager.getInstance().sendNotification(
 					Notification.ZOOM_OUT);
+		} else if (code == KeyEvent.VK_F1){
+			DisplayHelper.getInstance().add(LogPanel.getInstance(), DisplayHelper.Layer.PALETTE,
+					DisplayHelper.Positioning.BOTTOM_LEFT);
+			LogPanel.getInstance().setVisible(true);
 		}
-
 	}
 }

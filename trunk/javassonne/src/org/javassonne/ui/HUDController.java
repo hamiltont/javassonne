@@ -19,11 +19,12 @@
 package org.javassonne.ui;
 
 import java.awt.Point;
+import java.util.List;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
-import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileDeck;
 
 /**
@@ -43,6 +44,8 @@ public class HUDController {
 	RemainingTilesPanel hudRemainingTiles_;
 	HUDPanel hudPanel_;
 	HUDButtonsPanel	hudButtons_;
+	HUDGameStatsPanel hudGameStats_;
+	
 	/**
 	 * The HUDController is created from the GameController when a new game is
 	 * started. The GameController passes the model objects so we can manipulate
@@ -52,7 +55,7 @@ public class HUDController {
 	 *            The TileDeck. This will never be changed once the game has
 	 *            begun.
 	 */
-	public HUDController(TileDeck d) {
+	public HUDController(TileDeck d, List<Player> players_) {
 		deck_ = d;
 		
 		// Draw the first tile!
@@ -61,6 +64,7 @@ public class HUDController {
 		hudRemainingTiles_ = new RemainingTilesPanel();
 		hudButtons_ = new HUDButtonsPanel();
 		hudPanel_ = new HUDPanel();
+		hudGameStats_ = new HUDGameStatsPanel(players_);
 		
 		// Attach the remaining tiles panel to the top right
 		DisplayHelper.getInstance().add(hudRemainingTiles_,
@@ -76,6 +80,10 @@ public class HUDController {
 		DisplayHelper.getInstance().add(hudPanel_,
 				DisplayHelper.Layer.PALETTE,
 				new Point(10,40));
+
+		// Attach the stats panel to the bottom left
+		DisplayHelper.getInstance().add(hudGameStats_,
+				DisplayHelper.Layer.PALETTE, DisplayHelper.Positioning.BOTTOM_LEFT);
 
 		// Send notification that we've modified the deck
 		NotificationManager.getInstance().sendNotification(
@@ -106,6 +114,7 @@ public class HUDController {
 		hudRemainingTiles_ = null;
 		hudButtons_ = null;
 		hudPanel_ = null;
+		hudGameStats_ = null;
 		
 		// let go of local variables related to game state. They should not be 
 		// used once this notification is received and setting to null allows

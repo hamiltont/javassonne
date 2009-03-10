@@ -18,16 +18,24 @@
 
 package org.javassonne.model;
 
-import java.awt.Color;
 
 public class Player {
 
+	public enum MeepleColor {
+		Yellow(0), Green(1), Blue(2), Red(3), Black(4), Pink(5);
+		public final int value;
+
+		MeepleColor(int i) {
+			this.value = i;
+		}
+	}
+	
 	private static final String DEFAULT_NAME = "Guest";
-	private static final Color DEFAULT_MEEPLE_COLOR = Color.BLUE;
+	private static final MeepleColor DEFAULT_MEEPLE_COLOR = MeepleColor.Yellow;
 	private static final int DEFAULT_MEEPLE_REMAINING = 7;
 
 	private String name_;
-	private Color meepleColor_;
+	private MeepleColor meepleColor_;
 	private int meepleRemaining_;
 	private int turnNumber_;
 	private int score_;
@@ -41,7 +49,7 @@ public class Player {
 		score_ = 0;
 	}
 
-	public Player(String name, Color meepleColor, int turnNumber) {
+	public Player(String name, MeepleColor meepleColor, int turnNumber) {
 		name_ = name;
 		meepleColor_ = meepleColor;
 		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
@@ -67,11 +75,11 @@ public class Player {
 		this.name_ = name;
 	}
 
-	public Color getMeepleColor() {
+	public MeepleColor getMeepleColor() {
 		return meepleColor_;
 	}
 
-	public void setMeepleColor(Color meepleColor) {
+	public void setMeepleColor(MeepleColor meepleColor) {
 		this.meepleColor_ = meepleColor;
 	}
 

@@ -90,13 +90,7 @@ public class LogPanel extends JPanel implements KeyListener {
 				.argument().toString())
 				+ "\n");
 		area_.append(areaString_.toString());
-		
-		DisplayHelper.getInstance().add(this, DisplayHelper.Layer.PALETTE,
-				DisplayHelper.Positioning.BOTTOM_LEFT);
-		setVisible(true);
-	}
-	
-
+	}	
 
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
