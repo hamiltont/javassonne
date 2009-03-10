@@ -19,6 +19,7 @@
 package org.javassonne.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
 import org.javassonne.ui.AbstractHUDPanel;
+import org.javassonne.ui.control.JKeyListener;
 
 public class RemainingTilesPanel extends AbstractHUDPanel{
 
@@ -114,5 +116,13 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 		this.setSize(COLS * UNIT_WIDTH, (int) (Math.ceil((double) ii
 				/ (double) COLS) * UNIT_HEIGHT));
 		this.invalidate();
+	}
+	
+	// Overloaded the add() method to bind a key listener to any elements placed
+	// within the JPanel
+	public Component add(Component comp) {
+		super.add(comp);
+		comp.addKeyListener(JKeyListener.getInstance());
+		return comp;
 	}
 }

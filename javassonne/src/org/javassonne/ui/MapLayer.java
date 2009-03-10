@@ -19,6 +19,7 @@
 package org.javassonne.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -43,6 +44,7 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.ui.DragTilePanel.ResetSlideTask;
+import org.javassonne.ui.control.JKeyListener;
 
 /**
  * The default panel, displayed below all others. This panel is responsible for
@@ -475,8 +477,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		if ((dx != 0) || (dy != 0))
 			facilitateShift(dx, dy);
 		
-		
-
+		// Propagate out the key event
+		JKeyListener.getInstance().keyPressed(e);
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -495,6 +497,14 @@ public class MapLayer extends JPanel implements MouseListener,
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	// Overloaded the add() method to bind a key listener to any elements placed
+	// within the JPanel
+	public Component add(Component comp) {
+		super.add(comp);
+		comp.addKeyListener(JKeyListener.getInstance());
+		return comp;
 	}
 
 	// TIMERS 
