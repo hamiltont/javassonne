@@ -49,7 +49,7 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 		addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/menu_background.jpg");
 		setVisible(true);
-		setSize(500, 335);
+		setSize(500, 300);
 		setLayout(new OverlayLayout(this));
 
 		generalButtons_ = new JPanel();
@@ -73,12 +73,10 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 				new Point(100, 245), generalButtons_);
 
 		// add the buttons to the inGame buttons panel
-		addButtonToPanel("images/menu_new_game.jpg", Notification.NEW_GAME,
-				new Point(100, 105), inGameButtons_);
 		addButtonToPanel("images/menu_save_game.jpg", Notification.SAVE_GAME,
+				new Point(100, 105), inGameButtons_);
+		addButtonToPanel("images/menu_end_game.jpg", Notification.END_GAME,
 				new Point(100, 150), inGameButtons_);
-		addButtonToPanel("images/menu_exit.jpg", Notification.EXIT_GAME,
-				new Point(100, 195), inGameButtons_);
 		addButtonToPanel("images/menu_resume_game.jpg", null, new Point(100,
 				240), inGameButtons_);
 
@@ -104,12 +102,11 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_MAIN_MENU);
 		if (e.getActionCommand().length() > 0)
 			NotificationManager.getInstance()
 				.sendNotification(e.getActionCommand());
-
-		NotificationManager.getInstance().sendNotification(
-				Notification.TOGGLE_MAIN_MENU);
 	}
 
 	public void setGameInProgress(Boolean inProgress) {

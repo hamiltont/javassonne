@@ -48,12 +48,12 @@ public class Notification {
 	public static final String START_GAME = "NotificationStartGame";
 	public static final String LOAD_GAME = "NotificationLoadGame";
 	public static final String SAVE_GAME = "NotificationSaveGame";
-	public static final String EXIT_GAME = "NotificationExitGame";
+	public static final String END_GAME = "NotificationEndGame";
 	public static final String DECK_CHANGED = "NotificationDeckChanged";
 
 	public static final String BOARD_SET = "NotificationSetBoard";
-	public static final String SHUTDOWN = "NotificationShutdown";
 	
+	public static final String QUIT = "NotificationQuit";
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String CLICK_ADD_TILE = "NotificationClickAddTile";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
