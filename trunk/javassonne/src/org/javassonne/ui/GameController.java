@@ -34,6 +34,7 @@ import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.networking.ClientImpl;
 import org.javassonne.networking.HostImpl;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.ui.control.JPopUp;
 
 /**
  * The GameController is the primary controller in the application. It is
@@ -45,6 +46,10 @@ import org.javassonne.networking.HostMonitor;
  * @author bengotow
  */
 public class GameController {
+
+	private static final String END_WITHOUT_SAVING = "End Without Saving";
+
+	private static final String RETURN_TO_GAME = "Return to Game";
 
 	private static final long serialVersionUID = 1L;
 
@@ -76,6 +81,8 @@ public class GameController {
 				this, "newNetworkGame");
 		NotificationManager.getInstance().addObserver(Notification.START_GAME,
 				this, "startGame");
+		NotificationManager.getInstance().addObserver(Notification.ATTEMPT_END_GAME,
+				this, "attemptEndGame");
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
 		NotificationManager.getInstance().addObserver(Notification.QUIT,
@@ -179,6 +186,21 @@ public class GameController {
 		// show the main menu again, but this time with gameInProgress = false
 		toggleMainMenu(null);
 	}
+	
+	/* 
+	 * Game is currently in progress. Verify that the user wants to exit
+	 */
+	public void attemptEndGame() {
+		String[] options = {RETURN_TO_GAME,END_WITHOUT_SAVING};
+
+		JPopUp dialogBox = new JPopUp("A game is currently in progress!");
+		String ans = dialogBox.promptUser(options);
+
+		if(ans == END_WITHOUT_SAVING) 
+			NotificationManager.getInstance().sendNotification(
+					Notification.END_GAME);
+	}
+	
 	
 	
 	public void toggleMainMenu(Notification n) {
