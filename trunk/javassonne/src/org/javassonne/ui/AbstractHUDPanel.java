@@ -18,11 +18,15 @@
 
 package org.javassonne.ui;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -40,9 +44,14 @@ import org.javassonne.ui.control.JKeyListener;
  */
 public class AbstractHUDPanel extends JPanel {
 
+	private static final long serialVersionUID = 1L;
+	private BufferedImage backgroundOriginal_ = null;
 	private BufferedImage background_ = null;
+	private Timer timer_;
+	private float alpha_ = 1.0f;
+	
 	private boolean scaleToFit_ = true;
-
+	
 	public AbstractHUDPanel() {
 		super();
 
@@ -63,9 +72,36 @@ public class AbstractHUDPanel extends JPanel {
 	}
 
 	public void setBackgroundImage(BufferedImage img) {
+		backgroundOriginal_ = img;
 		background_ = img;
+		
+		repaint();
 	}
 
+	public void setBackgroundAlpha(float alpha) {
+		int w = backgroundOriginal_.getWidth();
+		int h = backgroundOriginal_.getHeight();
+		
+		// create a semi-transparent version of the image
+		BufferedImage mask = new BufferedImage(w, h,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics2D maskG = mask.createGraphics();
+		maskG.setColor(new Color(0f, 0f, 0f, alpha));
+		maskG.fillRect(0, 0, w, h);
+		maskG.dispose();
+
+		background_ = new BufferedImage(w, h,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics2D g2 = background_.createGraphics();
+		g2.drawImage(backgroundOriginal_, 0, 0, null);
+		AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_IN,
+				1.0F);
+		g2.setComposite(ac);
+		g2.drawImage(mask, 0, 0, null);
+		g2.dispose();
+		
+		repaint();
+	}
 	/*
 	 * This function is responsible for painting the background image we have.
 	 */
@@ -83,5 +119,46 @@ public class AbstractHUDPanel extends JPanel {
 
 		}
 	}
-
+	
+	/*
+	 * Convenience functions for animating the panel
+	 */
+	public void close(){
+		DisplayHelper.getInstance().remove(this);
+		if (timer_ != null)
+			timer_.cancel();
+	}
+	
+	public void fadeOut(){
+		if (timer_ != null)
+			timer_.cancel();
+		timer_ = new Timer();
+		timer_.schedule(new FadeTimer(-0.05f), 0, 20);	
+	}
+	
+	public void fadeIn(){
+		setBackgroundAlpha(0.0f);
+		if (timer_ != null)
+			timer_.cancel();
+		timer_ = new Timer();
+		timer_.schedule(new FadeTimer(0.05f), 0, 20);
+	}
+	// TIMERS 
+	// ---------------------------------------------------------------------
+	class FadeTimer extends TimerTask {
+		float delta_ = 0.0f;
+		
+		FadeTimer(float delta){
+			super();
+			delta_ = delta;
+		}
+		public void run() {
+			alpha_ = Math.max(alpha_ + delta_, 0.0f);
+			setBackgroundAlpha(alpha_);
+		
+			if ((alpha_ == 0.0f) || (alpha_ == 1.0f)){
+				cancel();
+			}
+		}
+	}
 }
