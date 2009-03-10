@@ -22,11 +22,13 @@ import junit.framework.TestCase;
 
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
+import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileMapBoard;
 
 public class TileMapBoardTests extends TestCase {
 
 	TileMapBoard board_;
+	TileDeck td = new TileDeck();
 	Tile homeTile = new Tile();
 	Tile leftTile = new Tile();
 	Tile rightTile = new Tile();
@@ -35,8 +37,9 @@ public class TileMapBoardTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-
-		board_ = new TileMapBoard(homeTile);
+		//sets hometile
+		td.addTile(homeTile, 1);
+		board_ = new TileMapBoard(td);
 		TileBoardGenIterator home = (TileBoardGenIterator) board_.homeTile();
 		board_.addTile(home.leftCopy(), leftTile);
 		board_.addTile(home.rightCopy(), rightTile);
