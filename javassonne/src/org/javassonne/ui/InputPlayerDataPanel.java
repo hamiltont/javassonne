@@ -44,6 +44,8 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		super();
 
 		addKeyListener(JKeyListener.getInstance());
+		//TODO: Externalize string
+		//TODO: Fix background so it doesn't look all stretched
 		setBackgroundImagePath("images/menu_background.jpg");
 		setVisible(true);
 		setSize(800, 600);
@@ -60,9 +62,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		textFields_.setLayout(null);
 		textFields_.setAlignmentY(CENTER_ALIGNMENT);
 
-		add(textFields_);
-		add(generalButtons_);
-
+		//TODO: Use Java default layout organizers to eliminate ugly integers
 		// add the buttons to the generalButtons_ panel
 		addButtonToPanel("Start Game", Notification.START_GAME, new Point(250,
 				420), generalButtons_);
@@ -78,14 +78,19 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		addTextBoxToPanel(new Point(250, 285), textFields_);
 		addTextBoxToPanel(new Point(250, 330), textFields_);
 		addTextBoxToPanel(new Point(250, 375), textFields_);
+
+		// add panels 
+		add(textFields_);
+		add(generalButtons_);
 	}
 
-	private void addButtonToPanel(String path, String notification,
+	private void addButtonToPanel(String text, String notification,
 			Point location, JPanel panel) {
-		JButton b = new JButton(path);
+		JButton b = new JButton(text);
 		b.addActionListener(this);
 		b.setActionCommand(notification);
 		b.setLocation(location);
+		//TODO: explain this weird size?
 		b.setSize(279, 38);
 		panel.add(b);
 	}
@@ -114,7 +119,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		for (Component c : textFields_.getComponents()) {
 			list.add(((JTextField) c).getText());
 		}
-
+		//TODO: Does this return empty text too?
 		return list;
 	}
 
