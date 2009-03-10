@@ -68,6 +68,8 @@ public class GameController {
 		// register to receive events from the game window
 		NotificationManager.getInstance().addObserver(Notification.NEW_GAME,
 				this, "newGame");
+		NotificationManager.getInstance().addObserver(Notification.NEW_NW_GAME,
+				this, "newNetworkGame");
 		NotificationManager.getInstance().addObserver(Notification.START_GAME,
 				this, "startGame");
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
@@ -89,6 +91,19 @@ public class GameController {
 	public void newGame(Notification n) {
 
 		InputPlayerDataPanel p = new InputPlayerDataPanel();
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
+	}
+	
+	/**
+	 * Called when a NEW_NW_GAME notification is received.
+	 * 
+	 * @param n
+	 *            The notification object sent from the NotificationManager.
+	 */
+	public void newNetworkGame(Notification n) {
+
+		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 	}

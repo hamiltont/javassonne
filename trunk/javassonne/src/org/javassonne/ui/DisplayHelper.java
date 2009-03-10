@@ -147,9 +147,11 @@ public class DisplayHelper {
 			add(displayMe, displayLayer, new Point(desktopPane_.getWidth() - 10
 					- displayMe.getWidth(), 10));
 		else if (position == Positioning.BOTTOM_LEFT)
-			add(displayMe, displayLayer, new Point(10, desktopPane_.getHeight() - 10 - displayMe.getHeight()));
+			add(displayMe, displayLayer, new Point(10, desktopPane_.getHeight()
+					- 10 - displayMe.getHeight()));
 		else if (position == Positioning.TOP_CENTER)
-			add(displayMe, displayLayer, new Point((desktopPane_.getWidth() - displayMe.getWidth()) / 2, 10));
+			add(displayMe, displayLayer, new Point(
+					(desktopPane_.getWidth() - displayMe.getWidth()) / 2, 10));
 		else
 			add(displayMe, displayLayer, new Point(
 					(desktopPane_.getWidth() - displayMe.getWidth()) / 2,

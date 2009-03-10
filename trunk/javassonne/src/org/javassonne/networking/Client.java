@@ -19,8 +19,8 @@
 package org.javassonne.networking;
 
 /**
- * This is the networking only interface of the client. Only put functions here that
- * a remote host or client should be able to call. 
+ * This is the networking only interface of the client. Only put functions here
+ * that a remote host or client should be able to call.
  * 
  * @author Hamilton Turner
  */
