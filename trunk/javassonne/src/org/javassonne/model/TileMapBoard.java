@@ -19,8 +19,9 @@
 package org.javassonne.model;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.javassonne.model.Tile.Region;
 
@@ -29,22 +30,23 @@ import org.javassonne.model.Tile.Region;
  * 
  */
 // TODO A class description is really required here. It would also be REALLY
-// 		useful to have some example code here, or how you expect this class to be 
-//		used
+// useful to have some example code here, or how you expect this class to be
+// used
 public class TileMapBoard implements TileBoard {
 
 	// TODO I changed the format here to make this easier to read
-	//		Some descriptions on the members would be helpful (what is tempTileLocations for, without reading the code?)
-	private HashMap<Point, Tile> 	data_;
-	private TileBoardGenIterator 	upperLeft_;
-	private TileBoardGenIterator 	lowerRight_;
-	private ArrayList<Point> 		tempTileLocations_;
-	private TileFeatureBindings 	tileFeatureBindings_;
+	// Some descriptions on the members would be helpful (what is
+	// tempTileLocations for, without reading the code?)
+	private HashMap<Point, Tile> data_;
+	private TileBoardGenIterator upperLeft_;
+	private TileBoardGenIterator lowerRight_;
+	private HashSet<Point> tempTileLocations_;
+	private TileFeatureBindings tileFeatureBindings_;
 
 	public TileMapBoard(TileDeck deck) {
 		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
 		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
-		tempTileLocations_ = new ArrayList<Point>();
+		tempTileLocations_ = new HashSet<Point>();
 
 		data_ = new HashMap<Point, Tile>();
 		data_.put(new Point(0, 0), deck.homeTile());
@@ -67,29 +69,6 @@ public class TileMapBoard implements TileBoard {
 	 */
 	public boolean positionFilled(TileBoardIterator iter) {
 		return data_.containsKey(iter.getLocation());
-	}
-
-	
-	private void addTile(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException {
-		if (positionFilled(iter))
-			throw new BoardPositionFilledException(iter.getLocation());
-		else {
-			data_.put(iter.getLocation(), tile);
-			// Check for bounds extension
-			if (iter.getLocation().getX() == upperLeft_.getLocation().getX())
-				upperLeft_.left();
-			else if (iter.getLocation().getY() == upperLeft_.getLocation()
-					.getY())
-				upperLeft_.up();
-			else if (iter.getLocation().getX() == lowerRight_.getLocation()
-					.getX())
-				lowerRight_.right();
-			else if (iter.getLocation().getY() == lowerRight_.getLocation()
-					.getY())
-				lowerRight_.down();
-			//else, no bounds extension occurs
-		}
 	}
 
 	/*
@@ -133,35 +112,35 @@ public class TileMapBoard implements TileBoard {
 			return false;
 		else {
 			TileBoardGenIterator localIter = new TileBoardGenIterator(iter);
-			//iterate left and check if features match
+			// iterate left and check if features match
 			Tile left = localIter.leftCopy().current();
 			if (left != null
 					&& !tileFeatureBindings_.featuresBind(left
 							.featureIdentifierInRegion(Region.Right), tile
 							.featureIdentifierInRegion(Region.Left)))
 				return false;
-			//iterate up and check if features match
+			// iterate up and check if features match
 			Tile top = localIter.upCopy().current();
 			if (top != null
 					&& !tileFeatureBindings_.featuresBind(top
 							.featureIdentifierInRegion(Region.Bottom), tile
 							.featureIdentifierInRegion(Region.Top)))
 				return false;
-			//iterate right and check if features match
+			// iterate right and check if features match
 			Tile right = localIter.rightCopy().current();
 			if (right != null
 					&& !tileFeatureBindings_.featuresBind(right
 							.featureIdentifierInRegion(Region.Left), tile
 							.featureIdentifierInRegion(Region.Right)))
 				return false;
-			//iterate down and check if features match
+			// iterate down and check if features match
 			Tile bottom = localIter.downCopy().current();
 			if (bottom != null
 					&& !tileFeatureBindings_.featuresBind(bottom
 							.featureIdentifierInRegion(Region.Top), tile
 							.featureIdentifierInRegion(Region.Bottom)))
 				return false;
-			//make sure at least one of the adjacent tiles exists
+			// make sure at least one of the adjacent tiles exists
 			if (left == null && top == null && right == null && bottom == null)
 				return false;
 			// else
@@ -169,9 +148,12 @@ public class TileMapBoard implements TileBoard {
 		}
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see org.javassonne.model.TileBoard#addTemp(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javassonne.model.TileBoard#addTemp(org.javassonne.model.TileBoardIterator
+	 * , org.javassonne.model.Tile, boolean)
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
 			throws BoardPositionFilledException {
@@ -185,6 +167,26 @@ public class TileMapBoard implements TileBoard {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javassonne.model.TileBoard#addTemps(java.util.Set,
+	 * org.javassonne.model.Tile)
+	 */
+	public void addTemps(Set<TileBoardIterator> iters, Tile t)
+			throws BoardPositionFilledException {
+		// Check for conflicts first
+		for (TileBoardIterator iter : iters) {
+			if (positionFilled(iter))
+				throw new BoardPositionFilledException(iter.getLocation());
+		}
+		// now add temps
+		for (TileBoardIterator iter : iters) {
+			tempTileLocations_.add(iter.getLocation());
+			data_.put(iter.getLocation(), t);
+		}
+
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -195,32 +197,57 @@ public class TileMapBoard implements TileBoard {
 		for (Point i : tempTileLocations_)
 			data_.remove(i);
 		tempTileLocations_.clear();
-		//fixBoundaries();
+		// fixBoundaries();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.javassonne.model.TileBoard#removeTempStatus(org.javassonne.model.TileBoardIterator)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javassonne.model.TileBoard#removeTempStatus(org.javassonne.model.
+	 * TileBoardIterator)
 	 */
-	public void removeTempStatus(TileBoardIterator iter) throws NotValidPlacementException {
-		if(iter.current()==null)
+	public void removeTempStatus(TileBoardIterator iter)
+			throws NotValidPlacementException {
+		if (iter.current() == null)
 			return;
-		if(!isValidPlacement(iter, iter.current()))
+		if (!isValidPlacement(iter, iter.current()))
 			throw new NotValidPlacementException(iter.getLocation());
 		tempTileLocations_.remove(iter.getLocation());
 		// Check for bounds extension
 		if (iter.getLocation().getX() == upperLeft_.getLocation().getX())
 			upperLeft_.left();
-		else if (iter.getLocation().getY() == upperLeft_.getLocation()
-				.getY())
+		else if (iter.getLocation().getY() == upperLeft_.getLocation().getY())
 			upperLeft_.up();
-		else if (iter.getLocation().getX() == lowerRight_.getLocation()
-				.getX())
+		else if (iter.getLocation().getX() == lowerRight_.getLocation().getX())
 			lowerRight_.right();
-		else if (iter.getLocation().getY() == lowerRight_.getLocation()
-				.getY())
+		else if (iter.getLocation().getY() == lowerRight_.getLocation().getY())
 			lowerRight_.down();
-		//else, no bounds extension occurs
+		// else, no bounds extension occurs
 	}
 
+	public Set<TileBoardIterator> possiblePlacements(Tile t) {
+		Set<TileBoardIterator> locations = new HashSet<TileBoardIterator>();
+		TileBoardDrawIterator current;
+		Tile local = new Tile(t);
+		// 4 rotations
+		for (int i = 0; i < 4; ++i) {
+			current = new TileBoardDrawIterator(this.upperLeft_.rightCopy());
+			while (!current.outOfBounds()) {
+				if (!positionFilled(current)
+						&& isValidPlacement(current, local))
+					locations.add(new TileBoardDrawIterator(current));
+				current.right();
+			}
+			local.rotateRight();
+		}
+		return locations;
+	}
+
+	public void removeTempAtLocation(TileBoardIterator iter) {
+		//if it exists as a temp location, remove it, else do nothing
+		if (tempTileLocations_.remove(iter.getLocation())) 
+			data_.remove(iter.getLocation());
+	}
 
 }

@@ -19,6 +19,10 @@
 package org.javassonne.ui.controllers;
 
 import java.awt.Point;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -27,10 +31,12 @@ import org.javassonne.model.NotValidPlacementException;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
-import org.javassonne.model.TileDeck;
 
 public class BoardController {
 
+	private static final String tempTileImagesFolder_ = "images";
+	private static final String litTileIdentifier_ = "background_tile_highlighted.jpg";
+	Tile tempLitTile;
 	TileBoard board_;
 	Tile tileInHandRef_;
 
@@ -46,7 +52,15 @@ public class BoardController {
 	public BoardController( TileBoard b) {
 
 		board_ = b;
-
+		tempLitTile = new Tile();
+		try {
+			tempLitTile.setImage(ImageIO.read(new File(String.format(
+							"%s/%s", tempTileImagesFolder_, litTileIdentifier_))));
+		}catch (IOException ex){
+			//TODO: Fix this
+		}
+			
+			
 		NotificationManager.getInstance().addObserver(
 				Notification.CLICK_ADD_TILE, this, "addTile");
 		NotificationManager.getInstance().addObserver(
@@ -78,8 +92,11 @@ public class BoardController {
 			Point here = (Point) (n.argument());
 			TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
 			try {
-				if(board_.isValidPlacement(iter, tileInHandRef_))
+				if(board_.isValidPlacement(iter, tileInHandRef_)){
+					//board_.removeTempAtLocation(iter);
+					board_.removeTemps();
 					board_.addTemp(iter, tileInHandRef_);
+				}
 			} catch (BoardPositionFilledException ex) {
 				// Bury this exception?
 				NotificationManager.getInstance().logError(
@@ -88,22 +105,32 @@ public class BoardController {
 				return;
 			}
 			//this block will be removed when we implement turn completion
-			try{
-				board_.removeTempStatus(iter);
-				NotificationManager.getInstance().sendNotification(
-						Notification.BOARD_SET, board_);
-				NotificationManager.getInstance().sendNotification(
-						Notification.TILE_IN_HAND_CHANGED, null);
-			}catch (NotValidPlacementException ex){
-				//kill it
-				board_.removeTemps();
-			}
+			if(board_.getTile(iter)!=null)
+				try{
+					board_.removeTempStatus(iter);
+					NotificationManager.getInstance().sendNotification(
+							Notification.BOARD_SET, board_);
+					NotificationManager.getInstance().sendNotification(
+							Notification.TILE_IN_HAND_CHANGED, null);
+				}catch (NotValidPlacementException ex){
+					//kill it
+					board_.removeTemps();
+				}
 		}
 
 	}
 
 	public void updateTileInHandRef(Notification n) {
-		tileInHandRef_ = (Tile) n.argument();
+		Tile t = (Tile) n.argument();
+		tileInHandRef_ = t;
+		try {
+			board_.addTemps(board_.possiblePlacements(t), tempLitTile);	
+			NotificationManager.getInstance().sendNotification(
+					Notification.BOARD_SET, board_);
+		} catch (BoardPositionFilledException e) {
+			// we really shouldn't get here if possible placements works correctly
+			e.printStackTrace();
+		}
 	}
 
 }
