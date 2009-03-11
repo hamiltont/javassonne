@@ -28,6 +28,7 @@ import java.util.List;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
+import org.javassonne.messaging.Notification;
 import org.javassonne.networking.impl.RemotingUtils;
 
 /**
@@ -77,7 +78,7 @@ public class Host implements RemoteHost {
 		// Create the RMI service
 		try {
 			info = RemotingUtils.exportRMIService(this, RemoteHost.class,
-					Host.SERVICENAME + "_" + rmiSafeName_);
+					RemoteHost.SERVICENAME + "_" + rmiSafeName_);
 		} catch (RemoteException e) {
 			log("A RemoteException occurred when exporting host RMI");
 			System.out.println(e.getMessage());
@@ -160,6 +161,23 @@ public class Host implements RemoteHost {
 	public void receiveMessage(String msg, String clientURI) {
 		log("Received message '" + msg + "'");
 
+		RemoteClient c = isClientConnected(clientURI); 
+		if (c == null)
+			return;
+		
+		// Send the message out to all other clients
+		for (Iterator<RemoteClient> i = clients_.iterator(); i.hasNext();) {
+			RemoteClient curClient = i.next();
+
+			// Do not send the message back out to the client that sent it to us
+			if (curClient.equals(c))
+				continue;
+
+			curClient.receiveMessageFromHost(msg);
+		}
+	}
+
+	private RemoteClient isClientConnected(String clientURI) {
 		// If the client sending us a message is unknown to us,
 		// ignore the message
 		boolean knownClient = false;
@@ -174,8 +192,21 @@ public class Host implements RemoteHost {
 		}
 		if (knownClient == false) {
 			log("Received message from unknown client");
-			return;
+			return null;
 		}
+		
+		return c;
+	}
+	
+	/**
+	 * Accepts a message from a client and propagates it to all other clients
+	 */
+	public void receiveNotification(Notification n, String clientURI) {
+		log("Received message '" + n.identifier() + "'");
+
+		RemoteClient c = isClientConnected(clientURI); 
+		if (c == null)
+			return;
 
 		// Send the message out to all other clients
 		for (Iterator<RemoteClient> i = clients_.iterator(); i.hasNext();) {
@@ -185,9 +216,10 @@ public class Host implements RemoteHost {
 			if (curClient.equals(c))
 				continue;
 
-			curClient.receiveMessageFromHost(msg);
+			curClient.receiveNotificationFromHost(n);
 		}
 	}
+	
 
 	/**
 	 * Start accepting connections when we are about to host a game

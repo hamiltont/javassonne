@@ -18,6 +18,8 @@
 
 package org.javassonne.networking;
 
+import org.javassonne.messaging.Notification;
+
 /**
  * This is the networking only interface of the host. Only put functions here
  * that a remote host or client should be able to call.
@@ -58,6 +60,7 @@ public interface RemoteHost {
 	 */
 	public void receiveMessage(String msg, String clientURI);
 
-	
+	// TODO desc
+	public void receiveNotification(Notification n, String clientURI);
 	
 }

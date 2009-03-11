@@ -23,6 +23,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -128,6 +130,9 @@ public class GameController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Turn off annoying RMI logging
+		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
+		
 		Host localHost = new Host(addr.getHostName());
 		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
 		Client mainClient = new Client("mainClient");
