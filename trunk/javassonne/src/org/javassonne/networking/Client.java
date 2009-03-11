@@ -23,6 +23,7 @@ import java.rmi.RemoteException;
 
 import javax.jmdns.ServiceInfo;
 
+import org.javassonne.messaging.Notification;
 import org.javassonne.networking.impl.RemotingUtils;
 
 /**
@@ -33,11 +34,10 @@ import org.javassonne.networking.impl.RemotingUtils;
  * @author Hamilton Turner
  */
 public class Client implements RemoteClient {
-	private static final String SERVICENAME = "JavassonneClient";
-	private boolean connected_ = false; // Lets this client know if it is
+	
+	// Lets this client know if it is
 	// currently connected to a host
-	private String localHostURI_; // The address of the local host. Used
-	// for when this computer is the host
+	private boolean connected_ = false; 
 	private ServiceInfo service_; // The serviceInfo associated with this
 	// clients RMI service
 	private RemoteHost host_; // The host we are currently connected to,
@@ -63,7 +63,7 @@ public class Client implements RemoteClient {
 			// that
 			// there are no duplicate names
 			service_ = RemotingUtils.exportRMIService(this, RemoteClient.class,
-					SERVICENAME + "_" + name);
+					RemoteClient.SERVICENAME + "_" + name);
 		} catch (RemoteException e) {
 			log("A RemoteException occurred while creating the RMI");
 			System.out.println(e.getMessage());
@@ -90,6 +90,10 @@ public class Client implements RemoteClient {
 	public void receiveMessageFromHost(String msg) {
 		log("Received msg - " + msg);
 	}
+	
+	public void receiveNotificationFromHost(Notification n) {
+		log("Received notification - " + n.identifier());
+	}
 
 	/**
 	 * Send a message to the host of the game
@@ -99,6 +103,13 @@ public class Client implements RemoteClient {
 			throw new IllegalArgumentException();
 		log("Sending message " + msg + " to host");
 		host_.receiveMessage(msg, clientURI_);
+	}
+	
+	public void sendNotificationToHost(Notification n) {
+		if (connected_ == false)
+			throw new IllegalArgumentException();
+		log("Sending notification " + n.identifier() + " to host");
+		host_.receiveNotification(n, clientURI_);
 	}
 
 	/**

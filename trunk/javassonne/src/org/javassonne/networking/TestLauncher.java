@@ -18,6 +18,11 @@
 
 package org.javassonne.networking;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.javassonne.messaging.Notification;
+
 /**
  * A bootstrapper used to very simply test the networking
  * 
@@ -26,7 +31,7 @@ package org.javassonne.networking;
 public class TestLauncher {
 
 	public static void main(String[] args) {
-
+		
 		Host h = new Host("Hamy");
 		HostMonitor.getInstance().setLocalHostURI(h.getURI());
 		h.startAcceptingConnections();
@@ -40,5 +45,11 @@ public class TestLauncher {
 		Client clb = new Client("b");
 		clb.connectToLocalHost();
 		clb.sendMessageToHost("hello from b");
+		
+		// TODO works with a serializable object, but not with a non
+		// Object boo = new Object(); 
+		String boo = new String();
+		Notification n = new Notification("test notification", boo);
+		cl.sendNotificationToHost(n);
 	}
 }

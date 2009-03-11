@@ -18,6 +18,8 @@
 
 package org.javassonne.messaging;
 
+import java.io.Serializable;
+
 /**
  * The Notification class represents a single notification sent using the
  * NotificationManager. Each notification has a few important properties:
@@ -30,7 +32,7 @@ package org.javassonne.messaging;
  * @author bengotow
  * 
  */
-public class Notification {
+public class Notification implements Serializable {
 
 	public static final String LOG_WARNING = "NotificationLogWarning";
 	public static final String LOG_ERROR = "NotificationLogError";

@@ -18,6 +18,8 @@
 
 package org.javassonne.networking;
 
+import org.javassonne.messaging.Notification;
+
 /**
  * This is the networking only interface of the client. Only put functions here
  * that a remote host or client should be able to call.
@@ -25,6 +27,8 @@ package org.javassonne.networking;
  * @author Hamilton Turner
  */
 public interface RemoteClient {
+	public static final String SERVICENAME = "JavassonneClient";
+	
 	/**
 	 * Receive a message from the host. This will eventually
 	 * change to a notification
@@ -32,6 +36,7 @@ public interface RemoteClient {
 	 */
 	public void receiveMessageFromHost(String msg);
 
+	public void receiveNotificationFromHost(Notification n);
 	/**
 	 * Allows an arbitrary host to get the clients current URI. 
 	 * 
