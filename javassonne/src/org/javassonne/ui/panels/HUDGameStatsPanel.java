@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -27,7 +27,9 @@ import javax.swing.JLabel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.controls.JMeepleCount;
 
 public class HUDGameStatsPanel extends AbstractHUDPanel {
 	

@@ -21,7 +21,7 @@
  */
 
 
-package org.javassonne.ui.control;
+package org.javassonne.ui.controls;
 
 import java.awt.Frame;
 

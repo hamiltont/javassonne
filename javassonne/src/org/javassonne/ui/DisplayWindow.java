@@ -26,7 +26,7 @@ import java.awt.GraphicsEnvironment;
 
 import javax.swing.JFrame;
 
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.controls.DisplayDesktopPane;
 
 /**
  * @author Hamilton Turner

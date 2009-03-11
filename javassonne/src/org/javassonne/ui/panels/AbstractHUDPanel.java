@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -31,7 +31,8 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.JKeyListener;
 
 /**
  * The AbstractHUDPanel provides basic functionality used in the game's HUD

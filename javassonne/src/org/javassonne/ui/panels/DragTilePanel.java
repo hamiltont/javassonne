@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;

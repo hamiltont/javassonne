@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -33,7 +33,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.javassonne.networking.HostMonitor;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.JKeyListener;
 
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, ListSelectionListener {

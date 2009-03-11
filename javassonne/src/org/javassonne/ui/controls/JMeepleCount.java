@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.controls;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -30,7 +30,7 @@ public class JMeepleCount extends JPanel {
 	int color_;
 	int count_;
 
-	JMeepleCount(int color) {
+	public JMeepleCount(int color) {
 		super();
 		setOpaque(false);
 		color_ = color;

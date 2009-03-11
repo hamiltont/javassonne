@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -26,10 +26,11 @@ import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.DisplayHelper;
 
 public class HUDShowInstructionsPanel extends AbstractHUDPanel implements MouseListener {
 
-	HUDShowInstructionsPanel() {
+	public HUDShowInstructionsPanel() {
 		setOpaque(false);
 		setVisible(true);
 		setSize(448, 44);
@@ -38,9 +39,29 @@ public class HUDShowInstructionsPanel extends AbstractHUDPanel implements MouseL
 		// Listen for a notification from the tile being dragged. If we 
 		// receive this, we will close the instructions panel.
 		NotificationManager.getInstance().addObserver(Notification.TILE_DROPPED,
-				this, "fadeOut");
+				this, "tileDropped");
+
+		// Subscribe for notifications from the controller so we know when to
+		// update ourselves!
+		NotificationManager.getInstance().addObserver(
+				Notification.END_GAME, this, "endGame");
 		
 		setBackgroundImagePath("images/hud_show_instructions.png");
+	}
+	
+	public void tileDropped(Notification n)
+	{
+		fadeOut();
+		
+		// Unsubscribe from notifications once the game has ended
+		NotificationManager.getInstance().removeObserver(this);
+	}
+	public void endGame(Notification n) {
+		// Unsubscribe from notifications once the game has ended
+		NotificationManager.getInstance().removeObserver(this);
+	
+		// remove ourselves from the displayHelper
+		DisplayHelper.getInstance().remove(this);
 	}
 	
 	public void mouseClicked(MouseEvent e) {

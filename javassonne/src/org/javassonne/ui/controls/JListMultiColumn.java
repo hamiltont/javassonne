@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui.control;
+package org.javassonne.ui.controls;
 
 import java.awt.Color;
 import java.awt.Component;

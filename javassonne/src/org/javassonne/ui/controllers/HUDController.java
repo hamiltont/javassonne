@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.controllers;
 
 import java.awt.Point;
 import java.util.List;
@@ -27,6 +27,15 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.DisplayHelper.Layer;
+import org.javassonne.ui.DisplayHelper.Positioning;
+import org.javassonne.ui.panels.GameOverPanel;
+import org.javassonne.ui.panels.HUDButtonsPanel;
+import org.javassonne.ui.panels.HUDGameStatsPanel;
+import org.javassonne.ui.panels.HUDPanel;
+import org.javassonne.ui.panels.HUDShowInstructionsPanel;
+import org.javassonne.ui.panels.RemainingTilesPanel;
 
 /**
  * The HUDController manages interaction between the model and the HUD user
