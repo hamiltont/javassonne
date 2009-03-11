@@ -26,46 +26,14 @@ public interface TileBoard {
 	 */
 	public TileBoardIterator homeTile();
 	
+
 	/**
-	 * @param iter
-	 *            - where tile will be inserted in TileBoard
-	 * @param tile
-	 *            - what will be inserted in TileBoard
+	 * @param iter location to insert
+	 * @param tile to be inserted
 	 * @throws BoardPositionFilledException
-	 *             - thrown if iter position is filled
-	 * @throws NotValidPlacementException
-	 *             - thrown if tile at iter is not a valid placement
-	 */
-	public void addTile(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException, NotValidPlacementException;
-
-	/**
-	 * @param iter
-	 *            - where tile will be inserted in TileBoard
-	 * @param tile
-	 *            - what will be inserted in TileBoard
-	 * @param checkValid
-	 *            - false to override valid position check
-	 * @throws BoardPositionFilledException
-	 *             - thrown if iter position is filled
-	 * @throws NotValidPlacementException
-	 *             - thrown if tile at iter is not a valid placement
-	 */
-	public void addTile(TileBoardIterator iter, Tile tile, boolean checkValid)
-			throws BoardPositionFilledException, NotValidPlacementException;
-
-	// Removes tile from the specified TileBoardIterator location
-	// public Tile removeTile(TileBoardIterator iter);
-
-	/**
-	 * @param iter
-	 *            - position where temp tile is to be added
-	 * @param tile
-	 *            - temp tile to be added
-	 * @throws NotValidPlacementException 
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException, NotValidPlacementException;
+			throws BoardPositionFilledException;
 
 	/**
 	 * removes all temp tiles from board
@@ -75,8 +43,9 @@ public interface TileBoard {
 	/**
 	 * @param iter
 	 *            - location at which tile should be made permanent
+	 * @throws NotValidPlacementException 
 	 */
-	public void removeTempStatus(TileBoardIterator iter);
+	public void removeTempStatus(TileBoardIterator iter) throws NotValidPlacementException;
 
 	/**
 	 * @param iter

@@ -41,10 +41,10 @@ public class TileMapBoardTests extends TestCase {
 		td.addTile(homeTile, 1);
 		board_ = new TileMapBoard(td);
 		TileBoardGenIterator home = (TileBoardGenIterator) board_.homeTile();
-		board_.addTile(home.leftCopy(), leftTile);
-		board_.addTile(home.rightCopy(), rightTile);
-		board_.addTile(home.upCopy(), upTile);
-		board_.addTile(home.downCopy(), downTile);
+		board_.addTemp(home.leftCopy(), leftTile);
+		board_.addTemp(home.rightCopy(), rightTile);
+		board_.addTemp(home.upCopy(), upTile);
+		board_.addTemp(home.downCopy(), downTile);
 	}
 	
 	public void testIterCopy(){

@@ -78,26 +78,26 @@ public class BoardController {
 			Point here = (Point) (n.argument());
 			TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
 			try {
-				board_.addTemp(iter, tileInHandRef_);
+				if(board_.isValidPlacement(iter, tileInHandRef_))
+					board_.addTemp(iter, tileInHandRef_);
 			} catch (BoardPositionFilledException ex) {
 				// Bury this exception?
 				NotificationManager.getInstance().logError(
 						new Notification("PositionFilled", here.toString()
 								+ " is filled"));
 				return;
-			} catch (NotValidPlacementException ex) {
-				// Bury this exception?
-				NotificationManager.getInstance().logError(
-						new Notification("InvalidPlacement", here.toString()
-								+ " is not valid"));
-				return;
 			}
-			// Add some kind of confirmation of click?
-			board_.removeTempStatus(iter);
-			NotificationManager.getInstance().sendNotification(
-					Notification.BOARD_SET, board_);
-			NotificationManager.getInstance().sendNotification(
-					Notification.TILE_IN_HAND_CHANGED, null);
+			//this block will be removed when we implement turn completion
+			try{
+				board_.removeTempStatus(iter);
+				NotificationManager.getInstance().sendNotification(
+						Notification.BOARD_SET, board_);
+				NotificationManager.getInstance().sendNotification(
+						Notification.TILE_IN_HAND_CHANGED, null);
+			}catch (NotValidPlacementException ex){
+				//kill it
+				board_.removeTemps();
+			}
 		}
 
 	}
