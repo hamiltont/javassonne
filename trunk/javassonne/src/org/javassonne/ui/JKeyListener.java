@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui.control;
+package org.javassonne.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,8 +27,7 @@ import javax.swing.JFrame;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.DisplayHelper;
-import org.javassonne.ui.LogPanel;
+import org.javassonne.ui.panels.LogPanel;
 
 public class JKeyListener extends JFrame implements KeyListener, ActionListener {
 

@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -27,7 +27,9 @@ import javax.swing.JButton;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.map.MapLayer;
 
 public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener {
 

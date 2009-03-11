@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -29,7 +29,7 @@ import javax.swing.OverlayLayout;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.JKeyListener;
 
 /**
  * This panel shows the Javassonne Logo and the buttons to start a new game,

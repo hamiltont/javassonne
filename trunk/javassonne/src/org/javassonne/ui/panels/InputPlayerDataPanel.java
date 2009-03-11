@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -33,7 +33,7 @@ import javax.swing.OverlayLayout;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.JKeyListener;
 
 public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		ActionListener {

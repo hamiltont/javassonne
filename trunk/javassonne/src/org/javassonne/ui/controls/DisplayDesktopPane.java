@@ -16,12 +16,15 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.controls;
 
 import java.awt.Dimension;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JLayeredPane;
+
+import org.javassonne.ui.map.MapLayer;
+
 
 /**
  * @author Hamilton Turner

@@ -16,15 +16,13 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.map;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -33,6 +31,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,8 +42,9 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
-import org.javassonne.ui.DragTilePanel.ResetSlideTask;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.JKeyListener;
+
+import quicktime.std.anim.Sprite;
 
 /**
  * The default panel, displayed below all others. This panel is responsible for
@@ -54,7 +54,12 @@ public class MapLayer extends JPanel implements MouseListener,
 		MouseMotionListener, KeyListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
-	private BufferedImage buffer_ = null;
+	
+	private BufferedImage boardBuffer_ = null;
+	
+	private BufferedImage spritesBuffer_ = null;
+	private ArrayList<MapSprite> sprites_ = null;
+	
 	private Point paintOffset_ = new Point(0, 0);
 	private Point renderOffset_ = new Point(0, 0);
 	private Point renderCenteringOffset_ = new Point(0, 0);
@@ -148,7 +153,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		// let go of the board. It should not be used once this notification
 		// is received and setting to null allows us to make sure this is followed.
 		board_ = null;
-		buffer_ = null;
+		boardBuffer_ = null;
+		spritesBuffer_ = null;
 		
 		renderBoard();
 		repaint();
@@ -247,14 +253,16 @@ public class MapLayer extends JPanel implements MouseListener,
 		// if we've rendered the board into the buffer image, draw the buffer
 		// image onto the screen using the "paintOffset_" to determine where it
 		// goes.
-		if (buffer_ != null) {
+		if (boardBuffer_ != null) {
 			int bufferRegionX = (int)((paintOffset_.x + bufferMaxOffsetX_));
 			int bufferRegionY = (int)((paintOffset_.y + bufferMaxOffsetY_));
 
 			int bufferRegionWidth = (int)((w + paintOffset_.x + bufferMaxOffsetX_));
 			int bufferRegionHeight = (int)((h + paintOffset_.y + bufferMaxOffsetY_));
 			
-			gra.drawImage(buffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
+			gra.drawImage(boardBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
+					bufferRegionWidth, bufferRegionHeight, null);
+			gra.drawImage(spritesBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
 					bufferRegionWidth, bufferRegionHeight, null);
 		}
 	}
@@ -291,13 +299,15 @@ public class MapLayer extends JPanel implements MouseListener,
 			renderCenteringOffset_.y = (bufferHeight - boardHeight * tileHeight) / 2;
 
 			// create the buffered image if it doesn't already exist.
-			if (buffer_ == null) {
-				buffer_ = new BufferedImage(bufferWidth, bufferHeight,
+			if (boardBuffer_ == null) {
+				boardBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
+						BufferedImage.TYPE_INT_RGB);
+				spritesBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
 						BufferedImage.TYPE_INT_ARGB);
 			}
 
 			// clear the buffer to a dark gray
-			Graphics gra = buffer_.getGraphics();
+			Graphics gra = boardBuffer_.getGraphics();
 			gra.setColor(Color.darkGray);
 			gra.fillRect(0, 0, bufferWidth, bufferHeight);
 

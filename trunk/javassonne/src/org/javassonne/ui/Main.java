@@ -20,6 +20,8 @@ package org.javassonne.ui;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.controllers.GameController;
+import org.javassonne.ui.panels.LogPanel;
 
 
 public class Main {

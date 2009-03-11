@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,13 @@ import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.networking.ClientImpl;
 import org.javassonne.networking.HostImpl;
 import org.javassonne.networking.HostMonitor;
-import org.javassonne.ui.control.JPopUp;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.DisplayHelper.Layer;
+import org.javassonne.ui.DisplayHelper.Positioning;
+import org.javassonne.ui.controls.JPopUp;
+import org.javassonne.ui.panels.InputPlayerDataPanel;
+import org.javassonne.ui.panels.MenuPanel;
+import org.javassonne.ui.panels.ViewNetworkHostsPanel;
 
 /**
  * The GameController is the primary controller in the application. It is
@@ -116,7 +122,7 @@ public class GameController {
 	public void newNetworkGame(Notification n) {
 
 		HostImpl localHost = new HostImpl();
-		ClientImpl mainClient = new ClientImpl("Hamy");
+		ClientImpl mainClient = new ClientImpl("Doodlebugh");
 		HostMonitor hm = new HostMonitor();
 		
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel(hm);

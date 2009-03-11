@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.JKeyListener;
 
 public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 	

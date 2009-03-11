@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.ui;
+package org.javassonne.ui.panels;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -32,7 +32,9 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
-import org.javassonne.ui.control.JKeyListener;
+import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.DisplayHelper.Layer;
 
 /**
  * The primary JPanel in the HUD
