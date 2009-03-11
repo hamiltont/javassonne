@@ -20,6 +20,7 @@ package org.javassonne.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -183,8 +184,10 @@ public class GameController {
 		playerData_ = null;
 		players_ = null;
 
-		// show the main menu again, but this time with gameInProgress = false
-		toggleMainMenu(null);
+		Properties config = (Properties) n.argument();
+		if(config == null || !config.containsKey("hideMainMenu"))
+			// show the main menu again, but this time with gameInProgress = false
+			toggleMainMenu(null);
 	}
 	
 	/* 
@@ -245,4 +248,5 @@ public class GameController {
 	public void playerDataReset(Notification n) {
 		players_.clear();
 	}
+		
 }

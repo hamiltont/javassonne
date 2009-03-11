@@ -38,6 +38,7 @@ public class NotificationCallback {
 				method_.invoke(target_, n);
 
 		} catch (Exception e) {
+			Thread.dumpStack();
 			NotificationManager.getInstance().sendNotification(Notification.LOG_ERROR, e.getStackTrace());
 		}
 	}
