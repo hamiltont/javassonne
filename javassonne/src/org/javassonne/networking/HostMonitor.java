@@ -18,7 +18,8 @@
 
 package org.javassonne.networking;
 
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,28 +32,101 @@ import javax.swing.SwingUtilities;
 
 import org.javassonne.networking.impl.RemotingUtils;
 
+// TODO This should be changed into a singleton, and rather than
+//  	being given the localhost URI it should be able to dynamically 
+//		find it
 public class HostMonitor {
+	private JmDNS jmdns_;
+	private List<RemoteHost> hostList_;
+	private String localhostURI_ = null;
+	private static HostMonitor instance_ = null;
+	// Used to discover if a service is the local service
+	private String localIP_;
+	
+	private HostMonitor() {
+		// Using service discovery service
+		jmdns_ = JmDNSSingleton.getJmDNS();
 
-	private class ServiceRequestor implements Runnable {
-		private ServiceEvent event_;
+		hostList_ = new ArrayList<RemoteHost>();
 
-		public ServiceRequestor(ServiceEvent e) {
-			event_ = e;
+		jmdns_
+				.addServiceListener("_rmi._tcp.local.",
+						new HostMonitorListener());
+		
+		try {
+			InetAddress addr = InetAddress.getLocalHost();
+			localIP_ = addr.getHostAddress();
+			log("Found localip to be " + localIP_);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+	}
+	
+	public static HostMonitor getInstance() {
+		if (instance_ == null)
+			instance_ = new HostMonitor();
+		return instance_;
+	}
 
-		public void run() {
-			jmdns_.requestServiceInfo(event_.getType(), event_.getName());
+	public String[] getHostNames() {
+		// Convert internal ArrayList to String[]
+		ArrayList<String> al = new ArrayList<String>();
+		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
+			al.add(it.next().getName());
 		}
+		String str[] = (String[]) al.toArray(new String[al.size()]);
+		return str;
+	}
+	
+	// TODO make this call more fail safe
+	public String getLocalHostURI() {
+		if (localhostURI_ == null)
+			return null;
+		return localhostURI_;
+	}
+	
+	public void setLocalHostURI(String uri) {
+		localhostURI_ = uri;
+	}
+
+	protected void addHost(String hostURI) {
+		RemoteHost h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+				RemoteHost.class);
+		
+		if (hostURI.contains(localIP_)) {
+			localhostURI_ = hostURI;
+			log("found host uri to be " + hostURI);
+			// TODO error - we shoudl not be adding this,m just for testing!
+			hostList_.add(h);
+		}
+		else
+			hostList_.add(h);
+	}
+
+	protected void removeHost(String hostURI) {
+
+	}
+
+	/**
+	 * A very simple logger
+	 * 
+	 * @param msg
+	 */
+	private void log(String msg) {
+		System.out.println("HostMonitor : " + msg);
 	}
 
 	private class HostMonitorListener implements ServiceListener {
-		// TODO bad practice that I am accessing private parent members...
 		public void serviceAdded(ServiceEvent e) {
 			log("found service " + e.getName());
 
-			if (e.getName().equals(HostImpl.SERVICENAME)) {
-				SwingUtilities.invokeLater(new ServiceRequestor(e));
-			}
+			// We only care if this is a Javassonne host
+			if (e.getName().contains(Host.SERVICENAME) == false)
+				return;
+
+			SwingUtilities.invokeLater(new ServiceRequestor(e));
 		}
 
 		public void serviceRemoved(ServiceEvent e) {
@@ -61,18 +135,23 @@ public class HostMonitor {
 
 		public void serviceResolved(ServiceEvent e) {
 			log("service finally resolved");
-			if (e.getName().equals(HostImpl.SERVICENAME)) {
 
-				ServiceInfo info = e.getInfo();
-				if (info == null)
-					return;
-				String hostURI = "rmi://" + info.getHostAddress() + ":"
-						+ info.getPort() + "/" + info.getName();
-				log("Found uri of " + hostURI);
-				Host h = (Host) RemotingUtils.lookupRMIService(hostURI,
-						Host.class);
-				hostList_.add(h);
+			// We only care if this is a Javassonne host
+			if (e.getName().contains(Host.SERVICENAME) == false)
+				return;
+
+			ServiceInfo info = e.getInfo();
+			if (info == null) {
+				log("getting service info failed");
+				return;
 			}
+
+			String hostURI = "rmi://" + info.getHostAddress() + ":"
+					+ info.getPort() + "/" + info.getName();
+
+			log("Found uri of " + hostURI);
+
+			addHost(hostURI);
 		}
 
 		/**
@@ -86,42 +165,17 @@ public class HostMonitor {
 
 	}
 
-	private JmDNS jmdns_; // Instance of JmDNS
-	private List<Host> hostList_;
+	private class ServiceRequestor implements Runnable {
+		private ServiceEvent event_;
 
-	public HostMonitor() {
-		// Create service discovery service
-		try {
-			jmdns_ = JmDNS.create();
-		} catch (IOException e) {
-			log("An IOException occurred when creating jmdns");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+		public ServiceRequestor(ServiceEvent e) {
+			event_ = e;
 		}
 
-		hostList_ = new ArrayList<Host>();
-
-		jmdns_
-				.addServiceListener("_rmi._tcp.local.",
-						new HostMonitorListener());
-	}
-
-	public String[] getHostNames() {
-		ArrayList al = new ArrayList();
-		for (Iterator<Host> it = hostList_.iterator(); it.hasNext();) {
-			al.add(it.next().getName());
+		public void run() {
+			JmDNSSingleton.getJmDNS().requestServiceInfo(event_.getType(),
+					event_.getName());
 		}
-		String str[] = (String[]) al.toArray(new String[al.size()]);
-		return str;
-	}
-
-	/**
-	 * A very simple logger
-	 * 
-	 * @param msg
-	 */
-	private void log(String msg) {
-		System.out.println("HostMonitor : " + msg);
 	}
 
 }

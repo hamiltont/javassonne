@@ -18,30 +18,139 @@
 
 package org.javassonne.networking;
 
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+
+import javax.jmdns.ServiceInfo;
+
+import org.javassonne.networking.impl.RemotingUtils;
+
 /**
- * This is the networking only interface of the client. Only put functions here
- * that a remote host or client should be able to call.
+ * The implementation of our client. Note that although the functions here can
+ * be called by the code running on this machine, only the functions declared in
+ * the Client interface can be called remotely.
  * 
  * @author Hamilton Turner
  */
-public interface Client {
-	/**
-	 * Receive a message from the host. This will eventually
-	 * change to a notification
-	 * @param msg - the message
-	 */
-	public void receiveMessageFromHost(String msg);
+public class Client implements RemoteClient {
+	private static final String SERVICENAME = "JavassonneClient";
+	private boolean connected_ = false; // Lets this client know if it is
+	// currently connected to a host
+	private String localHostURI_; // The address of the local host. Used
+	// for when this computer is the host
+	private ServiceInfo service_; // The serviceInfo associated with this
+	// clients RMI service
+	private RemoteHost host_; // The host we are currently connected to,
+	// if any
+	private String clientURI_; // The URI of this client
+	private String name_; // The player name of the client
 
 	/**
-	 * Allows an arbitrary host to get the clients current URI. 
+	 * Create the RMI service
 	 * 
-	 * @return client URI
+	 * @param localHostURI
+	 *            The URI of the host local to this machine, in case this
+	 *            machine ends up hosting a game
+	 * @param name
+	 *            The name the player would like to have
 	 */
-	public String getURI();
-	
+	public Client(String name) {
+		name_ = name;
+
+		// Create the RMI service
+		try {
+			// TODO If we want to run multiplayer by using networking, ensure
+			// that
+			// there are no duplicate names
+			service_ = RemotingUtils.exportRMIService(this, RemoteClient.class,
+					SERVICENAME + "_" + name);
+		} catch (RemoteException e) {
+			log("A RemoteException occurred while creating the RMI");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			log("A UnknownHostException occurrec while creating the RMI");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+
+		// TODO rather than using the ServiceInfo wrapper provided, we should
+		// probably just do this manually. the call to service_.getHostAddr
+		// will fail b/c we have not registered this service with JmDNS,
+		// which we have no real desire/need to do
+		clientURI_ = "rmi://" + RemotingUtils.LOCAL_HOST + ":"
+				+ service_.getPort() + "/" + service_.getName();
+
+		
+	}
+
 	/**
-	 * Query for what name this player has chosen
-	 * @return the name of this player in the game
+	 * Receive a message from the host of the game
 	 */
-	public String getName();
+	public void receiveMessageFromHost(String msg) {
+		log("Received msg - " + msg);
+	}
+
+	/**
+	 * Send a message to the host of the game
+	 */
+	public void sendMessageToHost(String msg) {
+		if (connected_ == false)
+			throw new IllegalArgumentException();
+		log("Sending message " + msg + " to host");
+		host_.receiveMessage(msg, clientURI_);
+	}
+
+	/**
+	 * Attempt to connect to a specified host
+	 * 
+	 * @param hostURI
+	 *            The host to try and connect to
+	 */
+	public void connectToHost(String hostURI) {
+		if (connected_)
+			throw new IllegalArgumentException();
+
+		// should probably verify that host exists, and
+		// then safely attempt to connect
+		host_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI, RemoteHost.class);
+
+		host_.addClient(clientURI_);
+
+		connected_ = true;
+	}
+
+	/**
+	 * Return the URI that this client can be reached at
+	 */
+	public String getURI() {
+		return clientURI_;
+	}
+
+	/**
+	 * Function called by this clients host that allows this client to connect
+	 * to the local host. This effectively helps us start a game that we are
+	 * hosting ourselves
+	 */
+	public void connectToLocalHost() {
+		// TODO - this call could fail 
+		connectToHost(HostMonitor.getInstance().getLocalHostURI());
+	}
+
+	/**
+	 * A very simple logger
+	 * 
+	 * @param msg
+	 */
+	private void log(String msg) {
+		System.out.println("Client " + name_ + ": " + msg);
+	}
+
+	/**
+	 * Return the name this player is using in the game
+	 */
+	public String getName() {
+		return name_;
+	}
+
 }
