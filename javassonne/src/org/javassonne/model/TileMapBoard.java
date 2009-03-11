@@ -69,34 +69,11 @@ public class TileMapBoard implements TileBoard {
 		return data_.containsKey(iter.getLocation());
 	}
 
-	/**
-	 * @param iter
-	 *            where tile will be inserted in TileBoard
-	 * @param tile
-	 *            what will be inserted in TileBoard
-	 * @throws BoardPositionFilledException
-	 *            thrown if iter position is filled
-	 * @throws NotValidPlacementException
-	 *            thrown if tile at iter is not a valid placement
-	 */
-	public void addTile(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException, NotValidPlacementException {
-		addTile(iter, tile, true);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.javassonne.model.TileBoard#addTile(org.javassonne.model.TileBoardIterator
-	 * , org.javassonne.model.Tile)
-	 */
-	public void addTile(TileBoardIterator iter, Tile tile, boolean checkValid)
-			throws BoardPositionFilledException, NotValidPlacementException {
+	
+	private void addTile(TileBoardIterator iter, Tile tile)
+			throws BoardPositionFilledException {
 		if (positionFilled(iter))
 			throw new BoardPositionFilledException(iter.getLocation());
-		else if (checkValid && !isValidPlacement(iter, tile))
-			throw new NotValidPlacementException(iter.getLocation());
 		else {
 			data_.put(iter.getLocation(), tile);
 			// Check for bounds extension
@@ -154,8 +131,6 @@ public class TileMapBoard implements TileBoard {
 	public boolean isValidPlacement(TileBoardIterator iter, Tile tile) {
 		if (iter.outOfBounds())
 			return false;
-		else if (positionFilled(iter))
-			return false;
 		else {
 			TileBoardGenIterator localIter = new TileBoardGenIterator(iter);
 			//iterate left and check if features match
@@ -194,32 +169,22 @@ public class TileMapBoard implements TileBoard {
 		}
 	}
 
-	/**
-	 * @param iter
-	 * @param tile
-	 * @param checkValid
-	 * @throws BoardPositionFilledException
-	 * @throws NotValidPlacementException
-	 */
-	public void addTemp(TileBoardIterator iter, Tile tile, boolean checkValid)
-			throws BoardPositionFilledException, NotValidPlacementException {
-
-		addTile(iter, tile, checkValid);
-		tempTileLocations_.add(iter.getLocation());
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.javassonne.model.TileBoard#addTemp(org.javassonne.model.TileBoardIterator
-	 * , org.javassonne.model.Tile)
+	
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoard#addTemp(org.javassonne.model.TileBoardIterator, org.javassonne.model.Tile, boolean)
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
-			throws BoardPositionFilledException, NotValidPlacementException {
-		addTemp(iter, tile, true);
+			throws BoardPositionFilledException {
+
+		if (positionFilled(iter))
+			throw new BoardPositionFilledException(iter.getLocation());
+		else {
+			tempTileLocations_.add(iter.getLocation());
+			data_.put(iter.getLocation(), tile);
+		}
+
 	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -230,88 +195,31 @@ public class TileMapBoard implements TileBoard {
 		for (Point i : tempTileLocations_)
 			data_.remove(i);
 		tempTileLocations_.clear();
-		fixBoundaries();
+		//fixBoundaries();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javassonne.model.TileBoard#removeTempStatus(org.javassonne.model.TileBoardIterator)
 	 */
-	public void removeTempStatus(TileBoardIterator iter) {
+	public void removeTempStatus(TileBoardIterator iter) throws NotValidPlacementException {
+		if(iter.current()==null)
+			return;
+		if(!isValidPlacement(iter, iter.current()))
+			throw new NotValidPlacementException(iter.getLocation());
 		tempTileLocations_.remove(iter.getLocation());
-	}
-
-
-	// TODO comments
-	private void fixBoundaries() {
-		fixLeft();
-		fixTop();
-		fixBot();
-		fixRight();
-	}
-
-	// TODO comments
-	private void fixRight() {
-		TileBoardGenIterator temp = (TileBoardGenIterator) lowerRight_
-				.leftCopy();
-		boolean notFound = true;
-		// look for a tile, stop if you reach bottom edge
-		while (notFound
-				&& temp.getLocation().getY() < upperLeft_.getLocation().getY()) {
-			// First place will not have tile
-			if (temp.up().current() != null)
-				// found one
-				notFound = false;
-		}
-		if (notFound)
+		// Check for bounds extension
+		if (iter.getLocation().getX() == upperLeft_.getLocation().getX())
 			upperLeft_.left();
-	}
-
-	private void fixBot() {
-		TileBoardGenIterator temp = (TileBoardGenIterator) lowerRight_.upCopy();
-		boolean notFound = true;
-		// look for a tile, stop if you reach bottom edge
-		while (notFound
-				&& temp.getLocation().getX() > upperLeft_.getLocation().getX()) {
-			// First place will not have tile
-			if (temp.left().current() != null)
-				// found one
-				notFound = false;
-		}
-		if (notFound)
+		else if (iter.getLocation().getY() == upperLeft_.getLocation()
+				.getY())
 			upperLeft_.up();
-
-	}
-
-	private void fixTop() {
-		TileBoardGenIterator temp = (TileBoardGenIterator) upperLeft_
-				.downCopy();
-		boolean notFound = true;
-		// look for a tile, stop if you reach right edge
-		while (notFound
-				&& temp.getLocation().getX() < lowerRight_.getLocation().getX()) {
-			// First place will not have tile
-			if (temp.right().current() != null)
-				// found one
-				notFound = false;
-		}
-		if (notFound)
-			upperLeft_.down();
-	}
-
-	private void fixLeft() {
-		TileBoardGenIterator temp = (TileBoardGenIterator) upperLeft_
-				.rightCopy();
-		boolean notFound = true;
-		// look for a tile, stop if you reach bottom edge
-		while (notFound
-				&& temp.getLocation().getY() > lowerRight_.getLocation().getY()) {
-			// First place will not have tile
-			if (temp.down().current() != null)
-				// found one
-				notFound = false;
-		}
-		if (notFound)
-			upperLeft_.right();
+		else if (iter.getLocation().getX() == lowerRight_.getLocation()
+				.getX())
+			lowerRight_.right();
+		else if (iter.getLocation().getY() == lowerRight_.getLocation()
+				.getY())
+			lowerRight_.down();
+		//else, no bounds extension occurs
 	}
 
 
