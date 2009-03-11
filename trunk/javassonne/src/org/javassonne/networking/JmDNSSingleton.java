@@ -2,8 +2,8 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author Hamilton Turner
- * @date Mar 6, 2009
+ * @author [Add Name Here]
+ * @date Mar 10, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,27 +18,28 @@
 
 package org.javassonne.networking;
 
-/**
- * A bootstrapper used to very simply test the networking
- * 
- * @author Hamilton Turner
- */
-public class TestLauncher {
+import java.io.IOException;
 
-	public static void main(String[] args) {
+import javax.jmdns.JmDNS;
 
-		Host h = new Host("Hamy");
-		HostMonitor.getInstance().setLocalHostURI(h.getURI());
-		h.startAcceptingConnections();
-			
-		Client cl = new Client("a");
-		cl.connectToLocalHost();
-		cl.sendMessageToHost("hello from a");
+public class JmDNSSingleton {
 
-		// TODO change code so that it makes sure the name has no spaces 
-		// or fix underlying imp
-		Client clb = new Client("b");
-		clb.connectToLocalHost();
-		clb.sendMessageToHost("hello from b");
+	private static JmDNS jmdns_ = null;
+
+	private JmDNSSingleton() {}
+
+	public static JmDNS getJmDNS() {
+		if (jmdns_ == null) {
+			try {
+				jmdns_ = JmDNS.create();
+			} catch (IOException e) {
+				System.out
+						.println("An IOException occurred when creating jmdns");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+
+		return jmdns_;
 	}
 }

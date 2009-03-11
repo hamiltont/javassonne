@@ -18,6 +18,8 @@
 
 package org.javassonne.ui.controllers;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,12 +34,10 @@ import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
 import org.javassonne.model.Player.MeepleColor;
-import org.javassonne.networking.ClientImpl;
-import org.javassonne.networking.HostImpl;
+import org.javassonne.networking.Client;
+import org.javassonne.networking.Host;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.ui.DisplayHelper;
-import org.javassonne.ui.DisplayHelper.Layer;
-import org.javassonne.ui.DisplayHelper.Positioning;
 import org.javassonne.ui.controls.JPopUp;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
 import org.javassonne.ui.panels.MenuPanel;
@@ -121,11 +121,19 @@ public class GameController {
 	 */
 	public void newNetworkGame(Notification n) {
 
-		HostImpl localHost = new HostImpl();
-		ClientImpl mainClient = new ClientImpl("Doodlebugh");
-		HostMonitor hm = new HostMonitor();
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Host localHost = new Host(addr.getHostName());
+		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
+		Client mainClient = new Client("mainClient");
 		
-		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel(hm);
+		
+		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 	}

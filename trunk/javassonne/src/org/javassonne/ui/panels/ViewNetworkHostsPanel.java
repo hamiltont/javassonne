@@ -38,16 +38,10 @@ import org.javassonne.ui.JKeyListener;
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, ListSelectionListener {
 	private JPanel hostsList_;
-	private HostMonitor hostMonitor_;
 
-	// Do not allow a default constructor
-	private ViewNetworkHostsPanel() {
-	}
-
-	public ViewNetworkHostsPanel(HostMonitor hm) {
+	public ViewNetworkHostsPanel() {
 		super();
 
-		hostMonitor_ = hm;
 		addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/menu_background.jpg");
 		setVisible(true);
@@ -64,7 +58,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 		// Add list items to the hostsList_ panel
 
-		String[] items = hm.getHostNames();
+		String[] items = HostMonitor.getInstance().getHostNames();
 		JList l = new JList();
 		l.addListSelectionListener(this);
 		l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -74,7 +68,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostsList_.add(l);
 
 		Timer t = new Timer();
-		t.scheduleAtFixedRate(new GetNewHosts(l, hm), 0, 1000);
+		t.scheduleAtFixedRate(new GetNewHosts(l), 0, 1000);
 
 	}
 
@@ -95,22 +89,20 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	protected class GetNewHosts extends TimerTask {
 		private JList hostList_;
 		private DefaultListModel listModel_;
-		private HostMonitor hostMonitor_;
 
-		public GetNewHosts(JList l, HostMonitor hm) {
+		public GetNewHosts(JList l) {
 			hostList_ = l;
 			listModel_ = new DefaultListModel();
 			hostList_.setModel(listModel_);
-			hostMonitor_ = hm;
 		}
 
 		public void run() {
-			String[] hosts = hostMonitor_.getHostNames();
-			
-			listModel_.clear();
-			
-			for (int pos = 0; pos < hosts.length; pos++) {
-				listModel_.add(pos, hosts[pos]);
+			String[] hosts = HostMonitor.getInstance().getHostNames();
+
+			// TODO Note that this does not remove old hosts!
+			for (int i = 0; i < hosts.length; i++) {
+				if (listModel_.contains(hosts[i]) == false)
+					listModel_.add(listModel_.getSize(), hosts[i]);
 			}
 		}
 
