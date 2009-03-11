@@ -18,59 +18,86 @@
 
 package org.javassonne.model;
 
+import java.util.Set;
+
 public interface TileBoard {
 
 	/**
-	 * @return - TileBoardIterator pointing to "home" square - the tile the game
+	 * @return TileBoardIterator pointing to "home" square - the tile the game
 	 *         began with.
 	 */
 	public TileBoardIterator homeTile();
-	
 
 	/**
-	 * @param iter location to insert
-	 * @param tile to be inserted
+	 * @param iter
+	 *            location to insert
+	 * @param tile
+	 *            tile to be inserted
 	 * @throws BoardPositionFilledException
 	 */
 	public void addTemp(TileBoardIterator iter, Tile tile)
 			throws BoardPositionFilledException;
 
 	/**
+	 * @param iters
+	 *            locations to insert
+	 * @param t
+	 *            tile to be inserted
+	 * @throws BoardPositionFilledException
+	 *             first location of error; if thrown, no tiles were added
+	 */
+	public void addTemps(Set<TileBoardIterator> iters, Tile t)
+			throws BoardPositionFilledException;
+
+	/**
 	 * removes all temp tiles from board
 	 */
 	public void removeTemps();
-
+	
 	/**
-	 * @param iter
-	 *            - location at which tile should be made permanent
-	 * @throws NotValidPlacementException 
+	 * @param iter location where temp tile should be removed
 	 */
-	public void removeTempStatus(TileBoardIterator iter) throws NotValidPlacementException;
+	public void removeTempAtLocation(TileBoardIterator iter);
 
 	/**
 	 * @param iter
-	 *            - where the tile is to be placed
+	 *            location at which tile should be made permanent
+	 * @throws NotValidPlacementException
+	 */
+	public void removeTempStatus(TileBoardIterator iter)
+			throws NotValidPlacementException;
+
+	/**
+	 * @param iter
+	 *            where the tile is to be placed
 	 * @param tile
-	 *            - what will be placed
-	 * @return - whether or not the placement is valid
+	 *            what will be placed
+	 * @return whether or not the placement is valid
 	 */
 	public boolean isValidPlacement(TileBoardIterator iter, Tile tile);
 
 	/**
 	 * @param iter
-	 *            - where to grab a tile
-	 * @return - Tile at iter location (or null)
+	 *            where to grab a tile
+	 * @return Tile at iter location (or null)
 	 */
 	public Tile getTile(TileBoardIterator iter);
 
 	/**
-	 * @return - TileBoardIterator pointing to upper left corner of board
+	 * @return TileBoardIterator pointing to upper left corner of board
 	 */
 	public TileBoardIterator getUpperLeftCorner();
 
 	/**
-	 * @return - TileBoardIterator pointing to lower right corner of board
+	 * @return TileBoardIterator pointing to lower right corner of board
 	 */
 	public TileBoardIterator getLowerRightCorner();
+
+	/**
+	 * @param t
+	 *            The Tile to be placed
+	 * @return a Set of Iterators pointing to the various valid locations
+	 */
+	public Set<TileBoardIterator> possiblePlacements(Tile t);
 
 }

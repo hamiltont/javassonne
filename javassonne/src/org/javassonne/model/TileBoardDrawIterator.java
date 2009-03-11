@@ -59,7 +59,6 @@ public class TileBoardDrawIterator implements TileBoardIterator {
 
 	// Advances iterator to start of next row
 	public TileBoardDrawIterator nextRow() {
-		// previousLocation_ = location_;
 		location_ = new Point((int) (data_.getUpperLeftCorner().getLocation()
 				.getX()), (int) (location_.getY() - 1));
 		return this;
@@ -71,8 +70,9 @@ public class TileBoardDrawIterator implements TileBoardIterator {
 	}
 
 	public TileBoardIterator right() {
-		// TODO Auto-generated method stub
-		// THIS SHOULD NOT BE HERE>>>
-		return null;
+		location_ = new Point((int) (location_.getX() + 1), (int) (location_.getY()));
+		if(outOfBounds())
+			return nextRow();		
+		return this;
 	}
 }
