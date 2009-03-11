@@ -20,6 +20,7 @@ package org.javassonne.ui;
 
 import java.awt.Point;
 import java.util.List;
+import java.util.Properties;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -38,7 +39,7 @@ import org.javassonne.model.TileDeck;
 public class HUDController {
 
 	TileDeck deck_;
-
+	List<Player> players_;
 	Tile tileInHand_;
 
 	RemainingTilesPanel hudRemainingTiles_;
@@ -56,9 +57,9 @@ public class HUDController {
 	 *            The TileDeck. This will never be changed once the game has
 	 *            begun.
 	 */
-	public HUDController(TileDeck d, List<Player> players_) {
+	public HUDController(TileDeck d, List<Player> players) {
 		deck_ = d;
-
+		players_ = players;
 		// Draw the first tile!
 		tileInHand_ = deck_.popRandomTile();
 
@@ -111,6 +112,10 @@ public class HUDController {
 
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
+		
+		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
+				this, "gameOver");
+		
 	}
 
 	public void endGame(Notification n) {
@@ -177,5 +182,27 @@ public class HUDController {
 	public void updateTileInHand(Notification n) {
 		tileInHand_ = (Tile) n.argument();
 
+	}
+	
+	/*
+	 * The game has been completed! We must now finish scoring and end the game
+	 */
+	public void gameOver(Notification n){
+
+		// Game Over Conditions: Tile End is Empty
+		if(deck_.tilesRemaining() != 0)
+				return;
+		
+		// Finish scoring
+		// TODO: calculate scores & update players_
+		
+		GameOverPanel g = new GameOverPanel(players_);
+		
+		Properties config = new Properties();
+		config.setProperty("hideMainMenu", "true");
+		NotificationManager.getInstance().sendNotification(Notification.END_GAME,config);
+		
+		DisplayHelper.getInstance().add(g,DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
 	}
 }
