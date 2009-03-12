@@ -20,23 +20,23 @@
  * 
  */
 
-
 package org.javassonne.ui.controls;
 
-import java.awt.Frame;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
-import org.javassonne.messaging.Notification;
-import org.javassonne.messaging.NotificationManager;
 import org.javassonne.ui.DisplayHelper;
 
 /**
  * @author Adam Albright
  * 
  *         This class displays a PopUp message to communicate with the user
- * 
+ *         Save/load file chooser PopUp to allow user to access their local
+ *         files
  */
 public class JPopUp {
 	private String message_;
@@ -72,19 +72,19 @@ public class JPopUp {
 	public String promptUser(String[] options) {
 
 		JPanel p = new JPanel();
-		//p.addKeyListener(null);
-		//p.addMouseListener(null);
+		// p.addKeyListener(null);
+		// p.addMouseListener(null);
 
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
-		
+
 		int ans = JOptionPane.showOptionDialog(p, message_, title_,
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 				options, options[0]);
-		
+
 		DisplayHelper.getInstance().remove(p);
-		
-		if(ans == JOptionPane.CLOSED_OPTION)
+
+		if (ans == JOptionPane.CLOSED_OPTION)
 			return null;
 		else
 			return options[ans];
@@ -100,12 +100,10 @@ public class JPopUp {
 
 	/**
 	 * 
-	 * @param JOptionPaneType (int) : Type of icon to use 
-	 *           examples:
-	 *            JOptionPane.INFORMATION_MESSAGE, 
-	 *            JOptionPane.ERROR_MESSAGE,
-	 *            JOptionPane.PLAIN_MESSAGE, 
-	 *            JOptionPane.QUESTION_MESSAGE,
+	 * @param JOptionPaneType
+	 *            (int) : Type of icon to use examples:
+	 *            JOptionPane.INFORMATION_MESSAGE, JOptionPane.ERROR_MESSAGE,
+	 *            JOptionPane.PLAIN_MESSAGE, JOptionPane.QUESTION_MESSAGE,
 	 *            JOptionPane.WARNING_MESSAGE
 	 */
 	public void showMsg(int JOptionPaneType) {
@@ -118,5 +116,64 @@ public class JPopUp {
 		JOptionPane.showMessageDialog(p, message_, title_, JOptionPaneType);
 
 		DisplayHelper.getInstance().remove(p);
+	}
+
+	/*
+	 * Allows the user to select a SAVED local file from their hard drive
+	 */
+
+	public File openFileDialog() {
+		JPanel p = new JPanel();
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle(title_);
+		fc.setFileFilter(new FileTypeFilter());
+
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
+		int returnVal = fc.showOpenDialog(p);
+
+		DisplayHelper.getInstance().remove(p);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			return fc.getSelectedFile();
+		} else {
+			return null;
+		}
+	}
+
+	/*
+	 * Allows the user to select a destination directory and preferred directory
+	 */
+	public File saveFileDialog() {
+		JPanel p = new JPanel();
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle(title_);
+		fc.setFileFilter(new FileTypeFilter());
+
+		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+				DisplayHelper.Positioning.CENTER);
+		int returnVal = fc.showSaveDialog(p);
+		DisplayHelper.getInstance().remove(p);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			return fc.getSelectedFile();
+		} else {
+			return null;
+		}
+	}
+
+	/*
+	 * Private class that specifies the type of a saved Javassonne game
+	 */
+
+	private class FileTypeFilter extends FileFilter {
+		public boolean accept(File f) {
+			return f.isDirectory()
+					|| f.getName().toLowerCase().endsWith(".javassonne");
+		}
+
+		public String getDescription() {
+			return "Javassonne Game (.javassonne)";
+		}
 	}
 }
