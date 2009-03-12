@@ -129,6 +129,9 @@ public class BoardController {
 			Set<TileBoardIterator> temp = board_.possiblePlacements(t);
 			if (temp.isEmpty()) {
 				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_WARNING,
+						"Tile does not fit on board; drawing new Tile");
+				NotificationManager.getInstance().sendNotification(
 						Notification.DRAW_TILE);
 			} else {
 				board_.addTemps(temp, tempLitTile);
