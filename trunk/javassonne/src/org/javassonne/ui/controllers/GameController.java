@@ -271,11 +271,17 @@ public class GameController {
 		// InputPlayerDataPanel.
 		// In the future, maybe this entire function should be in the panel, and
 		// then the gameController can just get a list of player objects?
-		int ii = 0;
+		int i = 0;
 		for (String s : playerData_.getPlayerData()) {
 			if (s.length() > 0) {
 				Player player = new Player(s);
-				player.setMeepleColor(MeepleColor.values()[ii++]);
+				player.setMeepleColor(MeepleColor.values()[i++]);
+				players_.add(player);
+			}
+			else
+			{
+				Player player = new Player();
+				player.setMeepleColor(MeepleColor.values()[i++]);
 				players_.add(player);
 			}
 		}
