@@ -32,8 +32,8 @@ import javax.swing.SwingUtilities;
 
 import org.javassonne.networking.impl.RemotingUtils;
 
-// TODO This should be changed into a singleton, and rather than
-//  	being given the localhost URI it should be able to dynamically 
+// TODO Rather than being given the localhost URI 
+//		it should be able to dynamically 
 //		find it
 public class HostMonitor {
 	private JmDNS jmdns_;
@@ -42,7 +42,7 @@ public class HostMonitor {
 	private static HostMonitor instance_ = null;
 	// Used to discover if a service is the local service
 	private String localIP_;
-	
+
 	private HostMonitor() {
 		// Using service discovery service
 		jmdns_ = JmDNSSingleton.getJmDNS();
@@ -52,7 +52,7 @@ public class HostMonitor {
 		jmdns_
 				.addServiceListener("_rmi._tcp.local.",
 						new HostMonitorListener());
-		
+
 		try {
 			InetAddress addr = InetAddress.getLocalHost();
 			localIP_ = addr.getHostAddress();
@@ -61,9 +61,8 @@ public class HostMonitor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
 	//Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
 		if (instance_ == null)
@@ -71,7 +70,6 @@ public class HostMonitor {
 		return instance_;
 	}
 
-	//Returns an array of name for all hosts.
 	public String[] getHostNames() {
 		// Convert internal ArrayList to String[]
 		ArrayList<String> al = new ArrayList<String>();
@@ -81,14 +79,14 @@ public class HostMonitor {
 		String str[] = (String[]) al.toArray(new String[al.size()]);
 		return str;
 	}
-	
+
 	// TODO make this call more fail safe
 	public String getLocalHostURI() {
 		if (localhostURI_ == null)
 			return null;
 		return localhostURI_;
 	}
-	
+
 	public void setLocalHostURI(String uri) {
 		localhostURI_ = uri;
 	}
@@ -96,32 +94,18 @@ public class HostMonitor {
 	protected void addHost(String hostURI) {
 		RemoteHost h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
 				RemoteHost.class);
-		
+
 		if (hostURI.contains(localIP_)) {
 			localhostURI_ = hostURI;
 			log("found host uri to be " + hostURI);
-			// TODO error - we should not be adding this,m just for testing!
+			// TODO error - we should not be adding this, just for testing!
 			hostList_.add(h);
-		}
-		else
+		} else
 			hostList_.add(h);
 	}
 
 	protected void removeHost(String hostURI) {
-		boolean removed = false;
-		for(int i = 0; i < hostList_.size(); i++)
-		{
-			if(hostList_.get(i).getName().equals(hostURI))
-			{
-				hostList_.remove(i);
-				removed = true;
-				break;
-			}
-		}
-		if(!removed)
-		{
-			//host name not found.
-		}
+
 	}
 
 	/**
