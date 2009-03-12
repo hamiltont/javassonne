@@ -42,7 +42,6 @@ Game Team:
  * User able to navigate the map using the 4 directional keys. (Kyle)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User see's an end game menu when they run out of tiles. (Adam)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User will see a 'Game In Progress' dialog when trying to start a new game  (Adam)
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User will be able to see a save game dialog (Adam)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the number of game "meeple" they have remaining in part of the H.U.D. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an option at the beginning of the game to view instructions. (Ben)
 
