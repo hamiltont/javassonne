@@ -21,6 +21,7 @@ package org.javassonne.ui.controllers;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -31,6 +32,7 @@ import org.javassonne.model.NotValidPlacementException;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
+import org.javassonne.model.TileBoardIterator;
 
 public class BoardController {
 
@@ -49,24 +51,24 @@ public class BoardController {
 	 *            The TileBoard. This will never be changed once the game has
 	 *            begun.
 	 */
-	public BoardController( TileBoard b) {
+	public BoardController(TileBoard b) {
 
 		board_ = b;
 		tempLitTile = new Tile();
 		try {
-			tempLitTile.setImage(ImageIO.read(new File(String.format(
-							"%s/%s", tempTileImagesFolder_, litTileIdentifier_))));
-		}catch (IOException ex){
-			//TODO: Fix this
+			tempLitTile.setImage(ImageIO.read(new File(String.format("%s/%s",
+					tempTileImagesFolder_, litTileIdentifier_))));
+		} catch (IOException ex) {
+			// TODO: Fix this
+			ex.printStackTrace();
 		}
-			
-			
+
 		NotificationManager.getInstance().addObserver(
 				Notification.CLICK_ADD_TILE, this, "addTile");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHandRef");
-		NotificationManager.getInstance().addObserver(
-				Notification.END_GAME, this, "endGame");
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
 
 		// Now that we have a board object, we want to update the interface to
 		// show the board. Share our board_ object in a notification so the
@@ -75,25 +77,25 @@ public class BoardController {
 				Notification.BOARD_SET, board_);
 
 	}
-	
+
 	public void endGame(Notification n) {
 		// Unsubscribe from notifications once the game has ended
 		NotificationManager.getInstance().removeObserver(this);
-		
+
 		// let go of the board and the tileInhand. They should not be used
 		// once this notification is received and setting to null allows
 		// us to make sure this is followed.
 		board_ = null;
 		tileInHandRef_ = null;
 	}
-	
+
 	public void addTile(Notification n) {
 		if (tileInHandRef_ != null) {
 			Point here = (Point) (n.argument());
 			TileBoardGenIterator iter = new TileBoardGenIterator(board_, here);
 			try {
-				if(board_.isValidPlacement(iter, tileInHandRef_)){
-					//board_.removeTempAtLocation(iter);
+				if (board_.isValidPlacement(iter, tileInHandRef_)) {
+					// board_.removeTempAtLocation(iter);
 					board_.removeTemps();
 					board_.addTemp(iter, tileInHandRef_);
 				}
@@ -104,16 +106,16 @@ public class BoardController {
 								+ " is filled"));
 				return;
 			}
-			//this block will be removed when we implement turn completion
-			if(board_.getTile(iter)!=null)
-				try{
+			// this block will be removed when we implement turn completion
+			if (board_.getTile(iter) != null)
+				try {
 					board_.removeTempStatus(iter);
 					NotificationManager.getInstance().sendNotification(
 							Notification.BOARD_SET, board_);
 					NotificationManager.getInstance().sendNotification(
 							Notification.TILE_IN_HAND_CHANGED, null);
-				}catch (NotValidPlacementException ex){
-					//kill it
+				} catch (NotValidPlacementException ex) {
+					// kill it
 					board_.removeTemps();
 				}
 		}
@@ -124,11 +126,18 @@ public class BoardController {
 		Tile t = (Tile) n.argument();
 		tileInHandRef_ = t;
 		try {
-			board_.addTemps(board_.possiblePlacements(t), tempLitTile);	
-			NotificationManager.getInstance().sendNotification(
-					Notification.BOARD_SET, board_);
+			Set<TileBoardIterator> temp = board_.possiblePlacements(t);
+			if (temp.isEmpty()) {
+				NotificationManager.getInstance().sendNotification(
+						Notification.DRAW_TILE);
+			} else {
+				board_.addTemps(temp, tempLitTile);
+				NotificationManager.getInstance().sendNotification(
+						Notification.BOARD_SET, board_);
+			}
 		} catch (BoardPositionFilledException e) {
-			// we really shouldn't get here if possible placements works correctly
+			// we really shouldn't get here if possible placements works
+			// correctly
 			e.printStackTrace();
 		}
 	}
