@@ -38,8 +38,11 @@ public class NotificationCallback {
 				method_.invoke(target_, n);
 
 		} catch (Exception e) {
-			Thread.dumpStack();
-			NotificationManager.getInstance().sendNotification(Notification.LOG_ERROR, e.getStackTrace());
+			String err = String.format("An exception occurred while sending "
+					+ "the notification %s to an observer of %s", n
+					.identifier(), target_.getClass().toString());
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
 		}
 	}
 
@@ -49,13 +52,14 @@ public class NotificationCallback {
 			return false;
 		NotificationCallback other = (NotificationCallback) obj;
 
-		return ((other.target_.equals(target_)) && (other.method_.equals(method_)));
+		return ((other.target_.equals(target_)) && (other.method_
+				.equals(method_)));
 	}
 
 	public Object target() {
 		return target_;
 	}
-	
+
 	public Method method() {
 		return method_;
 	}

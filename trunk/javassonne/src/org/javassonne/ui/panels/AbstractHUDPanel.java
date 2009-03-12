@@ -80,6 +80,9 @@ public class AbstractHUDPanel extends JPanel {
 	}
 
 	public void setBackgroundAlpha(float alpha) {
+		if (backgroundOriginal_ == null)
+			return;
+		
 		int w = backgroundOriginal_.getWidth();
 		int h = backgroundOriginal_.getHeight();
 		

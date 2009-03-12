@@ -22,13 +22,13 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
+import org.javassonne.ui.DisplayHelper;
 
 public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 		MouseMotionListener {
@@ -49,13 +49,18 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	}
 
 	public void setTile(Tile t) {
-		setBackgroundImage(t.getImage());
+		if (t != null){
+			setBackgroundImage(t.getImage());
+			setVisible(true);
+		}else{
+			setVisible(false);
+		}
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		setBackgroundAlpha(0.6f);
-		
 		if (respondToClick_){
+			setBackgroundAlpha(0.6f);
+			
 			if (mouseOffset_ == null)
 				mouseOffset_ = new Point(e.getX(), e.getY());
 			else {
@@ -98,14 +103,16 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 		if (respondToClick_){
 			// see if we can place the tile on the map.
 			Point clickLocation = this.getLocation();
-			clickLocation.x += this.getWidth() / 2;
-			clickLocation.y += this.getHeight() / 2;
+			clickLocation.x += mouseOffset_.x;
+			clickLocation.y += mouseOffset_.y;
 	
 			// slide the tile back to it's starting location on the sidebar
 			if (resetTimer_ != null) resetTimer_.cancel();
 			resetTimer_ = new Timer();
 			resetTimer_.scheduleAtFixedRate(new ResetSlideTask(), 0, 5);
+			
 			respondToClick_ = false;
+			mouseOffset_ = null;
 			
 			NotificationManager.getInstance().sendNotification(
 					Notification.TILE_DROPPED, clickLocation);

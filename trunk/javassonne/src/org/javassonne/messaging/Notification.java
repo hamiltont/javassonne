@@ -38,7 +38,7 @@ public class Notification implements Serializable {
 	public static final String LOG_ERROR = "NotificationLogError";
 	public static final String MAX = "NotificationMaximize";
 
-	public static final String TILE_IN_HAND_CHANGED = "NotificationGameDrawTile";
+	public static final String TILE_IN_HAND_CHANGED = "NotificationTileInHandChanged";
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
 	public static final String ZOOM_IN = "NotificationGameZoomIn";
@@ -81,4 +81,9 @@ public class Notification implements Serializable {
 		return argument_;
 	}
 
+	@Override
+	public String toString()
+	{
+		return identifier_;
+	}
 }

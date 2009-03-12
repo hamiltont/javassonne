@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Mar 10, 2009
+ * @date Mar 11, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,26 +18,34 @@
 
 package org.javassonne.ui.map;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-public class MapSprite {
+import org.javassonne.model.Tile;
 
-	protected int x_;
-	protected int y_;
+public class TilePlacementSprite extends MapSprite {
+
+	public Tile tile_;
 	
-	public MapSprite(int x, int y)
-	{
-		x_ = x;
-		y_ = y;
+	public TilePlacementSprite(int x, int y, Tile t) {	
+		super(x, y);
+
+		tile_ = t;
 	}
-	
+
+	@Override
 	public void draw(BufferedImage target)
 	{
-		// default implementations do nothing
+		// draw something
+		Graphics g = target.getGraphics();
+		g.setColor(Color.BLUE);
+		g.fillOval(x_, y_, 100, 100);
 	}
-
+	
+	@Override
 	public void update(MapLayer mapLayer) 
 	{
-		// default implementations do nothing
+		// animate ourselves?
 	}
 }
