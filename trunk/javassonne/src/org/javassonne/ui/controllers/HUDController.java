@@ -128,9 +128,12 @@ public class HUDController {
 	}
 
 	public void endGame(Notification n) {
+		// unregister ourselves so we no longer get notifications. A new HUDController
+		// will be created if a new game is started!
+		NotificationManager.getInstance().removeObserver(this);
+		
 		// the panels all respond to this notification, and they remove
-		// themselves
-		// from the view.
+		// themselves from the view.
 		hudRemainingTiles_ = null;
 		hudButtons_ = null;
 		hudPanel_ = null;

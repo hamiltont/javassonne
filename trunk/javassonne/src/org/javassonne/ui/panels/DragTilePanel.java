@@ -100,7 +100,7 @@ public class DragTilePanel extends AbstractHUDPanel implements MouseListener,
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		if (respondToClick_){
+		if ((respondToClick_) && (mouseOffset_ !=null)){
 			// see if we can place the tile on the map.
 			Point clickLocation = this.getLocation();
 			clickLocation.x += mouseOffset_.x;

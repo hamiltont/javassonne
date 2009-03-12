@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ import javax.swing.OverlayLayout;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
 
 public class InputPlayerDataPanel extends AbstractHUDPanel implements
@@ -45,8 +47,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 
 		addKeyListener(JKeyListener.getInstance());
 		//TODO: Externalize string
-		//TODO: Fix background so it doesn't look all stretched
-		setBackgroundImagePath("images/menu_background.jpg");
+		setBackgroundImagePath("images/new_game_background.jpg");
 		setVisible(true);
 		setSize(800, 600);
 		setLayout(new OverlayLayout(this));
@@ -64,12 +65,10 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 
 		//TODO: Use Java default layout organizers to eliminate ugly integers
 		// add the buttons to the generalButtons_ panel
-		addButtonToPanel("Start Game", Notification.START_GAME, new Point(250,
-				420), generalButtons_);
-		addButtonToPanel("Reset Fields", Notification.PLAYER_DATA_RESET,
-				new Point(250, 465), generalButtons_);
-		addButtonToPanel("Quit and Exit", Notification.QUIT, new Point(
-				250, 510), generalButtons_);
+		addButtonToPanel("images/new_game_cancel.jpg", "", 
+				new Point(25, 543), generalButtons_);
+		addButtonToPanel("images/new_game_start.jpg", Notification.START_GAME, 
+				new Point(492, 543), generalButtons_);
 
 		// add the text boxes to the textFields_ panel
 		addTextBoxToPanel(new Point(250, 150), textFields_);
@@ -84,9 +83,9 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		add(generalButtons_);
 	}
 
-	private void addButtonToPanel(String text, String notification,
+	private void addButtonToPanel(String imagePath, String notification,
 			Point location, JPanel panel) {
-		JButton b = new JButton(text);
+		JButton b = new JButton(new ImageIcon(imagePath));
 		b.addActionListener(this);
 		b.setActionCommand(notification);
 		b.setLocation(location);
@@ -135,6 +134,11 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		if (e.getActionCommand().length() > 0)
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
+		else{
+			// user pressed cancel
+			DisplayHelper.getInstance().remove(this);
+			NotificationManager.getInstance().removeObserver(this);
+		}
 	}
 
 }
