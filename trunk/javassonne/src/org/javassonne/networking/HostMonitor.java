@@ -64,12 +64,14 @@ public class HostMonitor {
 		
 	}
 	
+	//Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
 		if (instance_ == null)
 			instance_ = new HostMonitor();
 		return instance_;
 	}
 
+	//Returns an array of name for all hosts.
 	public String[] getHostNames() {
 		// Convert internal ArrayList to String[]
 		ArrayList<String> al = new ArrayList<String>();
@@ -98,7 +100,7 @@ public class HostMonitor {
 		if (hostURI.contains(localIP_)) {
 			localhostURI_ = hostURI;
 			log("found host uri to be " + hostURI);
-			// TODO error - we shoudl not be adding this,m just for testing!
+			// TODO error - we should not be adding this,m just for testing!
 			hostList_.add(h);
 		}
 		else
@@ -106,7 +108,20 @@ public class HostMonitor {
 	}
 
 	protected void removeHost(String hostURI) {
-
+		boolean removed = false;
+		for(int i = 0; i < hostList_.size(); i++)
+		{
+			if(hostList_.get(i).getName().equals(hostURI))
+			{
+				hostList_.remove(i);
+				removed = true;
+				break;
+			}
+		}
+		if(!removed)
+		{
+			//host name not found.
+		}
 	}
 
 	/**
