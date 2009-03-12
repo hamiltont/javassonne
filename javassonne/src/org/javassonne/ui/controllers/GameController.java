@@ -18,6 +18,7 @@
 
 package org.javassonne.ui.controllers;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -90,12 +91,16 @@ public class GameController {
 				this, "newNetworkGame");
 		NotificationManager.getInstance().addObserver(Notification.START_GAME,
 				this, "startGame");
-		NotificationManager.getInstance().addObserver(Notification.ATTEMPT_END_GAME,
-				this, "attemptEndGame");
+		NotificationManager.getInstance().addObserver(
+				Notification.ATTEMPT_END_GAME, this, "attemptEndGame");
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.QUIT,
-				this, "quitGame");
+		NotificationManager.getInstance().addObserver(Notification.LOAD_GAME,
+				this, "loadGame");
+		NotificationManager.getInstance().addObserver(Notification.SAVE_GAME,
+				this, "saveGame");
+		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
+				"quitGame");
 		NotificationManager.getInstance().addObserver(
 				Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		NotificationManager.getInstance().addObserver(
@@ -114,7 +119,7 @@ public class GameController {
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 	}
-	
+
 	/**
 	 * Called when a NEW_NW_GAME notification is received.
 	 * 
@@ -132,12 +137,11 @@ public class GameController {
 		}
 		// Turn off annoying RMI logging
 		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
-		
+
 		Host localHost = new Host(addr.getHostName());
 		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
 		Client mainClient = new Client("mainClient");
-		
-		
+
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
@@ -175,56 +179,58 @@ public class GameController {
 		deck.addTileSet(set);
 
 		TileBoard board = new TileMapBoard(deck);
-		
+
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController(board);
 		hudController_ = new HUDController(deck, players_);
 	}
-	
+
 	/**
-	 * Called when an END_GAME notification is received. This notification used to
-	 * be called EXIT_GAME, but it is now possible to end a game without quitting the
-	 * app, so we've broken EXIT_GAME into END_GAME and QUIT. The game controller
-	 * should clean up any resources related to the game to make sure they are destroyed.
+	 * Called when an END_GAME notification is received. This notification used
+	 * to be called EXIT_GAME, but it is now possible to end a game without
+	 * quitting the app, so we've broken EXIT_GAME into END_GAME and QUIT. The
+	 * game controller should clean up any resources related to the game to make
+	 * sure they are destroyed.
 	 * 
 	 * @param n
 	 *            The notification object sent from the NotificationManager.
 	 */
 	public void endGame(Notification n) {
-		// reset game-related state variables. The board controller and hud controller
-		// also receive this notification, and they will remove their views from the screen.
+		// reset game-related state variables. The board controller and hud
+		// controller
+		// also receive this notification, and they will remove their views from
+		// the screen.
 		boardController_ = null;
 		hudController_ = null;
 		gameInProgress_ = false;
 		tileInHand_ = null;
-		
+
 		playerData_ = null;
 		players_ = null;
 
 		Properties config = (Properties) n.argument();
-		if(config == null || !config.containsKey("hideMainMenu"))
-			// show the main menu again, but this time with gameInProgress = false
+		if (config == null || !config.containsKey("hideMainMenu"))
+			// show the main menu again, but this time with gameInProgress =
+			// false
 			toggleMainMenu(null);
 	}
-	
-	/* 
+
+	/*
 	 * Game is currently in progress. Verify that the user wants to exit
 	 */
 	public void attemptEndGame() {
-		String[] options = {RETURN_TO_GAME,END_WITHOUT_SAVING};
+		String[] options = { RETURN_TO_GAME, END_WITHOUT_SAVING };
 
 		JPopUp dialogBox = new JPopUp("A game is currently in progress!");
 		String ans = dialogBox.promptUser(options);
 
-		if(ans == END_WITHOUT_SAVING) 
+		if (ans == END_WITHOUT_SAVING)
 			NotificationManager.getInstance().sendNotification(
 					Notification.END_GAME);
 	}
-	
-	
-	
+
 	public void toggleMainMenu(Notification n) {
 		// Determine whether the game is currently in progress
 		menu_.setGameInProgress(gameInProgress_);
@@ -248,15 +254,26 @@ public class GameController {
 		System.exit(0);
 	}
 
+	public void loadGame(Notification n) {
+		JPopUp p = new JPopUp("", "Select your saved game file...");
+		File f = p.openFileDialog();
+	}
+
+	public void saveGame(Notification n) {
+		JPopUp p = new JPopUp("", "Select a location to save your game...");
+		File f = p.saveFileDialog();
+	}
+
 	private void loadPlayerData() {
 		players_ = new ArrayList<Player>();
 
-		// TODO: player colors should be passed in from the InputPlayerDataPanel.
+		// TODO: player colors should be passed in from the
+		// InputPlayerDataPanel.
 		// In the future, maybe this entire function should be in the panel, and
 		// then the gameController can just get a list of player objects?
 		int ii = 0;
 		for (String s : playerData_.getPlayerData()) {
-			if (s.length() > 0){
+			if (s.length() > 0) {
 				Player player = new Player(s);
 				player.setMeepleColor(MeepleColor.values()[ii++]);
 				players_.add(player);
@@ -267,5 +284,5 @@ public class GameController {
 	public void playerDataReset(Notification n) {
 		players_.clear();
 	}
-		
+
 }
