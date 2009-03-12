@@ -31,23 +31,24 @@ Game Team:
 Networking Team:
  * In addition to looking at users on the local network, user can type in IP address of a game server to join a game.
  * User can chat with others playing the same game by typing onto the game canvas. Text appears transparently and pressing enter sends it to the other players.
+ * User can see what other players on the network are doing, and chat with them.
 
 == 4th Build (Feb. 24 - Mar. 12) ==
 
 Game Team:
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Prior to starting a game, user sees a "New Game" panel and enters information such as players' names that get stored during gameplay. (David)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Add HUD Panel to show game stats and more advanced turn information. (Ben)
- * User can see possible locations where the tile is allowed to be placed. (Kyle and Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see possible locations where the tile is allowed to be placed. (Kyle and Ben)
  * User able to navigate the map using the 4 directional keys. (Kyle)
  * User see's an end game menu when they run out of tiles. (Adam)
- * User will see a 'Game In Progress' dialog when trying to start a new game  (Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User will see a 'Game In Progress' dialog when trying to start a new game  (Adam)
  * User will be able to see a save game dialog (Adam)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees the number of game "meeple" they have remaining in part of the H.U.D. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees an option at the beginning of the game to view instructions. (Ben)
 
 Networking Team:
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Get DNS-SD working, and allow user to see show all network games in the GUI, even if they are ongoing.
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can send a notification across the network and receive it.
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Get DNS-SD working, and allow user to see show all network games in the GUI, even if they are ongoing. (Hamy, Brian)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can send a notification across the network and receive it. (Hamy, Brian)
 
 == 3rd Build (Feb. 10 - Feb. 19) ==
 
