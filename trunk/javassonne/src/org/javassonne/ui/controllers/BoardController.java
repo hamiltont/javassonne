@@ -41,6 +41,9 @@ public class BoardController {
 	Tile tempLitTile;
 	TileBoard board_;
 	Tile tileInHandRef_;
+	//True when the next tile_in_hand_changed event should be a tile
+	// we should try to fit in the board (i.e. false for rotates and nulls)
+	boolean tileHasChanged = true;
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -125,24 +128,33 @@ public class BoardController {
 	public void updateTileInHandRef(Notification n) {
 		Tile t = (Tile) n.argument();
 		tileInHandRef_ = t;
-		try {
-			Set<TileBoardIterator> temp = board_.possiblePlacements(t);
-			if (temp.isEmpty()) {
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_WARNING,
-						"Tile does not fit on board; drawing new Tile");
-				NotificationManager.getInstance().sendNotification(
-						Notification.DRAW_TILE);
-			} else {
-				board_.addTemps(temp, tempLitTile);
-				NotificationManager.getInstance().sendNotification(
-						Notification.BOARD_SET, board_);
+		//Do we need to populate possible locations?
+		if(tileHasChanged && t!=null)
+			try {
+				Set<TileBoardIterator> temp = board_.possiblePlacements(t);
+				//If there are none, throw out TileInHand
+				if (temp.isEmpty()) {
+					NotificationManager.getInstance().sendNotification(
+							Notification.LOG_WARNING,
+							"Tile does not fit on board; drawing new Tile");
+					NotificationManager.getInstance().sendNotification(
+							Notification.DRAW_TILE);
+				//Otherwise, add the possibles
+				} else {
+					board_.addTemps(temp, tempLitTile);
+					NotificationManager.getInstance().sendNotification(
+							Notification.BOARD_SET, board_);
+					tileHasChanged = false;
+				}
+			} catch (BoardPositionFilledException e) {
+				// we really shouldn't get here if possible placements works
+				// correctly
+				e.printStackTrace();
 			}
-		} catch (BoardPositionFilledException e) {
-			// we really shouldn't get here if possible placements works
-			// correctly
-			e.printStackTrace();
-		}
+		//When TileInHand is null, next Tile_IN_HAND_CHANGED event 
+		//should trigger repop of possibles
+		if(t==null)
+			tileHasChanged = true;
 	}
 
 }
