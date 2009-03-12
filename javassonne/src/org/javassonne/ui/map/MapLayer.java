@@ -204,8 +204,10 @@ public class MapLayer extends JPanel implements MouseListener,
 		// let go of the board. It should not be used once this notification
 		// is received and setting to null allows us to make sure this is followed.
 		board_ = null;
-		boardBuffer_ = null;
-		spritesBuffer_ = null;
+		
+		// reset the board scroll offset, in case they start a new game
+		paintOffset_ = new Point(0,0);
+		renderOffset_ = new Point(0,0);
 		
 		renderBoard();
 		repaint();

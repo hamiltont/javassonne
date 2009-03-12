@@ -43,7 +43,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		super();
 
 		addKeyListener(JKeyListener.getInstance());
-		setBackgroundImagePath("images/menu_background.jpg");
+		setBackgroundImagePath("images/multiplayer_lobby_background.jpg");
 		setVisible(true);
 		setSize(800, 600);
 		setLayout(new OverlayLayout(this));
