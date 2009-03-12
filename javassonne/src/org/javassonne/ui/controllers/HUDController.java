@@ -190,7 +190,6 @@ public class HUDController {
 
 	public void updateTileInHand(Notification n) {
 		tileInHand_ = (Tile) n.argument();
-
 	}
 	
 	/*

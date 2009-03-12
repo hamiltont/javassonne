@@ -19,7 +19,6 @@
 package org.javassonne.ui.map;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -44,8 +43,6 @@ import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.ui.JKeyListener;
 
-import quicktime.std.anim.Sprite;
-
 /**
  * The default panel, displayed below all others. This panel is responsible for
  * rendering the map.
@@ -59,6 +56,7 @@ public class MapLayer extends JPanel implements MouseListener,
 	
 	private BufferedImage spritesBuffer_ = null;
 	private ArrayList<MapSprite> sprites_ = null;
+	private Timer spritesUpdateTimer_ = null;
 	
 	private Point paintOffset_ = new Point(0, 0);
 	private Point renderOffset_ = new Point(0, 0);
@@ -140,9 +138,62 @@ public class MapLayer extends JPanel implements MouseListener,
 		
 		this.addKeyListener(this);
 		this.setFocusable(true);
+
+		// create the buffers we need for drawing
+		int bufferWidth = this.getWidth() + bufferMaxOffsetX_ * 2;
+		int bufferHeight = this.getHeight() + bufferMaxOffsetY_ * 2;
+		boardBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
+				BufferedImage.TYPE_INT_RGB);
+		spritesBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
+				BufferedImage.TYPE_INT_ARGB);
+		renderBoard();
 		
+		// create the sprites array
+		sprites_ = new ArrayList<MapSprite>();
+		//TilePlacementSprite s = new TilePlacementSprite(10,10,null);
+		//this.addSprite(s);
 	}
 
+	public void addSprite(MapSprite s)
+	{
+		sprites_.add(s);
+		
+		if (spritesUpdateTimer_ != null) spritesUpdateTimer_.cancel();
+		spritesUpdateTimer_ = new Timer();
+		spritesUpdateTimer_.scheduleAtFixedRate(new UpdateSpritesTask(), 0, 1000);
+	}
+	
+	public void removeSprite(MapSprite s)
+	{
+		sprites_.remove(s);
+		
+		if (sprites_.size() == 0){
+			if (spritesUpdateTimer_ != null) spritesUpdateTimer_.cancel();
+		}
+	}
+	
+	public void updateSprites()
+	{
+		Graphics g = spritesBuffer_.getGraphics();
+		g.clearRect(0, 0, spritesBuffer_.getWidth(), spritesBuffer_.getHeight());
+		
+		// we have to iterate through the array backwards in case sprites 
+		// are removed in the update() call.
+		for (int ii = sprites_.size()-1; ii >= 0; ii--){
+			sprites_.get(ii).update(this);
+			sprites_.get(ii).draw(spritesBuffer_);
+		}
+		
+		// update the canvas
+		repaint();
+	}
+	
+	protected class UpdateSpritesTask extends TimerTask {
+		public void run() {
+			updateSprites();
+		}
+	}
+	
 	public void setBoard(Notification n) {
 		board_ = (TileBoard) n.argument();
 		renderBoard();
@@ -246,10 +297,6 @@ public class MapLayer extends JPanel implements MouseListener,
 		int w = this.getWidth();
 		int h = this.getHeight();
 
-		// paint a solid background color
-		gra.setColor(backgroundColor_);
-		gra.fillRect(0, 0, w, h);
-
 		// if we've rendered the board into the buffer image, draw the buffer
 		// image onto the screen using the "paintOffset_" to determine where it
 		// goes.
@@ -262,8 +309,8 @@ public class MapLayer extends JPanel implements MouseListener,
 			
 			gra.drawImage(boardBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
 					bufferRegionWidth, bufferRegionHeight, null);
-			gra.drawImage(spritesBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
-					bufferRegionWidth, bufferRegionHeight, null);
+			//gra.drawImage(spritesBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
+			//		bufferRegionWidth, bufferRegionHeight, null);
 		}
 	}
 
@@ -274,8 +321,12 @@ public class MapLayer extends JPanel implements MouseListener,
 	 * scrolls. It must be re-rendered when a new tile is added, etc..
 	 */
 	public void renderBoard() {
-		if (board_ == null)
-			return;
+		if (board_ == null){
+			Graphics gra = boardBuffer_.getGraphics();
+			// paint a solid background color
+			gra.setColor(backgroundColor_);
+			gra.fillRect(0, 0, boardBuffer_.getWidth(), boardBuffer_.getHeight());
+		}
 
 		try {
 			// paint the board background from the top left to the bottom
@@ -297,14 +348,6 @@ public class MapLayer extends JPanel implements MouseListener,
 			// the image we'll create.
 			renderCenteringOffset_.x = (bufferWidth - boardWidth * tileWidth) / 2;
 			renderCenteringOffset_.y = (bufferHeight - boardHeight * tileHeight) / 2;
-
-			// create the buffered image if it doesn't already exist.
-			if (boardBuffer_ == null) {
-				boardBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
-						BufferedImage.TYPE_INT_RGB);
-				spritesBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
-						BufferedImage.TYPE_INT_ARGB);
-			}
 
 			// clear the buffer to a dark gray
 			Graphics gra = boardBuffer_.getGraphics();
@@ -509,14 +552,6 @@ public class MapLayer extends JPanel implements MouseListener,
 		
 	}
 	
-	// Overloaded the add() method to bind a key listener to any elements placed
-	// within the JPanel
-	public Component add(Component comp) {
-		super.add(comp);
-		comp.addKeyListener(JKeyListener.getInstance());
-		return comp;
-	}
-
 	// TIMERS 
 	// ---------------------------------------------------------------------
 	class WorldScrollTask extends TimerTask {

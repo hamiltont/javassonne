@@ -115,18 +115,12 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	public void updateTileInHand(Notification n) {
 		Tile t = (Tile) n.argument();
-		if(t != null)
-		{
-			if (tilePanel_ == null){
-				tilePanel_ = new DragTilePanel(t);
-				DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));	
-			}
-			tilePanel_.setTile(t);
 		
-		}else {
-			DisplayHelper.getInstance().remove(tilePanel_);
-			tilePanel_ = null;
+		if (tilePanel_ == null){
+			tilePanel_ = new DragTilePanel(t);
+			DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));	
 		}
+		tilePanel_.setTile(t);
 		
 		this.invalidate();
 	}
