@@ -140,5 +140,4 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		}
 	}
-
 }
