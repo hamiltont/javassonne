@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
@@ -32,12 +33,14 @@ import javax.swing.OverlayLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
 
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, ListSelectionListener {
-	private JPanel hostsList_;
+	private JPanel main_;
 
 	public ViewNetworkHostsPanel() {
 		super();
@@ -45,16 +48,20 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/multiplayer_lobby_background.jpg");
 		setVisible(true);
-		setSize(800, 600);
 		setLayout(new OverlayLayout(this));
+		setSize(800, 600);
 		setAlignmentY(CENTER_ALIGNMENT);
 
-		hostsList_ = new JPanel();
-		hostsList_.setOpaque(false);
-		hostsList_.setLayout(null);
-		hostsList_.setAlignmentX(CENTER_ALIGNMENT);
+		main_ = new JPanel();
+		main_.setOpaque(false);
+		main_.setLayout(null);
+		main_.setAlignmentX(CENTER_ALIGNMENT);
 
-		add(hostsList_);
+		
+		// add the buttons to the general buttons panel
+		addButtonToPanel("images/new_game_cancel.jpg", "", 
+				new Point(275, 543), main_);
+
 
 		// Add list items to the hostsList_ panel
 
@@ -62,24 +69,43 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		JList l = new JList();
 		l.addListSelectionListener(this);
 		l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		l.setLocation(new Point(100, 180));
+		l.setLocation(new Point(105, 143));
 		l.setListData(items);
-		l.setSize(600, 350);
-		hostsList_.add(l);
+		l.setSize(600, 360);
+		main_.add(l);
+		
+		add(main_);
 
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(new GetNewHosts(l), 0, 1000);
-
 	}
 
 	private void addListToPanel(Point location, String[] items, JPanel panel) {
 
 	}
-
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-
+	
+	private void addButtonToPanel(String path, String notification,
+			Point location, JPanel panel) {
+		JButton b = new JButton("Close");
+		b.addActionListener(this);
+		b.setActionCommand(notification);
+		b.setLocation(location);
+		b.setSize(279, 38);
+		panel.add(b);
 	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getActionCommand().length() > 0)
+			NotificationManager.getInstance().sendNotification(
+					e.getActionCommand(), this);
+		else{
+			// user pressed cancel
+			DisplayHelper.getInstance().remove(this);
+			NotificationManager.getInstance().removeObserver(this);
+		}
+	}
+
 
 	public void valueChanged(ListSelectionEvent arg0) {
 		// TODO Auto-generated method stub
