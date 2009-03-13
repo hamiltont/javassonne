@@ -223,8 +223,26 @@ public class MapLayer extends JPanel implements MouseListener,
 	 *            respectively.
 	 */
 	public void shiftView(Point amount) {
-		paintOffset_.y += amount.y;
-		paintOffset_.x += amount.x;
+		// paint the board background from the top left to the bottom
+		// right
+		Point topLeft = board_.getUpperLeftCorner().getLocation();
+		Point bottomRight = board_.getLowerRightCorner().getLocation();
+
+		// Compute the size of the board, size of the tiles, etc...
+		// and determine if we can actually move.
+		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
+		
+		int maxScrollX = (int) (((bottomRight.getX() - topLeft.getX()) * tileSize) /2);
+		int maxScrollY = (int) (((bottomRight.getY() - topLeft.getY()) * tileSize) /2);
+
+		int possibleX = paintOffset_.x + renderOffset_.x + amount.x;
+		int possibleY = paintOffset_.y + renderOffset_.y + amount.y;
+		
+		if ((amount.x < 0 && -maxScrollX < possibleX) || (amount.x > 0 && maxScrollX > possibleX))
+			paintOffset_.x += amount.x;
+
+		if ((amount.y > 0 && -maxScrollY > possibleY) || (amount.y < 0 && maxScrollY < possibleY))
+			paintOffset_.y += amount.y;
 
 		// If we've scrolled far enough to reach part of the map not drawn into
 		// the buffer image, we need to push the paintOffset into the

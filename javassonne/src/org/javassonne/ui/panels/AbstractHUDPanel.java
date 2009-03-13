@@ -163,6 +163,8 @@ public class AbstractHUDPanel extends JPanel {
 			if ((alpha_ == 0.0f) || (alpha_ == 1.0f)){
 				cancel();
 			}
+			if (alpha_ == 0.0f)
+				close();
 		}
 	}
 }
