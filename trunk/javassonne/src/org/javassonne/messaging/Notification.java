@@ -59,11 +59,18 @@ public class Notification implements Serializable {
 	
 	public static final String QUIT = "NotificationQuit";
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
-	public static final String CLICK_ADD_TILE = "NotificationClickAddTile";
+	public static final String PLACE_TILE = "NotificationClickAddTile";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
 	
 	public static final String PLAYER_DATA_CHANGED = "NotificationPlayerDataChanged";
 	public static final String PLAYER_DATA_RESET = "NotificationPlayerDataReset";
+	
+	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
+	public static final String MEEPLE_DROPPED = "NotificationMeepleDropped";
+	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
+	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
+	public static final String END_TURN = "NotificationEndTurn";
+	public static final String BEGIN_TURN = "NotificationBeginTurn";
 
 	private String identifier_;
 	private Object argument_;

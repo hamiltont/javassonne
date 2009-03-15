@@ -18,26 +18,68 @@
 
 package org.javassonne.ui.map;
 
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 public class MapSprite {
 
 	protected int x_;
 	protected int y_;
+	protected BufferedImage image_;
+	protected Boolean shouldScaleImage_ = true;
+	protected Boolean animating_ = false;
 	
-	public MapSprite(int x, int y)
-	{
+	public MapSprite(int x, int y) {
 		x_ = x;
 		y_ = y;
 	}
-	
-	public void draw(BufferedImage target)
-	{
-		// default implementations do nothing
+
+	public void setImage(String path) {
+		try {
+			image_ = ImageIO.read(new File(path));
+		} catch (IOException e) {
+			image_ = null;
+			e.printStackTrace();
+		}
 	}
 
-	public void update(MapLayer mapLayer) 
+	public void setLocation(Point location) {
+		x_ = location.x;
+		y_ = location.y;
+	}
+	
+	public Boolean isAnimating()
 	{
+		return animating_;
+	}
+	
+	public void setAnimating(Boolean a)
+	{
+		animating_ = a;
+	}
+
+	public void addedToMap(MapLayer m)
+	{
+		
+	}
+	
+	public void draw(Graphics g, Point offset, double scale) {
+		// default implementations draws image if set
+		if (image_ != null) {
+			if (shouldScaleImage_)
+				g.drawImage(image_, x_ + offset.x, y_ + offset.y, (int)(image_
+						.getWidth() * scale), (int)(image_.getHeight() * scale), null);
+			else
+				g.drawImage(image_, x_ + offset.x, y_ + offset.y, null);
+		}
+	}
+
+	public void update(MapLayer mapLayer) {
 		// default implementations do nothing
 	}
 }

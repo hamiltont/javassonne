@@ -22,22 +22,25 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
-import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
 import org.javassonne.ui.controls.JMeepleCount;
 
 public class HUDGameStatsPanel extends AbstractHUDPanel {
-	
+
 	List<Player> players_;
-	
+	int currentPlayer_;
+
 	ArrayList<JLabel> names_;
 	ArrayList<JLabel> scores_;
 	ArrayList<JMeepleCount> meeple_;
+
+	JLabel focus_;
 	
 	public HUDGameStatsPanel(List<Player> players) {
 		super();
@@ -47,48 +50,61 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		setLayout(null);
 		setBackgroundImagePath("images/hud_stats_background.jpg");
 		setBackgroundScaleToFit(false);
-		
+
 		// store the array of players locally
 		players_ = players;
+		currentPlayer_ = 0;
 		
 		// create the labels and stuff for each of the player's stats
 		int y = 28;
-		for (Player p : players_){
+		for (Player p : players_) {
 			JLabel name = new JLabel(p.getName());
 			name.setLocation(6, y);
 			name.setSize(135, 22);
 			add(name);
-			
+
 			JLabel score = new JLabel(String.valueOf(p.getScore()));
 			score.setLocation(144, y);
 			score.setSize(65, 22);
 			add(score);
-			
+
 			JMeepleCount meeple = new JMeepleCount(p.getMeepleColor().value);
 			meeple.setLocation(214, y);
-			meeple.setSize(170,24);
+			meeple.setSize(170, 24);
 			add(meeple);
 			meeple.setCount(7);
-			y+= 28;
+			y += 28;
 		}
+		// create the focus thing that makes the selected player blue
+		focus_ = new JLabel(new ImageIcon("images/hud_stats_focus_background.png"));
+		focus_.setSize(380, 26);
+		focus_.setLocation(0, 26);
+		focus_.setOpaque(false);
+		add(focus_);
 		
 		// Subscribe for notifications from the controller so we know when to
 		// update ourselves!
-		NotificationManager.getInstance().addObserver(
-				Notification.END_GAME, this, "endGame");
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
+		NotificationManager.getInstance().addObserver(Notification.END_TURN,
+				this, "endTurn");
 	}
-	
+
 	public void endGame(Notification n) {
-		// Unsubscribe from notifications once the game has ended
-		NotificationManager.getInstance().removeObserver(this);
-	
-		// remove ourselves from the displayHelper
-		DisplayHelper.getInstance().remove(this);
-		
 		// reset the players array to make sure it is not references
 		players_ = null;
+		close();
 	}
-	
+
+	public void endTurn(Notification n) {
+		// sent from the confirmPlacement panel when the user presses end turn.
+		// We want to advance the turn and change current player.
+		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
+		
+		// move the selected player focus background
+		focus_.setLocation(0, 26 + currentPlayer_ * 28);
+	}
+
 	// Overloaded the add() method to bind a key listener to any elements placed
 	// within the JPanel
 	public Component add(Component comp) {

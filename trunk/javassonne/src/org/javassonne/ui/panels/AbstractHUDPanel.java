@@ -22,6 +22,10 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +35,8 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
 
@@ -43,19 +49,31 @@ import org.javassonne.ui.JKeyListener;
  * @author bengotow
  * 
  */
-public class AbstractHUDPanel extends JPanel {
+public class AbstractHUDPanel extends JPanel implements MouseListener,
+MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
 	private BufferedImage backgroundOriginal_ = null;
 	private BufferedImage background_ = null;
 	private Timer timer_;
 	private float alpha_ = 1.0f;
-	
+
 	private boolean scaleToFit_ = true;
-	
+
+	// for dragging
+	private Point mouseOffset_ = null;
+	private Point resetLocation_ = null;
+	private Timer resetTimer_;
+	private Boolean respondToClick_ = true;
+
+	private Boolean draggable_ = false;
+	private String draggableNotification_ = null;
+
 	public AbstractHUDPanel() {
 		super();
 
+		addMouseListener(this);
+		addMouseMotionListener(this);
 		addKeyListener(JKeyListener.getInstance());
 	}
 
@@ -75,17 +93,24 @@ public class AbstractHUDPanel extends JPanel {
 	public void setBackgroundImage(BufferedImage img) {
 		backgroundOriginal_ = img;
 		background_ = img;
-		
+
 		repaint();
 	}
 
 	public void setBackgroundAlpha(float alpha) {
 		if (backgroundOriginal_ == null)
 			return;
-		
+
+		if (alpha < 0f || alpha > 1.0f)
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR,
+					String.format("Alpha %f illegial.", alpha));
+
+		alpha_ = alpha;
+
 		int w = backgroundOriginal_.getWidth();
 		int h = backgroundOriginal_.getHeight();
-		
+
 		// create a semi-transparent version of the image
 		BufferedImage mask = new BufferedImage(w, h,
 				BufferedImage.TYPE_4BYTE_ABGR);
@@ -94,8 +119,7 @@ public class AbstractHUDPanel extends JPanel {
 		maskG.fillRect(0, 0, w, h);
 		maskG.dispose();
 
-		background_ = new BufferedImage(w, h,
-				BufferedImage.TYPE_4BYTE_ABGR);
+		background_ = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g2 = background_.createGraphics();
 		g2.drawImage(backgroundOriginal_, 0, 0, null);
 		AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_IN,
@@ -103,9 +127,18 @@ public class AbstractHUDPanel extends JPanel {
 		g2.setComposite(ac);
 		g2.drawImage(mask, 0, 0, null);
 		g2.dispose();
-		
+
 		repaint();
 	}
+
+	public void setDraggable(Boolean d) {
+		draggable_ = d;
+	}
+
+	public void setDropNotification(String notificationIdentifier) {
+		draggableNotification_ = notificationIdentifier;
+	}
+
 	/*
 	 * This function is responsible for painting the background image we have.
 	 */
@@ -123,48 +156,150 @@ public class AbstractHUDPanel extends JPanel {
 
 		}
 	}
-	
+
+	/*
+	 * Convenience functions for dragging the panel
+	 */
+	public void mouseDragged(MouseEvent e) {
+		if (respondToClick_ && draggable_) {
+			setBackgroundAlpha(0.6f);
+
+			if (mouseOffset_ == null)
+				mouseOffset_ = new Point(e.getX(), e.getY());
+			else {
+				Point c = this.getLocation();
+				this.setLocation(c.x + e.getX() - mouseOffset_.x, c.y
+						+ e.getY() - mouseOffset_.y);
+			}
+		}
+	}
+
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mousePressed(MouseEvent e) {
+		if ((respondToClick_) && (draggable_)) {
+			if (resetTimer_ != null)
+				resetTimer_.cancel();
+			resetLocation_ = this.getLocation();
+			repaint();
+		}
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		if ((respondToClick_) && (draggable_) && (mouseOffset_ != null)) {
+			// see if we can place the tile on the map.
+			Point clickLocation = this.getLocation();
+			clickLocation.x += mouseOffset_.x;
+			clickLocation.y += mouseOffset_.y;
+
+			// slide the tile back to it's starting location on the sidebar
+			if (resetTimer_ != null)
+				resetTimer_.cancel();
+			resetTimer_ = new Timer();
+			resetTimer_.scheduleAtFixedRate(new ResetSlideTask(), 0, 5);
+
+			respondToClick_ = false;
+			mouseOffset_ = null;
+
+			NotificationManager.getInstance().sendNotification(
+					draggableNotification_, clickLocation);
+		}
+	}
+
 	/*
 	 * Convenience functions for animating the panel
 	 */
-	public void close(){
+	public void close() {
+		NotificationManager.getInstance().removeObserver(this);
 		DisplayHelper.getInstance().remove(this);
 		if (timer_ != null)
 			timer_.cancel();
 	}
-	
-	public void fadeOut(){
+
+	public void fadeOut() {
 		if (timer_ != null)
 			timer_.cancel();
 		timer_ = new Timer();
-		timer_.schedule(new FadeTimer(-0.05f), 0, 20);	
+		timer_.schedule(new FadeTimer(-0.05f), 0, 20);
 	}
-	
-	public void fadeIn(){
+
+	public void fadeIn() {
 		setBackgroundAlpha(0.0f);
 		if (timer_ != null)
 			timer_.cancel();
 		timer_ = new Timer();
 		timer_.schedule(new FadeTimer(0.05f), 0, 20);
 	}
-	// TIMERS 
+
+	// TIMERS
 	// ---------------------------------------------------------------------
 	class FadeTimer extends TimerTask {
 		float delta_ = 0.0f;
-		
-		FadeTimer(float delta){
+
+		FadeTimer(float delta) {
 			super();
 			delta_ = delta;
 		}
+
 		public void run() {
-			alpha_ = Math.max(alpha_ + delta_, 0.0f);
+			alpha_ = Math.min(Math.max(alpha_ + delta_, 0.0f), 1.0f);
 			setBackgroundAlpha(alpha_);
-		
-			if ((alpha_ == 0.0f) || (alpha_ == 1.0f)){
+
+			if ((alpha_ == 0.0f) || (alpha_ == 1.0f)) {
 				cancel();
 			}
 			if (alpha_ == 0.0f)
 				close();
 		}
 	}
+
+	protected class ResetSlideTask extends TimerTask {
+		private double dx;
+		private double dy;
+		private double x;
+		private double y;
+
+		public ResetSlideTask() {
+			dx = (double) (resetLocation_.x - getLocation().x) / 40.0;
+			dy = (double) (resetLocation_.y - getLocation().y) / 40.0;
+			x = getLocation().x;
+			y = getLocation().y;
+		}
+
+		public void run() {
+			x += dx;
+			y += dy;
+			setLocation(new Point((int) x, (int) y));
+
+			// if we are now in the starting location, make us opaque again and
+			// stop the timer from firing. Also set the location to the exact
+			// one, just in case.
+			if (x <= resetLocation_.x || y <= resetLocation_.y) {
+				setLocation(resetLocation_);
+				setBackgroundAlpha(1.0f);
+
+				resetTimer_.cancel();
+				respondToClick_ = true;
+			}
+		}
+	}
+
 }

@@ -56,12 +56,10 @@ public class HUDShowInstructionsPanel extends AbstractHUDPanel implements MouseL
 		// Unsubscribe from notifications once the game has ended
 		NotificationManager.getInstance().removeObserver(this);
 	}
-	public void endGame(Notification n) {
-		// Unsubscribe from notifications once the game has ended
-		NotificationManager.getInstance().removeObserver(this);
 	
-		// remove ourselves from the displayHelper
-		DisplayHelper.getInstance().remove(this);
+	public void endGame(Notification n) {
+		//close ourselves
+		close();
 	}
 	
 	public void mouseClicked(MouseEvent e) {

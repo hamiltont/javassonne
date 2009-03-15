@@ -69,10 +69,12 @@ public class GameController {
 	private Boolean gameInProgress_ = false;
 
 	private MenuPanel menu_;
-	private Tile tileInHand_;
 
 	private InputPlayerDataPanel playerData_;
 	private List<Player> players_;
+	private int currentPlayer_;
+
+	private TileDeck deck_;
 
 	/**
 	 * The default constructor takes no arguments and assumes a GameWindow has
@@ -99,6 +101,8 @@ public class GameController {
 				this, "loadGame");
 		NotificationManager.getInstance().addObserver(Notification.SAVE_GAME,
 				this, "saveGame");
+		NotificationManager.getInstance().addObserver(Notification.END_TURN,
+				this, "endTurn");
 		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
 				"quitGame");
 		NotificationManager.getInstance().addObserver(
@@ -160,6 +164,7 @@ public class GameController {
 				Notification.TOGGLE_MAIN_MENU);
 
 		playerData_ = (InputPlayerDataPanel) n.argument();
+		currentPlayer_ = 0;
 		loadPlayerData();
 
 		DisplayHelper.getInstance().remove(playerData_);
@@ -174,17 +179,19 @@ public class GameController {
 
 		// Populate the set into the deck. Note: you can have multiple copies of
 		// a tile in a deck, but not in a set
-		TileDeck deck = new TileDeck();
-		deck.addTileSet(set);
-		deck.addTileSet(set);
-
-		TileBoard board = new TileMapBoard(deck);
+		deck_ = new TileDeck();
+		deck_.addTileSet(set);
+		TileBoard board = new TileMapBoard(deck_);
 
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController(board);
-		hudController_ = new HUDController(deck, players_);
+		hudController_ = new HUDController(deck_, players_);
+
+		// See if the first person is playing on this computer. If they are,
+		// send the begin turn notification to activate the interface for them.
+		beginTurn();
 	}
 
 	/**
@@ -199,13 +206,11 @@ public class GameController {
 	 */
 	public void endGame(Notification n) {
 		// reset game-related state variables. The board controller and hud
-		// controller
-		// also receive this notification, and they will remove their views from
-		// the screen.
+		// controller also receive this notification, and they will remove their
+		// views from the screen.
 		boardController_ = null;
 		hudController_ = null;
 		gameInProgress_ = false;
-		tileInHand_ = null;
 
 		playerData_ = null;
 		players_ = null;
@@ -229,6 +234,38 @@ public class GameController {
 		if (ans == END_WITHOUT_SAVING)
 			NotificationManager.getInstance().sendNotification(
 					Notification.END_GAME);
+	}
+
+	public void endTurn(Notification n) {
+		// sent from the confirmPlacement panel when the user presses end turn.
+		// We want to advance the turn and change current player.
+		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
+
+		beginTurn();
+	}
+
+	public void beginTurn() {
+		// if the current player is playing on this machine, we need to enable
+		// the
+		// interface so they can place a tile. We do that by passing another
+		// notification
+		Player p = players_.get(currentPlayer_);
+
+		if (p.getIsLocal() == true) {
+			// Draw the another tile!
+			Tile t = deck_.popRandomTile();
+
+			// Send notification that we've modified the deck
+			NotificationManager.getInstance().sendNotification(
+					Notification.DECK_CHANGED, deck_);
+
+			// Send notifications to attach our tileInHand to the view
+			NotificationManager.getInstance().sendNotification(
+					Notification.TILE_IN_HAND_CHANGED, t);
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.BEGIN_TURN, p);
+		}
 	}
 
 	public void toggleMainMenu(Notification n) {
@@ -277,9 +314,7 @@ public class GameController {
 				Player player = new Player(s);
 				player.setMeepleColor(MeepleColor.values()[i++]);
 				players_.add(player);
-			}
-			else
-			{
+			} else {
 				Player player = new Player();
 				player.setMeepleColor(MeepleColor.values()[i++]);
 				players_.add(player);

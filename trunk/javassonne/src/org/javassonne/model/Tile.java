@@ -19,6 +19,7 @@
 package org.javassonne.model;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
@@ -52,11 +53,21 @@ public class Tile {
 	 * 
 	 */
 	public enum Region {
-		Left(0), Top(1), Right(2), Bottom(3), Center(4);
+		Left(0, 30, 91), Top(1, 91, 30), Right(2, 152, 91), Bottom(3, 91, 152), Center(
+				4, 91, 91);
 		private final int index;
 
-		Region(int i) {
+		// HACK: In order to actually display a guy on top of a region,
+		// we need to know where on the tile the region is. This has to be
+		// hardcoded somewhere, so it seemed like this was a good place.
+		// Used in TilePlacementSprite.
+		public final int x;
+		public final int y;
+
+		Region(int i, int x, int y) {
 			this.index = i;
+			this.x = x;
+			this.y = y;
 		}
 	}
 
@@ -68,11 +79,22 @@ public class Tile {
 	 * 
 	 */
 	public enum Quadrant {
-		TopLeft(0), TopRight(1), BottomRight(2), BottomLeft(3);
+		TopLeft(0, new Rectangle2D.Double(0, 0, 91, 91)), 
+		TopRight(1, new Rectangle2D.Double(91, 0, 91, 91)), 
+		BottomRight(2, new Rectangle2D.Double(91, 91, 91, 91)), 
+		BottomLeft(3, new Rectangle2D.Double(0, 91, 91, 91));
+		
 		private final int index;
+		public final Rectangle2D rect;
 
-		Quadrant(int i) {
+		// HACK: In order to actually display a guy on top of a region,
+		// we need to know where on the tile the region is. This has to be
+		// hardcoded somewhere, so it seemed like this was a good place.
+		// Used in TilePlacementSprite.
+
+		Quadrant(int i, Rectangle2D rect) {
 			this.index = i;
+			this.rect = rect;
 		}
 	}
 
@@ -99,9 +121,10 @@ public class Tile {
 		farmWalls_ = t.farmWalls_;
 		uniqueIdentifier_ = new String(t.getUniqueIdentifier());
 
-		if (t.getImage() != null){
+		if (t.getImage() != null) {
 			BufferedImage other = t.getImage();
-			image_ = other.getSubimage(0, 0, other.getWidth(), other.getHeight());
+			image_ = other.getSubimage(0, 0, other.getWidth(), other
+					.getHeight());
 		}
 	}
 
@@ -255,18 +278,18 @@ public class Tile {
 	 *            Direction that properties of the tile should be shifted
 	 */
 	private void rotate(int direction) {
-		//Make tempDir positive by rotating 360 until it is
+		// Make tempDir positive by rotating 360 until it is
 		while (direction < 0)
-			direction+=4;
-		
-		//Make tempArrays so contents aren't overwritten
+			direction += 4;
+
+		// Make tempArrays so contents aren't overwritten
 		String[] tempFeatures = features_.clone();
 		int[] tempFarms = farms_.clone();
 		boolean[] tempWalls = farmWalls_.clone();
-		
+
 		// move all of the features, farms, and farmWalls one position to the
 		// right by shifting them within their respective arrays
-		
+
 		for (int i = 0; i < 4; i++) {
 			tempFeatures[(i + direction) % 4] = features_[i];
 			tempFarms[(i + direction) % 4] = farms_[i];

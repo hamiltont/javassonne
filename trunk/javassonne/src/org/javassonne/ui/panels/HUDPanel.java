@@ -46,7 +46,6 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton drawTile_;
 	private JButton rotateRight_;
 	private JButton rotateLeft_;
 	private DragTilePanel tilePanel_;
@@ -58,13 +57,6 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		setVisible(true);
 		setSize(144, 181);
 		setLayout(null);
-		
-		drawTile_ = new JButton(new ImageIcon("images/hud_draw_tile.jpg"));
-		drawTile_.setActionCommand(Notification.DRAW_TILE);
-		drawTile_.addActionListener(this);
-		drawTile_.setLocation(24,53);
-		drawTile_.setSize(93, 38);
-		add(drawTile_);
 		
 		rotateRight_ = new JButton(new ImageIcon("images/hud_rotate_right.jpg"));
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
@@ -91,12 +83,11 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 	}
 
 	public void endGame(Notification n) {
-		// Unsubscribe from notifications once the game has ended
-		NotificationManager.getInstance().removeObserver(this);
-		
-		// remove ourselves from the displayHelper
-		DisplayHelper.getInstance().remove(this);
+		// remove our tilePanel from the displayHelper
 		DisplayHelper.getInstance().remove(tilePanel_);
+		
+		// close ourselves
+		close();
 	}
 	
 	/*
