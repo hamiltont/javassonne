@@ -69,9 +69,7 @@ public class HUDController {
 	public HUDController(TileDeck d, List<Player> players) {
 		deck_ = d;
 		players_ = players;
-		// Draw the first tile!
-		tileInHand_ = deck_.popRandomTile();
-
+		
 		hudRemainingTiles_ = new RemainingTilesPanel();
 		hudButtons_ = new HUDButtonsPanel();
 		hudPanel_ = new HUDPanel();
@@ -101,37 +99,26 @@ public class HUDController {
 				DisplayHelper.Layer.PALETTE,
 				DisplayHelper.Positioning.BOTTOM_LEFT);
 
-		// Send notification that we've modified the deck
-		NotificationManager.getInstance().sendNotification(
-				Notification.DECK_CHANGED, deck_);
-
-		// Send notifications to attach our tileInHand to the view
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
-
 		// register to receive events from the HUD views
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_ROTATE_LEFT, this, "rotateTileInHandLeft");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
-		NotificationManager.getInstance().addObserver(Notification.DRAW_TILE,
-				this, "drawTile");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
-
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "gameOver");
-		
-	}
 
+	}
+	
 	public void endGame(Notification n) {
-		// unregister ourselves so we no longer get notifications. A new HUDController
+		// unregister ourselves so we no longer get notifications. A new
+		// HUDController
 		// will be created if a new game is started!
 		NotificationManager.getInstance().removeObserver(this);
-		
+
 		// the panels all respond to this notification, and they remove
 		// themselves from the view.
 		hudRemainingTiles_ = null;
@@ -172,48 +159,30 @@ public class HUDController {
 		}
 	}
 
-	/**
-	 * This function is called when a DRAW_TILE notification is received. We
-	 * want to draw a tile, update the turn indicator and then send a
-	 * notification back letting the views know that they should redraw the tile
-	 * onscreen.
-	 */
-	public void drawTile() {
-		// Draw a tile
-		tileInHand_ = deck_.popRandomTile();
-
-		// Send notification that we've modified the deck
-		NotificationManager.getInstance().sendNotification(
-				Notification.DECK_CHANGED, deck_);
-
-		// Send notification that we've changed the tile in hand
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, tileInHand_);
-	}
-
 	public void updateTileInHand(Notification n) {
 		tileInHand_ = (Tile) n.argument();
 	}
-	
+
 	/*
 	 * The game has been completed! We must now finish scoring and end the game
 	 */
-	public void gameOver(Notification n){
+	public void gameOver(Notification n) {
 
 		// Game Over Conditions: Tile End is Empty
-		if(deck_.tilesRemaining() != 0)
-				return;
-		
+		if (deck_.tilesRemaining() != 0)
+			return;
+
 		// Finish scoring
 		// TODO: calculate scores & update players_
-		
+
 		GameOverPanel g = new GameOverPanel(players_);
-		
+
 		Properties config = new Properties();
 		config.setProperty("hideMainMenu", "true");
-		NotificationManager.getInstance().sendNotification(Notification.END_GAME,config);
-		
-		DisplayHelper.getInstance().add(g,DisplayHelper.Layer.MODAL,
+		NotificationManager.getInstance().sendNotification(
+				Notification.END_GAME, config);
+
+		DisplayHelper.getInstance().add(g, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 	}
 }

@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Feb 15, 2009
+ * @date Mar 13, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,27 +19,18 @@
 package org.javassonne.ui.panels;
 
 import org.javassonne.messaging.Notification;
-import org.javassonne.model.Tile;
 
-public class DragTilePanel extends AbstractHUDPanel {
+public class DragMeeplePanel extends AbstractHUDPanel {
 
-	public DragTilePanel(Tile t) {
-		setSize(120, 120);
-		setTile(t);
+	public DragMeeplePanel()
+	{
+		setSize(48, 52);
 		setOpaque(false);
-
+		setBackgroundImagePath("images/meeple_0.png");
+		setBackgroundScaleToFit(true);
+		
 		// make it so the user can drag and drop the tile
-		setDropNotification(Notification.TILE_DROPPED);
+		setDropNotification(Notification.MEEPLE_DROPPED);
 		setDraggable(true);
 	}
-
-	public void setTile(Tile t) {
-		if (t != null) {
-			setBackgroundImage(t.getImage());
-			setVisible(true);
-		} else {
-			setVisible(false);
-		}
-	}
-
 }

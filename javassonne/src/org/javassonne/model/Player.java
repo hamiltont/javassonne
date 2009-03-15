@@ -39,12 +39,18 @@ public class Player {
 	private int meepleRemaining_;
 	private int turnNumber_;
 	private int score_;
-
+	
+	// The game interface needs to know if this player is on the local machine or not.
+	// (So we can allow them to place a tile during their turn or not) This may have
+	// a more complex representation here later, but this is all we need for now.
+	private Boolean isLocal_;
+	
 	//ctors
 	public Player() {
 		name_ = DEFAULT_NAME;
 		meepleColor_ = DEFAULT_MEEPLE_COLOR;
 		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
+		isLocal_ = true;
 		turnNumber_ = 0;
 		score_ = 0;
 	}
@@ -106,5 +112,12 @@ public class Player {
 	public void setScore(int score) {
 		this.score_ = score;
 	}
-
+	
+	public Boolean getIsLocal(){
+		return isLocal_;
+	}
+	
+	public void setIsLocal(Boolean local){
+		this.isLocal_ = local;
+	}
 }

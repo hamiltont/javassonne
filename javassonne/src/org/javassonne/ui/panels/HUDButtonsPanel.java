@@ -78,11 +78,7 @@ public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener 
 	}
 
 	public void endGame(Notification n) {
-		// Unsubscribe from notifications once the game has ended
-		NotificationManager.getInstance().removeObserver(this);
-	
-		// remove ourselves from the displayHelper
-		DisplayHelper.getInstance().remove(this);
+		close();
 	}
 	
 	/*

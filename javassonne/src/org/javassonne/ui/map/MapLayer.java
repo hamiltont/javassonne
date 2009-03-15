@@ -31,6 +31,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,13 +52,14 @@ public class MapLayer extends JPanel implements MouseListener,
 		MouseMotionListener, KeyListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
-	
+
 	private BufferedImage boardBuffer_ = null;
-	
-	private BufferedImage spritesBuffer_ = null;
 	private ArrayList<MapSprite> sprites_ = null;
-	private Timer spritesUpdateTimer_ = null;
-	
+
+	private Timer updateTimer_ = null;
+	private long updateLastMilliseconds_ = 0;
+	private int updateFPS_ = 0;
+
 	private Point paintOffset_ = new Point(0, 0);
 	private Point renderOffset_ = new Point(0, 0);
 	private Point renderCenteringOffset_ = new Point(0, 0);
@@ -66,22 +68,22 @@ public class MapLayer extends JPanel implements MouseListener,
 	// larger than the map view. That way, when you scroll, you can go a certain
 	// distance in any direction before the map needs to be redrawn into the
 	// buffer.
-	private static final int bufferMaxOffsetX_ = 500;
-	private static final int bufferMaxOffsetY_ = 500;
+	private static final int BUFFER_MAX_OFFSET_X = 500;
+	private static final int BUFFER_MAX_OFFSET_Y = 500;
 
 	// The background color is drawn into the buffer_ and used as a background
 	// for the JPanel.
-	private static final Color backgroundColor_ = Color.darkGray;
+	private static final Color BACKGROUND_COLOR = Color.darkGray;
+	private static final int MAP_SHIFT_SPEED = 10;
 
 	// The scale the tiles are drawn at
 	private double scale_ = 0.7;
-	
+
 	// For scrolling hotspots:
 	private Rectangle2D navLeft_;
 	private Rectangle2D navRight_;
 	private Rectangle2D navTop_;
 	private Rectangle2D navBottom_;
-	private Timer mapShiftTimer_;
 	private Point mapShift_;
 
 	/**
@@ -98,21 +100,24 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Listen for notification setting our board model
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
 				this, "setBoard");
-		
-		// Listen for the end-game notification so we know if we need to clear the board.
+		// Listen for the end-game notification so we know if we need to clear
+		// the board.
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-
 		// Listen for notifications changing the zoom
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_IN,
 				this, "zoomIn");
 		NotificationManager.getInstance().addObserver(Notification.ZOOM_OUT,
 				this, "zoomOut");
-
+		// Listen for notifications for adding and removing sprites
+		NotificationManager.getInstance().addObserver(
+				Notification.MAP_ADD_SPRITE, this, "addSprite");
+		NotificationManager.getInstance().addObserver(
+				Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
 		// Listen for a notification from the tile being dragged
-		NotificationManager.getInstance().addObserver(Notification.TILE_DROPPED,
-				this, "tileDropped");
-		
+		NotificationManager.getInstance().addObserver(
+				Notification.TILE_DROPPED, this, "tileDropped");
+
 		// Load the background image from disk
 		try {
 			backgroundTile_ = ImageIO.read(new File(
@@ -135,65 +140,102 @@ public class MapLayer extends JPanel implements MouseListener,
 		// click listener so we can detect clicks.
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-		
+
 		this.addKeyListener(this);
 		this.setFocusable(true);
 
 		// create the buffers we need for drawing
-		int bufferWidth = this.getWidth() + bufferMaxOffsetX_ * 2;
-		int bufferHeight = this.getHeight() + bufferMaxOffsetY_ * 2;
+		int bufferWidth = this.getWidth() + BUFFER_MAX_OFFSET_X * 2;
+		int bufferHeight = this.getHeight() + BUFFER_MAX_OFFSET_Y * 2;
 		boardBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
 				BufferedImage.TYPE_INT_RGB);
-		spritesBuffer_ = new BufferedImage(bufferWidth, bufferHeight,
-				BufferedImage.TYPE_INT_ARGB);
 		renderBoard();
-		
+
 		// create the sprites array
 		sprites_ = new ArrayList<MapSprite>();
-		//TilePlacementSprite s = new TilePlacementSprite(10,10,null);
-		//this.addSprite(s);
 	}
 
-	public void addSprite(MapSprite s)
-	{
+	// ------------------------------------------------------------------------
+	// SPRITE MANAGEMENT AND BOARD ANIMATION
+	// ------------------------------------------------------------------------
+
+	public void addSprite(MapSprite s) {
 		sprites_.add(s);
-		
-		if (spritesUpdateTimer_ != null) spritesUpdateTimer_.cancel();
-		spritesUpdateTimer_ = new Timer();
-		spritesUpdateTimer_.scheduleAtFixedRate(new UpdateSpritesTask(), 0, 1000);
+		recalculateUpdateFrequency();
 	}
-	
-	public void removeSprite(MapSprite s)
-	{
+
+	public void addSprite(Notification n) {
+		MapSprite s = (MapSprite) n.argument();
+		this.addSprite(s);
+		s.addedToMap(this);
+	}
+
+	public void removeSprite(MapSprite s) {
 		sprites_.remove(s);
-		
-		if (sprites_.size() == 0){
-			if (spritesUpdateTimer_ != null) spritesUpdateTimer_.cancel();
-		}
+		recalculateUpdateFrequency();
 	}
-	
-	public void updateSprites()
-	{
-		Graphics g = spritesBuffer_.getGraphics();
-		g.clearRect(0, 0, spritesBuffer_.getWidth(), spritesBuffer_.getHeight());
-		
-		// we have to iterate through the array backwards in case sprites 
-		// are removed in the update() call.
-		for (int ii = sprites_.size()-1; ii >= 0; ii--){
+
+	public void removeSprite(Notification n) {
+		this.removeSprite((MapSprite) n.argument());
+	}
+
+	protected void update() {
+		// we need to iterate through the list backwards in case
+		// any of the sprites remove themselves.
+		for (int ii = sprites_.size() - 1; ii >= 0; ii--) {
 			sprites_.get(ii).update(this);
-			sprites_.get(ii).draw(spritesBuffer_);
 		}
-		
-		// update the canvas
+
+		if (mapShift_ != null)
+			shiftView(mapShift_);
+
+		long m = Calendar.getInstance().getTimeInMillis();
+		updateFPS_ = (int) (1000 / (m - updateLastMilliseconds_));
+		updateLastMilliseconds_ = m;
+
 		repaint();
 	}
-	
-	protected class UpdateSpritesTask extends TimerTask {
-		public void run() {
-			updateSprites();
+
+	public void recalculateUpdateFrequency() {
+		if (updateTimer_ != null) {
+			updateTimer_.cancel();
+			updateTimer_ = null;
+		}
+
+		// determine if the timer should be firing or not. If any of our sprites
+		// need to be animated, or if the map is shifting, we want 20FPS.
+		// Otherwise
+		// 2 FPS will do.
+
+		Boolean spriteActive = false;
+		for (MapSprite s : sprites_) {
+			if (s.isAnimating()) {
+				spriteActive = true;
+				break;
+			}
+		}
+
+		if (spriteActive || (mapShift_ != null)) {
+			updateTimer_ = new Timer();
+			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 50); // 20
+																		// FPS
+		} else {
+			updateTimer_ = new Timer();
+			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 500); // 2
+																			// FPS
 		}
 	}
-	
+
+	protected class UpdateTask extends TimerTask {
+		public void run() {
+			update();
+		}
+	}
+
+	// ------------------------------------------------------------------------
+	// FOLLOWING GAME STATE
+	// ------------------------------------------------------------------------
+
 	public void setBoard(Notification n) {
 		board_ = (TileBoard) n.argument();
 		renderBoard();
@@ -202,17 +244,85 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public void endGame(Notification n) {
 		// let go of the board. It should not be used once this notification
-		// is received and setting to null allows us to make sure this is followed.
+		// is received and setting to null allows us to make sure this is
+		// followed.
 		board_ = null;
+		sprites_.clear();
 		
 		// reset the board scroll offset, in case they start a new game
-		paintOffset_ = new Point(0,0);
-		renderOffset_ = new Point(0,0);
-		
+		paintOffset_ = new Point(0, 0);
+		renderOffset_ = new Point(0, 0);
+
 		renderBoard();
 		repaint();
 	}
-	
+
+	public void tileDropped(Notification n) {
+		if (board_ == null)
+			return;
+
+		Point p = this.getTileAtPoint((Point) n.argument());
+		NotificationManager.getInstance().sendNotification(
+				Notification.PLACE_TILE, p);
+	}
+
+	// ------------------------------------------------------------------------
+	// ZOOM AND PAN OPERATIONS
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Handles the ZOOM_IN notification and re-renders the board at a higher
+	 * zoom level.
+	 * 
+	 * @param n
+	 */
+	public void zoomIn(Notification n) {
+		if (!zoomedMax()) {
+			scale_ += 0.1;
+
+			renderBoard();
+			repaint();
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_CHANGED, this);
+		}
+	}
+
+	/**
+	 * Handles the ZOOM_OUT notification and re-renders the board at a lower
+	 * zoom level.
+	 * 
+	 * @param n
+	 */
+	public void zoomOut(Notification n) {
+		if (!zoomedMin()) {
+			scale_ -= 0.1;
+
+			renderBoard();
+			repaint();
+			NotificationManager.getInstance().sendNotification(
+					Notification.ZOOM_CHANGED, this);
+		}
+	}
+
+	// Zoomed all the way in?
+	public boolean zoomedMax() {
+		return (scale_ > 1);
+	}
+
+	// Zoomed all the way out?
+	public boolean zoomedMin() {
+		return (scale_ < .6);
+	}
+
+	void setShift(int dx, int dy) {
+		Point newShift = null;
+		if (dx != 0 || dy != 0)
+			newShift = new Point(dx, dy);
+
+		mapShift_ = newShift;
+		recalculateUpdateFrequency();
+	}
+
 	/**
 	 * ShiftView allows you to pan the map by passing a scroll amount. This
 	 * function is used by the MapScrollEdges to move the map when the user
@@ -231,24 +341,26 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Compute the size of the board, size of the tiles, etc...
 		// and determine if we can actually move.
 		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
-		
-		int maxScrollX = (int) (((bottomRight.getX() - topLeft.getX()) * tileSize) /2);
-		int maxScrollY = (int) (((bottomRight.getY() - topLeft.getY()) * tileSize) /2);
+
+		int maxScrollX = (int) (((bottomRight.getX() - topLeft.getX()) * tileSize) / 2);
+		int maxScrollY = (int) (((bottomRight.getY() - topLeft.getY()) * tileSize) / 2);
 
 		int possibleX = paintOffset_.x + renderOffset_.x + amount.x;
 		int possibleY = paintOffset_.y + renderOffset_.y + amount.y;
-		
-		if ((amount.x < 0 && -maxScrollX < possibleX) || (amount.x > 0 && maxScrollX > possibleX))
+
+		if ((amount.x < 0 && -maxScrollX < possibleX)
+				|| (amount.x > 0 && maxScrollX > possibleX))
 			paintOffset_.x += amount.x;
 
-		if ((amount.y > 0 && -maxScrollY > possibleY) || (amount.y < 0 && maxScrollY < possibleY))
+		if ((amount.y > 0 && -maxScrollY > possibleY)
+				|| (amount.y < 0 && maxScrollY < possibleY))
 			paintOffset_.y += amount.y;
 
 		// If we've scrolled far enough to reach part of the map not drawn into
 		// the buffer image, we need to push the paintOffset into the
 		// renderOffset and then re-render the board.
-		if ((Math.abs(paintOffset_.x) > bufferMaxOffsetX_)
-				|| (Math.abs(paintOffset_.y) > bufferMaxOffsetY_)) {
+		if ((Math.abs(paintOffset_.x) > BUFFER_MAX_OFFSET_X)
+				|| (Math.abs(paintOffset_.y) > BUFFER_MAX_OFFSET_Y)) {
 
 			// Add the current paintOffset to the renderOffset.
 			renderOffset_.x += paintOffset_.x;
@@ -263,56 +375,13 @@ public class MapLayer extends JPanel implements MouseListener,
 			// Rerender the board to "commit" or changes to the offset.
 			renderBoard();
 		}
-
-		// Paint the buffer to the screen at the pointOffset.
-		repaint();
 	}
 
-	/**
-	 * Handles the ZOOM_IN notification and re-renders the board at a higher
-	 * zoom level.
-	 * 
-	 * @param n
-	 */
-	public void zoomIn(Notification n) {
-		if (!zoomedMax()) {
-			scale_ += 0.1;
-			
-			renderBoard();
-			repaint();
-			NotificationManager.getInstance().sendNotification(
-					Notification.ZOOM_CHANGED, this);
-		}
-	}
+	// ------------------------------------------------------------------------
+	// RENDERING AND DISPLAY
+	// ------------------------------------------------------------------------
 
-	/**
-	 * Handles the ZOOM_OUT notification and re-renders the board at a lower
-	 * zoom level.
-	 * 
-	 * @param n
-	 */
-	public void zoomOut(Notification n) {
-		if (!zoomedMin()) {
-			scale_ -= 0.1;
-			
-			renderBoard();
-			repaint();
-			NotificationManager.getInstance().sendNotification(
-					Notification.ZOOM_CHANGED, this);
-		}
-	}
-
-	// Zoomed all the way in?
-	public boolean zoomedMax() {
-		return (scale_ > 1);
-	}
-
-	// Zoomed all the way out?
-	public boolean zoomedMin() {
-		return (scale_ < .6);
-	}
-
-	public void paint(Graphics gra) {
+	public synchronized void paint(Graphics gra) {
 
 		int w = this.getWidth();
 		int h = this.getHeight();
@@ -320,18 +389,28 @@ public class MapLayer extends JPanel implements MouseListener,
 		// if we've rendered the board into the buffer image, draw the buffer
 		// image onto the screen using the "paintOffset_" to determine where it
 		// goes.
-		if (boardBuffer_ != null) {
-			int bufferRegionX = (int)((paintOffset_.x + bufferMaxOffsetX_));
-			int bufferRegionY = (int)((paintOffset_.y + bufferMaxOffsetY_));
+		int bufferRegionX = (int) ((paintOffset_.x + BUFFER_MAX_OFFSET_X));
+		int bufferRegionY = (int) ((paintOffset_.y + BUFFER_MAX_OFFSET_Y));
 
-			int bufferRegionWidth = (int)((w + paintOffset_.x + bufferMaxOffsetX_));
-			int bufferRegionHeight = (int)((h + paintOffset_.y + bufferMaxOffsetY_));
-			
-			gra.drawImage(boardBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
-					bufferRegionWidth, bufferRegionHeight, null);
-			//gra.drawImage(spritesBuffer_, 0, 0, w, h, bufferRegionX, bufferRegionY,
-			//		bufferRegionWidth, bufferRegionHeight, null);
+		int bufferRegionWidth = (int) ((w + paintOffset_.x + BUFFER_MAX_OFFSET_X));
+		int bufferRegionHeight = (int) ((h + paintOffset_.y + BUFFER_MAX_OFFSET_Y));
+
+		if (boardBuffer_ != null) {
+			gra.drawImage(boardBuffer_, 0, 0, w, h, bufferRegionX,
+					bufferRegionY, bufferRegionWidth, bufferRegionHeight, null);
 		}
+
+		// now draw all of the sprites
+		if (board_ != null && sprites_.size() > 0) {
+			Point offset = getScreenPointFromTileLocation(board_.homeTile()
+					.getLocation());
+			for (MapSprite s : sprites_)
+				s.draw(gra, offset, scale_);
+		}
+
+		// draw on the fps
+		gra.setColor(Color.BLACK);
+		gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
 	}
 
 	/**
@@ -341,11 +420,13 @@ public class MapLayer extends JPanel implements MouseListener,
 	 * scrolls. It must be re-rendered when a new tile is added, etc..
 	 */
 	public void renderBoard() {
-		if (board_ == null){
+		if (board_ == null) {
 			Graphics gra = boardBuffer_.getGraphics();
+
 			// paint a solid background color
-			gra.setColor(backgroundColor_);
-			gra.fillRect(0, 0, boardBuffer_.getWidth(), boardBuffer_.getHeight());
+			gra.setColor(BACKGROUND_COLOR);
+			gra.fillRect(0, 0, boardBuffer_.getWidth(), boardBuffer_
+					.getHeight());
 		}
 
 		try {
@@ -355,14 +436,16 @@ public class MapLayer extends JPanel implements MouseListener,
 			Point bottomRight = board_.getLowerRightCorner().getLocation();
 
 			// Compute the size of the board, size of the tiles, etc...
-			int boardWidth = (int) (Math.abs(bottomRight.getX() - topLeft.getX()) + 1);
-			int boardHeight = (int) (Math.abs(topLeft.getY() - bottomRight.getY()) + 1);
+			int boardWidth = (int) (Math.abs(bottomRight.getX()
+					- topLeft.getX()) + 1);
+			int boardHeight = (int) (Math.abs(topLeft.getY()
+					- bottomRight.getY()) + 1);
 
 			int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
 			int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
 
-			int bufferWidth = this.getWidth() + bufferMaxOffsetX_ * 2;
-			int bufferHeight = this.getHeight() + bufferMaxOffsetY_ * 2;
+			int bufferWidth = this.getWidth() + BUFFER_MAX_OFFSET_X * 2;
+			int bufferHeight = this.getHeight() + BUFFER_MAX_OFFSET_Y * 2;
 
 			// determine what the offset should be to center the game board in
 			// the image we'll create.
@@ -371,7 +454,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 			// clear the buffer to a dark gray
 			Graphics gra = boardBuffer_.getGraphics();
-			gra.setColor(Color.darkGray);
+			gra.setColor(BACKGROUND_COLOR);
 			gra.fillRect(0, 0, bufferWidth, bufferHeight);
 
 			// get the tile iterator.
@@ -412,26 +495,28 @@ public class MapLayer extends JPanel implements MouseListener,
 		}
 	}
 
-	public Point getTileAtPoint(Point p)
-	{
-		
+	// ------------------------------------------------------------------------
+	// CONVENIENCE FUNCTIONS
+	// ------------------------------------------------------------------------
+
+	public Point getTileAtPoint(Point p) {
+
 		// determine which tile was clicked! First, get the width and height of
 		// a tile.
-		int tileWidth = (int) (backgroundTile_.getWidth() * scale_);
-		int tileHeight = (int) (backgroundTile_.getHeight() * scale_);
+		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
 
 		// find out what the absolute location of the click was. This involves
 		// modifying the coordinates we received so that the location is
 		// relative to the buffer image. Once we know which pixel of the
 		// buffered image was clicked, we can get a tile.
-		p.x += -renderCenteringOffset_.x + bufferMaxOffsetX_;
+		p.x += -renderCenteringOffset_.x + BUFFER_MAX_OFFSET_X;
 		p.x += paintOffset_.x + renderOffset_.x;
-		p.y += -renderCenteringOffset_.y + bufferMaxOffsetY_;
+		p.y += -renderCenteringOffset_.y + BUFFER_MAX_OFFSET_Y;
 		p.y += paintOffset_.y + renderOffset_.y;
 
 		// get the tile index by dividing by the tile width and height
-		int tileX = (int) Math.floor(p.x / tileWidth);
-		int tileY = (int) Math.floor(p.y / tileHeight);
+		int tileX = (int) Math.floor(p.x / tileSize);
+		int tileY = (int) Math.floor(p.y / tileSize);
 
 		// that tile index is relative to the top left. We need to make the
 		// index relative to the home tile for it to be useful.
@@ -442,30 +527,46 @@ public class MapLayer extends JPanel implements MouseListener,
 		String text = String.format("You clicked tile %d,%d", tileX, tileY);
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_WARNING, text);
-		
+
 		Point location = new Point(tileX, tileY);
 		return location;
 	}
-	
-	public void tileDropped(Notification n) {
-		if (board_ == null)
-			return;
-		
-		Point p = this.getTileAtPoint((Point)n.argument());
-		NotificationManager.getInstance().sendNotification(
-				Notification.CLICK_ADD_TILE, p);
+
+	public Point getPointFromTileLocation(Point p) {
+		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
+		int X = (int) ((p.x + board_.getUpperLeftCorner().getLocation().getX() + 1) * tileSize);
+		int Y = (int) ((board_.getUpperLeftCorner().getLocation().getY() - p.y - 1) * tileSize);
+
+		return new Point(X, Y);
 	}
-	
+
+	public Point getScreenPointFromTileLocation(Point p) {
+		int topLeftX = renderCenteringOffset_.x - renderOffset_.x
+				- paintOffset_.x - BUFFER_MAX_OFFSET_X;
+		int topLeftY = renderCenteringOffset_.y - renderOffset_.y
+				- paintOffset_.y - BUFFER_MAX_OFFSET_Y;
+
+		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
+		int extraX = (int) ((-board_.getUpperLeftCorner().getLocation().getX()) * tileSize);
+		int extraY = (int) ((board_.getUpperLeftCorner().getLocation().getY()) * tileSize);
+
+		return new Point(topLeftX + extraX, topLeftY + extraY);
+	}
+
+	// ------------------------------------------------------------------------
+	// LISTENERS
+	// ------------------------------------------------------------------------
+
 	public void mouseClicked(MouseEvent e) {
 
 		if (board_ == null)
 			return;
-		
+
 		this.requestFocusInWindow();
-		
+
 		Point p = this.getTileAtPoint(e.getPoint());
 		NotificationManager.getInstance().sendNotification(
-				Notification.CLICK_ADD_TILE, p);
+				Notification.PLACE_TILE, p);
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -487,102 +588,52 @@ public class MapLayer extends JPanel implements MouseListener,
 		Point current = e.getPoint();
 		int dx = 0;
 		int dy = 0;
-		int delta = 2;
 
 		// are we inside one of the directional containers?
 		if (navRight_.contains(current))
-			dx = delta;
+			dx = MAP_SHIFT_SPEED;
 		if (navLeft_.contains(current))
-			dx = -delta;
+			dx = -MAP_SHIFT_SPEED;
 		if (navTop_.contains(current))
-			dy = -delta;
+			dy = -MAP_SHIFT_SPEED;
 		if (navBottom_.contains(current))
-			dy = delta;
+			dy = MAP_SHIFT_SPEED;
 
-		// if we are within a container and we're not scrolling, create a
-		// task to fire the "shift" event over and over again, until we leave
-		// the container
-		if ((dx != 0) || (dy != 0)) {
-			facilitateShift(dx, dy);
-
-		} else if (mapShiftTimer_ != null) {
-			// if we have left a directional container and the timer still
-			// exists, cancel it so we stop sending "shift" events to the map
-			// view.
-			mapShiftTimer_.cancel();
-			mapShiftTimer_ = null;
-		}
+		setShift(dx, dy);
 	}
-	
-	void facilitateShift(int dx, int dy)
-	{
-		Point newShift = new Point(dx, dy);
 
-		if ((mapShiftTimer_ == null) || (mapShift_ != newShift)) {
-			WorldScrollTask task = new WorldScrollTask();
-			task.setOffset(newShift);
-
-			mapShift_ = newShift;
-
-			if (mapShiftTimer_ != null)
-				mapShiftTimer_.cancel();
-			mapShiftTimer_ = new Timer();
-			mapShiftTimer_.schedule(task, 0, 5);
-		}
-	}
-		
 	public void keyPressed(KeyEvent e) {
 		int dir = e.getKeyCode();
 		int dx = 0;
 		int dy = 0;
-		int delta = 2;
 
 		// is the user pressing a direction key?
 		if (dir == KeyEvent.VK_RIGHT)
-			dx = delta;
+			dx = MAP_SHIFT_SPEED;
 		if (dir == KeyEvent.VK_LEFT)
-			dx = -delta;
+			dx = -MAP_SHIFT_SPEED;
 		if (dir == KeyEvent.VK_UP)
-			dy = -delta;
+			dy = -MAP_SHIFT_SPEED;
 		if (dir == KeyEvent.VK_DOWN)
-			dy = delta;
-		
+			dy = MAP_SHIFT_SPEED;
+
 		if ((dx != 0) || (dy != 0))
-			facilitateShift(dx, dy);
-		
+			setShift(dx, dy);
+
 		// Propagate out the key event
 		JKeyListener.getInstance().keyPressed(e);
 	}
 
 	public void keyReleased(KeyEvent e) {
 		int dir = e.getKeyCode();
-		if (dir == KeyEvent.VK_RIGHT || dir == KeyEvent.VK_LEFT ||
-				dir == KeyEvent.VK_UP || dir == KeyEvent.VK_DOWN)
-			if(mapShiftTimer_ != null) {
-				// if we have stopped pressing a directional key and the timer still
-				// exists, cancel it so we stop sending "shift" events to the map
-				// view.
-				mapShiftTimer_.cancel();
-				mapShiftTimer_ = null;
-			}		
+		if (dir == KeyEvent.VK_RIGHT || dir == KeyEvent.VK_LEFT
+				|| dir == KeyEvent.VK_UP || dir == KeyEvent.VK_DOWN) {
+			mapShift_ = null;
+			recalculateUpdateFrequency();
+		}
 	}
 
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	// TIMERS 
-	// ---------------------------------------------------------------------
-	class WorldScrollTask extends TimerTask {
-		private Point p_;
-
-		public void setOffset(Point p) {
-			this.p_ = p;
-		}
-
-		public void run() {
-			shiftView(this.p_);
-		}
 	}
 }
