@@ -106,6 +106,7 @@ public class HUDController {
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
+		
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
 		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,

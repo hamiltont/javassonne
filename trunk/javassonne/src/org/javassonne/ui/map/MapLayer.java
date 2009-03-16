@@ -98,25 +98,18 @@ public class MapLayer extends JPanel implements MouseListener,
 		setDoubleBuffered(false);
 
 		// Listen for notification setting our board model
-		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
-				this, "setBoard");
-		// Listen for the end-game notification so we know if we need to clear
-		// the board.
-		NotificationManager.getInstance().addObserver(Notification.END_GAME,
-				this, "endGame");
+		NotificationManager n = NotificationManager.getInstance();
+		n.addObserver(Notification.BOARD_SET, this, "setBoard");
+		// Listen for end-game so we know we need to clear the board.
+		n.addObserver(Notification.END_GAME, this, "endGame");
 		// Listen for notifications changing the zoom
-		NotificationManager.getInstance().addObserver(Notification.ZOOM_IN,
-				this, "zoomIn");
-		NotificationManager.getInstance().addObserver(Notification.ZOOM_OUT,
-				this, "zoomOut");
+		n.addObserver(Notification.ZOOM_IN, this, "zoomIn");
+		n.addObserver(Notification.ZOOM_OUT, this, "zoomOut");
 		// Listen for notifications for adding and removing sprites
-		NotificationManager.getInstance().addObserver(
-				Notification.MAP_ADD_SPRITE, this, "addSprite");
-		NotificationManager.getInstance().addObserver(
-				Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
+		n.addObserver(Notification.MAP_ADD_SPRITE, this, "addSprite");
+		n.addObserver(Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
 		// Listen for a notification from the tile being dragged
-		NotificationManager.getInstance().addObserver(
-				Notification.TILE_DROPPED, this, "tileDropped");
+		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
 
 		// Load the background image from disk
 		try {
@@ -218,11 +211,11 @@ public class MapLayer extends JPanel implements MouseListener,
 		if (spriteActive || (mapShift_ != null)) {
 			updateTimer_ = new Timer();
 			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 50); // 20
-																		// FPS
+			// FPS
 		} else {
 			updateTimer_ = new Timer();
 			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 500); // 2
-																			// FPS
+			// FPS
 		}
 	}
 
@@ -248,7 +241,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		// followed.
 		board_ = null;
 		sprites_.clear();
-		
+
 		// reset the board scroll offset, in case they start a new game
 		paintOffset_ = new Point(0, 0);
 		renderOffset_ = new Point(0, 0);
@@ -534,8 +527,8 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public Point getPointFromTileLocation(Point p) {
 		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
-		int X = (int) ((p.x + board_.getUpperLeftCorner().getLocation().getX() + 1) * tileSize);
-		int Y = (int) ((board_.getUpperLeftCorner().getLocation().getY() - p.y - 1) * tileSize);
+		int X = (int) (p.x * tileSize);
+		int Y = (int) -(p.y * tileSize);
 
 		return new Point(X, Y);
 	}

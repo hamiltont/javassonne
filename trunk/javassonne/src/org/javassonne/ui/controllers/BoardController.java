@@ -72,16 +72,13 @@ public class BoardController {
 			ex.printStackTrace();
 		}
 
-		NotificationManager.getInstance().addObserver(Notification.PLACE_TILE,
-				this, "placeTile");
-		NotificationManager.getInstance().addObserver(
-				Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
-		NotificationManager.getInstance().addObserver(
-				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
-		NotificationManager.getInstance().addObserver(Notification.END_GAME,
-				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.END_TURN,
-				this, "endTurn");
+		NotificationManager n = NotificationManager.getInstance();
+		n.addObserver(Notification.PLACE_TILE, this, "placeTile");
+		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
+		n.addObserver(Notification.END_GAME, this, "endGame");
+		n.addObserver(Notification.END_TURN, this, "endTurn");
+		n.addObserver(Notification.TILE_IN_HAND_CHANGED, this,
+		"updateTileInHand");
 
 		// Now that we have a board object, we want to update the interface to
 		// show the board. Share our board_ object in a notification so the
@@ -106,7 +103,6 @@ public class BoardController {
 		// update the tile's status so that it is now permanent
 		try {
 			board_.removeTempStatus(tempLocationIter_);
-			board_.removeTemps();
 		} catch (NotValidPlacementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -187,34 +183,32 @@ public class BoardController {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
-		tileInHand_ = null;
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
 		tempLocationIter_ = null;
 	}
 
 	public void updateTileInHand(Notification n) {
-		Boolean tileHasChanged = false;
+		Boolean shouldPopulateLocations = false;
 		Tile t = (Tile) n.argument();
 
-		if ((tileInHand_ == null)
-				|| ((t != null) && (t.getUniqueIdentifier() != tileInHand_
-						.getUniqueIdentifier())))
-			tileHasChanged = true;
+		shouldPopulateLocations = ((tileInHand_ == null) || ((t != null) && (t
+				.getUniqueIdentifier() != tileInHand_.getUniqueIdentifier())));
 
 		tileInHand_ = t;
 
 		// Do we need to populate possible locations?
-		if (tileHasChanged && t != null) {
+		if (shouldPopulateLocations) {
 			try {
 				Set<TileBoardIterator> temp = board_.possiblePlacements(t);
+
 				// If there are none, throw out TileInHand
 				if (temp.isEmpty()) {
 					NotificationManager.getInstance().sendNotification(
 							Notification.LOG_WARNING,
 							"Tile does not fit on board; drawing new Tile");
 					NotificationManager.getInstance().sendNotification(
-							Notification.DRAW_TILE);
+							Notification.TILE_UNUSABLE);
 
 					// Otherwise, add the possibles
 				} else {
@@ -229,5 +223,4 @@ public class BoardController {
 			}
 		}
 	}
-
 }

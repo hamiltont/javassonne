@@ -58,7 +58,7 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 		tileImageLabels_ = new ArrayList<JLabel>();
 
 		NotificationManager.getInstance().addObserver(
-				Notification.DECK_CHANGED, this, "updateDeck");
+				Notification.DECK_SET, this, "updateDeck");
 		NotificationManager.getInstance().addObserver(
 				Notification.END_GAME, this, "endGame");
 	}
