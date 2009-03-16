@@ -41,10 +41,12 @@ public class Notification implements Serializable {
 	public static final String TILE_IN_HAND_CHANGED = "NotificationTileInHandChanged";
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
+	public static final String TILE_DROPPED = "NotificationTileDropped";
+	public static final String TILE_UNUSABLE = "NotificationTileUnusable";
+	
 	public static final String ZOOM_IN = "NotificationGameZoomIn";
 	public static final String ZOOM_OUT = "NotificationGameZoomOut";
 	public static final String ZOOM_CHANGED = "NotificationGameZoomChanged";
-	public static final String DRAW_TILE = "NotificationDrawTile";
 
 	public static final String NEW_GAME = "NotificationNewGame";
 	public static final String NEW_NW_GAME = "NotificationNewNetworkGame";
@@ -53,24 +55,23 @@ public class Notification implements Serializable {
 	public static final String SAVE_GAME = "NotificationSaveGame";
 	public static final String ATTEMPT_END_GAME = "NotificationAttemptEndGame";
 	public static final String END_GAME = "NotificationEndGame";
-	public static final String DECK_CHANGED = "NotificationDeckChanged";
-
-	public static final String BOARD_SET = "NotificationSetBoard";
-	
 	public static final String QUIT = "NotificationQuit";
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
+	
+	public static final String DECK_SET = "NotificationSetDeck";
+	public static final String BOARD_SET = "NotificationSetBoard";
+	
 	public static final String PLACE_TILE = "NotificationClickAddTile";
-	public static final String TILE_DROPPED = "NotificationTileDropped";
+	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
 	
 	public static final String PLAYER_DATA_CHANGED = "NotificationPlayerDataChanged";
 	public static final String PLAYER_DATA_RESET = "NotificationPlayerDataReset";
 	
-	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
 	public static final String MEEPLE_DROPPED = "NotificationMeepleDropped";
 	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
-	public static final String END_TURN = "NotificationEndTurn";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
+	public static final String END_TURN = "NotificationEndTurn";
 
 	private String identifier_;
 	private Object argument_;

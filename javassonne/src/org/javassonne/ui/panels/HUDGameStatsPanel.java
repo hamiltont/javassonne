@@ -46,7 +46,7 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		super();
 
 		setVisible(true);
-		setSize(380, 26 + 28 * players.size());
+		setSize(380, 27 + 28 * players.size());
 		setLayout(null);
 		setBackgroundImagePath("images/hud_stats_background.jpg");
 		setBackgroundScaleToFit(false);
@@ -102,7 +102,7 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
 		
 		// move the selected player focus background
-		focus_.setLocation(0, 26 + currentPlayer_ * 28);
+		focus_.setLocation(0, 27 + currentPlayer_ * 28);
 	}
 
 	// Overloaded the add() method to bind a key listener to any elements placed

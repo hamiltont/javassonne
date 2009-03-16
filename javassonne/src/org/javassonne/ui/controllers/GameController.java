@@ -87,28 +87,19 @@ public class GameController {
 		menu_ = new MenuPanel();
 
 		// register to receive events from the game window
-		NotificationManager.getInstance().addObserver(Notification.NEW_GAME,
-				this, "newGame");
-		NotificationManager.getInstance().addObserver(Notification.NEW_NW_GAME,
-				this, "newNetworkGame");
-		NotificationManager.getInstance().addObserver(Notification.START_GAME,
-				this, "startGame");
-		NotificationManager.getInstance().addObserver(
-				Notification.ATTEMPT_END_GAME, this, "attemptEndGame");
-		NotificationManager.getInstance().addObserver(Notification.END_GAME,
-				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.LOAD_GAME,
-				this, "loadGame");
-		NotificationManager.getInstance().addObserver(Notification.SAVE_GAME,
-				this, "saveGame");
-		NotificationManager.getInstance().addObserver(Notification.END_TURN,
-				this, "endTurn");
-		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
-				"quitGame");
-		NotificationManager.getInstance().addObserver(
-				Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
-		NotificationManager.getInstance().addObserver(
-				Notification.PLAYER_DATA_RESET, this, "playerDataReset");
+		NotificationManager n = NotificationManager.getInstance();
+		n.addObserver(Notification.NEW_GAME, this, "newGame");
+		n.addObserver(Notification.NEW_NW_GAME, this, "newNetworkGame");
+		n.addObserver(Notification.START_GAME, this, "startGame");
+		n.addObserver(Notification.ATTEMPT_END_GAME, this, "attemptEndGame");
+		n.addObserver(Notification.END_GAME, this, "endGame");
+		n.addObserver(Notification.LOAD_GAME, this, "loadGame");
+		n.addObserver(Notification.SAVE_GAME, this, "saveGame");
+		n.addObserver(Notification.END_TURN, this, "endTurn");
+		n.addObserver(Notification.QUIT, this, "quitGame");
+		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
+		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
+		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
 	}
 
 	/**
@@ -244,10 +235,14 @@ public class GameController {
 		beginTurn();
 	}
 
+	/**
+	 * Called when a turn is ended, and may be called again if the BoardController
+	 * finds the drawn tile unusable.
+	 * 
+	 */
 	public void beginTurn() {
 		// if the current player is playing on this machine, we need to enable
-		// the
-		// interface so they can place a tile. We do that by passing another
+		// the interface so they can place a tile. We do that by passing another
 		// notification
 		Player p = players_.get(currentPlayer_);
 
@@ -257,7 +252,7 @@ public class GameController {
 
 			// Send notification that we've modified the deck
 			NotificationManager.getInstance().sendNotification(
-					Notification.DECK_CHANGED, deck_);
+					Notification.DECK_SET, deck_);
 
 			// Send notifications to attach our tileInHand to the view
 			NotificationManager.getInstance().sendNotification(
