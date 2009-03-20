@@ -113,7 +113,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		JScrollPane hostsScroll = new JScrollPane(hosts_table_);
 		hostsScroll.setSize(350, 350);
 		hostsScroll.setLocation(new Point(40, 160));
-		hosts_table_.setFillsViewportHeight(true);
+		hosts_table_.setSize(hostsScroll.getWidth(), hostsScroll.getHeight());
 
 		// Add a label
 		JLabel label = new JLabel("Hosts Table");
