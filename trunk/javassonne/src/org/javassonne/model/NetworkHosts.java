@@ -37,17 +37,21 @@ import org.javassonne.networking.RemoteHost;
 
 public class NetworkHosts extends TimerTask implements TableModel {
 
-	private HashMap<Integer, RemoteHost> tableData_;
+	private ArrayList<RemoteHost> tableData_;
+	private ArrayList<String> hostURIs_;				// Allows us to see if we already know about
+														//   a host without having to send a redundant 
+														//   network query
 	private ArrayList<TableModelListener> observers_;
 
 	public NetworkHosts() {
-		tableData_ = new HashMap<Integer, RemoteHost>();
+		tableData_ = new ArrayList<RemoteHost>();
 		observers_ = new ArrayList<TableModelListener>();
+		hostURIs_ = new ArrayList<String>();
 		updateData();
 
 		// Schedule ourselves to update
 		Timer t = new Timer("NetworkHosts UpdateData Timer");
-		t.scheduleAtFixedRate(this, 0, 1000);
+		t.scheduleAtFixedRate(this, 0, 10000);
 	}
 
 	public void addTableModelListener(TableModelListener l) {
@@ -102,7 +106,11 @@ public class NetworkHosts extends TimerTask implements TableModel {
 
 	// Run ourselves as a TimerTask so we update the model occasionally
 	public void run() {
-		updateData();
+		try {
+			updateData();
+		} catch (Exception e) {
+			System.out.println("gotcha");
+		}
 	}
 
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
@@ -115,8 +123,10 @@ public class NetworkHosts extends TimerTask implements TableModel {
 		boolean modelChanged = false;
 		for (Iterator<RemoteHost> it = hosts.iterator(); it.hasNext();) {
 			RemoteHost next = it.next();
-			if (tableData_.containsValue(next) == false) {
-				tableData_.put(tableData_.size(), next);
+			String nextURI = next.getURI();
+			if (hostURIs_.contains(nextURI) == false) {
+				tableData_.add(next);
+				hostURIs_.add(nextURI);
 				modelChanged = true;
 			}
 		}
