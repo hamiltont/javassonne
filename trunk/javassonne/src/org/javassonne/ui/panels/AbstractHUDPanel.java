@@ -213,7 +213,7 @@ MouseMotionListener {
 			// slide the tile back to it's starting location on the sidebar
 			if (resetTimer_ != null)
 				resetTimer_.cancel();
-			resetTimer_ = new Timer();
+			resetTimer_ = new Timer("AbstractHUDPanel ResetSlideTask");
 			resetTimer_.scheduleAtFixedRate(new ResetSlideTask(), 0, 5);
 
 			respondToClick_ = false;
