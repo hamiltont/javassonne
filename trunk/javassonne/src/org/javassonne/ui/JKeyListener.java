@@ -61,6 +61,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 
 	/** Capture key event */
 	public void keyReleased(KeyEvent e) {
+		keyCheck(e, "release");
 	}
 
 	/** Capture key event */
@@ -116,6 +117,16 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 			DisplayHelper.getInstance().add(LogPanel.getInstance(), DisplayHelper.Layer.PALETTE,
 					DisplayHelper.Positioning.BOTTOM_LEFT);
 			LogPanel.getInstance().setVisible(true);
+		}
+		
+		else if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_LEFT || 
+				code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN)
+		{
+			if(keyStatus == "press")
+				NotificationManager.getInstance().sendNotification(Notification.SHIFT_BOARD, keyString);
+			else if(keyStatus == "release")
+				NotificationManager.getInstance().sendNotification(Notification.SHIFT_BOARD, null);
+			
 		}
 	}
 }
