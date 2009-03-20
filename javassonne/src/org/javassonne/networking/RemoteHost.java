@@ -67,5 +67,5 @@ public interface RemoteHost {
 	// TODO desc
 	public void receiveNotification(Notification n, String clientURI);
 
-	public boolean equals(RemoteHost rh);
+	public boolean equals(Object o);
 }

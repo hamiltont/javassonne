@@ -46,15 +46,10 @@ public class Host implements RemoteHost {
 	 * CONNECTING The host has chosen to host a game, and is currently accepting
 	 * connections
 	 */
-	private static enum Mode {
-		OPEN, CONNECTING
-	};
+	private RemoteHost.MODE currentMode_;
 
 	// Currently connected clients
 	private List<RemoteClient> clients_ = new ArrayList<RemoteClient>();
-
-	// The current mode of the host
-	private Mode currentMode_ = Mode.OPEN;
 
 	private JmDNS jmdns_;
 
@@ -67,6 +62,9 @@ public class Host implements RemoteHost {
 	// The RMI safe name of the host
 	private String rmiSafeName_;
 
+	// A flag that indicates whether or not this host can be connected to
+	private boolean clientsCanConnect_;
+
 	/**
 	 * Creates the RMI host service, then broadcasts it using JmDNS
 	 */
@@ -74,6 +72,7 @@ public class Host implements RemoteHost {
 		ServiceInfo info = null;
 		realName_ = hostName;
 		rmiSafeName_ = realName_.replace(' ', '_');
+		clientsCanConnect_ = false;
 
 		// Create the RMI service
 		try {
@@ -110,31 +109,24 @@ public class Host implements RemoteHost {
 	 * clients
 	 */
 	public boolean addClient(String clientURI) {
-		if (currentMode_ == Mode.CONNECTING) {
+		if (clientsCanConnect_) {
 			RemoteClient c = (RemoteClient) RemotingUtils.lookupRMIService(
 					clientURI, RemoteClient.class);
 			clients_.add(c);
 			log("Client " + c.getName() + " connected");
 			return true;
+		} else {
+			log("Client " + clientURI + " attempted  to "
+					+ "connect to our host in an unsafe manner");
+			return false;
 		}
-
-		// Do not throw an exception - a stray client
-		// should not be able to bring a host down
-		log("Client " + clientURI + " attempted  to "
-				+ "connect to our host in an unsafe manner");
-		return false;
 	}
 
 	/**
 	 * Return whether or not clients can currently connect
 	 */
 	public boolean canClientsConnect() {
-		return (currentMode_ == Mode.CONNECTING);
-	}
-
-	public boolean canGameStart() {
-		// TODO Auto-generated method stub
-		return false;
+		return clientsCanConnect_;
 	}
 
 	/**
@@ -221,20 +213,6 @@ public class Host implements RemoteHost {
 	}
 
 	/**
-	 * Start accepting connections when we are about to host a game
-	 */
-	public void startAcceptingConnections() {
-		currentMode_ = Mode.CONNECTING;
-	}
-
-	/**
-	 * Stop accepting connections if we are not about to host a game
-	 */
-	public void stopAcceptingConnections() {
-		currentMode_ = Mode.OPEN;
-	}
-
-	/**
 	 * A very simple logger
 	 * 
 	 * @param msg
@@ -243,13 +221,18 @@ public class Host implements RemoteHost {
 		System.out.println("Host: " + msg);
 	}
 
-	public boolean equals(RemoteHost rh) {
+	public boolean equals(Object o) {
+		if (o.getClass() != RemoteHost.class)
+			return false;
+		RemoteHost rh = (RemoteHost)o;
 		return ((rh.getURI() == getURI()) && (rh.getName() == getName()));
 	}
 
 	// TODO - make this work
+	// TODO - need to listen for a semi complex pattern of notifications so that 
+	//    	we know if we can accept connections and what-not
 	public MODE getStatus() {
-		return RemoteHost.MODE.IN_LOBBY;
+		return this.currentMode_;
 	}
 
 }
