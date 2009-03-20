@@ -60,6 +60,7 @@ public class Player {
 		meepleColor_ = meepleColor;
 		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
 		turnNumber_ = turnNumber;
+		isLocal_ = true;
 		score_ = 0;
 	}
 	
@@ -69,6 +70,7 @@ public class Player {
 		meepleColor_ = DEFAULT_MEEPLE_COLOR;
 		meepleRemaining_ = DEFAULT_MEEPLE_REMAINING;
 		turnNumber_ = 0;
+		isLocal_ = true;
 		score_ = 0;
 	}
 
