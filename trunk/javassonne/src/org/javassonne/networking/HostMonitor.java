@@ -21,7 +21,6 @@ package org.javassonne.networking;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.jmdns.JmDNS;
@@ -35,6 +34,9 @@ import org.javassonne.networking.impl.RemotingUtils;
 // TODO Rather than being given the localhost URI 
 //		it should be able to dynamically 
 //		find it
+// TODO We can do this by initializing the localhost URI
+//		using a preferences manager and using the implicit
+//		naming conventions
 public class HostMonitor {
 	private JmDNS jmdns_;
 	private List<RemoteHost> hostList_;
@@ -58,33 +60,31 @@ public class HostMonitor {
 			localIP_ = addr.getHostAddress();
 			log("Found localip to be " + localIP_);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
-	//Singleton for our HostMonitor instance.
+	
+	// Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
 		if (instance_ == null)
 			instance_ = new HostMonitor();
 		return instance_;
 	}
-
-	public String[] getHostNames() {
-		// Convert internal ArrayList to String[]
-		ArrayList<String> al = new ArrayList<String>();
-		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
-			al.add(it.next().getName());
-		}
-		String str[] = (String[]) al.toArray(new String[al.size()]);
-		return str;
+	
+	public List<RemoteHost> getHosts() {
+		return hostList_;
 	}
-
+	
 	// TODO make this call more fail safe
 	public String getLocalHostURI() {
 		if (localhostURI_ == null)
 			return null;
 		return localhostURI_;
+	}
+	
+	public int numberOfHosts() {
+		return hostList_.size();
 	}
 
 	public void setLocalHostURI(String uri) {

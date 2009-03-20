@@ -28,7 +28,13 @@ import org.javassonne.messaging.Notification;
  */
 public interface RemoteHost {
 	public static final String SERVICENAME = "JavassonneHost";
-
+	public static enum MODE {
+		PLAYING_LOCAL_GAME, 
+		PLAYING_NETWORK_GAME, 
+		IN_LOBBY, 
+		IDLE                   // Paused game, or currently playing the game but stepped out
+	}
+	
 	/**
 	 * Add a client to a list of internal "connected" clients.
 	 * 
@@ -46,13 +52,11 @@ public interface RemoteHost {
 	public boolean canClientsConnect();
 	
 	// TODO desc
-	public boolean currentlyPlayingNetworkGame();
-	
-	// TODO desc
-	public boolean currentlyPlayingLocalGame();
-	
-	// TODO desc
 	public String getName();
+	
+	public String getURI();
+	
+	public RemoteHost.MODE getStatus();
 	
 	/**
 	 * Receives a message from a specified client, and automatically sends it to
@@ -62,5 +66,6 @@ public interface RemoteHost {
 
 	// TODO desc
 	public void receiveNotification(Notification n, String clientURI);
-	
+
+	public boolean equals(RemoteHost rh);
 }

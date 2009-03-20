@@ -21,31 +21,31 @@ package org.javassonne.ui.panels;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.OverlayLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.networking.HostMonitor;
+import org.javassonne.model.NetworkHosts;
 import org.javassonne.ui.DisplayHelper;
-import org.javassonne.ui.JKeyListener;
 
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
-		ActionListener, ListSelectionListener {
+		ActionListener, ListSelectionListener, TableModelListener {
 	private JPanel main_;
+	private JTable hosts_table_;
 
 	public ViewNetworkHostsPanel() {
 		super();
 
-		addKeyListener(JKeyListener.getInstance());
+		//addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/multiplayer_lobby_background.jpg");
 		setVisible(true);
 		setLayout(new OverlayLayout(this));
@@ -63,25 +63,24 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 				new Point(275, 543), main_);
 
 
-		// Add list items to the hostsList_ panel
-
-		String[] items = HostMonitor.getInstance().getHostNames();
-		JList l = new JList();
-		l.addListSelectionListener(this);
-		l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		l.setLocation(new Point(105, 143));
-		l.setListData(items);
-		l.setSize(600, 360);
-		main_.add(l);
+		// Create the hosts table
+		NetworkHosts tableModel = new NetworkHosts(); 
+		tableModel.addTableModelListener(this);
+		hosts_table_ = new JTable();
+		hosts_table_.setModel(tableModel);
+		hosts_table_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		hosts_table_.setSize(600, 360);
+		
+		
+		// Make it scroll able
+		JScrollPane hostsScroll = new JScrollPane(hosts_table_);
+		hostsScroll.setLocation(new Point(105,143));
+		hostsScroll.setSize(600, 360);
+		hosts_table_.setFillsViewportHeight(true);
+		
+		main_.add(hostsScroll);
 		
 		add(main_);
-
-		Timer t = new Timer();
-		t.scheduleAtFixedRate(new GetNewHosts(l), 0, 1000);
-	}
-
-	private void addListToPanel(Point location, String[] items, JPanel panel) {
-
 	}
 	
 	private void addButtonToPanel(String path, String notification,
@@ -111,27 +110,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// TODO Auto-generated method stub
 
 	}
-
-	protected class GetNewHosts extends TimerTask {
-		private JList hostList_;
-		private DefaultListModel listModel_;
-
-		public GetNewHosts(JList l) {
-			hostList_ = l;
-			listModel_ = new DefaultListModel();
-			hostList_.setModel(listModel_);
-		}
-
-		public void run() {
-			String[] hosts = HostMonitor.getInstance().getHostNames();
-
-			// TODO Note that this does not remove old hosts!
-			for (int i = 0; i < hosts.length; i++) {
-				if (listModel_.contains(hosts[i]) == false)
-					listModel_.add(listModel_.getSize(), hosts[i]);
-			}
-		}
-
+	
+	public void tableChanged(TableModelEvent arg0) {
+		System.out.println("Table changed!");
+		hosts_table_.repaint();
 	}
-
 }
