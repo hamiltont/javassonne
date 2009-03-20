@@ -14,12 +14,14 @@ public class TileFeature {
 	public String identifier;
 	public int multiplier;
 	public boolean actsAsWall;
-
+	public boolean endsTraversal;
+	
 	public TileFeature() {
 		this.name = "Untitled";
 		this.identifier = "U";
 		this.actsAsWall = false;
 		this.multiplier = 1;
+		this.endsTraversal = false;
 	}
 
 	public TileFeature(String name, String identifier, boolean actsAsWall,
@@ -28,6 +30,7 @@ public class TileFeature {
 		this.identifier = identifier;
 		this.actsAsWall = actsAsWall;
 		this.multiplier = multiplier;
+		this.endsTraversal = false;
 	}
 
 	/**

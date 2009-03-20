@@ -7,7 +7,7 @@
         <string>R</string>
         <string>FC</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -25,10 +25,10 @@
     </Tile>
     <Tile>
       <features__>
-        <string>R</string>
+        <string>RE</string>
         <string>N</string>
-        <string>R</string>
-        <string>R</string>
+        <string>RE</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -95,7 +95,7 @@
         <string>FC</string>
         <string>R</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -205,7 +205,7 @@
         <string>N</string>
         <string>N</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -337,7 +337,7 @@
         <string>N</string>
         <string>N</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -355,10 +355,10 @@
     </Tile>
     <Tile>
       <features__>
-        <string>R</string>
-        <string>R</string>
+        <string>RE</string>
+        <string>RE</string>
         <string>FC</string>
-        <string>R</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -399,10 +399,10 @@
     </Tile>
     <Tile>
       <features__>
-        <string>R</string>
-        <string>R</string>
-        <string>R</string>
-        <string>R</string>
+        <string>RE</string>
+        <string>RE</string>
+        <string>RE</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -425,7 +425,7 @@
         <string>F</string>
         <string>R</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -465,10 +465,10 @@
     </Tile>
     <Tile>
       <features__>
-        <string>R</string>
+        <string>RE</string>
         <string>N</string>
-        <string>R</string>
-        <string>R</string>
+        <string>RE</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -491,7 +491,7 @@
         <string>F</string>
         <string>R</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -513,7 +513,7 @@
         <string>R</string>
         <string>N</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -535,7 +535,7 @@
         <string>R</string>
         <string>FC</string>
         <string>N</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -579,7 +579,7 @@
         <string>R</string>
         <string>N</string>
         <string>R</string>
-        <string>R</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -654,36 +654,49 @@
       <identifier>R</identifier>
       <multiplier>0</multiplier>
       <actsAsWall>false</actsAsWall>
+      <endsTraversal>false</endsTraversal>
+    </TileFeature>
+    <TileFeature>
+      <name>RoadEnd</name>
+      <identifier>RE</identifier>
+      <multiplier>0</multiplier>
+      <actsAsWall>false</actsAsWall>
+      <endsTraversal>true</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>Fort</name>
       <identifier>F</identifier>
       <multiplier>0</multiplier>
       <actsAsWall>true</actsAsWall>
+      <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>FortCap</name>
       <identifier>FC</identifier>
       <multiplier>0</multiplier>
       <actsAsWall>true</actsAsWall>
+      <endsTraversal>true</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>FortWithMultiplier</name>
       <identifier>FM</identifier>
       <multiplier>2</multiplier>
       <actsAsWall>false</actsAsWall>
+      <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>Nothing</name>
       <identifier>N</identifier>
       <multiplier>0</multiplier>
       <actsAsWall>false</actsAsWall>
+      <endsTraversal>true</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>Cloister</name>
       <identifier>C</identifier>
       <multiplier>0</multiplier>
       <actsAsWall>false</actsAsWall>
+      <endsTraversal>false</endsTraversal>
     </TileFeature>
   </tileFeatures__>
   <tileImagesFolder__>tilesets/standard/</tileImagesFolder__>
@@ -693,6 +706,14 @@
         <string>R</string>
         <list>
           <string>R</string>
+          <string>RE</string>
+        </list>
+      </entry>
+      <entry>
+        <string>RE</string>
+        <list>
+          <string>R</string>
+          <string>RE</string>
         </list>
       </entry>
       <entry>
