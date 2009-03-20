@@ -221,13 +221,6 @@ public class Host implements RemoteHost {
 		System.out.println("Host: " + msg);
 	}
 
-	public boolean equals(Object o) {
-		if (o.getClass() != RemoteHost.class)
-			return false;
-		RemoteHost rh = (RemoteHost)o;
-		return ((rh.getURI() == getURI()) && (rh.getName() == getName()));
-	}
-
 	// TODO - make this work
 	// TODO - need to listen for a semi complex pattern of notifications so that 
 	//    	we know if we can accept connections and what-not
