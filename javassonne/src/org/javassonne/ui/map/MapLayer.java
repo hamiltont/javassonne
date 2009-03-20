@@ -209,11 +209,11 @@ public class MapLayer extends JPanel implements MouseListener,
 		}
 
 		if (spriteActive || (mapShift_ != null)) {
-			updateTimer_ = new Timer();
+			updateTimer_ = new Timer("MapLayer UpdateTask");
 			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 50); // 20
 			// FPS
 		} else {
-			updateTimer_ = new Timer();
+			updateTimer_ = new Timer("MapLayer UpdateTask");
 			updateTimer_.scheduleAtFixedRate(new UpdateTask(), 50, 500); // 2
 			// FPS
 		}

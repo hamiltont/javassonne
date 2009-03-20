@@ -133,9 +133,9 @@ public class GameController {
 		// Turn off annoying RMI logging
 		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
 
-		//Host localHost = new Host(addr.getHostName());
-		//HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
-		//Client mainClient = new Client("mainClient");
+		Host localHost = new Host(addr.getHostName());
+		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
+		Client mainClient = new Client("mainClient");
 
 		
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
