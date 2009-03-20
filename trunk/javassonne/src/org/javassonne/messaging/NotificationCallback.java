@@ -56,9 +56,12 @@ public class NotificationCallback {
 			String err = String.format("An exception occurred while sending "
 					+ "the notification %s to an observer of %s", n
 					.identifier(), target_.getClass().toString());
-			err += "\nAn exception of type "
-					+ e.getTargetException()
-					+ " was thrown in the callback function";
+			err += "\nAn exception of type '" + e.getTargetException()
+					+ "' was thrown in the callback function.\n"
+					+ "Stack Trace: \n";
+			for (int i = 0; i < e.getTargetException().getStackTrace().length; i++) {
+				err += e.getTargetException().getStackTrace()[i] + "\n";
+			}
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_ERROR, err);
@@ -66,7 +69,6 @@ public class NotificationCallback {
 
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj.getClass() != NotificationCallback.class)
 			return false;

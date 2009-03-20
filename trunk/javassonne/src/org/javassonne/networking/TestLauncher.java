@@ -34,7 +34,7 @@ public class TestLauncher {
 		
 		Host h = new Host("Hamy");
 		HostMonitor.getInstance().setLocalHostURI(h.getURI());
-		h.startAcceptingConnections();
+		
 			
 		Client cl = new Client("a");
 		cl.connectToLocalHost();
