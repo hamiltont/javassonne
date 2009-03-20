@@ -49,7 +49,7 @@ import org.javassonne.ui.JKeyListener;
  * rendering the map.
  */
 public class MapLayer extends JPanel implements MouseListener,
-		MouseMotionListener, KeyListener {
+		MouseMotionListener {
 	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 
@@ -110,6 +110,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		n.addObserver(Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
 		// Listen for a notification from the tile being dragged
 		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
+		n.addObserver(Notification.SHIFT_BOARD, this, "shiftBoard");
 
 		// Load the background image from disk
 		try {
@@ -134,8 +135,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 
-		this.addKeyListener(this);
-		this.setFocusable(true);
+		this.addKeyListener(JKeyListener.getInstance());
 
 		// create the buffers we need for drawing
 		int bufferWidth = this.getWidth() + BUFFER_MAX_OFFSET_X * 2;
@@ -595,38 +595,22 @@ public class MapLayer extends JPanel implements MouseListener,
 		setShift(dx, dy);
 	}
 
-	public void keyPressed(KeyEvent e) {
-		int dir = e.getKeyCode();
-		int dx = 0;
-		int dy = 0;
-
+	public void shiftBoard(Notification n) {
+		int dx = 0, dy = 0;
+		String dir = (String) n.argument();
 		// is the user pressing a direction key?
-		if (dir == KeyEvent.VK_RIGHT)
-			dx = MAP_SHIFT_SPEED;
-		if (dir == KeyEvent.VK_LEFT)
-			dx = -MAP_SHIFT_SPEED;
-		if (dir == KeyEvent.VK_UP)
-			dy = -MAP_SHIFT_SPEED;
-		if (dir == KeyEvent.VK_DOWN)
-			dy = MAP_SHIFT_SPEED;
-
-		if ((dx != 0) || (dy != 0))
-			setShift(dx, dy);
-
-		// Propagate out the key event
-		JKeyListener.getInstance().keyPressed(e);
-	}
-
-	public void keyReleased(KeyEvent e) {
-		int dir = e.getKeyCode();
-		if (dir == KeyEvent.VK_RIGHT || dir == KeyEvent.VK_LEFT
-				|| dir == KeyEvent.VK_UP || dir == KeyEvent.VK_DOWN) {
-			mapShift_ = null;
-			recalculateUpdateFrequency();
+		if (dir != null) {
+			if (dir == "Right")
+				dx = MAP_SHIFT_SPEED;
+			if (dir == "Left")
+				dx = -MAP_SHIFT_SPEED;
+			if (dir == "Up")
+				dy = -MAP_SHIFT_SPEED;
+			if (dir == "Down")
+				dy = MAP_SHIFT_SPEED;
 		}
+		setShift(dx, dy);
+
 	}
 
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-	}
 }
