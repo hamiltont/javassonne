@@ -63,7 +63,7 @@ public class Host implements RemoteHost {
 
 	// The name this host goes by
 	private String realName_;
-	
+
 	// The RMI safe name of the host
 	private String rmiSafeName_;
 
@@ -74,7 +74,7 @@ public class Host implements RemoteHost {
 		ServiceInfo info = null;
 		realName_ = hostName;
 		rmiSafeName_ = realName_.replace(' ', '_');
-		
+
 		// Create the RMI service
 		try {
 			info = RemotingUtils.exportRMIService(this, RemoteHost.class,
@@ -161,10 +161,10 @@ public class Host implements RemoteHost {
 	public void receiveMessage(String msg, String clientURI) {
 		log("Received message '" + msg + "'");
 
-		RemoteClient c = isClientConnected(clientURI); 
+		RemoteClient c = isClientConnected(clientURI);
 		if (c == null)
 			return;
-		
+
 		// Send the message out to all other clients
 		for (Iterator<RemoteClient> i = clients_.iterator(); i.hasNext();) {
 			RemoteClient curClient = i.next();
@@ -194,17 +194,17 @@ public class Host implements RemoteHost {
 			log("Received message from unknown client");
 			return null;
 		}
-		
+
 		return c;
 	}
-	
+
 	/**
 	 * Accepts a message from a client and propagates it to all other clients
 	 */
 	public void receiveNotification(Notification n, String clientURI) {
 		log("Received message '" + n.identifier() + "'");
 
-		RemoteClient c = isClientConnected(clientURI); 
+		RemoteClient c = isClientConnected(clientURI);
 		if (c == null)
 			return;
 
@@ -219,7 +219,6 @@ public class Host implements RemoteHost {
 			curClient.receiveNotificationFromHost(n);
 		}
 	}
-	
 
 	/**
 	 * Start accepting connections when we are about to host a game
@@ -244,14 +243,13 @@ public class Host implements RemoteHost {
 		System.out.println("Host: " + msg);
 	}
 
-	public boolean currentlyPlayingLocalGame() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean equals(RemoteHost rh) {
+		return ((rh.getURI() == getURI()) && (rh.getName() == getName()));
 	}
 
-	public boolean currentlyPlayingNetworkGame() {
-		// TODO Auto-generated method stub
-		return false;
+	// TODO - make this work
+	public MODE getStatus() {
+		return RemoteHost.MODE.IN_LOBBY;
 	}
 
 }

@@ -137,6 +137,7 @@ public class GameController {
 		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
 		Client mainClient = new Client("mainClient");
 
+		
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);

@@ -18,6 +18,7 @@
 
 package org.javassonne.messaging;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class NotificationCallback {
@@ -36,14 +37,33 @@ public class NotificationCallback {
 				method_.invoke(target_);
 			else
 				method_.invoke(target_, n);
-
-		} catch (Exception e) {
+		} catch (IllegalArgumentException e) {
 			String err = String.format("An exception occurred while sending "
 					+ "the notification %s to an observer of %s", n
 					.identifier(), target_.getClass().toString());
+			err += "\nThe callback function called does not take a Notification parameter";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+		} catch (IllegalAccessException e) {
+
+			String err = String.format("An exception occurred while sending "
+					+ "the notification %s to an observer of %s", n
+					.identifier(), target_.getClass().toString());
+			err += "\nNotificationCallback cannot access that function";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+		} catch (InvocationTargetException e) {
+			String err = String.format("An exception occurred while sending "
+					+ "the notification %s to an observer of %s", n
+					.identifier(), target_.getClass().toString());
+			err += "\nAn exception of type "
+					+ e.getTargetException()
+					+ " was thrown in the callback function";
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_ERROR, err);
 		}
+
 	}
 
 	@Override
