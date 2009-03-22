@@ -88,7 +88,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 
 		// Notify the system
 		// ESCAPE
-		if (code == KeyEvent.VK_ESCAPE) {
+		if (code == KeyEvent.VK_ESCAPE && keyStatus == "press") {
 			// Close the the log panel if it's open
 			if (LogPanel.getInstance().isVisible() == true) {
 				LogPanel.getInstance().setVisible(false);
@@ -103,17 +103,17 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		
 		
 		// +/= (Zoom In) 
-		else if(code == KeyEvent.VK_EQUALS){
+		else if(code == KeyEvent.VK_EQUALS && keyStatus == "press"){
 			NotificationManager.getInstance().sendNotification(
 					Notification.ZOOM_IN);
 		}
 		
 		
 		// = (Zoom Out) 
-		else if(code == KeyEvent.VK_MINUS){
+		else if(code == KeyEvent.VK_MINUS && keyStatus == "press"){
 			NotificationManager.getInstance().sendNotification(
 					Notification.ZOOM_OUT);
-		} else if (code == KeyEvent.VK_F1){
+		} else if (code == KeyEvent.VK_F1 && keyStatus == "press"){
 			DisplayHelper.getInstance().add(LogPanel.getInstance(), DisplayHelper.Layer.PALETTE,
 					DisplayHelper.Positioning.BOTTOM_LEFT);
 			LogPanel.getInstance().setVisible(true);
