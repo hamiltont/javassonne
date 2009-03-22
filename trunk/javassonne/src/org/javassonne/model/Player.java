@@ -30,7 +30,7 @@ public class Player {
 		
 		MeepleColor(int i) {
 			this.value = i;
-			this.image = new ImageIcon(String.format("images/meeple_color_%d.jpg"));
+			this.image = new ImageIcon(String.format("images/meeple_color_%d.jpg", value));
 		}
 	}
 	
