@@ -107,6 +107,11 @@ public class Tile {
 	// cache this, so the image is only loaded once from a file
 	private BufferedImage image_;
 
+	// Meeple can be attached to tiles in regions or quadrants, but only
+	// one meeple will ever be on the tile at once. IMPORTANT:
+	// The meeple knows which region or quadrant it is on.
+	private Meeple meeple_;
+	
 	// Constructor
 
 	public Tile() {
@@ -234,8 +239,46 @@ public class Tile {
 		image_ = image;
 	}
 
+	public Meeple getMeeple()
+	{
+		return meeple_;
+	}
+	
+	public void setMeeple(Meeple m)
+	{
+		meeple_ = m;
+	}
+	
 	// Convenience Functions
-
+	
+	/**
+	 * This function returns a meeple object if the Tile has a meeple in the 
+	 * region r, and null if no meeple exists there.
+	 * 
+	 * r The region you want to test for a meeple on
+	 * @return Returns the meeple at location r, or null.
+	 */
+	public Meeple meepleInRegion(Tile.Region r)
+	{
+		if ((meeple_ != null) && (meeple_.getRegionOnTile() == r))
+			return meeple_;
+		return null;
+	}
+	
+	/**
+	 * This function returns a meeple object if the Tile has a meeple in the 
+	 * quadrant q, and null if no meeple exists there.
+	 * 
+	 * q The quadrant you want to test for a meeple on
+	 * @return Returns the meeple at location q, or null.
+	 */
+	public Meeple meepleInQuadrant(Tile.Quadrant q)
+	{
+		if ((meeple_ != null) && (meeple_.getQuadrantOnTile() == q))
+			return meeple_;
+		return null;
+	}
+	
 	/**
 	 * @return Returns a string that visually represents the nine areas of the
 	 *         tile identified
