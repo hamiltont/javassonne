@@ -33,7 +33,9 @@ Game Team:
 
 
 Networking Team:
+ * User can interact with the multiplayer game window by joining and hosting game (Hamy, Brian)
  * In addition to looking at users on the local network, user can type in IP address of a game server to join a game.  (Hamy)
+ * Users will be able to chat with players in the global mutiplayer lobby (Hamy, Brian).
  * User can chat with others playing the same game by typing onto the game canvas. Text appears transparently and pressing enter sends it to the other players. (Hamy, Brian)
  * User can see what other players on the network are doing, and chat with them. (Hamy)
 
