@@ -157,7 +157,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		label.setFont(new Font("Serif", Font.BOLD, 16));
 		label.setSize(200, 20);
 		joinGamePanel_.add(label);
-
+		
+		//Add the Join game button
+		addButtonToPanel("images/join_game.png", "", new Point(600, 
+				543), joinGamePanel_);
+		
 		// Add the Create game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
 				455, 543), joinGamePanel_);
