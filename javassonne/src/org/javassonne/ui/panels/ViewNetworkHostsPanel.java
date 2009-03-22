@@ -55,6 +55,11 @@ import org.javassonne.ui.DisplayHelper;
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, ChatParticipant, KeyListener, ListSelectionListener,
 		TableModelListener {
+	/**
+	 * Default serial ID 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel main_;
 	private JPanel joinGamePanel_;
 	private JPanel hostGamePanel_;
@@ -253,7 +258,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			ChatManager.sendGlobalChat(talkArea_.getText(), this);
+			ChatManager.sendGlobalChat(talkArea_.getText());
 			talkArea_.setText(null);
 
 		}
@@ -265,15 +270,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	public void keyTyped(KeyEvent e) {
 	}
 
-	public void receiveGlobalChat(String msg, ChatParticipant sender) {
+	public void receiveGlobalChat(String msg, String senderName) {
 		chatArea_.setText(chatArea_.getText() + "\n" + msg);
 	}
 
-	public void receivePrivateGameChat(String msg, ChatParticipant sender) {
+	public void receivePrivateGameChat(String msg, String senderName) {
 
 	}
 
 	public String getChatParticipantName() {
-		return null;
+		return LocalHost.getName();
 	}
 }

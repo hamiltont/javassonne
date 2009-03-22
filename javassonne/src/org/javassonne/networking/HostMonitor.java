@@ -86,10 +86,18 @@ public class HostMonitor {
 		if (hostURI.contains(localIP_)) {
 			log("Found localhost broadcast at " + hostURI);
 			
+			// Our own localhost is interested in receiving 
+			// global chats
+			ChatManager.addGlobalChatListener(h);
+			
 			// TODO error - we should not be adding this, just for testing!
 			hostList_.add(h);
-		} else
+		} else {
+			
 			hostList_.add(h);
+			
+		}
+		
 	}
 
 	protected void removeHost(String hostURI) {

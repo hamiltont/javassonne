@@ -139,28 +139,6 @@ public class Host implements RemoteHost {
 		return isLocalHostStarted_;
 	}
 
-	/**
-	 * Accepts a message from a client and propagates it to all other clients
-	 */
-	public void receiveMessage(String msg, String clientURI) {
-		log("Received message '" + msg + "'");
-
-		RemoteClient c = isClientConnected(clientURI);
-		if (c == null)
-			return;
-
-		// Send the message out to all other clients
-		for (Iterator<RemoteClient> i = connectedClients_.iterator(); i
-				.hasNext();) {
-			RemoteClient curClient = i.next();
-
-			// Do not send the message back out to the client that sent it to us
-			if (curClient.equals(c))
-				continue;
-
-			curClient.receiveMessageFromHost(msg);
-		}
-	}
 
 	private RemoteClient isClientConnected(String clientURI) {
 		// If the client sending us a message is unknown to us,
@@ -269,6 +247,21 @@ public class Host implements RemoteHost {
 			log("Clients can connect to: " + URI_);
 		}
 
+	}
+
+	public String getChatParticipantName() {
+		return getName();
+	}
+
+	public void receiveGlobalChat(String msg, String senderName) {
+		// Note that here we should not propogate this message to our clients, they have their
+		// own hosts that can receive a message
+		log("Received global chat message: '" + msg + "' from host " + senderName);
+	}
+
+	public void receivePrivateGameChat(String msg, String senderName) {
+		// Note that here we should propogate it to all other clients
+		log("Received private chat message: '" + msg + "' from host " + senderName);
 	}
 
 }
