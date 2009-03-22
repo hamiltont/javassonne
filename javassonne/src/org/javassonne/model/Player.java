@@ -18,15 +18,19 @@
 
 package org.javassonne.model;
 
+import javax.swing.ImageIcon;
+
 
 public class Player {
 
 	public enum MeepleColor {
 		Yellow(0), Green(1), Blue(2), Red(3), Black(4), Pink(5);
 		public final int value;
-
+		public final ImageIcon image;
+		
 		MeepleColor(int i) {
 			this.value = i;
+			this.image = new ImageIcon(String.format("images/meeple_color_%d.jpg"));
 		}
 	}
 	
