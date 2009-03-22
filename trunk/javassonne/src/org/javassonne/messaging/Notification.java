@@ -78,7 +78,7 @@ public class Notification implements Serializable {
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
-
+	
 	private String identifier_;
 	private Object argument_;
 

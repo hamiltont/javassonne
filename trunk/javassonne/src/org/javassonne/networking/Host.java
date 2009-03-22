@@ -19,11 +19,14 @@
 package org.javassonne.networking;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -32,93 +35,70 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.networking.impl.RemotingUtils;
 
 /**
- * The implementation of our host. Note that although the functions here can be
- * called by the code running on this machine, only the functions declared in
- * the Host interface can be called remotely.
+ * The implementation of our local host. Note that this is a singleton, and
+ * therefore can be easily used by other classes to access the local host object
  * 
  * @author Hamilton Turner
  */
 public class Host implements RemoteHost {
 
-	/**
-	 * The possible modes the host is currently in. OPEN The host is not
-	 * currently hosting a game, and is simply on the network and available.
-	 * CONNECTING The host has chosen to host a game, and is currently accepting
-	 * connections
-	 */
+	private List<RemoteClient> connectedClients_;
 	private RemoteHost.MODE currentMode_;
-
-	// Currently connected clients
-	private List<RemoteClient> clients_ = new ArrayList<RemoteClient>();
-
 	private JmDNS jmdns_;
+	private String URI_; // The URI this host can be reached at
+	private String realName_; // The name this host goes by
+	private String rmiSafeName_; // The RMI safe name of the host
+	private boolean clientsCanConnect_; // A flag that indicates whether or not
+	// this host can be connected to
+	private static Host instance_ = null;
+	private boolean isLocalHostStarted_;
 
-	// The URI this host can be reached at
-	private String hostURI_;
-
-	// The name this host goes by
-	private String realName_;
-
-	// The RMI safe name of the host
-	private String rmiSafeName_;
-
-	// A flag that indicates whether or not this host can be connected to
-	private boolean clientsCanConnect_;
+	public static Host getInstance() {
+		if (instance_ == null)
+			instance_ = new Host();
+		return instance_;
+	}
 
 	/**
 	 * Creates the RMI host service, then broadcasts it using JmDNS
 	 */
-	public Host(String hostName) {
-		ServiceInfo info = null;
-		realName_ = hostName;
-		rmiSafeName_ = realName_.replace(' ', '_');
+	// TODO - this needs to get a hostName from the preferences manager
+	private Host() {
+		connectedClients_ = new ArrayList<RemoteClient>();
 		clientsCanConnect_ = false;
+		URI_ = null;
+		currentMode_ = RemoteHost.MODE.IN_LOBBY;
+		isLocalHostStarted_ = false;
 
-		// Create the RMI service
+		InetAddress addr = null;
 		try {
-			info = RemotingUtils.exportRMIService(this, RemoteHost.class,
-					RemoteHost.SERVICENAME + "_" + rmiSafeName_);
-		} catch (RemoteException e) {
-			log("A RemoteException occurred when exporting host RMI");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			addr = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
-			log("An UnknownHostException occurred when exporting host RMI");
-			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 
-		// Broadcast the created service
-		jmdns_ = JmDNSSingleton.getJmDNS();
-		try {
-			jmdns_.registerService(info);
-		} catch (IOException e) {
-			log("An IOException occurred when registering a service with jmdns");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
+		realName_ = addr.getHostName();
+		rmiSafeName_ = realName_.replace(' ', '_');
 
-		hostURI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
-				+ "/" + info.getName();
-
-		log("Clients can connect to: " + hostURI_);
+		Timer t = new Timer("Host Starter");
+		t.schedule(new HostStarter(), 0);
+		
+		//TODO come up with a nice way to throw away this timer
 	}
 
 	/**
 	 * A client can request that the host adds it to the list of connected
 	 * clients
 	 */
-	public boolean addClient(String clientURI) {
+	public void addClient(String clientURI) {
 		if (clientsCanConnect_) {
 			RemoteClient c = (RemoteClient) RemotingUtils.lookupRMIService(
 					clientURI, RemoteClient.class);
-			clients_.add(c);
+			connectedClients_.add(c);
 			log("Client " + c.getName() + " connected");
-			return true;
 		} else {
 			log("Client " + clientURI + " attempted  to "
 					+ "connect to our host in an unsafe manner");
-			return false;
 		}
 	}
 
@@ -144,7 +124,19 @@ public class Host implements RemoteHost {
 	 * @return host URI
 	 */
 	public String getURI() {
-		return hostURI_;
+		if (URI_ == null) {
+			HostStarter hs = new HostStarter();
+			hs.run();
+		}
+		return URI_;
+	}
+	
+	/**
+	 * Useful for other classes to know if the localhost is ready to go
+	 * @return true if the localhost is started, false otherwise
+	 */
+	public boolean isLocalHostStarted() {
+		return isLocalHostStarted_;
 	}
 
 	/**
@@ -158,7 +150,8 @@ public class Host implements RemoteHost {
 			return;
 
 		// Send the message out to all other clients
-		for (Iterator<RemoteClient> i = clients_.iterator(); i.hasNext();) {
+		for (Iterator<RemoteClient> i = connectedClients_.iterator(); i
+				.hasNext();) {
 			RemoteClient curClient = i.next();
 
 			// Do not send the message back out to the client that sent it to us
@@ -174,7 +167,8 @@ public class Host implements RemoteHost {
 		// ignore the message
 		boolean knownClient = false;
 		RemoteClient c = null;
-		for (Iterator<RemoteClient> it = clients_.iterator(); it.hasNext();) {
+		for (Iterator<RemoteClient> it = connectedClients_.iterator(); it
+				.hasNext();) {
 			RemoteClient curClient = it.next();
 			if (curClient.getURI().equals(clientURI)) {
 				knownClient = true;
@@ -201,7 +195,8 @@ public class Host implements RemoteHost {
 			return;
 
 		// Send the message out to all other clients
-		for (Iterator<RemoteClient> i = clients_.iterator(); i.hasNext();) {
+		for (Iterator<RemoteClient> i = connectedClients_.iterator(); i
+				.hasNext();) {
 			RemoteClient curClient = i.next();
 
 			// Do not send the message back out to the client that sent it to us
@@ -211,7 +206,7 @@ public class Host implements RemoteHost {
 			curClient.receiveNotificationFromHost(n);
 		}
 	}
-
+	
 	/**
 	 * A very simple logger
 	 * 
@@ -222,10 +217,58 @@ public class Host implements RemoteHost {
 	}
 
 	// TODO - make this work
-	// TODO - need to listen for a semi complex pattern of notifications so that 
-	//    	we know if we can accept connections and what-not
+	// TODO - need to listen for a semi complex pattern of notifications so that
+	// we know if we can accept connections and what-not
 	public MODE getStatus() {
 		return this.currentMode_;
+	}
+
+	private class HostStarter extends TimerTask {
+
+		private boolean called_ = false;
+
+		public void run() {
+			// Prevent this from accidentally being called twice
+			if (called_)
+				return;
+			called_ = true;
+			isLocalHostStarted_ = true;
+
+			// Create the RMI service
+			ServiceInfo info = null;
+			try {
+				info = RemotingUtils.exportRMIService(Host.getInstance(), RemoteHost.class,
+						RemoteHost.SERVICENAME + "_" + rmiSafeName_);
+			} catch (RemoteException e) {
+				log("A RemoteException occurred when exporting host RMI");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			} catch (UnknownHostException e) {
+				log("An UnknownHostException occurred when exporting host RMI");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				log("Something bad happened internally in RMI");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+
+			// Broadcast the created service
+			jmdns_ = JmDNSSingleton.getJmDNS();
+			try {
+				jmdns_.registerService(info);
+			} catch (IOException e) {
+				log("An IOException occurred when registering a service with jmdns");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+
+			URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
+					+ "/" + info.getName();
+
+			log("Clients can connect to: " + URI_);
+		}
+
 	}
 
 }

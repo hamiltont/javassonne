@@ -40,7 +40,6 @@ import org.javassonne.networking.impl.RemotingUtils;
 public class HostMonitor {
 	private JmDNS jmdns_;
 	private List<RemoteHost> hostList_;
-	private String localhostURI_ = null;
 	private static HostMonitor instance_ = null;
 	// Used to discover if a service is the local service
 	private String localIP_;
@@ -64,31 +63,20 @@ public class HostMonitor {
 		}
 
 	}
-	
+
 	// Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
 		if (instance_ == null)
 			instance_ = new HostMonitor();
 		return instance_;
 	}
-	
+
 	public List<RemoteHost> getHosts() {
 		return hostList_;
 	}
-	
-	// TODO make this call more fail safe
-	public String getLocalHostURI() {
-		if (localhostURI_ == null)
-			return null;
-		return localhostURI_;
-	}
-	
+
 	public int numberOfHosts() {
 		return hostList_.size();
-	}
-
-	public void setLocalHostURI(String uri) {
-		localhostURI_ = uri;
 	}
 
 	protected void addHost(String hostURI) {
@@ -96,8 +84,8 @@ public class HostMonitor {
 				RemoteHost.class);
 
 		if (hostURI.contains(localIP_)) {
-			localhostURI_ = hostURI;
-			log("found host uri to be " + hostURI);
+			log("Found localhost broadcast at " + hostURI);
+			
 			// TODO error - we should not be adding this, just for testing!
 			hostList_.add(h);
 		} else

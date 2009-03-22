@@ -20,6 +20,8 @@ package org.javassonne.networking;
 
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.jmdns.ServiceInfo;
 
@@ -34,12 +36,10 @@ import org.javassonne.networking.impl.RemotingUtils;
  * @author Hamilton Turner
  */
 public class Client implements RemoteClient {
-	
+
 	// Lets this client know if it is
 	// currently connected to a host
-	private boolean connected_ = false; 
-	private ServiceInfo service_; // The serviceInfo associated with this
-	// clients RMI service
+	private boolean connected_;
 	private RemoteHost host_; // The host we are currently connected to,
 	// if any
 	private String clientURI_; // The URI of this client
@@ -48,40 +48,18 @@ public class Client implements RemoteClient {
 	/**
 	 * Create the RMI service
 	 * 
-	 * @param localHostURI
-	 *            The URI of the host local to this machine, in case this
-	 *            machine ends up hosting a game
 	 * @param name
 	 *            The name the player would like to have
 	 */
 	public Client(String name) {
 		name_ = name;
+		connected_ = false;
+		clientURI_ = null;
 
-		// Create the RMI service
-		try {
-			// TODO If we want to run multiplayer by using networking, ensure
-			// that
-			// there are no duplicate names
-			service_ = RemotingUtils.exportRMIService(this, RemoteClient.class,
-					RemoteClient.SERVICENAME + "_" + name);
-		} catch (RemoteException e) {
-			log("A RemoteException occurred while creating the RMI");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			log("A UnknownHostException occurrec while creating the RMI");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-
-		// TODO rather than using the ServiceInfo wrapper provided, we should
-		// probably just do this manually. the call to service_.getHostAddr
-		// will fail b/c we have not registered this service with JmDNS,
-		// which we have no real desire/need to do
-		clientURI_ = "rmi://" + RemotingUtils.LOCAL_HOST + ":"
-				+ service_.getPort() + "/" + service_.getName();
-
+		Timer t = new Timer("Client Starter - Client " + name);
+		t.schedule(new ClientStarter(this), 0);
 		
+		//TODO come up with a nice way to throw away this timer
 	}
 
 	/**
@@ -90,7 +68,7 @@ public class Client implements RemoteClient {
 	public void receiveMessageFromHost(String msg) {
 		log("Received msg - " + msg);
 	}
-	
+
 	public void receiveNotificationFromHost(Notification n) {
 		log("Received notification - " + n.identifier());
 	}
@@ -104,7 +82,7 @@ public class Client implements RemoteClient {
 		log("Sending message " + msg + " to host");
 		host_.receiveMessage(msg, clientURI_);
 	}
-	
+
 	public void sendNotificationToHost(Notification n) {
 		if (connected_ == false)
 			throw new IllegalArgumentException();
@@ -124,7 +102,8 @@ public class Client implements RemoteClient {
 
 		// should probably verify that host exists, and
 		// then safely attempt to connect
-		host_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI, RemoteHost.class);
+		host_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+				RemoteHost.class);
 
 		host_.addClient(clientURI_);
 
@@ -135,17 +114,11 @@ public class Client implements RemoteClient {
 	 * Return the URI that this client can be reached at
 	 */
 	public String getURI() {
+		if (clientURI_ == null) {
+			ClientStarter cs = new ClientStarter(this);
+			cs.run();
+		}
 		return clientURI_;
-	}
-
-	/**
-	 * Function called by this clients host that allows this client to connect
-	 * to the local host. This effectively helps us start a game that we are
-	 * hosting ourselves
-	 */
-	public void connectToLocalHost() {
-		// TODO - this call could fail 
-		connectToHost(HostMonitor.getInstance().getLocalHostURI());
 	}
 
 	/**
@@ -162,6 +135,52 @@ public class Client implements RemoteClient {
 	 */
 	public String getName() {
 		return name_;
+	}
+
+	private class ClientStarter extends TimerTask {
+
+		private Client clientToStart_;
+		private boolean hasBeenCalled_;
+
+		public ClientStarter(Client c) {
+			clientToStart_ = c;
+			hasBeenCalled_ = false;
+		}
+
+		public void run() {
+			if (hasBeenCalled_)
+				return;
+			hasBeenCalled_ = false;
+
+			// Create the RMI service
+			ServiceInfo service = null;
+			try {
+				// TODO If we want to run multiplayer by using networking,
+				// ensure
+				// that
+				// there are no duplicate names
+				service = RemotingUtils.exportRMIService(clientToStart_,
+						RemoteClient.class, RemoteClient.SERVICENAME + "_"
+								+ clientToStart_.getName());
+			} catch (RemoteException e) {
+				log("A RemoteException occurred while creating the RMI");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			} catch (UnknownHostException e) {
+				log("A UnknownHostException occurred while creating the RMI");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+
+			// TODO rather than using the ServiceInfo wrapper provided, we
+			// should probably just do this manually. the call to
+			// service_.getHostAddr will fail b/c we have not registered this
+			// service with JmDNS, which we have no real desire/need to do
+			clientURI_ = "rmi://" + RemotingUtils.LOCAL_HOST + ":"
+					+ service.getPort() + "/" + service.getName();
+
+		}
+
 	}
 
 }

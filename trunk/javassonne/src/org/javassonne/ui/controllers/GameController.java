@@ -40,6 +40,7 @@ import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.networking.Client;
 import org.javassonne.networking.Host;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.networking.LocalHost;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.controls.JPopUp;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
@@ -82,7 +83,14 @@ public class GameController {
 	 * and waits for the user to click something in the menu.
 	 */
 	public GameController() {
+		
+		// Turn off annoying RMI logging
+		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
 
+		// Does nothing but force the LocalHost to
+		// be created sometime soon
+		LocalHost.getName();
+		
 		// create the menu panel
 		menu_ = new MenuPanel();
 
@@ -100,6 +108,7 @@ public class GameController {
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
+	
 	}
 
 	/**
@@ -123,21 +132,8 @@ public class GameController {
 	 */
 	public void newNetworkGame(Notification n) {
 
-		InetAddress addr = null;
-		try {
-			addr = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// Turn off annoying RMI logging
-		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
+		//Client mainClient = new Client("mainClient");
 
-		Host localHost = new Host(addr.getHostName());
-		HostMonitor.getInstance().setLocalHostURI(localHost.getURI());
-		Client mainClient = new Client("mainClient");
-
-		
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);

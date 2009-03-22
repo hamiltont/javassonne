@@ -22,6 +22,8 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,7 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.OverlayLayout;
 import javax.swing.event.ListSelectionEvent;
@@ -38,25 +40,39 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.model.NetworkHosts;
+import org.javassonne.model.AvailableNetworkHosts;
+import org.javassonne.networking.ChatManager;
+import org.javassonne.networking.ChatParticipant;
+import org.javassonne.networking.LocalHost;
 import org.javassonne.ui.DisplayHelper;
 
+// TODO - add a button that will allow you to join a game to the joinGamePanel
+//			Do a check that that person has a status that will allow others to join
+//			their game, and do not allow them to be selected if they do not have this 
+//			status
+// TODO - use the LocalHost.isLocalHostStarted() function to provide some visual feedback
+//			to the user about whether or not the multiplayer lobby is set up
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
-		ActionListener, ListSelectionListener, TableModelListener {
+		ActionListener, ChatParticipant, KeyListener, ListSelectionListener,
+		TableModelListener {
 	private JPanel main_;
-	private JPanel join_game_;
-	private JTable hosts_table_;
-	private JPanel host_game_;
+	private JPanel joinGamePanel_;
+	private JPanel hostGamePanel_;
+
+	private JTable availHostsTable_;
+	private JTable connectedHostsTable_;
+
+	private JTextArea chatArea_;
+	private JTextArea talkArea_;
 
 	// Action commands for buttons
 	private static String CANCEL = "Cancel";
-	private static String HIDE_HOST_PANEL = "Back";
+	private static String SHOW_JOIN_PANEL = "Back";
 	private static String SHOW_HOST_PANEL = "Host_Game";
 
 	public ViewNetworkHostsPanel() {
 		super();
 
-		// addKeyListener(JKeyListener.getInstance());
 		setBackgroundImagePath("images/multiplayer_lobby_background.jpg");
 		setVisible(true);
 		setLayout(new OverlayLayout(this));
@@ -68,65 +84,124 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		main_.setLayout(null);
 		main_.setAlignmentX(CENTER_ALIGNMENT);
 
-		join_game_ = new JPanel();
-		join_game_.setOpaque(false);
-		join_game_.setLayout(null);
-		join_game_.setAlignmentX(CENTER_ALIGNMENT);
+		joinGamePanel_ = new JPanel();
+		joinGamePanel_.setOpaque(false);
+		joinGamePanel_.setLayout(null);
+		joinGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
+		joinGamePanel_.setSize(getWidth(), getHeight());
+
+		hostGamePanel_ = new JPanel();
+		hostGamePanel_.setOpaque(false);
+		hostGamePanel_.setLayout(null);
+		hostGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
+		hostGamePanel_.setSize(getWidth(), getHeight());
+
+		ChatManager.addGlobalChatListener(this);
+
+		// ============================================
+		// Setup Main Panel
+		// ============================================
 
 		// Add Buttons that will be present for both
 		// the join game panel, and the host game
-		addButtonToPanel("images/new_game_cancel.jpg", CANCEL, new Point(55,
-				543), main_);
+		addButtonToPanel("images/host_cancel.png", CANCEL, new Point(55, 543),
+				main_);
 
 		// Setup the Global chat, which will be available for both host_game and
 		// join_game, and therefore gets added to the main
-		JTextField chatArea = new JTextField();
-		chatArea.setEditable(false);
-		chatArea.setLocation(new Point(410,160));
-		chatArea.setSize(350, 300);
-		main_.add(chatArea);
+		chatArea_ = new JTextArea();
+		chatArea_.setEditable(false);
+		chatArea_.setLocation(new Point(410, 160));
+		chatArea_.setSize(350, 300);
+		main_.add(chatArea_);
 
 		// Add a chat label
 		JLabel clabel = new JLabel("Global Chat");
 		clabel.setLocation(new Point(415, 130));
 		clabel.setFont(new Font("Serif", Font.BOLD, 16));
 		clabel.setSize(200, 20);
-		join_game_.add(clabel);
-		
+		main_.add(clabel);
+
 		// Add a chat text input area
-		JTextField talkArea = new JTextField("<Type here to chat to other players>");
-		talkArea.setLocation(new Point(410,460));
-		talkArea.setSize(350, 50);
-		main_.add(talkArea);
+		talkArea_ = new JTextArea("<Type here to chat to other players>");
+		talkArea_.setLocation(new Point(410, 461));
+		talkArea_.setSize(349, 50);
+		talkArea_.setWrapStyleWord(true);
+		talkArea_.setLineWrap(true);
+		talkArea_.addKeyListener(this);
+		main_.add(talkArea_);
 
-
+		// ============================================
+		// Setup Join Panel
+		// ============================================
 
 		// Create the hosts table
-		NetworkHosts tableModel = new NetworkHosts();
+		AvailableNetworkHosts tableModel = new AvailableNetworkHosts();
 		tableModel.addTableModelListener(this);
-		hosts_table_ = new JTable();
-		hosts_table_.setModel(tableModel);
-		hosts_table_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		//hosts_table_.setSize(600, 360);
+		availHostsTable_ = new JTable();
+		availHostsTable_.setModel(tableModel);
+		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		// hosts_table_.setSize(600, 360);
 
 		// Make it scroll able
-		JScrollPane hostsScroll = new JScrollPane(hosts_table_);
+		JScrollPane hostsScroll = new JScrollPane(availHostsTable_);
 		hostsScroll.setSize(350, 350);
 		hostsScroll.setLocation(new Point(40, 160));
-		hosts_table_.setSize(hostsScroll.getWidth(), hostsScroll.getHeight());
+		availHostsTable_.setSize(hostsScroll.getWidth(), hostsScroll
+				.getHeight());
+		joinGamePanel_.add(hostsScroll);
 
 		// Add a label
 		JLabel label = new JLabel("Hosts Table");
 		label.setLocation(new Point(45, 130));
 		label.setFont(new Font("Serif", Font.BOLD, 16));
 		label.setSize(200, 20);
-		join_game_.add(label);
+		joinGamePanel_.add(label);
 
-		// Add stuff to the join game
-		join_game_.add(hostsScroll);
-		join_game_.setSize(getWidth(), getHeight());
+		// Add the Create game button
+		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
+				455, 543), joinGamePanel_);
 
-		main_.add(join_game_);
+		// ============================================
+		// Setup Host Panel
+		// ============================================
+		hostGamePanel_.setVisible(false);
+
+		// TODO - create a model for the HostGame
+		// Create the hosts table
+		AvailableNetworkHosts change_me = new AvailableNetworkHosts();
+		change_me.addTableModelListener(this);
+		connectedHostsTable_ = new JTable();
+		connectedHostsTable_.setModel(change_me);
+		connectedHostsTable_
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		// hosts_table_.setSize(600, 360);
+
+		// Make it scroll able
+		JScrollPane connectedScroll = new JScrollPane(connectedHostsTable_);
+		connectedScroll.setSize(350, 200);
+		connectedScroll.setLocation(new Point(40, 160));
+		connectedHostsTable_.setSize(connectedScroll.getWidth(),
+				connectedScroll.getHeight());
+		hostGamePanel_.add(connectedScroll);
+
+		// Add a label
+		JLabel label1 = new JLabel("Connected Hosts");
+		label1.setLocation(new Point(45, 130));
+		label1.setFont(new Font("Serif", Font.BOLD, 16));
+		label1.setSize(200, 20);
+		hostGamePanel_.add(label1);
+
+		// Add some other options
+		// TODO - put game password option here
+		// TODO - put Boot Player button here
+
+		// Add the back button
+		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(
+				455, 543), hostGamePanel_);
+
+		main_.add(hostGamePanel_);
+		main_.add(joinGamePanel_);
 
 		add(main_);
 	}
@@ -137,29 +212,21 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		b.addActionListener(this);
 		b.setActionCommand(notification);
 		b.setLocation(location);
-		b.setSize(279, 38);
+		b.setSize(128, 48);
 		panel.add(b);
-	}
-
-	private void addTextBoxToPanel(Point location, JPanel panel) {
-		JTextField text = new JTextField();
-		// text.addActionListener(this);
-		// text.setActionCommand(notification);
-		text.setLocation(location);
-		text.setSize(279, 38);
-		panel.add(text);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getActionCommand().equals(SHOW_HOST_PANEL)) {
 			// Hide the join game options, and show host
-
-		} else if (e.getActionCommand().equals(HIDE_HOST_PANEL)) {
+			joinGamePanel_.setVisible(false);
+			hostGamePanel_.setVisible(true);
+		} else if (e.getActionCommand().equals(SHOW_JOIN_PANEL)) {
 			// Hide the host options, and show the join
-
+			hostGamePanel_.setVisible(false);
+			joinGamePanel_.setVisible(true);
 		} else if (e.getActionCommand().equals(CANCEL)) {
-			// user pressed cancel
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		} else
@@ -173,7 +240,36 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	}
 
-	public void tableChanged(TableModelEvent arg0) {
-		hosts_table_.repaint();
+	public void tableChanged(TableModelEvent e) {
+		if (joinGamePanel_.isVisible() == true)
+			availHostsTable_.repaint();
+		else
+			connectedHostsTable_.repaint();
+	}
+
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			ChatManager.sendGlobalChat(talkArea_.getText(), this);
+			talkArea_.setText(null);
+
+		}
+	}
+
+	public void keyReleased(KeyEvent e) {
+	}
+
+	public void keyTyped(KeyEvent e) {
+	}
+
+	public void receiveGlobalChat(String msg, ChatParticipant sender) {
+		chatArea_.setText(chatArea_.getText() + "\n" + msg);
+	}
+
+	public void receivePrivateGameChat(String msg, ChatParticipant sender) {
+
+	}
+
+	public String getChatParticipantName() {
+		return null;
 	}
 }
