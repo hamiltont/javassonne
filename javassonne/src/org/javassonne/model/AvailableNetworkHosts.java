@@ -35,7 +35,7 @@ import org.javassonne.networking.RemoteHost;
 // It would be nice to make this use reflection to figure out the available "get___" methods on RemoteHost, 
 //    and naturally update the table using the available methods
 
-public class NetworkHosts extends TimerTask implements TableModel {
+public class AvailableNetworkHosts extends TimerTask implements TableModel {
 
 	private ArrayList<RemoteHost> tableData_;
 	private ArrayList<String> hostURIs_;				// Allows us to see if we already know about
@@ -43,7 +43,7 @@ public class NetworkHosts extends TimerTask implements TableModel {
 														//   network query
 	private ArrayList<TableModelListener> observers_;
 
-	public NetworkHosts() {
+	public AvailableNetworkHosts() {
 		tableData_ = new ArrayList<RemoteHost>();
 		observers_ = new ArrayList<TableModelListener>();
 		hostURIs_ = new ArrayList<String>();

@@ -18,9 +18,6 @@
 
 package org.javassonne.networking;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.javassonne.messaging.Notification;
 
 /**
@@ -31,23 +28,19 @@ import org.javassonne.messaging.Notification;
 public class TestLauncher {
 
 	public static void main(String[] args) {
-		
-		Host h = new Host("Hamy");
-		HostMonitor.getInstance().setLocalHostURI(h.getURI());
-		
-			
+
 		Client cl = new Client("a");
-		cl.connectToLocalHost();
+		cl.connectToHost(LocalHost.getURI());
 		cl.sendMessageToHost("hello from a");
 
-		// TODO change code so that it makes sure the name has no spaces 
+		// TODO change code so that it makes sure the name has no spaces
 		// or fix underlying imp
 		Client clb = new Client("b");
-		clb.connectToLocalHost();
+		clb.connectToHost(LocalHost.getURI());
 		clb.sendMessageToHost("hello from b");
-		
+
 		// TODO works with a serializable object, but not with a non
-		// Object boo = new Object(); 
+		// Object boo = new Object();
 		String boo = new String();
 		Notification n = new Notification("test notification", boo);
 		cl.sendNotificationToHost(n);

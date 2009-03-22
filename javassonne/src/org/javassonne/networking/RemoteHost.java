@@ -42,7 +42,7 @@ public interface RemoteHost {
 	 *            URI of the client we would like to add
 	 * @return True if the client was added, false otherwise
 	 */
-	public boolean addClient(String clientURI);
+	public void addClient(String clientURI);
 
 	/**
 	 * Asks the host if it is ready to accept client connections

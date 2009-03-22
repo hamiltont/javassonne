@@ -79,7 +79,7 @@ public class RemotingUtils {
 	 * @throws RemoteException
 	 * @throws UnknownHostException
 	 */
-	public static ServiceInfo exportRMIService(Object svc, Class svcinterface,
+	public static synchronized ServiceInfo exportRMIService(Object svc, Class svcinterface,
 			int port, String name) throws RemoteException, UnknownHostException {
 		RmiServiceExporter exporter = new RmiServiceExporter();
 		exporter.setRegistryPort(port);
