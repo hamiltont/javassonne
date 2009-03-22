@@ -195,6 +195,9 @@ public class MapLayer extends JPanel implements MouseListener,
 			updateTimer_ = null;
 		}
 
+		if (board_ == null)
+			return;
+		
 		// determine if the timer should be firing or not. If any of our sprites
 		// need to be animated, or if the map is shifting, we want 20FPS.
 		// Otherwise
