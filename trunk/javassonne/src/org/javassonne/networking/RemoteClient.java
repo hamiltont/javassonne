@@ -18,6 +18,8 @@
 
 package org.javassonne.networking;
 
+import java.io.Serializable;
+
 import org.javassonne.messaging.Notification;
 
 /**
@@ -26,16 +28,9 @@ import org.javassonne.messaging.Notification;
  * 
  * @author Hamilton Turner
  */
-public interface RemoteClient {
+public interface RemoteClient extends ChatParticipant {
 	public static final String SERVICENAME = "JavassonneClient";
 	
-	/**
-	 * Receive a message from the host. This will eventually
-	 * change to a notification
-	 * @param msg - the message
-	 */
-	public void receiveMessageFromHost(String msg);
-
 	public void receiveNotificationFromHost(Notification n);
 	/**
 	 * Allows an arbitrary host to get the clients current URI. 

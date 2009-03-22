@@ -21,10 +21,11 @@ package org.javassonne.networking;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 /*
  * Handles keeping track of who is interested in chat, and sending messages
  */
+
+// TODO - change all instances of LocalHost.getName() to some sort of Preferences.getName()
 public class ChatManager {
 
 	private ArrayList<ChatParticipant> globalObservers_;
@@ -50,38 +51,40 @@ public class ChatManager {
 		if (globalObservers_.contains(c) == false)
 			globalObservers_.add(c);
 	}
-	
+
 	public static void removeGlobalChatListener(ChatParticipant c) {
 		getInstance()._removeGCListener(c);
 	}
-	
+
 	private void _removeGCListener(ChatParticipant c) {
 		if (globalObservers_.contains(c) == true)
 			globalObservers_.remove(c);
 	}
-	
-	public static void sendGlobalChat(String msg, ChatParticipant sender) {
-		getInstance()._sendGChat(msg, sender);
+
+	public static void sendGlobalChat(String msg) {
+		getInstance()._sendGChat(msg);
 	}
-	
-	private void _sendGChat(String msg, ChatParticipant sender) {
-		for(Iterator<ChatParticipant> it = globalObservers_.iterator(); it.hasNext();)
-			it.next().receiveGlobalChat(msg, sender);
+
+	private void _sendGChat(String msg) {
+		for (Iterator<ChatParticipant> it = globalObservers_.iterator(); it
+				.hasNext();)
+			it.next().receiveGlobalChat(msg, LocalHost.getName());
 	}
-	
-    //========================================
-    //	          Private Chat Functions
-    //========================================
-		
-	public static void sendPrivateGameChat(String msg, ChatParticipant sender) {
-		getInstance()._sendPGChat(msg, sender);
+
+	// ========================================
+	// Private Chat Functions
+	// ========================================
+
+	public static void sendPrivateGameChat(String msg) {
+		getInstance()._sendPGChat(msg);
 	}
-	
-	private void _sendPGChat(String msg, ChatParticipant sender) {
-		for(Iterator<ChatParticipant> it = privateObservers_.iterator(); it.hasNext();)
-			it.next().receivePrivateGameChat(msg, sender);
+
+	private void _sendPGChat(String msg) {
+		for (Iterator<ChatParticipant> it = privateObservers_.iterator(); it
+				.hasNext();)
+			it.next().receivePrivateGameChat(msg, LocalHost.getName());
 	}
-	
+
 	public static void addPrivateGameChatListener(ChatParticipant c) {
 		getInstance()._addPGListener(c);
 	}
@@ -90,13 +93,13 @@ public class ChatManager {
 		if (privateObservers_.contains(c) == false)
 			privateObservers_.add(c);
 	}
-	
+
 	public static void removePrivateGameChatListener(ChatParticipant c) {
 		getInstance()._removePGListener(c);
 	}
-	
+
 	private void _removePGListener(ChatParticipant c) {
 		if (privateObservers_.contains(c) == true)
 			privateObservers_.remove(c);
-	}	
+	}
 }

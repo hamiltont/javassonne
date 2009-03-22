@@ -47,10 +47,6 @@ public class LocalHost {
 		return Host.getInstance().getURI();
 	}
 
-	public static void receiveMessage(String msg, String clientURI) {
-		Host.getInstance().receiveMessage(msg, clientURI);
-	}
-
 	public static void receiveNotification(Notification n, String clientURI) {	
 		Host.getInstance().receiveNotification(n, clientURI);
 	}

@@ -21,11 +21,15 @@ package org.javassonne.networking;
 /*
  * Needed by the ChatManager to contact anyone that wants to participate in chat
  * Also needed so certain users can see who a message came from
+ * 
+ * Note that although some of the participants are local classes, most of them
+ * are in fact RemoteHosts or RemoteClients, so everything in ChatParticipant 
+ * needs to be Serializable
  */
 public interface ChatParticipant {
-	public void receiveGlobalChat(String msg, ChatParticipant sender);
+	public void receiveGlobalChat(String msg, String senderName);
 	
-	public void receivePrivateGameChat(String msg, ChatParticipant sender);
+	public void receivePrivateGameChat(String msg, String senderName);
 	
 	public String getChatParticipantName();
 }

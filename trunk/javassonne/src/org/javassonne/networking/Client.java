@@ -58,15 +58,8 @@ public class Client implements RemoteClient {
 
 		Timer t = new Timer("Client Starter - Client " + name);
 		t.schedule(new ClientStarter(this), 0);
-		
-		//TODO come up with a nice way to throw away this timer
-	}
 
-	/**
-	 * Receive a message from the host of the game
-	 */
-	public void receiveMessageFromHost(String msg) {
-		log("Received msg - " + msg);
+		// TODO come up with a nice way to throw away this timer
 	}
 
 	public void receiveNotificationFromHost(Notification n) {
@@ -80,7 +73,7 @@ public class Client implements RemoteClient {
 		if (connected_ == false)
 			throw new IllegalArgumentException();
 		log("Sending message " + msg + " to host");
-		host_.receiveMessage(msg, clientURI_);
+		ChatManager.sendPrivateGameChat(msg);
 	}
 
 	public void sendNotificationToHost(Notification n) {
@@ -180,7 +173,21 @@ public class Client implements RemoteClient {
 					+ service.getPort() + "/" + service.getName();
 
 		}
+	}
 
+	// TODO - should eventually change this to some sort of a preferences system
+	public String getChatParticipantName() {
+		return LocalHost.getName();
+	}
+
+	public void receiveGlobalChat(String msg, String senderName) {
+		log("ERROR - should not have received any global messages!"
+				+ " These should go to our host!");
+		log("Received global chat msg - '" + msg + "' from " + senderName);
+	}
+
+	public void receivePrivateGameChat(String msg, String senderName) {
+		log("Received private chat msg - '" + msg + "' from " + senderName);
 	}
 
 }

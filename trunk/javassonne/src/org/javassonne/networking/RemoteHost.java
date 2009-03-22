@@ -26,7 +26,7 @@ import org.javassonne.messaging.Notification;
  * 
  * @author Hamilton Turner
  */
-public interface RemoteHost {
+public interface RemoteHost extends ChatParticipant {
 	public static final String SERVICENAME = "JavassonneHost";
 	public static enum MODE {
 		PLAYING_LOCAL_GAME, 
@@ -58,12 +58,6 @@ public interface RemoteHost {
 	
 	public RemoteHost.MODE getStatus();
 	
-	/**
-	 * Receives a message from a specified client, and automatically sends it to
-	 * all clients (besides the one it was just contacted by)
-	 */
-	public void receiveMessage(String msg, String clientURI);
-
 	// TODO desc
 	public void receiveNotification(Notification n, String clientURI);
 }
