@@ -83,14 +83,14 @@ public class GameController {
 	 * and waits for the user to click something in the menu.
 	 */
 	public GameController() {
-		
+
 		// Turn off annoying RMI logging
 		Logger.getLogger("org.springframework").setLevel(Level.SEVERE);
 
 		// Does nothing but force the LocalHost to
 		// be created sometime soon
 		LocalHost.getName();
-		
+
 		// create the menu panel
 		menu_ = new MenuPanel();
 
@@ -108,7 +108,7 @@ public class GameController {
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
-	
+
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class GameController {
 	 */
 	public void newNetworkGame(Notification n) {
 
-		//Client mainClient = new Client("mainClient");
+		// Client mainClient = new Client("mainClient");
 
 		ViewNetworkHostsPanel p = new ViewNetworkHostsPanel();
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
@@ -233,8 +233,8 @@ public class GameController {
 	}
 
 	/**
-	 * Called when a turn is ended, and may be called again if the BoardController
-	 * finds the drawn tile unusable.
+	 * Called when a turn is ended, and may be called again if the
+	 * BoardController finds the drawn tile unusable.
 	 * 
 	 */
 	public void beginTurn() {
@@ -300,16 +300,19 @@ public class GameController {
 		// InputPlayerDataPanel.
 		// In the future, maybe this entire function should be in the panel, and
 		// then the gameController can just get a list of player objects?
-		int i = 0;
-		for (String s : playerData_.getPlayerData()) {
+		int playerCount = 0;
+
+		for (String s : playerData_.getPlayerNames()) {
 			if (s.length() > 0) {
 				Player player = new Player(s);
-				player.setMeepleColor(MeepleColor.values()[i++]);
+				player.setMeepleColor(playerData_.getPlayerColors().get(playerCount));
 				players_.add(player);
-			} else {
+				playerCount++;
+			} else if (playerCount < 2) {
 				Player player = new Player();
-				player.setMeepleColor(MeepleColor.values()[i++]);
+				player.setMeepleColor(playerData_.getPlayerColors().get(playerCount));
 				players_.add(player);
+				playerCount++;
 			}
 		}
 	}
