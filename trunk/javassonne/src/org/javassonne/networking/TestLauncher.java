@@ -33,10 +33,8 @@ public class TestLauncher {
 	public static void main(String[] args) {
 
 		String hostURI = "rmi://129.59.82.77:5099/JavassonneHost_demetri-d5042f7";
-		RemoteHost h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
-				RemoteHost.class);
-		System.out.println(h.getName());
-		System.out.println(h.getURI());
+		HostMonitor.getInstance().addHost(hostURI);
+		
 		
 		
 		//Client cl = new Client("a");
