@@ -63,6 +63,7 @@ public class Notification implements Serializable {
 	public static final String END_GAME = "NotificationEndGame";
 	public static final String QUIT = "NotificationQuit";
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
+	public static final String TOGGLE_INSTRUCTIONS = "NotificationToggleInstructions";
 	
 	public static final String DECK_SET = "NotificationSetDeck";
 	public static final String BOARD_SET = "NotificationSetBoard";

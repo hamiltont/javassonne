@@ -72,9 +72,8 @@ public class JPopUp {
 	public String promptUser(String[] options) {
 
 		JPanel p = new JPanel();
-		// p.addKeyListener(null);
-		// p.addMouseListener(null);
-
+		p.setName("JPopUp");
+		
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 
@@ -109,7 +108,8 @@ public class JPopUp {
 	public void showMsg(int JOptionPaneType) {
 
 		JPanel p = new JPanel();
-
+		p.setName("JPopUp");
+		
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 
@@ -124,6 +124,8 @@ public class JPopUp {
 
 	public File openFileDialog() {
 		JPanel p = new JPanel();
+		p.setName("JPopUp");
+		
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle(title_);
 		fc.setFileFilter(new FileTypeFilter());
@@ -146,6 +148,8 @@ public class JPopUp {
 	 */
 	public File saveFileDialog() {
 		JPanel p = new JPanel();
+		p.setName("JPopUp");
+		
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle(title_);
 		fc.setFileFilter(new FileTypeFilter());
