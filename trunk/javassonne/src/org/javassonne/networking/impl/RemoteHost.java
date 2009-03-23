@@ -42,6 +42,8 @@ public interface RemoteHost {
 	 * @return True if the client was added, false otherwise
 	 */
 	public void addClient(String clientURI);
+	
+	public void removeClient(String clientURI);
 
 	/**
 	 * Asks the host if it is ready to accept client connections

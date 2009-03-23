@@ -18,8 +18,6 @@
 
 package org.javassonne.networking.impl;
 
-import java.io.Serializable;
-
 import org.javassonne.messaging.Notification;
 
 /**
@@ -31,16 +29,25 @@ import org.javassonne.messaging.Notification;
 public interface RemoteClient {
 	public static final String SERVICENAME = "JavassonneClient";
 	
+	/**
+	 * Allows the host to send an arbitrary notification to the 
+	 * client. Note that internally the client chooses to 
+	 * allow or deny this notification
+	 * 
+	 * @param n The notification to send
+	 */
 	public void receiveNotificationFromHost(Notification n);
+	
 	/**
 	 * Allows an arbitrary host to get the clients current URI. 
 	 * 
-	 * @return client URI
+	 * @return the RMI safe client URI
 	 */
 	public String getURI();
 	
 	/**
 	 * Query for what name this player has chosen
+	 * 
 	 * @return the name of this player in the game
 	 */
 	public String getName();

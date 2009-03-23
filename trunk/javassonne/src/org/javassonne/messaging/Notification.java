@@ -18,7 +18,6 @@
 
 package org.javassonne.messaging;
 
-import java.io.Serializable;
 
 /**
  * The Notification class represents a single notification sent using the
@@ -32,10 +31,12 @@ import java.io.Serializable;
  * @author bengotow
  * 
  */
-public class Notification implements Serializable {
+public class Notification {
 
 	public static final String LOG_WARNING = "NotificationLogWarning";
 	public static final String LOG_ERROR = "NotificationLogError";
+	public static final String LOG_INFO = "NotificationLogInfo";
+	
 	public static final String MAX = "NotificationMaximize";
 
 	public static final String TILE_IN_HAND_CHANGED = "NotificationTileInHandChanged";

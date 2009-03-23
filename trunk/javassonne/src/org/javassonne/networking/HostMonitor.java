@@ -71,19 +71,17 @@ public class HostMonitor {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		
-		this.addHost("rmi://129.59.82.77:5099/JavassonneHost_demetri-d5042f7");
+
+		// We will handle sending chats to all known hosts
+		NotificationManager.getInstance().addObserver(
+				Notification.SEND_GLOBAL_CHAT, this, "sendOutGlobalChat");
+
 	}
 
 	// Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
-		if (instance_ == null) {
+		if (instance_ == null)
 			instance_ = new HostMonitor();
-			NotificationManager.getInstance().addObserver(
-					Notification.SEND_GLOBAL_CHAT, instance_,
-					"sendOutGlobalChat");
-		}
-
 		return instance_;
 	}
 
