@@ -79,6 +79,12 @@ public class Notification implements Serializable {
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
 	
+	public static final String SEND_PRIVATE_CHAT = "SendPrivateChat";
+	public static final String RECV_PRIVATE_CHAT = "RecvPrivateChat";
+	
+	public static final String SEND_GLOBAL_CHAT = "SendGlobalChat";
+	public static final String RECV_GLOBAL_CHAT = "RecvGlobalChat";
+	
 	private String identifier_;
 	private Object argument_;
 

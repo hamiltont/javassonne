@@ -80,7 +80,7 @@ public class Client implements RemoteClient {
 		if (connected_ == false)
 			throw new IllegalArgumentException();
 		log("Sending notification " + n.identifier() + " to host");
-		host_.receiveNotification(n, clientURI_);
+		host_.receiveNotificationFromClient(n, clientURI_);
 	}
 
 	/**

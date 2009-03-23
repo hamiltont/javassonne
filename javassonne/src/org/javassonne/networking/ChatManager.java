@@ -68,7 +68,12 @@ public class ChatManager {
 	private void _sendGChat(String msg) {
 		for (Iterator<ChatParticipant> it = globalObservers_.iterator(); it
 				.hasNext();)
-			it.next().receiveGlobalChat(msg, LocalHost.getName());
+		{
+			ChatParticipant cp = it.next();
+			String name = cp.getChatParticipantName();
+			cp.receiveGlobalChat(msg, LocalHost.getName());
+			HostMonitor.getInstance();
+		}
 	}
 
 	// ========================================
