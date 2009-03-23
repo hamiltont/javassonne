@@ -35,14 +35,22 @@ public interface RemoteHost {
 	}
 
 	/**
-	 * Add a client to a list of internal "connected" clients.
+	 * Add a client to a list of internal "connected" clients. Note that
+	 * internally this method should ensure that the client is reachable 
+	 * before it adds them.
 	 * 
-	 * @param The
-	 *            URI of the client we would like to add
-	 * @return True if the client was added, false otherwise
+	 * @param clientURI
+	 *            The URI of the client to add
 	 */
 	public void addClient(String clientURI);
-	
+
+	/**
+	 * If the client is currently considered to be connected to this host, this
+	 * will remove them. Otherwise this call does nothing.
+	 * 
+	 * @param clientURI
+	 *            The URI of the client to remove
+	 */
 	public void removeClient(String clientURI);
 
 	/**
@@ -52,21 +60,38 @@ public interface RemoteHost {
 	 */
 	public boolean canClientsConnect();
 
-	// TODO desc
+	/**
+	 * Gets the name of this Host
+	 * 
+	 * @return hostname
+	 */
 	public String getName();
 
+	/**
+	 * Gets the URI of this host
+	 * 
+	 * @return host URI (address)
+	 */
 	public String getURI();
 
+	/**
+	 * Gets the status of this host
+	 * 
+	 * @return host status
+	 */
 	public RemoteHost.MODE getStatus();
 
 	/**
-	 * Used when in the game for clients to talk to the host
+	 * Used for clients to talk to the host. The host internally chooses to
+	 * either ignore these notifications, or to redistribute them to all other
+	 * clients
 	 */
 	public void receiveNotificationFromClient(Notification n, String clientURI);
 
 	/**
 	 * Used when other hosts would like to send notifications to this host.
-	 * Typically just chat messages
+	 * Typically just global chat messages. Internally this host can either
+	 * ignore or act on these.
 	 */
 	public void receiveNotification(Notification n);
 }

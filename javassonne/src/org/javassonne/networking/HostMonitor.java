@@ -18,11 +18,10 @@
 
 package org.javassonne.networking;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -36,41 +35,31 @@ import org.javassonne.networking.impl.JmDNSSingleton;
 import org.javassonne.networking.impl.LocalHostImpl;
 import org.javassonne.networking.impl.RemoteHost;
 import org.javassonne.networking.impl.RemotingUtils;
+import org.springframework.remoting.RemoteLookupFailureException;
 
-// TODO Rather than being given the localhost URI 
-//		it should be able to dynamically 
-//		find it
-// TODO We can do this by initializing the localhost URI
-//		using a preferences manager and using the implicit
-//		naming conventions
 /**
  * Because this guy keeps track of all known hosts, he is also responsible for
- * sending global chat messages to them.
+ * sending global chat messages to them. HostMonitor keeps an internal cache of
+ * hostURI's that allow it to save many network queries.
+ * 
+ * HostMonitor is guaranteed to add hosts only if it can resolve those hosts.
  */
 public class HostMonitor {
-	private JmDNS jmdns_;
+	// Keep a local cache of URI's so we do not have to
+	// continually query all the hosts
+	private List<String> hostURIs_;
 	private List<RemoteHost> hostList_;
 	private static HostMonitor instance_ = null;
-	// Used to discover if a service is the local service
-	private String localIP_;
 
 	private HostMonitor() {
 		// Using service discovery service
-		jmdns_ = JmDNSSingleton.getJmDNS();
-
-		hostList_ = new ArrayList<RemoteHost>();
-
+		JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
 		jmdns_
 				.addServiceListener("_rmi._tcp.local.",
 						new HostMonitorListener());
 
-		try {
-			InetAddress addr = InetAddress.getLocalHost();
-			localIP_ = addr.getHostAddress();
-			log("Found localip to be " + localIP_);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		hostList_ = new ArrayList<RemoteHost>();
+		hostURIs_ = new ArrayList<String>();
 
 		// We will handle sending chats to all known hosts
 		NotificationManager.getInstance().addObserver(
@@ -104,48 +93,107 @@ public class HostMonitor {
 		return hostList_.size();
 	}
 
-	protected void addHost(String hostURI) {
-		RemoteHost h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
-				RemoteHost.class);
+	public void addHost(String hostURI) {
+		// Avoid expensive host resolution if we already know this
+		// host
+		if (hostURIs_.contains(hostURI))
+			return;
 
-		if (hostURI.contains(localIP_)) {
-			log("Found localhost broadcast at " + hostURI);
-		} else {
-			hostList_.add(h);
+		// Try to resolve host
+		RemoteHost h = null;
+		try {
+			h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+					RemoteHost.class);
+		} catch (RemoteLookupFailureException e) {
+			String info = "HostMonitor could not resolve host at uri: "
+					+ hostURI;
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, info);
+			return;
+		} catch (RuntimeException e) {
+			String err = "HostMonitor: A RuntimeException occurred while adding a host";
+			err += "\n" + e.getMessage();
+			err += "\nStack Trace: \n";
+			for (int i = 0; i < e.getStackTrace().length; i++)
+				err += e.getStackTrace()[i] + "\n";
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
 		}
 
+		if (hostURI.equals(LocalHost.getURI())) {
+			String info = "HostMonitor: Found localhost broadcast at "
+					+ hostURI;
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, info);
+		} else {
+			hostList_.add(h);
+			hostURIs_.add(hostURI);
+		}
 	}
 
 	protected void removeHost(String hostURI) {
+		if (hostURIs_.contains(hostURI) == false)
+			return;
 
-	}
+		// Remove from hostList
+		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
+			RemoteHost next = it.next();
+			if (next.getURI().equals(hostURI)) {
+				hostList_.remove(next);
+				break;
+			}
+		}
 
-	/**
-	 * A very simple logger
-	 * 
-	 * @param msg
-	 */
-	private void log(String msg) {
-		System.out.println("HostMonitor : " + msg);
+		// Remote from hostURIs
+		hostURIs_.remove(hostURI);
 	}
 
 	private class HostMonitorListener implements ServiceListener {
 		public void serviceAdded(ServiceEvent e) {
-			log("found service " + e.getName());
+			String info = "HostMonitorListener: Found service " + e.getName();
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, info);
 
 			// We only care if this is a Javassonne host
 			if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
 				return;
 
+			// Cut out instances of
+			// rmi://some.ip.here:port/JavassonneHost_name (2)
+			// These are 'old' instances of the current host that are still
+			// alive in multicast, but will not be there when you try to make
+			// calls on them
+			if (e.getName().matches(".+\\(\\d+\\)") == true) {
+				String info2 = "HostMonitorListener: Determined that service '"
+						+ e.getName() + "' is a duplicate, ignoring";
+
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_INFO, info2);
+
+				return;
+			}
+
 			SwingUtilities.invokeLater(new ServiceRequestor(e));
 		}
 
 		public void serviceRemoved(ServiceEvent e) {
-			log("service " + e.getName() + " removed");
+			String info = "HostMonitorListener: Service '" + e.getName()
+					+ "' removed";
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, info);
 		}
 
 		public void serviceResolved(ServiceEvent e) {
-			log("service finally resolved");
+			String rinfo = "HostMonitorListener: Service '" + e.getName()
+					+ "' resolved";
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, rinfo);
 
 			// We only care if this is a Javassonne host
 			if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
@@ -153,27 +201,25 @@ public class HostMonitor {
 
 			ServiceInfo info = e.getInfo();
 			if (info == null) {
-				log("getting service info failed");
+				String sinfo = "HostMonitorListener: Service '" + e.getName()
+						+ "' failed to get info on";
+
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_INFO, sinfo);
 				return;
 			}
 
 			String hostURI = "rmi://" + info.getHostAddress() + ":"
 					+ info.getPort() + "/" + info.getName();
 
-			log("Found uri of " + hostURI);
+			String hinfo = "HostMonitorListener: Service '" + e.getName()
+					+ "' has URI of: " + hostURI;
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, hinfo);
 
 			addHost(hostURI);
 		}
-
-		/**
-		 * A very simple logger
-		 * 
-		 * @param msg
-		 */
-		private void log(String msg) {
-			System.out.println("HostMonitorListener : " + msg);
-		}
-
 	}
 
 	private class ServiceRequestor implements Runnable {

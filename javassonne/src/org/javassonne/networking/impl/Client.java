@@ -36,6 +36,7 @@ import org.javassonne.networking.LocalHost;
  * 
  * @author Hamilton Turner
  */
+// TODO - turn into singleton?
 public class Client implements RemoteClient {
 
 	private boolean connectedToHost_;

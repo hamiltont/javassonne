@@ -33,7 +33,6 @@ import javax.jmdns.ServiceInfo;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.networking.impl.RemoteHost.MODE;
 
 /**
  * The implementation of our local host. Note that this is a singleton, and
@@ -45,7 +44,6 @@ public class LocalHostImpl implements RemoteHost {
 
 	private List<RemoteClient> connectedClients_;
 	private RemoteHost.MODE currentMode_;
-	private JmDNS jmdns_;
 	private String URI_; // The URI this host can be reached at
 	private String realName_; // The name this host goes by
 	private String rmiSafeName_; // The RMI safe name of the host
@@ -90,15 +88,33 @@ public class LocalHostImpl implements RemoteHost {
 	 * clients
 	 */
 	public void addClient(String clientURI) {
-		if (clientsCanConnect_) {
+		if (clientsCanConnect_ == false) {
+
+			String info = "Client " + clientURI + " attempted  to "
+					+ "connect to our host while our host was not "
+					+ "accepting connections";
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, info);
+		}
+
+		try {
 			RemoteClient c = (RemoteClient) RemotingUtils.lookupRMIService(
 					clientURI, RemoteClient.class);
 			connectedClients_.add(c);
 			log("Client " + c.getName() + " connected");
-		} else {
-			log("Client " + clientURI + " attempted  to "
-					+ "connect to our host in an unsafe manner");
+		} catch (RuntimeException e) {
+			String err = "LocalHostImpl - A RuntimeException occurred while adding "
+					+ "a client at URI: " + clientURI;
+			err += "\n" + e.getMessage();
+			err += "\nStack Trace: \n";
+			for (int i = 0; i < e.getStackTrace().length; i++)
+				err += e.getStackTrace()[i] + "\n";
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
 		}
+
 	}
 
 	public void removeClient(String clientURI) {
@@ -231,6 +247,48 @@ public class LocalHostImpl implements RemoteHost {
 			isLocalHostStarted_ = true;
 
 			// Create the RMI service
+			ServiceInfo info = createRMI();
+
+			URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
+					+ "/" + info.getName();
+
+			// As long as we detect that we are a duplicate, 
+			// try to force the old original to close and 
+			// give us our name back
+			while (URI_.matches(".+\\(\\d+\\)") == true) {
+				
+				// Shutdown any previous service
+				try {
+					RemotingUtils.shutdownService(RemoteHost.SERVICENAME + "_"
+							+ rmiSafeName_);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				// Try to re-create our RMI
+				info = createRMI();
+				URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
+				+ "/" + info.getName();
+			}
+
+			// Broadcast the created service
+			JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
+			try {
+				jmdns_.registerService(info);
+			} catch (IOException e) {
+				log("An IOException occurred when registering a service with jmdns");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+
+			log("Clients can connect to: " + URI_);
+
+			// Cancel this timer task
+			cancel();
+		}
+
+		private ServiceInfo createRMI() {
 			ServiceInfo info = null;
 			try {
 				info = RemotingUtils.exportRMIService(LocalHostImpl
@@ -249,24 +307,7 @@ public class LocalHostImpl implements RemoteHost {
 				System.out.println(e.getMessage());
 				e.printStackTrace();
 			}
-
-			// Broadcast the created service
-			jmdns_ = JmDNSSingleton.getJmDNS();
-			try {
-				jmdns_.registerService(info);
-			} catch (IOException e) {
-				log("An IOException occurred when registering a service with jmdns");
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-			}
-
-			URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
-					+ "/" + info.getName();
-
-			log("Clients can connect to: " + URI_);
-
-			// Cancel this timer task
-			cancel();
+			return info;
 		}
 
 	}
