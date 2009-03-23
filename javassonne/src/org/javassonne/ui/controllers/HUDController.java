@@ -28,8 +28,6 @@ import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
 import org.javassonne.ui.DisplayHelper;
-import org.javassonne.ui.DisplayHelper.Layer;
-import org.javassonne.ui.DisplayHelper.Positioning;
 import org.javassonne.ui.panels.GameOverPanel;
 import org.javassonne.ui.panels.HUDButtonsPanel;
 import org.javassonne.ui.panels.HUDGameStatsPanel;

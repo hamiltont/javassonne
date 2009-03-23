@@ -22,8 +22,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -40,7 +38,10 @@ import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Meeple;
+import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.ui.JKeyListener;
 
@@ -108,8 +109,9 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Listen for notifications for adding and removing sprites
 		n.addObserver(Notification.MAP_ADD_SPRITE, this, "addSprite");
 		n.addObserver(Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
-		// Listen for a notification from the tile being dragged
+		// Listen for a notification from the tile or a meeple being dragged
 		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
+		n.addObserver(Notification.MEEPLE_DROPPED, this, "meepleDropped");
 		n.addObserver(Notification.SHIFT_BOARD, this, "shiftBoard");
 
 		// Load the background image from disk
@@ -183,7 +185,7 @@ public class MapLayer extends JPanel implements MouseListener,
 			shiftView(mapShift_);
 
 		long m = Calendar.getInstance().getTimeInMillis();
-		updateFPS_ = (int) (1000 / (m - updateLastMilliseconds_));
+		updateFPS_ = (int) (1000 / (m - updateLastMilliseconds_ + 1));
 		updateLastMilliseconds_ = m;
 
 		repaint();
@@ -197,7 +199,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 		if (board_ == null)
 			return;
-		
+
 		// determine if the timer should be firing or not. If any of our sprites
 		// need to be animated, or if the map is shifting, we want 20FPS.
 		// Otherwise
@@ -257,9 +259,45 @@ public class MapLayer extends JPanel implements MouseListener,
 		if (board_ == null)
 			return;
 
-		Point p = this.getTileAtPoint((Point) n.argument());
+		Point p = this.getTileAtScreenPoint((Point) n.argument());
 		NotificationManager.getInstance().sendNotification(
 				Notification.PLACE_TILE, p);
+	}
+
+	public void meepleDropped(Notification n) {
+
+		if (board_ == null)
+			return;
+
+		Point dropPoint = (Point) n.argument();
+		Point tileLocation = this.getTileAtScreenPoint((Point)dropPoint.clone());
+		Point offset = this.getOffsetWithinTileAtScreenPoint((Point)dropPoint.clone());
+
+		// determine which region the meeple was closest to
+		Tile.Region lowest = null;
+		double lowestDist = 10000;
+
+		// compute pythagorean distance to all the feature centers, and see
+		// which center we're closest too. This is the feature that the user
+		// probably wanted.
+		for (Tile.Region r : Tile.Region.values()) {
+			double dist = Math.sqrt(Math.pow(r.x - offset.x, 2)
+					+ Math.pow(r.y - offset.y, 2));
+			if (dist < lowestDist) {
+				lowest = r;
+				lowestDist = dist;
+			}
+		}
+
+		Meeple m = new Meeple();
+		m.setParentTileLocation(tileLocation);
+		m.setParentTile(board_.getTile(new TileBoardGenIterator(board_,
+				tileLocation)));
+		m.setRegionOnTile(lowest);
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.PLACE_MEEPLE, m);
+
 	}
 
 	// ------------------------------------------------------------------------
@@ -495,7 +533,7 @@ public class MapLayer extends JPanel implements MouseListener,
 	// CONVENIENCE FUNCTIONS
 	// ------------------------------------------------------------------------
 
-	public Point getTileAtPoint(Point p) {
+	public Point getTileAtScreenPoint(Point p) {
 
 		// determine which tile was clicked! First, get the width and height of
 		// a tile.
@@ -528,8 +566,19 @@ public class MapLayer extends JPanel implements MouseListener,
 		return location;
 	}
 
-	public Point getPointFromTileLocation(Point p) {
-		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
+	public Point getOffsetWithinTileAtScreenPoint(Point p) {
+		Point tileStart = this.getScreenPointFromTileLocation(this
+				.getTileAtScreenPoint((Point) p.clone()));
+		Point offset = new Point(p.x - tileStart.x, p.y - tileStart.y);
+		
+		offset.x /= scale_;
+		offset.y /= scale_;
+		
+		return offset;
+	}
+
+	public Point getBoardPointFromTileLocation(Point p) {
+		int tileSize = (int) (backgroundTile_.getWidth());
 		int X = (int) (p.x * tileSize);
 		int Y = (int) -(p.y * tileSize);
 
@@ -543,8 +592,8 @@ public class MapLayer extends JPanel implements MouseListener,
 				- paintOffset_.y - BUFFER_MAX_OFFSET_Y;
 
 		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
-		int extraX = (int) ((-board_.getUpperLeftCorner().getLocation().getX()) * tileSize);
-		int extraY = (int) ((board_.getUpperLeftCorner().getLocation().getY()) * tileSize);
+		int extraX = (int) ((-board_.getUpperLeftCorner().getLocation().getX() + p.x) * tileSize);
+		int extraY = (int) ((board_.getUpperLeftCorner().getLocation().getY() - p.y) * tileSize);
 
 		return new Point(topLeftX + extraX, topLeftY + extraY);
 	}
@@ -560,7 +609,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 		this.requestFocusInWindow();
 
-		Point p = this.getTileAtPoint(e.getPoint());
+		Point p = this.getTileAtScreenPoint(e.getPoint());
 		NotificationManager.getInstance().sendNotification(
 				Notification.PLACE_TILE, p);
 	}

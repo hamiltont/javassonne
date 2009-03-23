@@ -171,7 +171,7 @@ public class GameController {
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
-		boardController_ = new BoardController(board);
+		boardController_ = new BoardController(board, deck_.tileFeatureBindings(), players_);
 		hudController_ = new HUDController(deck_, players_);
 
 		// See if the first person is playing on this computer. If they are,
@@ -225,7 +225,8 @@ public class GameController {
 		// sent from the confirmPlacement panel when the user presses end turn.
 		// We want to advance the turn and change current player.
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
-
+		NotificationManager.getInstance().sendNotification(Notification.SET_CURRENT_PLAYER, currentPlayer_);
+		
 		beginTurn();
 	}
 

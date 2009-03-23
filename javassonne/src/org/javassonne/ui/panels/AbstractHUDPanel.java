@@ -133,6 +133,7 @@ MouseMotionListener {
 
 	public void setDraggable(Boolean d) {
 		draggable_ = d;
+		NotificationManager.getInstance().addObserver(Notification.DRAG_PANEL_RESET, this, "resetDrag");
 	}
 
 	public void setDropNotification(String notificationIdentifier) {
@@ -198,7 +199,8 @@ MouseMotionListener {
 		if ((respondToClick_) && (draggable_)) {
 			if (resetTimer_ != null)
 				resetTimer_.cancel();
-			resetLocation_ = this.getLocation();
+			if (resetLocation_ == null) 
+				resetLocation_ = this.getLocation();
 			repaint();
 		}
 	}
@@ -249,6 +251,13 @@ MouseMotionListener {
 		timer_.schedule(new FadeTimer(0.05f), 0, 20);
 	}
 
+	public void resetDrag() {
+		if (resetLocation_ != null) setLocation(resetLocation_);
+		setBackgroundAlpha(1.0f);
+		if (resetTimer_ != null) resetTimer_.cancel();
+		respondToClick_ = true;
+	}
+	
 	// TIMERS
 	// ---------------------------------------------------------------------
 	class FadeTimer extends TimerTask {
@@ -293,11 +302,7 @@ MouseMotionListener {
 			// stop the timer from firing. Also set the location to the exact
 			// one, just in case.
 			if (x <= resetLocation_.x || y <= resetLocation_.y) {
-				setLocation(resetLocation_);
-				setBackgroundAlpha(1.0f);
-
-				resetTimer_.cancel();
-				respondToClick_ = true;
+				resetDrag();
 			}
 		}
 	}

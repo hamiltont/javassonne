@@ -22,16 +22,18 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.javassonne.model.Tile;
+import org.javassonne.model.Tile.Region;
 
 public class TilePlacementSprite extends MapSprite {
 
 	public Point tileIndex_;
 	private float hue_;
 
-	private ArrayList<Tile.Region> regionOptions_;
-	private ArrayList<Tile.Quadrant> quadrantOptions_;
+	private List<Tile.Region> regionOptions_;
+	private List<Tile.Quadrant> quadrantOptions_;
 
 	public TilePlacementSprite(Point t) {
 		super(0, 0);
@@ -48,12 +50,12 @@ public class TilePlacementSprite extends MapSprite {
 	public void addedToMap(MapLayer m) {
 		// determine where we should be located based on the tile we want to be
 		// on top of.
-		setLocation(m.getPointFromTileLocation(tileIndex_));
+		setLocation(m.getBoardPointFromTileLocation(tileIndex_));
 	}
 
-	public void setRegionOptions(ArrayList<Tile.Region> a)
+	public void setRegionOptions(List<Region> currentRegionOptions_)
 	{
-		regionOptions_ = a;
+		regionOptions_ = currentRegionOptions_;
 	}
 	
 	public void setQuadrantOptions(ArrayList<Tile.Quadrant> a)
@@ -68,16 +70,16 @@ public class TilePlacementSprite extends MapSprite {
 		int h = image_.getHeight();
 
 		for (Tile.Region r : regionOptions_) {
-			int x = (int) (x_ + offset.x + (r.x - w / 2) * scale);
-			int y = (int) (y_ + offset.y + (r.y - h / 2) * scale);
+			int x = (int) (x_ * scale + offset.x + (r.x - w / 2) * scale);
+			int y = (int) (y_ * scale + offset.y + (r.y - h / 2) * scale);
 			g.drawImage(image_, x, y, (int) (w * scale), (int) (h * scale),
 					null);
 		}
 
 		g.setColor(new Color(1, 1, 1, 0.5f));
 		for (Tile.Quadrant q : quadrantOptions_) {
-			int x = (int) (x_ + offset.x + q.rect.getX() * scale);
-			int y = (int) (y_ + offset.y + q.rect.getY() * scale);
+			int x = (int) (x_ * scale + offset.x + q.rect.getX() * scale);
+			int y = (int) (y_ * scale + offset.y + q.rect.getY() * scale);
 			g.fillRect(x, y, (int) (q.rect.getWidth() * scale), (int) (q.rect
 					.getHeight() * scale));
 		}

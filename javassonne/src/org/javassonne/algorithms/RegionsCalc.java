@@ -116,9 +116,14 @@ public class RegionsCalc {
 	// If traverseRegion has touched given region of Tile at given location
 	// This function returns the size of the region, else, returns -1
 	public Integer sizeOfRegion(Point loc, Tile.Region reg) {
-		Integer temp = marked_.get(loc).get(reg);
+		HashMap<Tile.Region, Integer> tileRegions = marked_.get(loc);
+		if (tileRegions == null)
+			return -1;
+		
+		Integer temp = tileRegions.get(reg);
 		if (temp == null)
 			return -1;
+		
 		return temp;
 	}
 
