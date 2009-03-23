@@ -19,8 +19,6 @@
 package org.javassonne.ui.controllers;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -36,14 +34,11 @@ import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
-import org.javassonne.model.Player.MeepleColor;
-import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
-import org.javassonne.networking.impl.Client;
-import org.javassonne.networking.impl.LocalHostImpl;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.controls.JPopUp;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
+import org.javassonne.ui.panels.InstructionsPanel;
 import org.javassonne.ui.panels.MenuPanel;
 import org.javassonne.ui.panels.ViewNetworkHostsPanel;
 
@@ -70,6 +65,7 @@ public class GameController {
 	private Boolean gameInProgress_ = false;
 
 	private MenuPanel menu_;
+	private InstructionsPanel instructions_;
 
 	private InputPlayerDataPanel playerData_;
 	private List<Player> players_;
@@ -93,6 +89,7 @@ public class GameController {
 
 		// create the menu panel
 		menu_ = new MenuPanel();
+		instructions_ = new InstructionsPanel();
 
 		// register to receive events from the game window
 		NotificationManager n = NotificationManager.getInstance();
@@ -108,7 +105,7 @@ public class GameController {
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
-
+		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,"toggleInstructions");
 	}
 
 	/**
@@ -270,6 +267,15 @@ public class GameController {
 		} else
 			DisplayHelper.getInstance().add(menu_, DisplayHelper.Layer.MODAL,
 					DisplayHelper.Positioning.CENTER);
+	}
+
+	public void toggleInstructions() {
+		if (instructions_.isShowing()) {
+			DisplayHelper.getInstance().remove(instructions_);
+		} else
+			DisplayHelper.getInstance()
+					.add(instructions_, DisplayHelper.Layer.MODAL,
+							DisplayHelper.Positioning.CENTER);
 	}
 
 	public void quitGame(Notification n) {

@@ -21,6 +21,7 @@
 
 package org.javassonne.ui;
 
+import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
@@ -95,6 +96,7 @@ public class DisplayWindow extends JFrame implements WindowListener {
 
 		// Add state listener
 		this.addWindowListener(this);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Show the window
 		setVisible(true);
@@ -116,10 +118,19 @@ public class DisplayWindow extends JFrame implements WindowListener {
 	 * Called when the game window is minimized
 	 */
 	public void windowIconified(WindowEvent e) {
-		// Restore the game window to full screen
+		// Restore the game window to full screen when dialog is being displayed
 		// Workaround for bug with JVM 1.6.0_12-b04 that
 		// auto minimizes for JOptionPane method calls
-		//this.setState(NORMAL);
+
+		boolean restore = false;
+		Component[] onScreen = DisplayHelper.getInstance().getComponents();
+
+		for (int i = 0; i < onScreen.length; i++)
+			if ("JPopUp".equalsIgnoreCase(onScreen[i].getName()))
+				restore = true;
+
+		if (restore == true)
+			this.setState(NORMAL);
 	}
 
 	public void windowActivated(WindowEvent e) {

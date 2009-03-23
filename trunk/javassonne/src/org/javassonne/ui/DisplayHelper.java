@@ -18,6 +18,7 @@
 
 package org.javassonne.ui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 
@@ -88,6 +89,7 @@ public class DisplayHelper {
 	 * Private singleton constructor.
 	 */
 	private DisplayHelper() {
+
 	}
 
 	/**
@@ -121,6 +123,10 @@ public class DisplayHelper {
 		if (!isLayeredPaneInvalid())
 			return null;
 		return desktopPane_.getSize();
+	}
+	
+	public Component[] getComponents(){
+		return desktopPane_.getComponents();
 	}
 
 	/**
