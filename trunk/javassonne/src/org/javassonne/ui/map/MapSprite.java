@@ -39,6 +39,11 @@ public class MapSprite {
 		y_ = y;
 	}
 
+	public BufferedImage getImage()
+	{
+		return image_;
+	}
+	
 	public void setImage(String path) {
 		try {
 			image_ = ImageIO.read(new File(path));
@@ -72,10 +77,10 @@ public class MapSprite {
 		// default implementations draws image if set
 		if (image_ != null) {
 			if (shouldScaleImage_)
-				g.drawImage(image_, x_ + offset.x, y_ + offset.y, (int)(image_
+				g.drawImage(image_, (int)(x_ * scale + offset.x), (int)(y_ * scale + offset.y), (int)(image_
 						.getWidth() * scale), (int)(image_.getHeight() * scale), null);
 			else
-				g.drawImage(image_, x_ + offset.x, y_ + offset.y, null);
+				g.drawImage(image_, (int)(x_ * scale + offset.x), (int)(y_ * scale + offset.y), null);
 		}
 	}
 

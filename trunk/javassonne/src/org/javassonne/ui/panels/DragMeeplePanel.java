@@ -19,14 +19,15 @@
 package org.javassonne.ui.panels;
 
 import org.javassonne.messaging.Notification;
+import org.javassonne.model.Player.MeepleColor;
 
 public class DragMeeplePanel extends AbstractHUDPanel {
 
-	public DragMeeplePanel()
+	public DragMeeplePanel(MeepleColor c)
 	{
 		setSize(48, 52);
 		setOpaque(false);
-		setBackgroundImagePath("images/meeple_0.png");
+		setBackgroundImagePath(String.format("images/meeple_%d.png", c.value));
 		setBackgroundScaleToFit(true);
 		
 		// make it so the user can drag and drop the tile

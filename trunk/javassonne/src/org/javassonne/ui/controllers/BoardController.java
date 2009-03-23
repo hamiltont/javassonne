@@ -22,19 +22,26 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import org.javassonne.algorithms.RegionsCalc;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.BoardPositionFilledException;
+import org.javassonne.model.Meeple;
 import org.javassonne.model.NotValidPlacementException;
+import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
+import org.javassonne.model.TileFeatureBindings;
+import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.map.TilePlacementSprite;
 import org.javassonne.ui.panels.HUDConfirmPlacementPanel;
 
@@ -45,11 +52,20 @@ public class BoardController {
 
 	Tile tempLitTile_;
 	Tile tempPlacedTile_;
+	MeepleSprite tempPlacedMeeple_;
+	
 	TilePlacementSprite tempPlacementSprite_;
 	TileBoardGenIterator tempLocationIter_;
 
 	Tile tileInHand_;
 	TileBoard board_;
+
+	List<Tile.Region> currentRegionOptions_;
+	List<Tile.Quadrant> currentQuadrantOptions_;
+	
+	TileFeatureBindings bindings_;
+	List<Player> players_;
+	int currentPlayer_ = 0;
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -59,10 +75,15 @@ public class BoardController {
 	 * @param b
 	 *            The TileBoard. This will never be changed once the game has
 	 *            begun.
+	 * @param players_
 	 */
-	public BoardController(TileBoard b) {
+	public BoardController(TileBoard b, TileFeatureBindings bindings,
+			List<Player> players) {
 
 		board_ = b;
+		bindings_ = bindings;
+		players_ = players;
+
 		tempLitTile_ = new Tile();
 		try {
 			tempLitTile_.setImage(ImageIO.read(new File(String.format("%s/%s",
@@ -74,11 +95,15 @@ public class BoardController {
 
 		NotificationManager n = NotificationManager.getInstance();
 		n.addObserver(Notification.PLACE_TILE, this, "placeTile");
+		n.addObserver(Notification.PLACE_MEEPLE, this, "placeMeeple");
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
 		n.addObserver(Notification.TILE_IN_HAND_CHANGED, this,
-		"updateTileInHand");
+				"updateTileInHand");
+		n
+				.addObserver(Notification.SET_CURRENT_PLAYER, this,
+						"setCurrentPlayer");
 
 		// Now that we have a board object, we want to update the interface to
 		// show the board. Share our board_ object in a notification so the
@@ -86,6 +111,10 @@ public class BoardController {
 		NotificationManager.getInstance().sendNotification(
 				Notification.BOARD_SET, board_);
 
+	}
+
+	public void setCurrentPlayer(Notification n) {
+		currentPlayer_ = (Integer) n.argument();
 	}
 
 	public void endGame(Notification n) {
@@ -113,6 +142,7 @@ public class BoardController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
+		tempPlacedMeeple_ = null;
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
 		tempLocationIter_ = null;
@@ -136,7 +166,8 @@ public class BoardController {
 					board_.addTemp(tempLocationIter_, tempPlacedTile_);
 
 					// show the confirm placement panel
-					HUDConfirmPlacementPanel confirmPanel = new HUDConfirmPlacementPanel();
+					MeepleColor c = players_.get(currentPlayer_).getMeepleColor();
+					HUDConfirmPlacementPanel confirmPanel = new HUDConfirmPlacementPanel(c);
 					DisplayHelper.getInstance().add(confirmPanel,
 							DisplayHelper.Layer.PALETTE,
 							DisplayHelper.Positioning.TOP_CENTER);
@@ -150,16 +181,22 @@ public class BoardController {
 					// highlight the tile on the map and show placement options
 					tempPlacementSprite_ = new TilePlacementSprite(here);
 
+					// determine what regions of the tile are valid placements
+					RegionsCalc r = new RegionsCalc(bindings_);
+					currentRegionOptions_ = new ArrayList<Tile.Region>();
+
+					for (Tile.Region region : Tile.Region.values()) {
+						ArrayList<Meeple> result = new ArrayList<Meeple>();
+						r.traverseRegion(tempLocationIter_, region, result);
+						if ((result.size() == 0) && 
+								(!tempPlacedTile_.featureIdentifierInRegion(region).equals("N")))
+							currentRegionOptions_.add(region);
+					}
+
 					// TODO: Determine which spots on the tile are valid meeple
 					// locations and populate the options arrays. This is dummy
 					// code:
-					ArrayList<Tile.Region> options = new ArrayList<Tile.Region>();
-					options.add(Tile.Region.Left);
-					options.add(Tile.Region.Top);
-					options.add(Tile.Region.Right);
-					options.add(Tile.Region.Bottom);
-					options.add(Tile.Region.Center);
-					tempPlacementSprite_.setRegionOptions(options);
+					tempPlacementSprite_.setRegionOptions(currentRegionOptions_);
 
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
@@ -176,6 +213,40 @@ public class BoardController {
 		}
 	}
 
+	public void placeMeeple(Notification n) {
+		
+		// the meeple is created in the map layer, because the map layer
+		// has more intimate knowledege of which region the drag ended on.
+		// (It can convert the pixel to the tile, and then to a region)
+		// Region / Quadrant is set. We just set everything else.
+		Meeple m = (Meeple) n.argument();
+		
+		if ((currentRegionOptions_.contains(m.getRegionOnTile())) &&
+			(m.getParentTile() == tempPlacedTile_)){
+			
+			// if they've already tried placing a meeple, remove it before
+			// allowing them to place another.
+			if (tempPlacedMeeple_ != null){
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+			}
+			
+			m.setPlayer(currentPlayer_);
+	
+			// add the meeple to the tile
+			tempPlacedTile_.setMeeple(m);
+	
+			// add the meeple sprite to the map layer so the guy is visible
+			tempPlacedMeeple_ = new MeepleSprite(m, players_.get(currentPlayer_)
+					.getMeepleColor());
+	
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
+			NotificationManager.getInstance().sendNotification(
+					Notification.DRAG_PANEL_RESET);
+		}
+	}
+
 	public void undoPlaceTile(Notification n) {
 		board_.removeTemps();
 		NotificationManager.getInstance().sendNotification(
@@ -183,6 +254,11 @@ public class BoardController {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
+		if (tempPlacedMeeple_ != null){
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+		}
+		
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
 		tempLocationIter_ = null;

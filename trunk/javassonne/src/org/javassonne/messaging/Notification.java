@@ -43,6 +43,7 @@ public class Notification {
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
+	public static final String MEEPLE_DROPPED = "NotificationMeepleDropped";
 	public static final String TILE_UNUSABLE = "NotificationTileUnusable";
 	
 	public static final String ZOOM_IN = "NotificationGameZoomIn";
@@ -70,22 +71,27 @@ public class Notification {
 	public static final String BOARD_SET = "NotificationSetBoard";
 	
 	public static final String PLACE_TILE = "NotificationClickAddTile";
+	public static final String PLACE_MEEPLE = "NotificationClickAddMeeple";
 	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
 	
 	public static final String PLAYER_DATA_CHANGED = "NotificationPlayerDataChanged";
 	public static final String PLAYER_DATA_RESET = "NotificationPlayerDataReset";
 	
-	public static final String MEEPLE_DROPPED = "NotificationMeepleDropped";
 	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
+	public static final String SET_CURRENT_PLAYER = "SetCurrentPlayer";
 	
 	public static final String SEND_PRIVATE_CHAT = "SendPrivateChat";
 	public static final String RECV_PRIVATE_CHAT = "RecvPrivateChat";
 	
 	public static final String SEND_GLOBAL_CHAT = "SendGlobalChat";
 	public static final String RECV_GLOBAL_CHAT = "RecvGlobalChat";
+
+	// Local only:
+	public static final String DRAG_PANEL_RESET = "ResetDragPanel";
+	
 	
 	private String identifier_;
 	private Object argument_;

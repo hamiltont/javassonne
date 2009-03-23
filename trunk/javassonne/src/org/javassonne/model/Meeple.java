@@ -52,6 +52,9 @@ public class Meeple {
 		
 	}
 
+	public Meeple() {
+	}
+
 	public Tile getParentTile() {
 		return parentTile_;
 	}

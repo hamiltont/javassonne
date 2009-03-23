@@ -27,6 +27,7 @@ import javax.swing.JButton;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 
 public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
@@ -37,8 +38,10 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 
 	DragMeeplePanel placeFarmer_ = null;
 	DragMeeplePanel placeVillager_ = null;
-				
-	public HUDConfirmPlacementPanel() {
+	
+	MeepleColor color_;
+	
+	public HUDConfirmPlacementPanel(MeepleColor c) {
 		super();
 		setLayout(null);
 		setSize(490, 100);
@@ -46,6 +49,8 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 		setOpaque(false);
 		setBackgroundImagePath("images/hud_confirm_placement_background.jpg");
 
+		color_ = c;
+		
 		// add the end turn and cancel buttons
 		endTurnButton_ = new JButton(new ImageIcon("images/end_turn.jpg"));
 		endTurnButton_.setActionCommand(Notification.END_TURN);
@@ -74,11 +79,11 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 	public void attachMeeplePanels()
 	{	
 		// create drag meeple panels
-		placeFarmer_ = new DragMeeplePanel();
+		placeFarmer_ = new DragMeeplePanel(color_);
 		Point location1 = new Point(this.getLocation().x + 50,this.getLocation().y + 16);
 		DisplayHelper.getInstance().add(placeFarmer_, DisplayHelper.Layer.DRAG, location1);
 
-		placeVillager_ = new DragMeeplePanel();
+		placeVillager_ = new DragMeeplePanel(color_);
 		Point location2 = new Point(this.getLocation().x + 255,this.getLocation().y + 16);
 		DisplayHelper.getInstance().add(placeVillager_, DisplayHelper.Layer.DRAG, location2);
 	}
@@ -96,7 +101,7 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 	public void close()
 	{
 		super.close();
-		DisplayHelper.getInstance().remove(placeFarmer_);
-		DisplayHelper.getInstance().remove(placeVillager_);
+		placeFarmer_.close();
+		placeVillager_.close();
 	}
 }
