@@ -71,6 +71,8 @@ public class HostMonitor {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+		
+		this.addHost("rmi://129.59.82.77:5099/JavassonneHost_demetri-d5042f7");
 	}
 
 	// Singleton for our HostMonitor instance.

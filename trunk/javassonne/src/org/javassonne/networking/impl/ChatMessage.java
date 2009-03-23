@@ -18,8 +18,11 @@
 
 package org.javassonne.networking.impl;
 
-public class ChatMessage {
+import java.io.Serializable;
+
+public class ChatMessage implements Serializable {
 	
+	private static final long serialVersionUID = -5655527303311934537L;
 	private String message_;
 	private String senderName_;
 	
