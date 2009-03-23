@@ -26,15 +26,14 @@ import org.javassonne.messaging.Notification;
  * 
  * @author Hamilton Turner
  */
-public interface RemoteHost extends ChatParticipant {
+public interface RemoteHost {
 	public static final String SERVICENAME = "JavassonneHost";
+
 	public static enum MODE {
-		PLAYING_LOCAL_GAME, 
-		PLAYING_NETWORK_GAME, 
-		IN_LOBBY, 
-		IDLE                   // Paused game, or currently playing the game but stepped out
+		PLAYING_LOCAL_GAME, PLAYING_NETWORK_GAME, IN_LOBBY, IDLE
+		// Paused game, or currently playing the game but stepped out
 	}
-	
+
 	/**
 	 * Add a client to a list of internal "connected" clients.
 	 * 
@@ -50,14 +49,22 @@ public interface RemoteHost extends ChatParticipant {
 	 * @return true if clients can connect, false otherwise
 	 */
 	public boolean canClientsConnect();
-	
+
 	// TODO desc
 	public String getName();
-	
+
 	public String getURI();
-	
+
 	public RemoteHost.MODE getStatus();
-	
-	// TODO desc
-	public void receiveNotification(Notification n, String clientURI);
+
+	/**
+	 * Used when in the game for clients to talk to the host
+	 */
+	public void receiveNotificationFromClient(Notification n, String clientURI);
+
+	/**
+	 * Used when other hosts would like to send notifications to this host.
+	 * Typically just chat messages
+	 */
+	public void receiveNotification(Notification n);
 }

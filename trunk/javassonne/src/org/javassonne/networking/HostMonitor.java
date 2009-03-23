@@ -21,6 +21,7 @@ package org.javassonne.networking;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jmdns.JmDNS;
@@ -29,6 +30,8 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.swing.SwingUtilities;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.impl.RemotingUtils;
 
 // TODO Rather than being given the localhost URI 
@@ -37,6 +40,10 @@ import org.javassonne.networking.impl.RemotingUtils;
 // TODO We can do this by initializing the localhost URI
 //		using a preferences manager and using the implicit
 //		naming conventions
+/**
+ * Because this guy keeps track of all known hosts, he is also responsible for
+ * sending global chat messages to them.
+ */
 public class HostMonitor {
 	private JmDNS jmdns_;
 	private List<RemoteHost> hostList_;
@@ -61,18 +68,32 @@ public class HostMonitor {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	// Singleton for our HostMonitor instance.
 	public static HostMonitor getInstance() {
-		if (instance_ == null)
+		if (instance_ == null) {
 			instance_ = new HostMonitor();
+			NotificationManager.getInstance().addObserver(
+					Notification.GLOBAL_CHAT, instance_, "sendOutGlobalChat");
+		}
+
 		return instance_;
 	}
 
 	public List<RemoteHost> getHosts() {
 		return hostList_;
+	}
+
+	public void sendOutGlobalChat(Notification sendMessage) {
+		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT, 
+		// and send to all the known remote hosts
+		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
+			RemoteHost next = it.next();
+			Notification recvMessage = new Notification(
+					Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
+			next.receiveNotification(recvMessage);
+		}
 	}
 
 	public int numberOfHosts() {
@@ -85,19 +106,10 @@ public class HostMonitor {
 
 		if (hostURI.contains(localIP_)) {
 			log("Found localhost broadcast at " + hostURI);
-			
-			// Our own localhost is interested in receiving 
-			// global chats
-			ChatManager.addGlobalChatListener(h);
-			
-			// TODO error - we should not be adding this, just for testing!
-			hostList_.add(h);
 		} else {
-			
 			hostList_.add(h);
-			
 		}
-		
+
 	}
 
 	protected void removeHost(String hostURI) {

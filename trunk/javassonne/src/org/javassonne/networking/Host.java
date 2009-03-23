@@ -32,6 +32,7 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
 import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.impl.RemotingUtils;
 
 /**
@@ -54,8 +55,12 @@ public class Host implements RemoteHost {
 	private boolean isLocalHostStarted_;
 
 	public static Host getInstance() {
-		if (instance_ == null)
+		if (instance_ == null) {
 			instance_ = new Host();
+			NotificationManager.getInstance().addObserver(
+					Notification.PRIVATE_CHAT, instance_, "handlePrivateChat");
+		}
+
 		return instance_;
 	}
 
@@ -82,8 +87,8 @@ public class Host implements RemoteHost {
 
 		Timer t = new Timer("Host Starter");
 		t.schedule(new HostStarter(), 0);
-		
-		//TODO come up with a nice way to throw away this timer
+
+		// TODO come up with a nice way to throw away this timer
 	}
 
 	/**
@@ -130,15 +135,15 @@ public class Host implements RemoteHost {
 		}
 		return URI_;
 	}
-	
+
 	/**
 	 * Useful for other classes to know if the localhost is ready to go
+	 * 
 	 * @return true if the localhost is started, false otherwise
 	 */
 	public boolean isLocalHostStarted() {
 		return isLocalHostStarted_;
 	}
-
 
 	private RemoteClient isClientConnected(String clientURI) {
 		// If the client sending us a message is unknown to us,
@@ -165,7 +170,7 @@ public class Host implements RemoteHost {
 	/**
 	 * Accepts a message from a client and propagates it to all other clients
 	 */
-	public void receiveNotification(Notification n, String clientURI) {
+	public void receiveNotificationFromClient(Notification n, String clientURI) {
 		log("Received message '" + n.identifier() + "'");
 
 		RemoteClient c = isClientConnected(clientURI);
@@ -184,7 +189,7 @@ public class Host implements RemoteHost {
 			curClient.receiveNotificationFromHost(n);
 		}
 	}
-	
+
 	/**
 	 * A very simple logger
 	 * 
@@ -215,8 +220,9 @@ public class Host implements RemoteHost {
 			// Create the RMI service
 			ServiceInfo info = null;
 			try {
-				info = RemotingUtils.exportRMIService(Host.getInstance(), RemoteHost.class,
-						RemoteHost.SERVICENAME + "_" + rmiSafeName_);
+				info = RemotingUtils.exportRMIService(Host.getInstance(),
+						RemoteHost.class, RemoteHost.SERVICENAME + "_"
+								+ rmiSafeName_);
 			} catch (RemoteException e) {
 				log("A RemoteException occurred when exporting host RMI");
 				System.out.println(e.getMessage());
@@ -249,19 +255,15 @@ public class Host implements RemoteHost {
 
 	}
 
-	public String getChatParticipantName() {
-		return getName();
+	/**
+	 * Used if another host would like to send notifications to this host
+	 */
+	// TODO - list the not allowed notifications
+	public void receiveNotification(Notification n) {
+		String id = n.identifier();
+		if ((id != Notification.SEND_GLOBAL_CHAT) &&
+			(id != Notification.SEND_PRIVATE_CHAT))
+			NotificationManager.getInstance().sendNotification(n.identifier(),
+					n.argument());
 	}
-
-	public void receiveGlobalChat(String msg, String senderName) {
-		// Note that here we should not propogate this message to our clients, they have their
-		// own hosts that can receive a message
-		log("Received global chat message: '" + msg + "' from host " + senderName);
-	}
-
-	public void receivePrivateGameChat(String msg, String senderName) {
-		// Note that here we should propogate it to all other clients
-		log("Received private chat message: '" + msg + "' from host " + senderName);
-	}
-
 }

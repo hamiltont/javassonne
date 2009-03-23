@@ -48,7 +48,7 @@ public class LocalHost {
 	}
 
 	public static void receiveNotification(Notification n, String clientURI) {	
-		Host.getInstance().receiveNotification(n, clientURI);
+		Host.getInstance().receiveNotificationFromClient(n, clientURI);
 	}
 	
 	public static boolean isLocalHostStarted() {
