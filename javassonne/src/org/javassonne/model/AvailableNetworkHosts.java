@@ -30,7 +30,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.javassonne.networking.HostMonitor;
-import org.javassonne.networking.RemoteHost;
+import org.javassonne.networking.impl.RemoteHost;
 
 // It would be nice to make this use reflection to figure out the available "get___" methods on RemoteHost, 
 //    and naturally update the table using the available methods

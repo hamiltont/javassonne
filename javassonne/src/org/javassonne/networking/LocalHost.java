@@ -19,7 +19,8 @@
 package org.javassonne.networking;
 
 import org.javassonne.messaging.Notification;
-import org.javassonne.networking.RemoteHost.MODE;
+import org.javassonne.networking.impl.LocalHostImpl;
+import org.javassonne.networking.impl.RemoteHost.MODE;
 
 /*
  * A Helper class that lets other developers very easily connect to the Local Host 
@@ -28,31 +29,31 @@ import org.javassonne.networking.RemoteHost.MODE;
 public class LocalHost {
 
 	public static void addClient(String clientURI) {
-		Host.getInstance().addClient(clientURI);
+		LocalHostImpl.getInstance().addClient(clientURI);
 	}
 
 	public static boolean canClientsConnect() {
-		return Host.getInstance().canClientsConnect();
+		return LocalHostImpl.getInstance().canClientsConnect();
 	}
 
 	public static String getName() {
-		return Host.getInstance().getName();
+		return LocalHostImpl.getInstance().getName();
 	}
 
 	public static MODE getStatus() {
-		return Host.getInstance().getStatus();
+		return LocalHostImpl.getInstance().getStatus();
 	}
 
 	public static String getURI() {
-		return Host.getInstance().getURI();
+		return LocalHostImpl.getInstance().getURI();
 	}
 
 	public static void receiveNotification(Notification n, String clientURI) {	
-		Host.getInstance().receiveNotificationFromClient(n, clientURI);
+		LocalHostImpl.getInstance().receiveNotificationFromClient(n, clientURI);
 	}
 	
 	public static boolean isLocalHostStarted() {
-		return Host.getInstance().isLocalHostStarted();
+		return LocalHostImpl.getInstance().isLocalHostStarted();
 	}
 	
 }

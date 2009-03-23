@@ -32,6 +32,9 @@ import javax.swing.SwingUtilities;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.impl.JmDNSSingleton;
+import org.javassonne.networking.impl.LocalHostImpl;
+import org.javassonne.networking.impl.RemoteHost;
 import org.javassonne.networking.impl.RemotingUtils;
 
 // TODO Rather than being given the localhost URI 
@@ -75,7 +78,8 @@ public class HostMonitor {
 		if (instance_ == null) {
 			instance_ = new HostMonitor();
 			NotificationManager.getInstance().addObserver(
-					Notification.GLOBAL_CHAT, instance_, "sendOutGlobalChat");
+					Notification.SEND_GLOBAL_CHAT, instance_,
+					"sendOutGlobalChat");
 		}
 
 		return instance_;
@@ -86,7 +90,7 @@ public class HostMonitor {
 	}
 
 	public void sendOutGlobalChat(Notification sendMessage) {
-		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT, 
+		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT,
 		// and send to all the known remote hosts
 		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
 			RemoteHost next = it.next();
@@ -130,7 +134,7 @@ public class HostMonitor {
 			log("found service " + e.getName());
 
 			// We only care if this is a Javassonne host
-			if (e.getName().contains(Host.SERVICENAME) == false)
+			if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
 				return;
 
 			SwingUtilities.invokeLater(new ServiceRequestor(e));
@@ -144,7 +148,7 @@ public class HostMonitor {
 			log("service finally resolved");
 
 			// We only care if this is a Javassonne host
-			if (e.getName().contains(Host.SERVICENAME) == false)
+			if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
 				return;
 
 			ServiceInfo info = e.getInfo();

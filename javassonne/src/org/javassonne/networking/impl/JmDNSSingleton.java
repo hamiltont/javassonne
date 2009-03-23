@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Mar 22, 2009
+ * @date Mar 10, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +16,30 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.impl;
 
-public class ChatMessage {
-	
-	private String message_;
-	private String senderName_;
-	
-	public ChatMessage(String message, String senderName) {
-		message_ = message;
-		senderName_ = senderName;
-	}
-	
-	public String getMessage(){
-		return message_;
-	}
-	public String getSenderName() {
-		return senderName_;
+import java.io.IOException;
+
+import javax.jmdns.JmDNS;
+
+public class JmDNSSingleton {
+
+	private static JmDNS jmdns_ = null;
+
+	private JmDNSSingleton() {}
+
+	public static JmDNS getJmDNS() {
+		if (jmdns_ == null) {
+			try {
+				jmdns_ = JmDNS.create();
+			} catch (IOException e) {
+				System.out
+						.println("An IOException occurred when creating jmdns");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+
+		return jmdns_;
 	}
 }
