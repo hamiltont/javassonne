@@ -39,11 +39,11 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.AvailableNetworkHosts;
-import org.javassonne.networking.ChatManager;
-import org.javassonne.networking.ChatParticipant;
 import org.javassonne.networking.LocalHost;
+import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
 
 // TODO - add a button that will allow you to join a game to the joinGamePanel
@@ -53,13 +53,8 @@ import org.javassonne.ui.DisplayHelper;
 // TODO - use the LocalHost.isLocalHostStarted() function to provide some visual feedback
 //			to the user about whether or not the multiplayer lobby is set up
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
-		ActionListener, ChatParticipant, KeyListener, ListSelectionListener,
-		TableModelListener {
-	/**
-	 * Default serial ID 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+		ActionListener, KeyListener, ListSelectionListener, TableModelListener {
+
 	private JPanel main_;
 	private JPanel joinGamePanel_;
 	private JPanel hostGamePanel_;
@@ -74,6 +69,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String CANCEL = "Cancel";
 	private static String SHOW_JOIN_PANEL = "Back";
 	private static String SHOW_HOST_PANEL = "Host_Game";
+	private static String JOIN_GAME = "Join_Game";
 
 	public ViewNetworkHostsPanel() {
 		super();
@@ -101,7 +97,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
 		hostGamePanel_.setSize(getWidth(), getHeight());
 
-		ChatManager.addGlobalChatListener(this);
+		NotificationManager.getInstance()
+				.addObserver(Notification.RECV_GLOBAL_CHAT, this,
+						"receiveGlobalChatMessage");
 
 		// ============================================
 		// Setup Main Panel
@@ -146,6 +144,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		availHostsTable_ = new JTable();
 		availHostsTable_.setModel(tableModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		availHostsTable_.repaint();
 		// hosts_table_.setSize(600, 360);
 
 		// Make it scroll able
@@ -162,11 +161,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		label.setFont(new Font("Serif", Font.BOLD, 16));
 		label.setSize(200, 20);
 		joinGamePanel_.add(label);
-		
-		//Add the Join game button
-		addButtonToPanel("images/join_game.png", "", new Point(600, 
-				543), joinGamePanel_);
-		
+
+		// Add the Join game button
+		addButtonToPanel("images/join_game.png", JOIN_GAME,
+				new Point(600, 543), joinGamePanel_);
+
 		// Add the Create game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
 				455, 543), joinGamePanel_);
@@ -184,6 +183,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		connectedHostsTable_.setModel(change_me);
 		connectedHostsTable_
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		connectedHostsTable_.repaint();
 		// hosts_table_.setSize(600, 360);
 
 		// Make it scroll able
@@ -238,6 +238,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		} else if (e.getActionCommand().equals(CANCEL)) {
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
+		} else if (e.getActionCommand().equals(JOIN_GAME)) {
+			// Do something here
+
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
@@ -258,9 +261,19 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			ChatManager.sendGlobalChat(talkArea_.getText());
-			talkArea_.setText(null);
+			ChatMessage cm = new ChatMessage(talkArea_.getText(), LocalHost
+					.getName());
 
+			// Send the message for the benefit of everyone else
+			NotificationManager.getInstance().sendNotification(
+					Notification.SEND_GLOBAL_CHAT, cm);
+
+			// Add the message to our personal chat window
+			receiveGlobalChatMessage(new Notification(
+					Notification.RECV_GLOBAL_CHAT, new ChatMessage(talkArea_
+							.getText(), LocalHost.getName())));
+
+			talkArea_.setText("");
 		}
 	}
 
@@ -270,15 +283,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	public void keyTyped(KeyEvent e) {
 	}
 
-	public void receiveGlobalChat(String msg, String senderName) {
-		chatArea_.setText(chatArea_.getText() + "\n" + msg);
-	}
-
-	public void receivePrivateGameChat(String msg, String senderName) {
-
-	}
-
-	public String getChatParticipantName() {
-		return LocalHost.getName();
+	public void receiveGlobalChatMessage(Notification recvGlobalChat) {
+		ChatMessage cm = (ChatMessage) recvGlobalChat.argument();
+		chatArea_.setText(chatArea_.getText() + "\n" + cm.getSenderName()
+				+ ": " + cm.getMessage() + "\n");
 	}
 }

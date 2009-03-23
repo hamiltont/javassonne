@@ -19,6 +19,7 @@
 package org.javassonne.networking;
 
 import org.javassonne.messaging.Notification;
+import org.javassonne.networking.impl.Client;
 
 /**
  * A bootstrapper used to very simply test the networking
@@ -31,13 +32,13 @@ public class TestLauncher {
 
 		Client cl = new Client("a");
 		cl.connectToHost(LocalHost.getURI());
-		cl.sendMessageToHost("hello from a");
+		
 
 		// TODO change code so that it makes sure the name has no spaces
 		// or fix underlying imp
 		Client clb = new Client("b");
 		clb.connectToHost(LocalHost.getURI());
-		clb.sendMessageToHost("hello from b");
+		
 
 		// TODO works with a serializable object, but not with a non
 		// Object boo = new Object();

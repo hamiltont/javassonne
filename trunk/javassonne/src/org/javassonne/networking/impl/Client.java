@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.impl;
 
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
@@ -26,7 +26,8 @@ import java.util.TimerTask;
 import javax.jmdns.ServiceInfo;
 
 import org.javassonne.messaging.Notification;
-import org.javassonne.networking.impl.RemotingUtils;
+import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.LocalHost;
 
 /**
  * The implementation of our client. Note that although the functions here can
@@ -62,18 +63,23 @@ public class Client implements RemoteClient {
 		// TODO come up with a nice way to throw away this timer
 	}
 
+	// TODO - list notifications that are illegal to send 
+	// TODO - no one currently listens for RECV_PRIVATE_CHAT
 	public void receiveNotificationFromHost(Notification n) {
 		log("Received notification - " + n.identifier());
+		NotificationManager.getInstance().sendNotification(n.identifier(), n.argument());
 	}
 
 	/**
-	 * Send a message to the host of the game
+	 * Handle the SEND_PRIVATE_CHAT notification by converting it to a
+	 * RECV_PRIVATE_CHAT and forwarding it to the Host
 	 */
-	public void sendMessageToHost(String msg) {
-		if (connected_ == false)
-			throw new IllegalArgumentException();
-		log("Sending message " + msg + " to host");
-		ChatManager.sendPrivateGameChat(msg);
+	public void sendChatMessageToHost(Notification sendPrivChat) {
+		ChatMessage cm = (ChatMessage) sendPrivChat.argument();
+		log("Sending message " + cm.getMessage() + " to host");
+		Notification recvPrivChat = new Notification(Notification.RECV_PRIVATE_CHAT, cm);
+
+		sendNotificationToHost(recvPrivChat);
 	}
 
 	public void sendNotificationToHost(Notification n) {
@@ -174,20 +180,4 @@ public class Client implements RemoteClient {
 
 		}
 	}
-
-	// TODO - should eventually change this to some sort of a preferences system
-	public String getChatParticipantName() {
-		return LocalHost.getName();
-	}
-
-	public void receiveGlobalChat(String msg, String senderName) {
-		log("ERROR - should not have received any global messages!"
-				+ " These should go to our host!");
-		log("Received global chat msg - '" + msg + "' from " + senderName);
-	}
-
-	public void receivePrivateGameChat(String msg, String senderName) {
-		log("Received private chat msg - '" + msg + "' from " + senderName);
-	}
-
 }

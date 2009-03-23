@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.impl;
 
 import java.io.Serializable;
 
@@ -28,7 +28,7 @@ import org.javassonne.messaging.Notification;
  * 
  * @author Hamilton Turner
  */
-public interface RemoteClient extends ChatParticipant {
+public interface RemoteClient {
 	public static final String SERVICENAME = "JavassonneClient";
 	
 	public void receiveNotificationFromHost(Notification n);

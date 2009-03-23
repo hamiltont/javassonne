@@ -119,7 +119,7 @@ public class DisplayWindow extends JFrame implements WindowListener {
 		// Restore the game window to full screen
 		// Workaround for bug with JVM 1.6.0_12-b04 that
 		// auto minimizes for JOptionPane method calls
-		this.setState(NORMAL);
+		//this.setState(NORMAL);
 	}
 
 	public void windowActivated(WindowEvent e) {

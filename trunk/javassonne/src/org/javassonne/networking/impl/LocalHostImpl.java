@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.impl;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -33,7 +33,7 @@ import javax.jmdns.ServiceInfo;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.networking.impl.RemotingUtils;
+import org.javassonne.networking.impl.RemoteHost.MODE;
 
 /**
  * The implementation of our local host. Note that this is a singleton, and
@@ -41,7 +41,7 @@ import org.javassonne.networking.impl.RemotingUtils;
  * 
  * @author Hamilton Turner
  */
-public class Host implements RemoteHost {
+public class LocalHostImpl implements RemoteHost {
 
 	private List<RemoteClient> connectedClients_;
 	private RemoteHost.MODE currentMode_;
@@ -51,16 +51,12 @@ public class Host implements RemoteHost {
 	private String rmiSafeName_; // The RMI safe name of the host
 	private boolean clientsCanConnect_; // A flag that indicates whether or not
 	// this host can be connected to
-	private static Host instance_ = null;
+	private static LocalHostImpl instance_ = null;
 	private boolean isLocalHostStarted_;
 
-	public static Host getInstance() {
-		if (instance_ == null) {
-			instance_ = new Host();
-			NotificationManager.getInstance().addObserver(
-					Notification.PRIVATE_CHAT, instance_, "handlePrivateChat");
-		}
-
+	public static LocalHostImpl getInstance() {
+		if (instance_ == null)
+			instance_ = new LocalHostImpl();
 		return instance_;
 	}
 
@@ -68,7 +64,7 @@ public class Host implements RemoteHost {
 	 * Creates the RMI host service, then broadcasts it using JmDNS
 	 */
 	// TODO - this needs to get a hostName from the preferences manager
-	private Host() {
+	private LocalHostImpl() {
 		connectedClients_ = new ArrayList<RemoteClient>();
 		clientsCanConnect_ = false;
 		URI_ = null;
@@ -183,7 +179,7 @@ public class Host implements RemoteHost {
 			RemoteClient curClient = i.next();
 
 			// Do not send the message back out to the client that sent it to us
-			if (curClient.equals(c))
+			if (curClient.getURI().equals(clientURI))
 				continue;
 
 			curClient.receiveNotificationFromHost(n);
@@ -205,6 +201,21 @@ public class Host implements RemoteHost {
 	public MODE getStatus() {
 		return this.currentMode_;
 	}
+	
+	/**
+	 * Used if another host would like to send notifications to this host
+	 */
+	// TODO - list the not allowed notifications
+	public void receiveNotification(Notification n) {
+		String id = n.identifier();
+		if ((id != Notification.SEND_GLOBAL_CHAT)
+				&& (id != Notification.SEND_PRIVATE_CHAT))
+			NotificationManager.getInstance().sendNotification(n.identifier(),
+					n.argument());
+		ChatMessage cm = (ChatMessage) n.argument();
+		System.out.println("Received message '" + cm.getMessage() + "' from '"
+				+ cm.getSenderName() + "'");
+	}
 
 	private class HostStarter extends TimerTask {
 
@@ -220,9 +231,9 @@ public class Host implements RemoteHost {
 			// Create the RMI service
 			ServiceInfo info = null;
 			try {
-				info = RemotingUtils.exportRMIService(Host.getInstance(),
-						RemoteHost.class, RemoteHost.SERVICENAME + "_"
-								+ rmiSafeName_);
+				info = RemotingUtils.exportRMIService(LocalHostImpl
+						.getInstance(), RemoteHost.class,
+						RemoteHost.SERVICENAME + "_" + rmiSafeName_);
 			} catch (RemoteException e) {
 				log("A RemoteException occurred when exporting host RMI");
 				System.out.println(e.getMessage());
@@ -253,17 +264,5 @@ public class Host implements RemoteHost {
 			log("Clients can connect to: " + URI_);
 		}
 
-	}
-
-	/**
-	 * Used if another host would like to send notifications to this host
-	 */
-	// TODO - list the not allowed notifications
-	public void receiveNotification(Notification n) {
-		String id = n.identifier();
-		if ((id != Notification.SEND_GLOBAL_CHAT) &&
-			(id != Notification.SEND_PRIVATE_CHAT))
-			NotificationManager.getInstance().sendNotification(n.identifier(),
-					n.argument());
 	}
 }

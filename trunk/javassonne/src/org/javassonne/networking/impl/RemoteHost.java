@@ -16,7 +16,7 @@
  *  permissions and limitations under the License. 
  */
 
-package org.javassonne.networking;
+package org.javassonne.networking.impl;
 
 import org.javassonne.messaging.Notification;
 
