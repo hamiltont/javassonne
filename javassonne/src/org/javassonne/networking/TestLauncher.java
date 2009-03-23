@@ -20,6 +20,8 @@ package org.javassonne.networking;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.networking.impl.Client;
+import org.javassonne.networking.impl.RemoteHost;
+import org.javassonne.networking.impl.RemotingUtils;
 
 /**
  * A bootstrapper used to very simply test the networking
@@ -30,20 +32,27 @@ public class TestLauncher {
 
 	public static void main(String[] args) {
 
-		Client cl = new Client("a");
-		cl.connectToHost(LocalHost.getURI());
+		String hostURI = "rmi://129.59.82.77:5099/JavassonneHost_demetri-d5042f7";
+		RemoteHost h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+				RemoteHost.class);
+		System.out.println(h.getName());
+		System.out.println(h.getURI());
+		
+		
+		//Client cl = new Client("a");
+		//cl.connectToHost(LocalHost.getURI());
 		
 
 		// TODO change code so that it makes sure the name has no spaces
 		// or fix underlying imp
-		Client clb = new Client("b");
-		clb.connectToHost(LocalHost.getURI());
+		//Client clb = new Client("b");
+		//clb.connectToHost(LocalHost.getURI());
 		
 
 		// TODO works with a serializable object, but not with a non
 		// Object boo = new Object();
-		String boo = new String();
-		Notification n = new Notification("test notification", boo);
-		cl.sendNotificationToHost(n);
+		//String boo = new String();
+		//Notification n = new Notification("test notification", boo);
+		//cl.sendNotificationToHost(n);
 	}
 }
