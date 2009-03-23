@@ -38,36 +38,40 @@ import org.javassonne.networking.LocalHost;
  */
 public class Client implements RemoteClient {
 
-	// Lets this client know if it is
-	// currently connected to a host
-	private boolean connected_;
-	private RemoteHost host_; // The host we are currently connected to,
-	// if any
-	private String clientURI_; // The URI of this client
-	private String name_; // The player name of the client
+	private boolean connectedToHost_;
+	private RemoteHost connectedHost_;
+	private String clientURI_;
+	private Client instance_;
 
-	/**
-	 * Create the RMI service
-	 * 
-	 * @param name
-	 *            The name the player would like to have
-	 */
-	public Client(String name) {
-		name_ = name;
-		connected_ = false;
+	public Client() {
+		connectedToHost_ = false;
+		connectedHost_ = null;
 		clientURI_ = null;
 
-		Timer t = new Timer("Client Starter - Client " + name);
+		Timer t = new Timer("Client Starter");
 		t.schedule(new ClientStarter(this), 0);
 
-		// TODO come up with a nice way to throw away this timer
+		// We handle giving private chat messages to the host
+		NotificationManager.getInstance().addObserver(
+				Notification.SEND_PRIVATE_CHAT, this, "sendChatMessageToHost");
 	}
 
-	// TODO - list notifications that are illegal to send 
+	public Client getInstance() {
+		if (instance_ == null)
+			instance_ = new Client();
+		return instance_;
+	}
+
+	// TODO - list notifications that are illegal to send
 	// TODO - no one currently listens for RECV_PRIVATE_CHAT
 	public void receiveNotificationFromHost(Notification n) {
-		log("Received notification - " + n.identifier());
-		NotificationManager.getInstance().sendNotification(n.identifier(), n.argument());
+		String info = "Received notification - " + n.identifier();
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.LOG_INFO, info);
+
+		NotificationManager.getInstance().sendNotification(n.identifier(),
+				n.argument());
 	}
 
 	/**
@@ -76,17 +80,28 @@ public class Client implements RemoteClient {
 	 */
 	public void sendChatMessageToHost(Notification sendPrivChat) {
 		ChatMessage cm = (ChatMessage) sendPrivChat.argument();
-		log("Sending message " + cm.getMessage() + " to host");
-		Notification recvPrivChat = new Notification(Notification.RECV_PRIVATE_CHAT, cm);
+		String info = "Sending message " + cm.getMessage() + " to host";
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.LOG_INFO, info);
+
+		Notification recvPrivChat = new Notification(
+				Notification.RECV_PRIVATE_CHAT, cm);
 
 		sendNotificationToHost(recvPrivChat);
 	}
 
 	public void sendNotificationToHost(Notification n) {
-		if (connected_ == false)
-			throw new IllegalArgumentException();
-		log("Sending notification " + n.identifier() + " to host");
-		host_.receiveNotificationFromClient(n, clientURI_);
+		if (connectedToHost_ == false)
+			throw new RuntimeException("Client.java tried to send a "
+					+ " notification to a host, but it is not connected");
+
+		String info = "Sending notification " + n.identifier() + " to host";
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.LOG_INFO, info);
+
+		connectedHost_.receiveNotificationFromClient(n, clientURI_);
 	}
 
 	/**
@@ -96,22 +111,27 @@ public class Client implements RemoteClient {
 	 *            The host to try and connect to
 	 */
 	public void connectToHost(String hostURI) {
-		if (connected_)
-			throw new IllegalArgumentException();
+		if (connectedToHost_)
+			throw new RuntimeException("Client.java tried to connect to"
+					+ " a host, but it is already connected");
 
-		// should probably verify that host exists, and
-		// then safely attempt to connect
-		host_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+		connectedHost_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
 				RemoteHost.class);
 
-		host_.addClient(clientURI_);
+		connectedHost_.addClient(clientURI_);
 
-		connected_ = true;
+		connectedToHost_ = true;
 	}
 
-	/**
-	 * Return the URI that this client can be reached at
-	 */
+	public void disconnectFromHost() {
+		if (connectedToHost_ == false)
+			throw new RuntimeException("Client.java tried to disconnect from"
+					+ " a host, but it is not connected");
+
+		connectedHost_.removeClient(getURI());
+		connectedToHost_ = false;
+	}
+
 	public String getURI() {
 		if (clientURI_ == null) {
 			ClientStarter cs = new ClientStarter(this);
@@ -120,20 +140,9 @@ public class Client implements RemoteClient {
 		return clientURI_;
 	}
 
-	/**
-	 * A very simple logger
-	 * 
-	 * @param msg
-	 */
-	private void log(String msg) {
-		System.out.println("Client " + name_ + ": " + msg);
-	}
-
-	/**
-	 * Return the name this player is using in the game
-	 */
+	// TODO - get this from a preferences file somewhere
 	public String getName() {
-		return name_;
+		return LocalHost.getName();
 	}
 
 	private class ClientStarter extends TimerTask {
@@ -147,6 +156,7 @@ public class Client implements RemoteClient {
 		}
 
 		public void run() {
+			// Just in case
 			if (hasBeenCalled_)
 				return;
 			hasBeenCalled_ = false;
@@ -154,21 +164,27 @@ public class Client implements RemoteClient {
 			// Create the RMI service
 			ServiceInfo service = null;
 			try {
-				// TODO If we want to run multiplayer by using networking,
-				// ensure
-				// that
-				// there are no duplicate names
 				service = RemotingUtils.exportRMIService(clientToStart_,
 						RemoteClient.class, RemoteClient.SERVICENAME + "_"
 								+ clientToStart_.getName());
 			} catch (RemoteException e) {
-				log("A RemoteException occurred while creating the RMI");
-				System.out.println(e.getMessage());
-				e.printStackTrace();
+				String err = "A RemoteException occurred while creating the RMI";
+				err += "\n" + e.getMessage();
+				err += "\nStack Trace: \n";
+				for (int i = 0; i < e.getStackTrace().length; i++)
+					err += e.getStackTrace()[i] + "\n";
+
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
 			} catch (UnknownHostException e) {
-				log("A UnknownHostException occurred while creating the RMI");
-				System.out.println(e.getMessage());
-				e.printStackTrace();
+				String err = "A UnknownHostException occurred while creating the RMI";
+				err += "\n" + e.getMessage();
+				err += "\nStack Trace: \n";
+				for (int i = 0; i < e.getStackTrace().length; i++)
+					err += e.getStackTrace()[i] + "\n";
+
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
 			}
 
 			// TODO rather than using the ServiceInfo wrapper provided, we
@@ -178,6 +194,8 @@ public class Client implements RemoteClient {
 			clientURI_ = "rmi://" + RemotingUtils.LOCAL_HOST + ":"
 					+ service.getPort() + "/" + service.getName();
 
+			// Ensure this never runs again
+			cancel();
 		}
 	}
 }

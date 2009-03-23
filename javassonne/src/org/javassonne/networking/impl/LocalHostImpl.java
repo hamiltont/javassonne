@@ -83,8 +83,6 @@ public class LocalHostImpl implements RemoteHost {
 
 		Timer t = new Timer("Host Starter");
 		t.schedule(new HostStarter(), 0);
-
-		// TODO come up with a nice way to throw away this timer
 	}
 
 	/**
@@ -101,6 +99,10 @@ public class LocalHostImpl implements RemoteHost {
 			log("Client " + clientURI + " attempted  to "
 					+ "connect to our host in an unsafe manner");
 		}
+	}
+
+	public void removeClient(String clientURI) {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -201,7 +203,7 @@ public class LocalHostImpl implements RemoteHost {
 	public MODE getStatus() {
 		return this.currentMode_;
 	}
-	
+
 	/**
 	 * Used if another host would like to send notifications to this host
 	 */
@@ -262,6 +264,9 @@ public class LocalHostImpl implements RemoteHost {
 					+ "/" + info.getName();
 
 			log("Clients can connect to: " + URI_);
+
+			// Cancel this timer task
+			cancel();
 		}
 
 	}
