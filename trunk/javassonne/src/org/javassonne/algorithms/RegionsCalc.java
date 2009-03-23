@@ -57,10 +57,9 @@ public class RegionsCalc {
 				marked_.get(p).put(r, total);
 			}
 		}
-		// Given region on iter's Tile has no adjacent Tiles
-		// on which it continues; therefore size = 1
+		//Algorithm has already been run
 		if (total == 0)
-			++total;
+			total = sizeOfRegion(iter.getLocation(), reg);
 		return total;
 
 	}
