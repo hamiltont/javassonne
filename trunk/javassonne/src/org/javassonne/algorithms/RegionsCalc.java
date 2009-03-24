@@ -46,6 +46,7 @@ public class RegionsCalc {
 		tileFeatureBindings_ = tfbRef;
 		marked_ = new HashMap<Point, HashMap<Tile.Region, Integer>>();
 		globalMeep_ = new HashMap<Point, HashMap<Tile.Region, List<Meeple>>>();
+		isComplete_ = new HashMap<Point, HashMap<Tile.Region,Boolean>>();
 	}
 
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
@@ -109,13 +110,14 @@ public class RegionsCalc {
 							newReg, meeps, list, returnVal);
 		}
 		// traverse to other regions in Tile
-		for (Tile.Region r : Tile.Region.values()) {
-			if ((tileFeatureBindings_.featuresBind(iter.current()
-					.featureIdentifierInRegion(r), iter.current()
-					.featureIdentifierInRegion(reg)))
-					&& !iter.current().featureInRegion(r).endsTraversal) {
-				returnVal = returnVal
-						&& traverseRegion(iter, r, meeps, list, returnVal);
+		if(!iter.current().featureInRegion(reg).endsTraversal){
+			for (Tile.Region r : Tile.Region.values()) {
+				if (tileFeatureBindings_.featuresBind(iter.current()
+						.featureIdentifierInRegion(r), iter.current()
+						.featureIdentifierInRegion(reg))) {
+					returnVal = returnVal
+							&& traverseRegion(iter, r, meeps, list, returnVal);
+				}
 			}
 		}
 
