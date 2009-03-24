@@ -132,6 +132,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		talkArea_.setWrapStyleWord(true);
 		talkArea_.setLineWrap(true);
 		talkArea_.addKeyListener(this);
+		talkArea_.addMouseListener(this);
 		main_.add(talkArea_);
 
 		// ============================================
@@ -239,7 +240,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
-			// Do something here
+
+			//if(0==0){//gameHasPassword == true){
+							//passwordPopUpWindow pw = new passwordPopUpWindow();
+						//}
+						//TO DO: actually join the game
 
 		} else
 			NotificationManager.getInstance().sendNotification(
@@ -288,4 +293,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		chatArea_.setText(chatArea_.getText() + "\n" + cm.getSenderName()
 				+ ": " + cm.getMessage() + "\n");
 	}
+	
+
+	public void mouseClicked(MouseEvent m){
+			if(talkArea_.getText().equals("<Type here to chat to other players>")){
+				talkArea_.selectAll();
+				talkArea_.replaceSelection("");
+			}
+		}
 }
