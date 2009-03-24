@@ -18,23 +18,30 @@
 
 package org.javassonne.ui.panels;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.controls.JScrollablePicture;
 
-public class InstructionsPanel extends JPanel {
+public class InstructionsPanel extends JPanel implements MouseListener {
 	private static final String GAME_INSTRUCTIONS_IMAGE = "images/game_instructions.jpg";
 
 	public InstructionsPanel() {
 		setOpaque(false);
 		setVisible(true);
-		
+
 		// Get the image to use.
 		ImageIcon image = new ImageIcon(GAME_INSTRUCTIONS_IMAGE);
 
@@ -43,14 +50,62 @@ public class InstructionsPanel extends JPanel {
 
 		JScrollPane pictureScrollPane = new JScrollPane(picture);
 		pictureScrollPane.setPreferredSize(new Dimension(500, 500));
+		pictureScrollPane.setLocation(new Point(20, 20));
 
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		setLayout(new BorderLayout());
 		setOpaque(true);
 		setSize(image.getIconWidth() + 18, GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDisplayMode().getHeight() - 100);
 
-		// Put it in this panel.
+		// Create an exit button
+		JButton b = new JButton("CLOSE");
+		b.addMouseListener(this);
+		b.setLocation(new Point(0, 0));
+
+		// Add the close button and instructions image
+		add(b, BorderLayout.NORTH);
 		add(pictureScrollPane);
+
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
+
+	}
+
+	public void endGame(Notification n) {
+		// close ourselves
+		DisplayHelper.getInstance().remove(this);
+	}
+
+	/*
+	 * Mouse Listeners to capture the exit button click
+	 */
+	public void mouseClicked(MouseEvent arg0) {
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_INSTRUCTIONS);
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
 	}
 }
