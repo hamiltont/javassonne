@@ -48,8 +48,8 @@ public class LocalHost {
 		return LocalHostImpl.getInstance().getURI();
 	}
 
-	public static void receiveNotification(Notification n, String clientURI) {	
-		LocalHostImpl.getInstance().receiveNotificationFromClient(n, clientURI);
+	public static void receiveNotification(String serializedNotification, String clientURI) {	
+		LocalHostImpl.getInstance().receiveNotificationFromClient(serializedNotification, clientURI);
 	}
 	
 	public static boolean isLocalHostStarted() {

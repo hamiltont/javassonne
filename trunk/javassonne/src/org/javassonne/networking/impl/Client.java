@@ -107,7 +107,8 @@ public class Client implements RemoteClient {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
 
-		connectedHost_.receiveNotificationFromClient(n, clientURI_);
+		String serializedNotification = xStream_.toXML(n);
+		connectedHost_.receiveNotificationFromClient(serializedNotification, clientURI_);
 	}
 
 	/**
