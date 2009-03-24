@@ -126,4 +126,8 @@ public class Player {
 	public void setIsLocal(Boolean local){
 		this.isLocal_ = local;
 	}
+
+	public void shiftScore(int s) {
+		this.score_ += s;
+	}
 }
