@@ -256,8 +256,16 @@ public class LocalHostImpl implements RemoteHost {
 
 			// Create the RMI service
 			ServiceInfo info = createRMI();
-			
-			URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
+
+			String local_host = null;
+			try {
+				local_host = InetAddress.getLocalHost().getHostAddress();
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			URI_ = "rmi://" + local_host + ":" + info.getPort()
 					+ "/" + info.getName();
 
 			// As long as we detect that we are a duplicate,
