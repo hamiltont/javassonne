@@ -29,6 +29,8 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.LocalHost;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * The implementation of our client. Note that although the functions here can
  * be called by the code running on this machine, only the functions declared in
@@ -43,11 +45,13 @@ public class Client implements RemoteClient {
 	private RemoteHost connectedHost_;
 	private String clientURI_;
 	private Client instance_;
+	private XStream xStream_;
 
 	public Client() {
 		connectedToHost_ = false;
 		connectedHost_ = null;
 		clientURI_ = null;
+		xStream_ = new XStream();
 
 		Timer t = new Timer("Client Starter");
 		t.schedule(new ClientStarter(this), 0);
@@ -65,7 +69,8 @@ public class Client implements RemoteClient {
 
 	// TODO - list notifications that are illegal to send
 	// TODO - no one currently listens for RECV_PRIVATE_CHAT
-	public void receiveNotificationFromHost(Notification n) {
+	public void receiveNotificationFromHost(String serializedNotification) {
+		Notification n = (Notification) xStream_.fromXML(serializedNotification);
 		String info = "Received notification - " + n.identifier();
 
 		NotificationManager.getInstance().sendNotification(

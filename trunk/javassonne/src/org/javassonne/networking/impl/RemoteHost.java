@@ -18,7 +18,6 @@
 
 package org.javassonne.networking.impl;
 
-import org.javassonne.messaging.Notification;
 
 /**
  * This is the networking only interface of the host. Only put functions here
@@ -86,12 +85,12 @@ public interface RemoteHost {
 	 * either ignore these notifications, or to redistribute them to all other
 	 * clients
 	 */
-	public void receiveNotificationFromClient(Notification n, String clientURI);
+	public void receiveNotificationFromClient(String serializedNotification, String clientURI);
 
 	/**
 	 * Used when other hosts would like to send notifications to this host.
 	 * Typically just global chat messages. Internally this host can either
 	 * ignore or act on these.
 	 */
-	public void receiveNotification(Notification n);
+	public void receiveNotification(String serializedNotification);
 }
