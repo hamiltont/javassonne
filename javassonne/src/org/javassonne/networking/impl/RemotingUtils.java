@@ -92,7 +92,7 @@ public class RemotingUtils {
 
 		ServiceInfo info = ServiceInfo.create("_rmi._tcp.local.", name, port,
 				"path=index.html");
-
+		
 		// return "rmi://"+LOCAL_HOST+":"+port+"/"+name;
 		return info;
 	}

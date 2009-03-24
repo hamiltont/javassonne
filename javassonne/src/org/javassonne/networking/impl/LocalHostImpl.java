@@ -256,7 +256,7 @@ public class LocalHostImpl implements RemoteHost {
 
 			// Create the RMI service
 			ServiceInfo info = createRMI();
-
+			
 			URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
 					+ "/" + info.getName();
 
@@ -302,7 +302,7 @@ public class LocalHostImpl implements RemoteHost {
 						Notification.LOG_ERROR, err);
 			}
 
-			String info2 = "Clients can connect to: " + URI_;
+			String info2 = "HostStarter: Clients can connect to: " + URI_;
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, info2);
