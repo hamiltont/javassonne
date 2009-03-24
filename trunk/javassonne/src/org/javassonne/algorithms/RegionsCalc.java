@@ -46,7 +46,7 @@ public class RegionsCalc {
 		tileFeatureBindings_ = tfbRef;
 		marked_ = new HashMap<Point, HashMap<Tile.Region, Integer>>();
 		globalMeep_ = new HashMap<Point, HashMap<Tile.Region, List<Meeple>>>();
-		isComplete_ = new HashMap<Point, HashMap<Tile.Region,Boolean>>();
+		isComplete_ = new HashMap<Point, HashMap<Tile.Region, Boolean>>();
 	}
 
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
@@ -75,7 +75,8 @@ public class RegionsCalc {
 		if (getsizeOfRegion(iter.getLocation(), reg) != -1)
 			return returnVal;
 		if (marked_.get(iter.getLocation()) == null)
-			marked_.put(iter.getLocation(),
+			marked_
+					.put(iter.getLocation(),
 							new HashMap<Tile.Region, Integer>());
 		marked_.get(iter.getLocation()).put(reg, 0);
 		if (list.get(iter.getLocation()) == null)
@@ -89,34 +90,35 @@ public class RegionsCalc {
 		// traverse to next tile
 		if (reg.compareTo(Tile.Region.Left) == 0) {
 			newReg = Tile.Region.Right;
-			returnVal = returnVal
-					&& traverseRegion(((TileBoardGenIterator) iter).leftCopy(),
-							newReg, meeps, list, returnVal);
+			returnVal = traverseRegion(
+					((TileBoardGenIterator) iter).leftCopy(), newReg, meeps,
+					list, returnVal)
+					&& returnVal;
 		} else if (reg.compareTo(Tile.Region.Right) == 0) {
 			newReg = Tile.Region.Left;
-			returnVal = returnVal
-					&& traverseRegion(
-							((TileBoardGenIterator) iter).rightCopy(), newReg,
-							meeps, list, returnVal);
+			returnVal = traverseRegion(((TileBoardGenIterator) iter)
+					.rightCopy(), newReg, meeps, list, returnVal)
+					&& returnVal;
 		} else if (reg.compareTo(Tile.Region.Top) == 0) {
 			newReg = Tile.Region.Bottom;
-			returnVal = returnVal
-					&& traverseRegion(((TileBoardGenIterator) iter).upCopy(),
-							newReg, meeps, list, returnVal);
+			returnVal = traverseRegion(((TileBoardGenIterator) iter).upCopy(),
+					newReg, meeps, list, returnVal)
+					&& returnVal;
 		} else if (reg.compareTo(Tile.Region.Bottom) == 0) {
 			newReg = Tile.Region.Top;
-			returnVal = returnVal
-					&& traverseRegion(((TileBoardGenIterator) iter).downCopy(),
-							newReg, meeps, list, returnVal);
+			returnVal = traverseRegion(
+					((TileBoardGenIterator) iter).downCopy(), newReg, meeps,
+					list, returnVal)
+					&& returnVal;
 		}
 		// traverse to other regions in Tile
-		if(!iter.current().featureInRegion(reg).endsTraversal){
+		if (!iter.current().featureInRegion(reg).endsTraversal) {
 			for (Tile.Region r : Tile.Region.values()) {
 				if (tileFeatureBindings_.featuresBind(iter.current()
 						.featureIdentifierInRegion(r), iter.current()
 						.featureIdentifierInRegion(reg))) {
-					returnVal = returnVal
-							&& traverseRegion(iter, r, meeps, list, returnVal);
+					returnVal = traverseRegion(iter, r, meeps, list, returnVal)
+							&& returnVal;
 				}
 			}
 		}
