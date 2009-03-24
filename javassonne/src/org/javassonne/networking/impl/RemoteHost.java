@@ -18,6 +18,7 @@
 
 package org.javassonne.networking.impl;
 
+import java.util.List;
 
 /**
  * This is the networking only interface of the host. Only put functions here
@@ -35,13 +36,22 @@ public interface RemoteHost {
 
 	/**
 	 * Add a client to a list of internal "connected" clients. Note that
-	 * internally this method should ensure that the client is reachable 
-	 * before it adds them.
+	 * internally this method should ensure that the client is reachable before
+	 * it adds them.
 	 * 
 	 * @param clientURI
 	 *            The URI of the client to add
 	 */
 	public void addClient(String clientURI);
+
+	/**
+	 * Used to notify this host of other available hosts on the network. This
+	 * host should see if it can reach the other hosts, and add them to its list
+	 * of available hosts if it can
+	 * 
+	 * @param hostURIs the URI's of the hosts that are known
+	 */
+	public void addHosts(List<String> hostURIs);
 
 	/**
 	 * If the client is currently considered to be connected to this host, this
@@ -85,7 +95,8 @@ public interface RemoteHost {
 	 * either ignore these notifications, or to redistribute them to all other
 	 * clients
 	 */
-	public void receiveNotificationFromClient(String serializedNotification, String clientURI);
+	public void receiveNotificationFromClient(String serializedNotification,
+			String clientURI);
 
 	/**
 	 * Used when other hosts would like to send notifications to this host.

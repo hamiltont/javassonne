@@ -33,6 +33,7 @@ import javax.jmdns.ServiceInfo;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.HostMonitor;
 import org.springframework.remoting.RemoteLookupFailureException;
 
 import com.thoughtworks.xstream.XStream;
@@ -53,14 +54,14 @@ public class LocalHostImpl implements RemoteHost {
 	private RemoteHost.MODE currentMode_;
 	private static LocalHostImpl instance_ = null;
 
-	private String URI_;
+	protected String URI_;
 	private String realName_;
-	private String rmiSafeName_;
+	protected String rmiSafeName_;
 	// A flag that indicates whether or not
 	// this host can be connected to
 	private boolean clientsCanConnect_;
 
-	private boolean isLocalHostStarted_;
+	protected boolean isLocalHostStarted_;
 	private XStream xStream_;
 
 	public static LocalHostImpl getInstance() {
@@ -243,118 +244,12 @@ public class LocalHostImpl implements RemoteHost {
 					n.argument());
 	}
 
-	private class HostStarter extends TimerTask {
-
-		private boolean called_ = false;
-
-		public void run() {
-			// Prevent this from accidentally being called twice
-			if (called_)
-				return;
-			called_ = true;
-			isLocalHostStarted_ = true;
-
-			// Create the RMI service
-			ServiceInfo info = createRMI();
-
-			String local_host = null;
-			try {
-				local_host = InetAddress.getLocalHost().getHostAddress();
-			} catch (UnknownHostException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			URI_ = "rmi://" + local_host + ":" + info.getPort()
-					+ "/" + info.getName();
-
-			// As long as we detect that we are a duplicate,
-			// try to force the old original to close and
-			// give us our name back
-			while (URI_.matches(".+\\(\\d+\\)") == true) {
-
-				// Shutdown any previous service
-				try {
-					RemotingUtils.shutdownService(RemoteHost.SERVICENAME + "_"
-							+ rmiSafeName_);
-				} catch (RemoteException e) {
-					String err = "HostStarter in LocalHostImpl: A RemoteException occurred while starting";
-					err += "\n" + e.getMessage();
-					err += "\nStack Trace: \n";
-					for (int i = 0; i < e.getStackTrace().length; i++)
-						err += e.getStackTrace()[i] + "\n";
-
-					NotificationManager.getInstance().sendNotification(
-							Notification.LOG_ERROR, err);
-				}
-
-				// Try to re-create our RMI
-				info = createRMI();
-				URI_ = "rmi://" + info.getHostAddress() + ":" + info.getPort()
-						+ "/" + info.getName();
-			}
-
-			// Broadcast the created service
-			JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
-			try {
-				jmdns_.registerService(info);
-			} catch (IOException e) {
-				String err = "An IOException occurred when registering a service with jmdns";
-
-				err += "\n" + e.getMessage();
-				err += "\nStack Trace: \n";
-				for (int i = 0; i < e.getStackTrace().length; i++)
-					err += e.getStackTrace()[i] + "\n";
-
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-			}
-
-			String info2 = "HostStarter: Clients can connect to: " + URI_;
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info2);
-
-			// Cancel this timer task
-			cancel();
-		}
-
-		private ServiceInfo createRMI() {
-			ServiceInfo info = null;
-			try {
-				info = RemotingUtils.exportRMIService(LocalHostImpl
-						.getInstance(), RemoteHost.class,
-						RemoteHost.SERVICENAME + "_" + rmiSafeName_);
-			} catch (RemoteException e) {
-				String err = "A RemoteException occurred when exporting host RMI";
-				err += "\n" + e.getMessage();
-				err += "\nStack Trace: \n";
-				for (int i = 0; i < e.getStackTrace().length; i++)
-					err += e.getStackTrace()[i] + "\n";
-
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-
-			} catch (UnknownHostException e) {
-				String err = "An UnknownHostException occurred when exporting host RMI";
-				err += "\n" + e.getMessage();
-				err += "\nStack Trace: \n";
-				for (int i = 0; i < e.getStackTrace().length; i++)
-					err += e.getStackTrace()[i] + "\n";
-
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-			} catch (Exception e) {
-				String err = "Something bad happened internally in RMI";
-				err += "\n" + e.getMessage();
-				err += "\nStack Trace: \n";
-				for (int i = 0; i < e.getStackTrace().length; i++)
-					err += e.getStackTrace()[i] + "\n";
-
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-			}
-			return info;
-		}
+	/**
+	 * @see org.javassonne.networking.impl.RemoteHost
+	 */	
+	public void addHosts(List<String> hostURIs) {
+		for(Iterator<String> it = hostURIs.iterator(); it.hasNext();)
+			HostMonitor.getInstance().addHost(it.next());
 	}
+
 }
