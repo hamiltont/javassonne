@@ -73,7 +73,7 @@ public class JPopUp {
 
 		JPanel p = new JPanel();
 		p.setName("JPopUp");
-		
+
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 
@@ -109,7 +109,7 @@ public class JPopUp {
 
 		JPanel p = new JPanel();
 		p.setName("JPopUp");
-		
+
 		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
 
@@ -125,22 +125,26 @@ public class JPopUp {
 	public File openFileDialog() {
 		JPanel p = new JPanel();
 		p.setName("JPopUp");
-		
-		JFileChooser fc = new JFileChooser();
-		fc.setDialogTitle(title_);
-		fc.setFileFilter(new FileTypeFilter());
 
-		DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
-				DisplayHelper.Positioning.CENTER);
-		int returnVal = fc.showOpenDialog(p);
+		try {
+			JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle(title_);
+			fc.setFileFilter(new FileTypeFilter());
 
-		DisplayHelper.getInstance().remove(p);
+			DisplayHelper.getInstance().add(p, DisplayHelper.Layer.MODAL,
+					DisplayHelper.Positioning.CENTER);
+			int returnVal = fc.showOpenDialog(p);
 
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			return fc.getSelectedFile();
-		} else {
-			return null;
+			DisplayHelper.getInstance().remove(p);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+				return fc.getSelectedFile();
+
+		} catch (Exception e) {
+			System.out.println("Exception throw in openFileDialog: "
+					+ e.getMessage());
 		}
+		return null;
 	}
 
 	/*
@@ -149,7 +153,7 @@ public class JPopUp {
 	public File saveFileDialog() {
 		JPanel p = new JPanel();
 		p.setName("JPopUp");
-		
+
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle(title_);
 		fc.setFileFilter(new FileTypeFilter());

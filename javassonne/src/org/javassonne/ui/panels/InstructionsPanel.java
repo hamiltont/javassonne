@@ -32,6 +32,9 @@ public class InstructionsPanel extends JPanel {
 	private static final String GAME_INSTRUCTIONS_IMAGE = "images/game_instructions.jpg";
 
 	public InstructionsPanel() {
+		setOpaque(false);
+		setVisible(true);
+		
 		// Get the image to use.
 		ImageIcon image = new ImageIcon(GAME_INSTRUCTIONS_IMAGE);
 
