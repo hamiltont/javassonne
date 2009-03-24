@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * The Tile class is used to represent a single tile in the game. Tiles are
@@ -98,7 +99,9 @@ public class Tile {
 		}
 	}
 
+	private ArrayList<TileFeature> featureObjs_;
 	private String[] features_ = new String[5];
+	
 	private int[] farms_ = new int[4];
 	private boolean[] farmWalls_ = new boolean[4];
 	private String uniqueIdentifier_;
@@ -116,6 +119,7 @@ public class Tile {
 
 	public Tile() {
 		uniqueIdentifier_ = "not assigned";
+		featureObjs_ = new ArrayList<TileFeature>(5);
 	}
 
 	// FARMS: Getter and Setter Functionality
@@ -123,6 +127,8 @@ public class Tile {
 	public Tile(Tile t) {
 		farms_ = t.farms_;
 		features_ = t.features_;
+		featureObjs_ = t.featureObjs_;
+		
 		farmWalls_ = t.farmWalls_;
 		uniqueIdentifier_ = new String(t.getUniqueIdentifier());
 
@@ -172,6 +178,28 @@ public class Tile {
 	}
 
 	// FEATURES: Getter and Setter Functionality
+	
+	/**
+	 * @param r
+	 *            The region
+	 * @return The identifier of the feature present in this region of the tile.
+	 */
+	public TileFeature featureInRegion(Region r) {
+		return featureObjs_.get(r.index);
+	}
+
+	/**
+	 * @param r
+	 *            The region
+	 * @param feature
+	 *            The tile feature that you want to be present in this region of
+	 *            the tile.
+	 */
+	public void setFeatureInRegion(Region r, TileFeature feature) {
+		if (featureObjs_ == null)
+			featureObjs_ = new ArrayList<TileFeature>(5);
+		featureObjs_.add(r.index, feature);
+	}
 
 	/**
 	 * @param r
@@ -185,24 +213,14 @@ public class Tile {
 	/**
 	 * @param r
 	 *            The region
-	 * @param identifier
-	 *            The identifier for the feature you want in that region.
-	 */
-	public void setFeatureIdentifierInRegion(Region r, String identifier) {
-		features_[r.index] = identifier;
-	}
-
-	/**
-	 * @param r
-	 *            The region
 	 * @param feature
 	 *            The tile feature that you want to be present in this region of
 	 *            the tile.
 	 */
-	public void setFeatureInRegion(Region r, TileFeature feature) {
-		features_[r.index] = feature.identifier;
+	public void setFeatureIdentifierInRegion(Region r, String feature) {
+		features_[r.index] = feature;
 	}
-
+	
 	// UNIQUE ID: Getter and Setter Functionality
 
 	/**
@@ -326,6 +344,7 @@ public class Tile {
 			direction += 4;
 
 		// Make tempArrays so contents aren't overwritten
+		ArrayList<TileFeature> tempFeaturesObj = (ArrayList<TileFeature>) featureObjs_.clone();
 		String[] tempFeatures = features_.clone();
 		int[] tempFarms = farms_.clone();
 		boolean[] tempWalls = farmWalls_.clone();
@@ -334,10 +353,12 @@ public class Tile {
 		// right by shifting them within their respective arrays
 
 		for (int i = 0; i < 4; i++) {
+			tempFeaturesObj.set((i + direction) % 4, featureObjs_.get(i));
 			tempFeatures[(i + direction) % 4] = features_[i];
 			tempFarms[(i + direction) % 4] = farms_[i];
 			tempWalls[(i + direction) % 4] = farmWalls_[i];
 		}
+		featureObjs_ = tempFeaturesObj;
 		features_ = tempFeatures;
 		farms_ = tempFarms;
 		farmWalls_ = tempWalls;
@@ -370,5 +391,6 @@ public class Tile {
 	public int hashCode() {
 		return this.getUniqueIdentifier().hashCode();
 	}
+
 
 }

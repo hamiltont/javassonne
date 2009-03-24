@@ -66,14 +66,14 @@ public class TileTests extends TestCase {
 	}
 
 	private boolean checkEqual(Tile tile1, Tile tile2) {
-		return (tile1.featureIdentifierInRegion(Region.Bottom) == tile2
-						.featureIdentifierInRegion(Region.Bottom)
-				&& tile1.featureIdentifierInRegion(Region.Left) == tile2
-						.featureIdentifierInRegion(Region.Left)
-				&& tile1.featureIdentifierInRegion(Region.Top) == tile2
-						.featureIdentifierInRegion(Region.Top) 
-				&& tile1.featureIdentifierInRegion(Region.Right) == tile2
-						.featureIdentifierInRegion(Region.Right));
+		return (tile1.featureInRegion(Region.Bottom) == tile2
+						.featureInRegion(Region.Bottom)
+				&& tile1.featureInRegion(Region.Left) == tile2
+						.featureInRegion(Region.Left)
+				&& tile1.featureInRegion(Region.Top) == tile2
+						.featureInRegion(Region.Top) 
+				&& tile1.featureInRegion(Region.Right) == tile2
+						.featureInRegion(Region.Right));
 	}
 
 	public void testSetFarm() {
@@ -94,35 +94,39 @@ public class TileTests extends TestCase {
 	public void testSetFeature() {
 		TileFeature f = new TileFeature();
 
-		tile_.setFeatureIdentifierInRegion(Region.Left, f.identifier);
-		assertTrue(tile_.featureIdentifierInRegion(Region.Left) == f.identifier);
+		tile_.setFeatureInRegion(Region.Left, f);
+		assertTrue(tile_.featureInRegion(Region.Left) == f);
 
 		tile_.setFeatureInRegion(Region.Right, f);
-		assertTrue(tile_.featureIdentifierInRegion(Region.Right) == f.identifier);
+		assertTrue(tile_.featureInRegion(Region.Right) == f);
 	}
 
 	public void testRotateLeft() {
+		TileFeature f = new TileFeature();
+		
 		tile_.setFarmInQuadrant(Quadrant.TopLeft, 1);
 		tile_.setFarmWallInRegion(Region.Left, true);
-		tile_.setFeatureIdentifierInRegion(Region.Left, "f");
+		tile_.setFeatureInRegion(Region.Left, f);
 
 		tile_.rotateLeft();
 
 		assertTrue(tile_.farmInQuadrant(Quadrant.BottomLeft) == 1);
 		assertTrue(tile_.farmWallInRegion(Region.Bottom));
-		assertTrue(tile_.featureIdentifierInRegion(Region.Bottom) == "f");
+		assertTrue(tile_.featureInRegion(Region.Bottom) == f);
 	}
 
 	public void testRotateRight() {
+		TileFeature f = new TileFeature();
+		
 		tile_.setFarmInQuadrant(Quadrant.TopLeft, 1);
 		tile_.setFarmWallInRegion(Region.Left, true);
-		tile_.setFeatureIdentifierInRegion(Region.Left, "f");
+		tile_.setFeatureInRegion(Region.Left, f);
 
 		tile_.rotateRight();
 
 		assertTrue(tile_.farmInQuadrant(Quadrant.TopRight) == 1);
 		assertTrue(tile_.farmWallInRegion(Region.Top));
-		assertTrue(tile_.featureIdentifierInRegion(Region.Top) == "f");
+		assertTrue(tile_.featureInRegion(Region.Top) == f);
 	}
 
 	public void testCopyConstructor() {

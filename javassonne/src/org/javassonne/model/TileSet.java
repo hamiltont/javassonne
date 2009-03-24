@@ -157,4 +157,15 @@ public class TileSet {
 	{
 		return tiles_.get(0);
 	}
+
+	// Note: This should only be called once, after the tile set is loaded.
+	public void associateFeaturesWithTiles() {
+		
+		for (Tile t : this.tiles_) {
+			for (Tile.Region r : Tile.Region.values()){
+				String i = t.featureIdentifierInRegion(r);
+				t.setFeatureInRegion(r,this.tileFeatureWithIdentifier(i));
+			}
+		}
+	}
 }
