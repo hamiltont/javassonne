@@ -61,7 +61,6 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		rotateRight_ = new JButton(new ImageIcon("images/hud_rotate_right.jpg"));
 		rotateRight_.setActionCommand(Notification.TILE_ROTATE_RIGHT);
 		rotateRight_.addActionListener(this);
-		rotateRight_.addKeyListener(JKeyListener.getInstance());
 		rotateRight_.setLocation(74, 133);
 		rotateRight_.setSize(58,38);
 		add(rotateRight_);
@@ -69,7 +68,6 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		rotateLeft_ = new JButton(new ImageIcon("images/hud_rotate_left.jpg"));
 		rotateLeft_.setActionCommand(Notification.TILE_ROTATE_LEFT);
 		rotateLeft_.addActionListener(this);
-		rotateLeft_.addKeyListener(JKeyListener.getInstance());
 		rotateLeft_.setLocation(12, 133);
 		rotateLeft_.setSize(58,38);
 		add(rotateLeft_);
