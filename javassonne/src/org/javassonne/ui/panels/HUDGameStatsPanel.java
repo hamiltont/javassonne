@@ -88,6 +88,8 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 				this, "endGame");
 		NotificationManager.getInstance().addObserver(Notification.END_TURN,
 				this, "endTurn");
+		NotificationManager.getInstance().addObserver(Notification.BEGIN_TURN,
+				this, "beginTurn");
 	}
 
 	public void endGame(Notification n) {
@@ -102,7 +104,13 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
 		
 		// move the selected player focus background
-		focus_.setLocation(0, 27 + currentPlayer_ * 28);
+		focus_.setLocation(0, 27 + currentPlayer_ * 28);	
+	}
+	
+	public void beginTurn(Notification n) {
+		// iterate through all the players and make sure their scores are valid
+		for (int ii = 0; ii < players_.size(); ii++)
+			scores_.get(ii).setText(String.valueOf(players_.get(ii).getScore()));
 	}
 
 	// Overloaded the add() method to bind a key listener to any elements placed

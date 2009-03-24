@@ -142,6 +142,8 @@ public class BoardController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
+		NotificationManager.getInstance().sendNotification(Notification.SCORE_TURN, tempLocationIter_);
+		
 		tempPlacedMeeple_ = null;
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;

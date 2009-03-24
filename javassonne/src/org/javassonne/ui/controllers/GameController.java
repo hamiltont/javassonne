@@ -18,6 +18,7 @@
 
 package org.javassonne.ui.controllers;
 
+import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,16 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.javassonne.algorithms.RegionsCalc;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Meeple;
 import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileDeck;
+import org.javassonne.model.TileFeature;
 import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
@@ -101,6 +106,7 @@ public class GameController {
 		n.addObserver(Notification.LOAD_GAME, this, "loadGame");
 		n.addObserver(Notification.SAVE_GAME, this, "saveGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
+		n.addObserver(Notification.SCORE_TURN, this, "scoreTurn");
 		n.addObserver(Notification.QUIT, this, "quitGame");
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
@@ -226,8 +232,42 @@ public class GameController {
 		// We want to advance the turn and change current player.
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
 		NotificationManager.getInstance().sendNotification(Notification.SET_CURRENT_PLAYER, currentPlayer_);
+
+	}
+
+	public void scoreTurn(Notification n){
+		TileBoardIterator iter = (TileBoardIterator)n.argument();
+		Point p = iter.getLocation();
 		
-		beginTurn();
+		RegionsCalc c = new RegionsCalc(deck_.tileFeatureBindings());
+		for (Tile.Region r : Tile.Region.values()){
+			c.traverseRegion(iter, r);
+			if (c.getRegionCompletion(iter.getLocation(), r)){
+				scoreFeature(c.getsizeOfRegion(p, r), c.getMeepleList(p, r), iter.current().featureInRegion(r));
+			}
+		}
+		
+		beginTurn();		
+	}
+	
+	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
+			TileFeature regionFeatureType) {
+		
+		int counts[] = new int[players_.size()];
+		int maxCount = 0;
+		for (Meeple m : regionMeeple){
+			counts[m.getPlayer()] += 1;
+			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
+		}
+		
+		for (int ii = 0; ii < players_.size(); ii++){
+			if (counts[ii] == maxCount){
+				
+				// add to their score
+				players_.get(ii).shiftScore(regionSize);
+				
+			}
+		}
 	}
 
 	/**
