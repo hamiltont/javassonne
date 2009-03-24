@@ -131,23 +131,23 @@ public class TileMapBoard implements TileBoard {
 				bottom = null;
 		
 			if (left != null && !tileFeatureBindings_.featuresBind(left
-							.featureIdentifierInRegion(Region.Right), tile
-							.featureIdentifierInRegion(Region.Left)))
+							.featureInRegion(Region.Right), tile
+							.featureInRegion(Region.Left)))
 				return false;
 			// iterate up and check if features match
 			if (top != null && !tileFeatureBindings_.featuresBind(top
-							.featureIdentifierInRegion(Region.Bottom), tile
-							.featureIdentifierInRegion(Region.Top)))
+							.featureInRegion(Region.Bottom), tile
+							.featureInRegion(Region.Top)))
 				return false;
 			// iterate right and check if features match
 			if (right != null && !tileFeatureBindings_.featuresBind(right
-							.featureIdentifierInRegion(Region.Left), tile
-							.featureIdentifierInRegion(Region.Right)))
+							.featureInRegion(Region.Left), tile
+							.featureInRegion(Region.Right)))
 				return false;
 			// iterate down and check if features match
 			if (bottom != null && !tileFeatureBindings_.featuresBind(bottom
-							.featureIdentifierInRegion(Region.Top), tile
-							.featureIdentifierInRegion(Region.Bottom)))
+							.featureInRegion(Region.Top), tile
+							.featureInRegion(Region.Bottom)))
 				return false;
 			// make sure at least one of the adjacent tiles exists
 			if (left == null && top == null && right == null && bottom == null)

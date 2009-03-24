@@ -79,6 +79,7 @@ public class TileSerializer {
 				xml.append(line + "\n");
 
 			TileSet set = (TileSet) xstream.fromXML(xml.toString());
+			set.associateFeaturesWithTiles();
 			set.loadTileImages();
 			return set;
 
