@@ -47,10 +47,9 @@ public class RegionsCalc {
 		marked_ = new HashMap<Point, HashMap<Tile.Region, Integer>>();
 	}
 
-	public int traverseRegion(TileBoardIterator iter, Tile.Region reg,
-			List<Meeple> meeps) {
+	public int traverseRegion(TileBoardIterator iter, Tile.Region reg) {
 		HashMap<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
-		meeps.clear();
+		ArrayList<Meeple> meeps = new ArrayList<Meeple>();
 		traverseRegion(iter, reg, meeps, list);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
@@ -130,6 +129,19 @@ public class RegionsCalc {
 			return -1;
 		
 		return temp;
+	}
+	
+	public List<Meeple> getMeepleList(Point loc, Tile.Region reg)
+	{
+		ArrayList<Meeple> returnVal = new ArrayList<Meeple>();
+		HashMap<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
+		if (tileRegions == null)
+			return returnVal;
+		List<Meeple> temp = tileRegions.get(reg);
+		if (temp == null)
+			return returnVal;
+		returnVal.addAll(tileRegions.get(reg));
+		return returnVal;
 	}
 
 	// Keeps track of touched locations
