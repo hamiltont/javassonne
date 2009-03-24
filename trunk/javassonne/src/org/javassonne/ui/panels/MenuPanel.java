@@ -67,16 +67,21 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 				new Point(100, 95), generalButtons_);
 		addButtonToPanel("images/menu_new_multiplayer_game.jpg", Notification.NEW_NW_GAME,
 				new Point(100, 140), generalButtons_);
-		addButtonToPanel("images/menu_load_game.jpg", Notification.LOAD_GAME,
+		addButtonToPanel("images/menu_show_instructions.jpg", Notification.TOGGLE_INSTRUCTIONS,
 				new Point(100, 185), generalButtons_);
+		addButtonToPanel("images/menu_load_game.jpg", Notification.LOAD_GAME,
+				new Point(100, 230), generalButtons_);
 		addButtonToPanel("images/menu_quit.jpg", Notification.QUIT,
-				new Point(100, 245), generalButtons_);
-
+				new Point(100, 275), generalButtons_);
+		
+		
 		// add the buttons to the inGame buttons panel
-		addButtonToPanel("images/menu_save_game.jpg", Notification.SAVE_GAME,
+		addButtonToPanel("images/menu_show_instructions.jpg", Notification.TOGGLE_INSTRUCTIONS,
 				new Point(100, 105), inGameButtons_);
-		addButtonToPanel("images/menu_end_game.jpg", Notification.ATTEMPT_END_GAME,
+		addButtonToPanel("images/menu_save_game.jpg", Notification.SAVE_GAME,
 				new Point(100, 150), inGameButtons_);
+		addButtonToPanel("images/menu_end_game.jpg", Notification.ATTEMPT_END_GAME,
+				new Point(100, 195), inGameButtons_);
 		addButtonToPanel("images/menu_resume_game.jpg", null, new Point(100,
 				240), inGameButtons_);
 

@@ -26,45 +26,43 @@ import javax.swing.JOptionPane;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.DisplayHelper;
 
-public class HUDShowInstructionsPanel extends AbstractHUDPanel implements MouseListener {
+public class HUDShowInstructionsPanel extends AbstractHUDPanel implements
+		MouseListener {
 
 	public HUDShowInstructionsPanel() {
 		setOpaque(false);
 		setVisible(true);
 		setSize(448, 44);
-		addMouseListener(this);
-		
-		// Listen for a notification from the tile being dragged. If we 
+
+		// Listen for a notification from the tile being dragged. If we
 		// receive this, we will close the instructions panel.
-		NotificationManager.getInstance().addObserver(Notification.TILE_DROPPED,
-				this, "tileDropped");
+		NotificationManager.getInstance().addObserver(
+				Notification.TILE_DROPPED, this, "tileDropped");
 
 		// Subscribe for notifications from the controller so we know when to
 		// update ourselves!
-		NotificationManager.getInstance().addObserver(
-				Notification.END_GAME, this, "endGame");
-		
+		NotificationManager.getInstance().addObserver(Notification.END_GAME,
+				this, "endGame");
+
 		setBackgroundImagePath("images/hud_show_instructions.png");
 	}
-	
-	public void tileDropped(Notification n)
-	{
+
+	public void tileDropped(Notification n) {
 		fadeOut();
-		
+
 		// Unsubscribe from notifications once the game has ended
 		NotificationManager.getInstance().removeObserver(this);
 	}
-	
+
 	public void endGame(Notification n) {
-		//close ourselves
+		// close ourselves
 		close();
 	}
-	
+
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		openURL("http://www.fwtwr.com/fwtwr/carcassonne/rules.asp");
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_INSTRUCTIONS);
 	}
 
 	public void mouseEntered(MouseEvent e) {
