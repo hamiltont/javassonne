@@ -21,7 +21,6 @@ package org.javassonne.networking;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -37,6 +36,8 @@ import org.javassonne.networking.impl.RemoteHost;
 import org.javassonne.networking.impl.RemotingUtils;
 import org.springframework.remoting.RemoteLookupFailureException;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * Because this guy keeps track of all known hosts, he is also responsible for
  * sending global chat messages to them. HostMonitor keeps an internal cache of
@@ -50,6 +51,7 @@ public class HostMonitor {
 	private List<String> hostURIs_;
 	private List<RemoteHost> hostList_;
 	private static HostMonitor instance_ = null;
+	private XStream xStream_;
 
 	private HostMonitor() {
 		// Using service discovery service
@@ -60,6 +62,7 @@ public class HostMonitor {
 
 		hostList_ = new ArrayList<RemoteHost>();
 		hostURIs_ = new ArrayList<String>();
+		xStream_ = new XStream();
 
 		// We will handle sending chats to all known hosts
 		NotificationManager.getInstance().addObserver(
@@ -85,7 +88,8 @@ public class HostMonitor {
 			RemoteHost next = it.next();
 			Notification recvMessage = new Notification(
 					Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
-			next.receiveNotification(recvMessage);
+			String serializedNotification = xStream_.toXML(recvMessage);
+			next.receiveNotification(serializedNotification);
 		}
 	}
 
