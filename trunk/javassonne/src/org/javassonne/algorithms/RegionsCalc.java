@@ -45,35 +45,34 @@ public class RegionsCalc {
 	public RegionsCalc(TileFeatureBindings tfbRef) {
 		tileFeatureBindings_ = tfbRef;
 		marked_ = new HashMap<Point, HashMap<Tile.Region, Integer>>();
+		globalMeep_ = new HashMap<Point, HashMap<Tile.Region, List<Meeple>>>();
 	}
 
-	public int traverseRegion(TileBoardIterator iter, Tile.Region reg) {
+	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
 		HashMap<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
 		ArrayList<Meeple> meeps = new ArrayList<Meeple>();
-		traverseRegion(iter, reg, meeps, list);
+		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
 			globalMeep_.put(p, new HashMap<Tile.Region, List<Meeple>>());
+			isComplete_.put(p, new HashMap<Tile.Region, Boolean>());
 			for (Tile.Region r : list.get(p)) {
 				marked_.get(p).put(r, total);
 				globalMeep_.get(p).put(r, meeps);
+				isComplete_.get(p).put(r, returnVal);
 			}
 		}
-		//Algorithm has already been run
-		if (total == 0){
-			total = sizeOfRegion(iter.getLocation(), reg);
-			meeps.addAll(globalMeep_.get(iter.getLocation()).get(reg));
-		}
-		return total;
+		return;
 
 	}
 
-	private void traverseRegion(TileBoardIterator iter, Tile.Region reg,
-			List<Meeple> meeps, HashMap<Point, ArrayList<Tile.Region>> list) {
+	private boolean traverseRegion(TileBoardIterator iter, Tile.Region reg,
+			List<Meeple> meeps, HashMap<Point, ArrayList<Tile.Region>> list,
+			boolean returnVal) {
 		if (iter.current() == null)
-			return;
-		if (sizeOfRegion(iter.getLocation(), reg) != -1)
-			return;
+			return false;
+		if (getsizeOfRegion(iter.getLocation(), reg) != -1)
+			return returnVal;
 		if (marked_.get(iter.getLocation()) == null)
 			marked_.put(iter.getLocation(),
 							new HashMap<Tile.Region, Integer>());
@@ -89,50 +88,56 @@ public class RegionsCalc {
 		// traverse to next tile
 		if (reg.compareTo(Tile.Region.Left) == 0) {
 			newReg = Tile.Region.Right;
-			traverseRegion(((TileBoardGenIterator) iter).leftCopy(), newReg,
-					meeps, list);
+			returnVal = returnVal
+					&& traverseRegion(((TileBoardGenIterator) iter).leftCopy(),
+							newReg, meeps, list, returnVal);
 		} else if (reg.compareTo(Tile.Region.Right) == 0) {
 			newReg = Tile.Region.Left;
-			traverseRegion(((TileBoardGenIterator) iter).rightCopy(), newReg,
-					meeps, list);
+			returnVal = returnVal
+					&& traverseRegion(
+							((TileBoardGenIterator) iter).rightCopy(), newReg,
+							meeps, list, returnVal);
 		} else if (reg.compareTo(Tile.Region.Top) == 0) {
 			newReg = Tile.Region.Bottom;
-			traverseRegion(((TileBoardGenIterator) iter).upCopy(), newReg,
-					meeps, list);
+			returnVal = returnVal
+					&& traverseRegion(((TileBoardGenIterator) iter).upCopy(),
+							newReg, meeps, list, returnVal);
 		} else if (reg.compareTo(Tile.Region.Bottom) == 0) {
 			newReg = Tile.Region.Top;
-			traverseRegion(((TileBoardGenIterator) iter).downCopy(), newReg,
-					meeps, list);
+			returnVal = returnVal
+					&& traverseRegion(((TileBoardGenIterator) iter).downCopy(),
+							newReg, meeps, list, returnVal);
 		}
 		// traverse to other regions in Tile
 		for (Tile.Region r : Tile.Region.values()) {
-			if (tileFeatureBindings_.featuresBind(iter.current()
+			if ((tileFeatureBindings_.featuresBind(iter.current()
 					.featureIdentifierInRegion(r), iter.current()
-					.featureIdentifierInRegion(reg))) {
-				traverseRegion(iter, r, meeps, list);
+					.featureIdentifierInRegion(reg)))
+					&& !iter.current().featureInRegion(r).endsTraversal) {
+				returnVal = returnVal
+						&& traverseRegion(iter, r, meeps, list, returnVal);
 			}
 		}
 
-		return;
+		return returnVal;
 
 	}
 
 	// If traverseRegion has touched given region of Tile at given location
 	// This function returns the size of the region, else, returns -1
-	public Integer sizeOfRegion(Point loc, Tile.Region reg) {
+	public Integer getsizeOfRegion(Point loc, Tile.Region reg) {
 		HashMap<Tile.Region, Integer> tileRegions = marked_.get(loc);
 		if (tileRegions == null)
 			return -1;
-		
+
 		Integer temp = tileRegions.get(reg);
 		if (temp == null)
 			return -1;
-		
+
 		return temp;
 	}
-	
-	public List<Meeple> getMeepleList(Point loc, Tile.Region reg)
-	{
+
+	public List<Meeple> getMeepleList(Point loc, Tile.Region reg) {
 		ArrayList<Meeple> returnVal = new ArrayList<Meeple>();
 		HashMap<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
 		if (tileRegions == null)
@@ -144,9 +149,20 @@ public class RegionsCalc {
 		return returnVal;
 	}
 
+	public boolean getRegionCompletion(Point loc, Tile.Region reg) {
+		HashMap<Tile.Region, Boolean> tileRegions = isComplete_.get(loc);
+		if (tileRegions == null)
+			return true;
+		Boolean temp = tileRegions.get(reg);
+		if (temp == null)
+			return true;
+		return temp;
+	}
+
 	// Keeps track of touched locations
 	private HashMap<Point, HashMap<Tile.Region, Integer>> marked_;
 	private HashMap<Point, HashMap<Tile.Region, List<Meeple>>> globalMeep_;
+	private HashMap<Point, HashMap<Tile.Region, Boolean>> isComplete_;
 
 	private TileFeatureBindings tileFeatureBindings_;
 
