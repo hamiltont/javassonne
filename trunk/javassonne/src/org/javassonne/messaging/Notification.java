@@ -81,6 +81,7 @@ public class Notification {
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
+	public static final String SCORE_TURN = "NotificationScoreTurn";
 	public static final String SET_CURRENT_PLAYER = "SetCurrentPlayer";
 	
 	public static final String SEND_PRIVATE_CHAT = "SendPrivateChat";
