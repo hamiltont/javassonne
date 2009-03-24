@@ -50,16 +50,21 @@ public class RegionsCalc {
 	public int traverseRegion(TileBoardIterator iter, Tile.Region reg,
 			List<Meeple> meeps) {
 		HashMap<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
+		meeps.clear();
 		traverseRegion(iter, reg, meeps, list);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
+			globalMeep_.put(p, new HashMap<Tile.Region, List<Meeple>>());
 			for (Tile.Region r : list.get(p)) {
 				marked_.get(p).put(r, total);
+				globalMeep_.get(p).put(r, meeps);
 			}
 		}
 		//Algorithm has already been run
-		if (total == 0)
+		if (total == 0){
 			total = sizeOfRegion(iter.getLocation(), reg);
+			meeps.addAll(globalMeep_.get(iter.getLocation()).get(reg));
+		}
 		return total;
 
 	}
@@ -129,6 +134,7 @@ public class RegionsCalc {
 
 	// Keeps track of touched locations
 	private HashMap<Point, HashMap<Tile.Region, Integer>> marked_;
+	private HashMap<Point, HashMap<Tile.Region, List<Meeple>>> globalMeep_;
 
 	private TileFeatureBindings tileFeatureBindings_;
 
