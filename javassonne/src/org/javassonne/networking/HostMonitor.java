@@ -21,13 +21,12 @@ package org.javassonne.networking;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
 
 import javax.jmdns.JmDNS;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.networking.impl.HostMonitorHostAdder;
+import org.javassonne.networking.impl.CachedHost;
 import org.javassonne.networking.impl.HostMonitorListener;
 import org.javassonne.networking.impl.JmDNSSingleton;
 import org.javassonne.networking.impl.RemoteHost;
@@ -47,7 +46,8 @@ public class HostMonitor {
 	// Keep a local cache of URI's so we do not have to
 	// continually query all the hosts
 	private List<String> hostURIs_;
-	private List<RemoteHost> hostList_;
+	private List<RemoteHost> realHostList_;
+	private List<CachedHost> cachedHostList_;
 	private static HostMonitor instance_ = null;
 	private XStream xStream_;
 
@@ -58,7 +58,8 @@ public class HostMonitor {
 				.addServiceListener("_rmi._tcp.local.",
 						new HostMonitorListener());
 
-		hostList_ = new ArrayList<RemoteHost>();
+		realHostList_ = new ArrayList<RemoteHost>();
+		cachedHostList_ = new ArrayList<CachedHost>();
 		hostURIs_ = new ArrayList<String>();
 		xStream_ = new XStream();
 
@@ -75,14 +76,18 @@ public class HostMonitor {
 		return instance_;
 	}
 
-	public List<RemoteHost> getHosts() {
-		return hostList_;
+	public List<CachedHost> getHosts() {
+		return cachedHostList_;
+	}
+	
+	public List<String> getHostURIs() {
+		return hostURIs_;
 	}
 
 	public void sendOutGlobalChat(Notification sendMessage) {
 		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT,
 		// and send to all the known remote hosts
-		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
+		for (Iterator<RemoteHost> it = realHostList_.iterator(); it.hasNext();) {
 			RemoteHost next = it.next();
 			Notification recvMessage = new Notification(
 					Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
@@ -92,16 +97,76 @@ public class HostMonitor {
 	}
 
 	public int numberOfHosts() {
-		return hostList_.size();
+		return realHostList_.size();
 	}
 
+	public void addHostNoConfirmation(String hostURI) {
+		RemoteHost h = attemptToResolveHost(hostURI);
+		if (h == null)
+			return;
+
+		// Add them for ourselves
+		realHostList_.add(h);
+		cachedHostList_.add(new CachedHost(h));
+		hostURIs_.add(hostURI);
+	}
+	
+	public void addHostNoPropagation(String hostURI) {
+		RemoteHost h = attemptToResolveHost(hostURI);
+		if (h == null)
+			return;
+
+		// Request they add us without confirming 
+		h.addHostNoConfirmation(LocalHost.getURI());
+		
+		// Add them for ourselves
+		realHostList_.add(h);
+		cachedHostList_.add(new CachedHost(h));
+		hostURIs_.add(hostURI);
+	}
+
+
 	public void addHost(String hostURI) {
+		// TODO - incorporate this code from earlier
+		if (hostURIs_.contains(hostURI))
+			return;
+
 		// Avoid expensive host resolution if we already know this
 		// host
 		if (hostURIs_.contains(hostURI))
 			return;
 
+		// Check if it is the localhost
+		if (hostURI.equals(LocalHost.getURI())) {
+			String info = "HostMonitor: Found localhost broadcast at "
+					+ hostURI;
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_INFO, info);
+
+			return;
+		}
+
 		// Try to resolve host
+		RemoteHost h = attemptToResolveHost(hostURI);
+		if (h == null)
+			return;
+
+		// Add them for ourselves
+		realHostList_.add(h);
+		cachedHostList_.add(new CachedHost(h));
+		hostURIs_.add(hostURI);
+
+		// Request they add us without confirming
+		h.addHostNoConfirmation(LocalHost.getURI());
+
+		// Request all our known hosts to add them,
+		// without propagating the message farther
+		for (Iterator<RemoteHost> it = realHostList_.iterator(); it.hasNext();)
+			it.next().addHostNoPropagation(hostURI);
+	}
+
+	private RemoteHost attemptToResolveHost(String hostURI) {
 		RemoteHost h = null;
 		try {
 			h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
@@ -112,7 +177,7 @@ public class HostMonitor {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, info);
-			return;
+			return null;
 		} catch (RuntimeException e) {
 			String err = "HostMonitor: A RuntimeException occurred while adding a host";
 			err += "\n" + e.getMessage();
@@ -122,34 +187,30 @@ public class HostMonitor {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_ERROR, err);
+			return null;
 		}
-
-		// TODO - this might be called multiple times if a remoteHost notifies
-		// us of ourself, so we should probably not fire a notification here
-		if (hostURI.equals(LocalHost.getURI())) {
-			String info = "HostMonitor: Found localhost broadcast at "
-					+ hostURI;
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-		} else {
-			hostList_.add(h);
-			hostURIs_.add(hostURI);
-			
-			Timer t = new Timer("HostMonitorHostAdder");
-			t.schedule(new HostMonitorHostAdder(hostURIs_, h), 0);
-		}
+		return h;
 	}
 
+	// TODO - make sure these remove calls work
 	protected void removeHost(String hostURI) {
 		if (hostURIs_.contains(hostURI) == false)
 			return;
 
-		// Remove from hostList
-		for (Iterator<RemoteHost> it = hostList_.iterator(); it.hasNext();) {
+		// Remove from real hostList
+		for (Iterator<RemoteHost> it = realHostList_.iterator(); it.hasNext();) {
 			RemoteHost next = it.next();
 			if (next.getURI().equals(hostURI)) {
-				hostList_.remove(next);
+				realHostList_.remove(next);
+				break;
+			}
+		}
+		
+		// Remove from cachedHostList
+		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();) {
+			CachedHost next = it.next();
+			if (next.getURI().equals(hostURI)) {
+				cachedHostList_.remove(next);
 				break;
 			}
 		}
