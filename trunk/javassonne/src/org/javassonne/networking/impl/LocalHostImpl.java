@@ -247,9 +247,23 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */	
-	public void addHosts(List<String> hostURIs) {
-		for(Iterator<String> it = hostURIs.iterator(); it.hasNext();)
-			HostMonitor.getInstance().addHost(it.next());
+	public void addHost(String hostURI) {
+		HostMonitor.getInstance().addHost(hostURI);
+		
+	}
+
+	/**
+	 * @see org.javassonne.networking.impl.RemoteHost
+	 */	
+	public void addHostNoConfirmation(String hostURI) {
+		HostMonitor.getInstance().addHostNoConfirmation(hostURI);
+	}
+
+	/**
+	 * @see org.javassonne.networking.impl.RemoteHost
+	 */	
+	public void addHostNoPropagation(String hostURI) {
+		HostMonitor.getInstance().addHostNoPropagation(hostURI);
 	}
 
 }

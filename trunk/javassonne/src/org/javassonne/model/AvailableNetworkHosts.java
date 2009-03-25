@@ -18,7 +18,6 @@
 
 package org.javassonne.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,23 +29,25 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.javassonne.networking.HostMonitor;
-import org.javassonne.networking.impl.RemoteHost;
+import org.javassonne.networking.impl.CachedHost;
 
 // It would be nice to make this use reflection to figure out the available "get___" methods on RemoteHost, 
 //    and naturally update the table using the available methods
 
+/**
+ * Keeps track of all hosts we know about, and keeps caches of their information
+ * internally
+ * 
+ * Updates itself automatically
+ */
 public class AvailableNetworkHosts extends TimerTask implements TableModel {
 
-	private ArrayList<RemoteHost> tableData_;
-	private ArrayList<String> hostURIs_;				// Allows us to see if we already know about
-														//   a host without having to send a redundant 
-														//   network query
+	private List<CachedHost> tableData_;
 	private ArrayList<TableModelListener> observers_;
 
 	public AvailableNetworkHosts() {
-		tableData_ = new ArrayList<RemoteHost>();
+		tableData_ = new ArrayList<CachedHost>();
 		observers_ = new ArrayList<TableModelListener>();
-		hostURIs_ = new ArrayList<String>();
 		updateData();
 
 		// Schedule ourselves to update
@@ -102,43 +103,26 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 	public void removeTableModelListener(TableModelListener l) {
 		observers_.remove(l);
 	}
-	
 
 	// Run ourselves as a TimerTask so we update the model occasionally
 	public void run() {
-		try {
-			updateData();
-		} catch (Exception e) {
-			System.out.println("gotcha");
-		}
+		updateData();
 	}
 
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 	}
 
-	// TODO check that the call to contains actually works
 	private void updateData() {
-		List<RemoteHost> hosts = HostMonitor.getInstance().getHosts();
-
-		boolean modelChanged = false;
-		for (Iterator<RemoteHost> it = hosts.iterator(); it.hasNext();) {
-			RemoteHost next = it.next();
-			String nextURI = next.getURI();
-			if (hostURIs_.contains(nextURI) == false) {
-				tableData_.add(next);
-				hostURIs_.add(nextURI);
-				modelChanged = true;
-			}
+		if (tableData_.equals(HostMonitor.getInstance().getHosts()) == false) {
+			tableData_ = HostMonitor.getInstance().getHosts();
+			notifyListeners();
 		}
+	}
 
-		// If the model changed, let all observers know
-		if (modelChanged) {
-			for (Iterator<TableModelListener> it = observers_.iterator(); it
-					.hasNext();) {
-				TableModelListener next = it.next();
-				TableModelEvent e = new TableModelEvent(this);
-				next.tableChanged(e);
-			}
-		}
+	private void notifyListeners() {
+		TableModelEvent event = new TableModelEvent(this);
+		for (Iterator<TableModelListener> it = observers_.iterator(); it
+				.hasNext();)
+			it.next().tableChanged(event);
 	}
 }

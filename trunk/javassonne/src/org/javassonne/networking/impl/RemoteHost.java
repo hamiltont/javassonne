@@ -45,13 +45,32 @@ public interface RemoteHost {
 	public void addClient(String clientURI);
 
 	/**
-	 * Used to notify this host of other available hosts on the network. This
-	 * host should see if it can reach the other hosts, and add them to its list
-	 * of available hosts if it can
+	 * Adds a host, requests that that host add us without sending a
+	 * confirmation addHost call, and then sends the new hosts to all of our
+	 * immediately connected hosts, requesting that none of them propagate the
+	 * hostURI further
 	 * 
-	 * @param hostURIs the URI's of the hosts that are known
+	 * @param hostURI
 	 */
-	public void addHosts(List<String> hostURIs);
+	public void addHost(String hostURI);
+
+	/**
+	 * Used to request that we add a host without also requesting that they add
+	 * us. This is used when another host discovers us, and they would like to
+	 * ensure that we know about them (aka that the line of sight is two way)
+	 * 
+	 * @param hostURI
+	 */
+	public void addHostNoConfirmation(String hostURI);
+
+	/**
+	 * This is used to request that we try to connect to a host (also making
+	 * sure they see us by performing a addNoConfirmation call on them). This
+	 * implements a version of a limited query flooding approach.
+	 * 
+	 * @param hostURI
+	 */
+	public void addHostNoPropagation(String hostURI);
 
 	/**
 	 * If the client is currently considered to be connected to this host, this

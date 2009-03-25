@@ -18,36 +18,37 @@
 
 package org.javassonne.networking.impl;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimerTask;
+import org.javassonne.networking.impl.RemoteHost.MODE;
 
-import org.javassonne.networking.HostMonitor;
-
-/**
- * Used by the host to request that sometime in the background, the HostMonitor
- * tries to add all of these hosts
- * 
- * @author Hamilton Turner
- * 
- */
-public class HostMonitorHostAdder extends TimerTask {
-
-	private List<String> hostURIs_;
-	private RemoteHost host_;
-
-	public HostMonitorHostAdder(List<String> hostURIs, RemoteHost h) {
-		hostURIs_ = hostURIs;
-		host_ = h;
+public class CachedHost {
+	private String name_;
+	private String uri_;
+	private MODE status_;
+	
+	public CachedHost(RemoteHost host) {
+		name_ = host.getName();
+		uri_ = host.getURI();
+		status_ = host.getStatus();
+	}
+	
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name_;
 	}
 
-	public void run() {
-		// Attempt to add the hosts
-		host_.addHosts(hostURIs_);
-
-		// Ensure this timer task does not run again
-		cancel();
-
+	/**
+	 * @return the desc_
+	 */
+	public String getURI() {
+		return uri_;
 	}
 
+	/**
+	 * @return the mode_
+	 */
+	public MODE getStatus() {
+		return status_;
+	}
 }
