@@ -36,7 +36,11 @@ public class TileFeatureBindings {
 	}
 	
 	public Boolean featuresBind(TileFeature feature1, TileFeature feature2) {
-		if (bindings_.containsKey(feature1.identifier))
+		if (feature1 == null && feature2 == null)
+			return true;
+		else if (feature1 == null || feature2 == null)
+			return false;
+		else if (bindings_.containsKey(feature1.identifier))
 			return bindings_.get(feature1.identifier).contains(feature2.identifier);
 		else
 			return false;

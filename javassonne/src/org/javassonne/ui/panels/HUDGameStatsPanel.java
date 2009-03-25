@@ -54,6 +54,9 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		// store the array of players locally
 		players_ = players;
 		currentPlayer_ = 0;
+		names_ = new ArrayList<JLabel>();
+		scores_ = new ArrayList<JLabel>();
+		meeple_ = new ArrayList<JMeepleCount>();
 		
 		// create the labels and stuff for each of the player's stats
 		int y = 28;
@@ -62,11 +65,13 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 			name.setLocation(6, y);
 			name.setSize(135, 22);
 			add(name);
+			names_.add(name);
 
 			JLabel score = new JLabel(String.valueOf(p.getScore()));
 			score.setLocation(144, y);
 			score.setSize(65, 22);
 			add(score);
+			scores_.add(score);
 
 			JMeepleCount meeple = new JMeepleCount(p.getMeepleColor().value);
 			meeple.setLocation(214, y);
@@ -74,6 +79,7 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 			add(meeple);
 			meeple.setCount(7);
 			y += 28;
+			meeple_.add(meeple);
 		}
 		// create the focus thing that makes the selected player blue
 		focus_ = new JLabel(new ImageIcon("images/hud_stats_focus_background.png"));
