@@ -116,8 +116,8 @@
         <string>F</string>
         <string>F</string>
         <string>F</string>
-        <string>F</string>
         <string>FM</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -159,9 +159,9 @@
       <features__>
         <string>F</string>
         <string>N</string>
-        <string>F</string>
-        <string>N</string>
         <string>FM</string>
+        <string>N</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -271,7 +271,7 @@
         <string>F</string>
         <string>F</string>
         <string>N</string>
-        <string>F</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -381,7 +381,7 @@
         <string>F</string>
         <string>N</string>
         <string>F</string>
-        <string>F</string>
+        <string>N</string>
       </features__>
       <farms__>
         <int>0</int>
@@ -685,13 +685,6 @@
       <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
-      <name>Nothing</name>
-      <identifier>N</identifier>
-      <multiplier>0</multiplier>
-      <actsAsWall>false</actsAsWall>
-      <endsTraversal>true</endsTraversal>
-    </TileFeature>
-    <TileFeature>
       <name>Cloister</name>
       <identifier>C</identifier>
       <multiplier>0</multiplier>
@@ -744,12 +737,6 @@
           <string>F</string>
           <string>FC</string>
           <string>FM</string>
-        </list>
-      </entry>
-      <entry>
-        <string>N</string>
-        <list>
-          <string>N</string>
         </list>
       </entry>
     </bindings__>

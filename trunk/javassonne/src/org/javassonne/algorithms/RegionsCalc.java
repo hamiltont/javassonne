@@ -55,6 +55,7 @@ public class RegionsCalc {
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
+			marked_.put(p, new HashMap<Tile.Region, Integer>());
 			globalMeep_.put(p, new HashMap<Tile.Region, List<Meeple>>());
 			isComplete_.put(p, new HashMap<Tile.Region, Boolean>());
 			for (Tile.Region r : list.get(p)) {
@@ -72,8 +73,62 @@ public class RegionsCalc {
 			boolean returnVal) {
 		if (iter.current() == null)
 			return false;
+		// else if current feature is null, quit
+		if (iter.current().featureInRegion(reg) == null)
+			return returnVal;
+		// else
 		if (getsizeOfRegion(iter.getLocation(), reg) != -1)
 			return returnVal;
+		// else
+		if (reg.equals(Tile.Region.Center)) {
+
+			// test for not null
+			if (iter.current().featureInRegion(reg) != null) {
+				// meeple?
+				Meeple meep1 = iter.current().meepleInRegion(reg);
+				if (meep1 != null)
+					meeps.add(meep1);
+				// addme to list
+				if (list.get(iter.getLocation()) == null)
+					list.put(iter.getLocation(), new ArrayList<Tile.Region>());
+				list.get(iter.getLocation()).add(reg);
+				// check for completion
+				TileBoardIterator left = ((TileBoardGenIterator) iter)
+						.leftCopy();
+				if (left.current() == null)
+					return false;
+				TileBoardIterator right = ((TileBoardGenIterator) iter)
+						.rightCopy();
+				if (right.current() == null)
+					return false;
+				TileBoardIterator up = ((TileBoardGenIterator) iter).upCopy();
+				if (up.current() == null)
+					return false;
+				TileBoardIterator down = ((TileBoardGenIterator) iter)
+						.downCopy();
+				if (down.current() == null)
+					return false;
+				// rotate 45 degrees clockwise and keep checking
+				left = ((TileBoardGenIterator) left).up();
+				if (left.current() == null)
+					return false;
+				right = ((TileBoardGenIterator) right).down();
+				if (right.current() == null)
+					return false;
+				up = ((TileBoardGenIterator) up).right();
+				if (up.current() == null)
+					return false;
+				down = ((TileBoardGenIterator) down).left();
+				if (down.current() == null)
+					return false;
+				// never found null tile, so monastery is complete
+				return true;
+			}
+			// center feature is null - pass back returnVal
+			return returnVal;
+
+		}
+		// else{
 		if (marked_.get(iter.getLocation()) == null)
 			marked_
 					.put(iter.getLocation(),
@@ -111,7 +166,8 @@ public class RegionsCalc {
 					list, returnVal)
 					&& returnVal;
 		}
-		// traverse to other regions in Tile
+		// if feature not null (farm) and does not end traversal
+		// traverse to other regions in Tile, except center
 		if (!iter.current().featureInRegion(reg).endsTraversal) {
 			for (Tile.Region r : Tile.Region.values()) {
 				if (tileFeatureBindings_.featuresBind(iter.current()
@@ -124,6 +180,7 @@ public class RegionsCalc {
 		}
 
 		return returnVal;
+		// }
 
 	}
 
@@ -146,9 +203,11 @@ public class RegionsCalc {
 		HashMap<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
 		if (tileRegions == null)
 			return returnVal;
+
 		List<Meeple> temp = tileRegions.get(reg);
 		if (temp == null)
 			return returnVal;
+
 		returnVal.addAll(tileRegions.get(reg));
 		return returnVal;
 	}
@@ -156,10 +215,10 @@ public class RegionsCalc {
 	public boolean getRegionCompletion(Point loc, Tile.Region reg) {
 		HashMap<Tile.Region, Boolean> tileRegions = isComplete_.get(loc);
 		if (tileRegions == null)
-			return true;
+			return false;
 		Boolean temp = tileRegions.get(reg);
 		if (temp == null)
-			return true;
+			return false;
 		return temp;
 	}
 
