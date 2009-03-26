@@ -19,6 +19,8 @@
 package org.javassonne.networking.impl;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.jmdns.JmDNS;
 
@@ -31,7 +33,16 @@ public class JmDNSSingleton {
 	public static JmDNS getJmDNS() {
 		if (jmdns_ == null) {
 			try {
-				jmdns_ = JmDNS.create();
+				
+				try {
+					InetAddress localHost = InetAddress.getLocalHost();
+					jmdns_ = JmDNS.create(localHost);
+				} catch (UnknownHostException e1) {
+					// TODO - cleanup
+					e1.printStackTrace();
+					jmdns_ = JmDNS.create();
+				}
+				
 			} catch (IOException e) {
 				System.out
 						.println("An IOException occurred when creating jmdns");

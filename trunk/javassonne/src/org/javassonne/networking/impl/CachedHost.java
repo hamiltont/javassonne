@@ -18,9 +18,9 @@
 
 package org.javassonne.networking.impl;
 
-import org.javassonne.networking.impl.RemoteHost.MODE;
+import org.javassonne.networking.HostMonitor;
 
-public class CachedHost {
+public class CachedHost implements RemoteHost {
 	private String name_;
 	private String uri_;
 	private MODE status_;
@@ -50,5 +50,70 @@ public class CachedHost {
 	 */
 	public MODE getStatus() {
 		return status_;
+	}
+
+	public void addClient(String clientURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.addClient(clientURI);
+	}
+
+	public void addHost(String hostURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.addHost(hostURI);	
+	}
+
+	public void addHostNoConfirmation(String hostURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.addHostNoConfirmation(hostURI);
+	}
+
+	public void addHostNoPropagation(String hostURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.addHostNoPropagation(hostURI);
+	}
+
+	public boolean canClientsConnect() {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return false;
+		
+		return me.canClientsConnect();
+	}
+
+	public void receiveNotification(String serializedNotification) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.receiveNotification(serializedNotification);
+	}
+
+	public void receiveNotificationFromClient(String serializedNotification,
+			String clientURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.receiveNotificationFromClient(serializedNotification, clientURI);	
+	}
+
+	public void removeClient(String clientURI) {
+		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
+		if (me == null)
+			return;
+		
+		me.removeClient(clientURI);
 	}
 }
