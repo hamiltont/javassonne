@@ -256,6 +256,7 @@ public class GameController {
 		// Note: do not need to recheck iter because it was checked above
 		TileBoardGenIterator temp = new TileBoardGenIterator(iter);
 		c.traverseRegion(temp.right(), Tile.Region.Center);
+		//TODO: Change these to get the correct score (algorithm should do it)
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
 			scoreFeature(9, c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center), temp.current().featureInRegion(

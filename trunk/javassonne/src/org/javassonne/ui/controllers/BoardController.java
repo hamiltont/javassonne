@@ -142,6 +142,9 @@ public class BoardController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
+		NotificationManager.getInstance().sendNotification(
+				Notification.SCORE_TURN, tempLocationIter_);
+
 		tempPlacedMeeple_ = null;
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
@@ -190,9 +193,10 @@ public class BoardController {
 					for (Tile.Region region : Tile.Region.values()) {
 						List<Meeple> result;
 						r.traverseRegion(tempLocationIter_, region);
-						result = r.getMeepleList(tempLocationIter_.getLocation(), region);
-						if ((result.size() == 0) && 
-								(tempPlacedTile_.featureInRegion(region) != null))
+						result = r.getMeepleList(tempLocationIter_
+								.getLocation(), region);
+						if ((result.size() == 0)
+								&& (tempPlacedTile_.featureInRegion(region) != null))
 							currentRegionOptions_.add(region);
 					}
 
