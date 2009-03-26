@@ -241,7 +241,7 @@ public class HostMonitor {
 	public void removeHost(String name) {
 		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();) {
 			CachedHost next = it.next();
-			if (next.getName().equals(name)) {
+			if (name.contains(next.getName())) {
 				cachedHostList_.remove(next);
 				break;
 			}
