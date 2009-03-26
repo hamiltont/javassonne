@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -39,6 +40,7 @@ import org.javassonne.model.Player;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.controls.JPopUp;
 
 public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		ActionListener {
@@ -77,7 +79,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		labels_.setOpaque(false);
 		labels_.setLayout(null);
 		labels_.setAlignmentY(CENTER_ALIGNMENT);
-		
+
 		comboBoxes_ = new JPanel();
 		comboBoxes_.setOpaque(false);
 		comboBoxes_.setLayout(null);
@@ -154,8 +156,8 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		panel.add(label);
 	}
 
-	private void addComboBoxToPanel(Point location, ImageIcon[] colors, int selectedIndex,
-			JPanel panel) {
+	private void addComboBoxToPanel(Point location, ImageIcon[] colors,
+			int selectedIndex, JPanel panel) {
 		JComboBox comboBox = new JComboBox(colors);
 		comboBox.addActionListener(this);
 		comboBox.setLocation(location);
@@ -176,34 +178,58 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		return list;
 	}
 
-	public List<MeepleColor> getPlayerColors()
-	{
+	public List<MeepleColor> getPlayerColors() {
 		List<MeepleColor> list = new ArrayList<MeepleColor>();
-		
-		// for each Component/JComboBox in comboBoxes add the color selected to the list
+
+		// for each Component/JComboBox in comboBoxes add the color selected to
+		// the list
 		for (Component c : comboBoxes_.getComponents()) {
 			list.add(MeepleColor.values()[((JComboBox) c).getSelectedIndex()]);
 		}
-		
+
 		return list;
 	}
 
 	/*
 	 * Whenever a button is pressed in our panel, we want to send a notification
-	 * so the button press can be handled by the HUDController (and possibly
+	 * so the button press can be handled by the the controller (and possibly
 	 * elsewhere - the BoardController handles zoom in and zoom out). We've
 	 * wired things up so that each button sends a notification with the same
 	 * name as it's actionCommand.
 	 */
 	public void actionPerformed(ActionEvent e) {
-
-		if (e.getActionCommand().length() > 0)
+		if (e.getActionCommand().length() > 0) {
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
-		else {
+		} else {
 			// user pressed cancel
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		}
+	}
+
+	public boolean validateColors(List<MeepleColor> colors) {
+		int playerCount = 0;
+		List<MeepleColor> temp = colors;
+		
+		for (String s : getPlayerNames()) {
+			if (s.length() > 0 || playerCount < 2) {
+				playerCount++;
+			}
+		}
+
+		for (int i = 0; i < playerCount; i++) {
+			int count = 0;
+			for (int j = 0; j < playerCount; j++) {
+				if (colors.get(i).value == temp.get(j).value)
+					count++;
+			}
+
+			if (count > 1) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
