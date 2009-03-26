@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.ChatManager;
 import org.javassonne.ui.panels.LogPanel;
 
 public class JKeyListener extends JFrame implements KeyListener, ActionListener {
@@ -62,6 +63,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 	/** Capture key event */
 	public void keyReleased(KeyEvent e) {
 		keyCheck(e, "release");
+		ChatManager.KeyReleased(e);
 	}
 
 	/** Capture key event */
@@ -75,7 +77,7 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 	 *         position of key (ie: up, down)
 	 */
 	private void keyCheck(KeyEvent e, String keyStatus) {
-
+		
 		// Determine what type of event occurred
 		String keyString;
 		if (e.getID() == KeyEvent.KEY_TYPED) {

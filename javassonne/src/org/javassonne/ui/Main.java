@@ -21,6 +21,7 @@ package org.javassonne.ui;
 import org.javassonne.logger.LogWatcher;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.HostMonitor;
 import org.javassonne.ui.controllers.GameController;
 import org.javassonne.ui.panels.LogPanel;
 
@@ -30,6 +31,9 @@ public class Main {
 	public static void main(String args[]) {
 		// Create our LogWatcher
 		LogWatcher lw = new LogWatcher();		
+		
+		// Make sure our HostMonitor singleton is started
+		HostMonitor.getInstance();
 		
 		// create the application controller. This will handle starting a new
 		// game, etc...

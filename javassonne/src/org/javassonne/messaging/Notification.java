@@ -84,12 +84,16 @@ public class Notification {
 	public static final String SCORE_TURN = "NotificationScoreTurn";
 	public static final String SET_CURRENT_PLAYER = "SetCurrentPlayer";
 	
+	// Note that the RECV notifications will fire for local chat messages
 	public static final String SEND_PRIVATE_CHAT = "SendPrivateChat";
 	public static final String RECV_PRIVATE_CHAT = "RecvPrivateChat";
 	
 	public static final String SEND_GLOBAL_CHAT = "SendGlobalChat";
 	public static final String RECV_GLOBAL_CHAT = "RecvGlobalChat";
 
+	// Used to signal that the chat area on the map should be redrawn
+	public static final String CHAT_TEXT_CHANGED = "ChatTextChanged";
+	
 	// Local only:
 	public static final String DRAG_PANEL_RESET = "ResetDragPanel";
 	
