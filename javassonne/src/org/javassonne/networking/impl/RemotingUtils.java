@@ -9,9 +9,13 @@
  ******************************************************************************/
 package org.javassonne.networking.impl;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.rmi.server.RMISocketFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +32,13 @@ public class RemotingUtils {
 		try {
 			LOCAL_HOST = InetAddress.getLocalHost().getHostAddress();
 		} catch (Exception e) {
+		}
+		
+		try {
+			RMISocketFactory.setSocketFactory(new TimeoutFactory(500));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -175,5 +186,4 @@ public class RemotingUtils {
 			Class svcinterface) {
 		return lookupRMIService(LOCAL_HOST, DEFAULT_PORT, svcname, svcinterface);
 	}
-
 }
