@@ -151,41 +151,49 @@ public class GameController {
 	 *            The notification object sent from the NotificationManager.
 	 */
 	public void startGame(Notification n) {
-		// Game in progress!
-		gameInProgress_ = true;
-		NotificationManager.getInstance().sendNotification(
-				Notification.TOGGLE_MAIN_MENU);
-
 		playerData_ = (InputPlayerDataPanel) n.argument();
-		currentPlayer_ = 0;
-		loadPlayerData();
 
-		DisplayHelper.getInstance().remove(playerData_);
+		if (!playerData_.validateColors(playerData_.getPlayerColors())) {
+			JPopUp warning = new JPopUp("Each player must have a unique color");
+			warning.showMsg();
+		} else {
+			// Game in progress!
+			gameInProgress_ = true;
+			NotificationManager.getInstance().sendNotification(
+					Notification.TOGGLE_MAIN_MENU);
 
-		// Load all possible tiles
-		TileSerializer s = new TileSerializer();
-		TileSet set = s.loadTileSet("tilesets/standard.xml");
-		if (set == null) {
-			System.err.println("Tile set could not be found.");
-			System.exit(0);
+			currentPlayer_ = 0;
+			loadPlayerData();
+
+			DisplayHelper.getInstance().remove(playerData_);
+
+			// Load all possible tiles
+			TileSerializer s = new TileSerializer();
+			TileSet set = s.loadTileSet("tilesets/standard.xml");
+			if (set == null) {
+				System.err.println("Tile set could not be found.");
+				System.exit(0);
+			}
+
+			// Populate the set into the deck. Note: you can have multiple
+			// copies of
+			// a tile in a deck, but not in a set
+			deck_ = new TileDeck();
+			deck_.addTileSet(set);
+			TileBoard board = new TileMapBoard(deck_);
+
+			// Create a BoardController to do the heavy lifting during gameplay.
+			// These two objects handle notifications from the UI (like rotate
+			// tile).
+			boardController_ = new BoardController(board, deck_
+					.tileFeatureBindings(), players_);
+			hudController_ = new HUDController(deck_, players_);
+
+			// See if the first person is playing on this computer. If they are,
+			// send the begin turn notification to activate the interface for
+			// them.
+			beginTurn();
 		}
-
-		// Populate the set into the deck. Note: you can have multiple copies of
-		// a tile in a deck, but not in a set
-		deck_ = new TileDeck();
-		deck_.addTileSet(set);
-		TileBoard board = new TileMapBoard(deck_);
-
-		// Create a BoardController to do the heavy lifting during gameplay.
-		// These two objects handle notifications from the UI (like rotate
-		// tile).
-		boardController_ = new BoardController(board, deck_
-				.tileFeatureBindings(), players_);
-		hudController_ = new HUDController(deck_, players_);
-
-		// See if the first person is playing on this computer. If they are,
-		// send the begin turn notification to activate the interface for them.
-		beginTurn();
 	}
 
 	/**
@@ -256,7 +264,7 @@ public class GameController {
 		// Note: do not need to recheck iter because it was checked above
 		TileBoardGenIterator temp = new TileBoardGenIterator(iter);
 		c.traverseRegion(temp.right(), Tile.Region.Center);
-		//TODO: Change these to get the correct score (algorithm should do it)
+		// TODO: Change these to get the correct score (algorithm should do it)
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
 			scoreFeature(9, c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center), temp.current().featureInRegion(
