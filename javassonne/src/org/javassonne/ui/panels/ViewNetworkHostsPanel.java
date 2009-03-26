@@ -114,10 +114,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// Setup the Global chat, which will be available for both host_game and
 		// join_game, and therefore gets added to the main
 		chatArea_ = new JTextArea();
+
+		JScrollPane chatScroll_ = new JScrollPane(chatArea_);
+		chatScroll_.setLocation(new Point(410, 160));
+		chatScroll_.setSize(350, 300);
 		chatArea_.setEditable(false);
-		chatArea_.setLocation(new Point(410, 160));
-		chatArea_.setSize(350, 300);
-		main_.add(chatArea_);
+		chatArea_.setWrapStyleWord(true);
+		chatArea_.setLineWrap(true);
+		chatArea_.setCaretPosition(chatArea_.getDocument().getLength());
+		main_.add(chatScroll_);
 
 		// Add a chat label
 		JLabel clabel = new JLabel("Global Chat");
@@ -128,13 +133,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 		// Add a chat text input area
 		talkArea_ = new JTextArea("<Type here to chat to other players>");
-		talkArea_.setLocation(new Point(410, 461));
-		talkArea_.setSize(349, 50);
+		JScrollPane talkScroll_ = new JScrollPane(talkArea_);
+		talkScroll_.setLocation(new Point(410, 461));
+		talkScroll_.setSize(349, 50);
 		talkArea_.setWrapStyleWord(true);
 		talkArea_.setLineWrap(true);
 		talkArea_.addKeyListener(this);
 		talkArea_.addMouseListener(this);
-		main_.add(talkArea_);
+		talkArea_.setCaretPosition(talkArea_.getDocument().getLength());
+		main_.add(talkScroll_);
 
 		// ============================================
 		// Setup Join Panel
