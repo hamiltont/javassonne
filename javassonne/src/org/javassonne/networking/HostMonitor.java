@@ -100,15 +100,19 @@ public class HostMonitor {
 	}
 
 	public void addHostNoConfirmation(String hostURI) {
+		System.out.println("HostMonitor: addHostNoConf(" + hostURI + ")");
 		RemoteHost h = attemptToResolveHost(hostURI);
 		if (h == null)
 			return;
 
 		// Add them for ourselves
 		cachedHostList_.add(new CachedHost(h));
+		System.out.println("HostMonitor: host added");
 	}
 
 	public void addHostNoPropagation(String hostURI) {
+		System.out.println("HostMonitor: addHostNoProp(" + hostURI + ")");
+		
 		final RemoteHost host = attemptToResolveHost(hostURI);
 		if (host == null)
 			return;
@@ -122,9 +126,12 @@ public class HostMonitor {
 
 		// Add them for ourselves
 		cachedHostList_.add(new CachedHost(host));
+		System.out.println("HostMonitor: host added");
 	}
 
 	public void addHost(final String hostURI) {
+		System.out.println("HostMonitor: addHost(" + hostURI + ")");
+		
 		// Check if it is the localhost
 		if (hostURI.equals(LocalHost.getURI())) {
 			String info = "HostMonitor: Found localhost broadcast";
@@ -143,6 +150,7 @@ public class HostMonitor {
 		// Add them for ourselves
 		final CachedHost host = new CachedHost(h);
 		cachedHostList_.add(new CachedHost(h));
+		System.out.println("HostMonitor: host added");
 
 		// Request they add us without confirming
 		SwingUtilities.invokeLater(new Runnable() {
