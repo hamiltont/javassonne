@@ -55,7 +55,8 @@ public class RegionsCalc {
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
-			marked_.put(p, new HashMap<Tile.Region, Integer>());
+			if(marked_.get(p)==null)
+				marked_.put(p, new HashMap<Tile.Region, Integer>());
 			globalMeep_.put(p, new HashMap<Tile.Region, List<Meeple>>());
 			isComplete_.put(p, new HashMap<Tile.Region, Boolean>());
 			for (Tile.Region r : list.get(p)) {
@@ -93,35 +94,29 @@ public class RegionsCalc {
 					list.put(iter.getLocation(), new ArrayList<Tile.Region>());
 				list.get(iter.getLocation()).add(reg);
 				// check for completion
-				TileBoardIterator left = ((TileBoardGenIterator) iter)
-						.leftCopy();
-				if (left.current() == null)
+				TileBoardGenIterator temp = new TileBoardGenIterator(iter);
+				if (temp.right().current() == null) {
 					return false;
-				TileBoardIterator right = ((TileBoardGenIterator) iter)
-						.rightCopy();
-				if (right.current() == null)
+				} else if (temp.down().current() == null) {
 					return false;
-				TileBoardIterator up = ((TileBoardGenIterator) iter).upCopy();
-				if (up.current() == null)
+				} else if (temp.left().current() == null) {
 					return false;
-				TileBoardIterator down = ((TileBoardGenIterator) iter)
-						.downCopy();
-				if (down.current() == null)
+				} else if (temp.left().current() == null) {
 					return false;
-				// rotate 45 degrees clockwise and keep checking
-				left = ((TileBoardGenIterator) left).up();
-				if (left.current() == null)
+				} else if (temp.up().current() == null) {
 					return false;
-				right = ((TileBoardGenIterator) right).down();
-				if (right.current() == null)
+				} else if (temp.up().current() == null) {
 					return false;
-				up = ((TileBoardGenIterator) up).right();
-				if (up.current() == null)
+				} else if (temp.right().current() == null) {
 					return false;
-				down = ((TileBoardGenIterator) down).left();
-				if (down.current() == null)
+				} else if (temp.right().current() == null) {
 					return false;
+				}
 				// never found null tile, so monastery is complete
+				if (marked_.get(iter.getLocation()) == null)
+					marked_.put(iter.getLocation(),
+							new HashMap<Tile.Region, Integer>());
+				marked_.get(iter.getLocation()).put(reg, 9);
 				return true;
 			}
 			// center feature is null - pass back returnVal

@@ -33,6 +33,7 @@ import org.javassonne.model.Meeple;
 import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileFeature;
@@ -111,7 +112,8 @@ public class GameController {
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
-		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,"toggleInstructions");
+		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,
+				"toggleInstructions");
 	}
 
 	/**
@@ -177,7 +179,8 @@ public class GameController {
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
-		boardController_ = new BoardController(board, deck_.tileFeatureBindings(), players_);
+		boardController_ = new BoardController(board, deck_
+				.tileFeatureBindings(), players_);
 		hudController_ = new HUDController(deck_, players_);
 
 		// See if the first person is playing on this computer. If they are,
@@ -231,41 +234,98 @@ public class GameController {
 		// sent from the confirmPlacement panel when the user presses end turn.
 		// We want to advance the turn and change current player.
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
-		NotificationManager.getInstance().sendNotification(Notification.SET_CURRENT_PLAYER, currentPlayer_);
+		NotificationManager.getInstance().sendNotification(
+				Notification.SET_CURRENT_PLAYER, currentPlayer_);
 
 	}
 
-	public void scoreTurn(Notification n){
-		TileBoardIterator iter = (TileBoardIterator)n.argument();
+	public void scoreTurn(Notification n) {
+		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
-		
+
+		// Score completed features on this tile
 		RegionsCalc c = new RegionsCalc(deck_.tileFeatureBindings());
-		for (Tile.Region r : Tile.Region.values()){
+		for (Tile.Region r : Tile.Region.values()) {
 			c.traverseRegion(iter, r);
-			if (c.getRegionCompletion(iter.getLocation(), r)){
-				scoreFeature(c.getsizeOfRegion(p, r), c.getMeepleList(p, r), iter.current().featureInRegion(r));
+			if (c.getRegionCompletion(iter.getLocation(), r)) {
+				scoreFeature(c.getsizeOfRegion(p, r), c.getMeepleList(p, r),
+						iter.current().featureInRegion(r));
 			}
 		}
-		
-		beginTurn();		
+		// Score cloisters - go right then move clockwise
+		// Note: do not need to recheck iter because it was checked above
+		TileBoardGenIterator temp = new TileBoardGenIterator(iter);
+		c.traverseRegion(temp.right(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.down(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.left(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.left(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.up(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.up(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.right(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+		c.traverseRegion(temp.right(), Tile.Region.Center);
+		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
+			scoreFeature(9, c.getMeepleList(temp.getLocation(),
+					Tile.Region.Center), temp.current().featureInRegion(
+					Tile.Region.Center));
+		}
+
+		beginTurn();
 	}
-	
+
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
 			TileFeature regionFeatureType) {
-		
+
 		int counts[] = new int[players_.size()];
 		int maxCount = 0;
-		for (Meeple m : regionMeeple){
+		for (Meeple m : regionMeeple) {
 			counts[m.getPlayer()] += 1;
 			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
 		}
-		
-		for (int ii = 0; ii < players_.size(); ii++){
-			if (counts[ii] == maxCount){
-				
-				// add to their score
-				players_.get(ii).shiftScore(regionSize);
-				
+
+		// only score if someone claimed it
+		if (maxCount > 0) {
+			for (int ii = 0; ii < players_.size(); ii++) {
+				if (counts[ii] == maxCount) {
+
+					// add to their score
+					players_.get(ii).shiftScore(regionSize);
+
+				}
 			}
 		}
 	}
@@ -352,12 +412,14 @@ public class GameController {
 		for (String s : playerData_.getPlayerNames()) {
 			if (s.length() > 0) {
 				Player player = new Player(s);
-				player.setMeepleColor(playerData_.getPlayerColors().get(playerCount));
+				player.setMeepleColor(playerData_.getPlayerColors().get(
+						playerCount));
 				players_.add(player);
 				playerCount++;
 			} else if (playerCount < 2) {
 				Player player = new Player();
-				player.setMeepleColor(playerData_.getPlayerColors().get(playerCount));
+				player.setMeepleColor(playerData_.getPlayerColors().get(
+						playerCount));
 				players_.add(player);
 				playerCount++;
 			}
