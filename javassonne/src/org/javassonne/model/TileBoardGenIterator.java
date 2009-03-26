@@ -25,8 +25,6 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	private TileBoard data_;
 	private Point location_;
 
-	
-
 	/**
 	 * @param data
 	 *            - reference to TileBoard where data is stored

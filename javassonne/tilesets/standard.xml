@@ -47,8 +47,8 @@
     </Tile>
     <Tile>
       <features__>
-        <string>F</string>
-        <string>F</string>
+        <string>FM</string>
+        <string>FM</string>
         <string>N</string>
         <string>N</string>
         <string>N</string>
@@ -70,9 +70,9 @@
     <Tile>
       <features__>
         <string>FM</string>
-        <string>F</string>
-        <string>F</string>
-        <string>R</string>
+        <string>FM</string>
+        <string>FM</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -113,9 +113,9 @@
     </Tile>
     <Tile>
       <features__>
-        <string>F</string>
-        <string>F</string>
-        <string>F</string>
+        <string>FM</string>
+        <string>FM</string>
+        <string>FM</string>
         <string>FM</string>
         <string>N</string>
       </features__>
@@ -157,7 +157,7 @@
     </Tile>
     <Tile>
       <features__>
-        <string>F</string>
+        <string>FM</string>
         <string>N</string>
         <string>FM</string>
         <string>N</string>
@@ -182,7 +182,7 @@
         <string>F</string>
         <string>F</string>
         <string>F</string>
-        <string>R</string>
+        <string>RE</string>
         <string>N</string>
       </features__>
       <farms__>
@@ -226,7 +226,7 @@
         <string>N</string>
         <string>N</string>
         <string>N</string>
-        <string>R</string>
+        <string>RE</string>
         <string>C</string>
       </features__>
       <farms__>
@@ -488,7 +488,7 @@
     <Tile>
       <features__>
         <string>FM</string>
-        <string>F</string>
+        <string>FM</string>
         <string>R</string>
         <string>R</string>
         <string>N</string>
@@ -681,7 +681,7 @@
       <name>FortWithMultiplier</name>
       <identifier>FM</identifier>
       <multiplier>2</multiplier>
-      <actsAsWall>false</actsAsWall>
+      <actsAsWall>true</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>

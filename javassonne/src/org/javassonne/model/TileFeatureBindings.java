@@ -34,32 +34,31 @@ public class TileFeatureBindings {
 		else
 			return false;
 	}
-	
+
 	public Boolean featuresBind(TileFeature feature1, TileFeature feature2) {
 		if (feature1 == null && feature2 == null)
 			return true;
 		else if (feature1 == null || feature2 == null)
 			return false;
 		else if (bindings_.containsKey(feature1.identifier))
-			return bindings_.get(feature1.identifier).contains(feature2.identifier);
+			return bindings_.get(feature1.identifier).contains(
+					feature2.identifier);
 		else
 			return false;
 	}
-	
-	public void addFeatureBinding(String identifier1, String identifier2)
-	{
+
+	public void addFeatureBinding(String identifier1, String identifier2) {
 		if (bindings_.containsKey(identifier1) == false)
 			bindings_.put(identifier1, new ArrayList<String>());
 		if (bindings_.containsKey(identifier2) == false)
 			bindings_.put(identifier2, new ArrayList<String>());
-		
-		bindings_.get(identifier1).add(identifier2); 
+
+		bindings_.get(identifier1).add(identifier2);
 		if (identifier1.equals(identifier2) == false)
 			bindings_.get(identifier2).add(identifier1);
 	}
-	
-	public void addFeatureBindings(TileFeatureBindings other)
-	{
+
+	public void addFeatureBindings(TileFeatureBindings other) {
 		bindings_.putAll(other.bindings_);
 	}
 }
