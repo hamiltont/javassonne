@@ -58,12 +58,12 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 	/** Capture key event */
 	public void keyPressed(KeyEvent e) {
 		keyCheck(e, "press");
+		ChatManager.KeyPressed(e);
 	}
 
 	/** Capture key event */
 	public void keyReleased(KeyEvent e) {
 		keyCheck(e, "release");
-		ChatManager.KeyReleased(e);
 	}
 
 	/** Capture key event */

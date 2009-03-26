@@ -456,7 +456,11 @@ public class MapLayer extends JPanel implements MouseListener,
 		Iterator<String> iter = ChatManager.getIterator();
 		int ii = 0;
 		while (iter.hasNext() && ii < 5){
-			gra.drawString(iter.next(), this.getWidth() - 500, this.getHeight()-110+ii*20);
+			String s = iter.next();
+			gra.setColor(Color.BLACK);
+			gra.drawString(s, this.getWidth() - 549, this.getHeight()-109+ii*20);
+			gra.setColor(Color.WHITE);
+			gra.drawString(s, this.getWidth() - 550, this.getHeight()-110+ii*20);
 			ii++;
 		}
 	}
