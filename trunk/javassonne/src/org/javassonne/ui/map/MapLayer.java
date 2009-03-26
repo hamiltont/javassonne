@@ -441,27 +441,29 @@ public class MapLayer extends JPanel implements MouseListener,
 		}
 
 		// now draw all of the sprites
-		if (board_ != null && sprites_.size() > 0) {
-			Point offset = getScreenPointFromTileLocation(board_.homeTile()
-					.getLocation());
-			for (MapSprite s : sprites_)
-				s.draw(gra, offset, scale_);
-		}
-
-		// draw on the fps
-		gra.setColor(Color.BLACK);
-		gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
-	
-		// draw the chat messages
-		Iterator<String> iter = ChatManager.getIterator();
-		int ii = 0;
-		while (iter.hasNext() && ii < 5){
-			String s = iter.next();
+		if (board_ != null){
+			if (sprites_.size() > 0) {
+				Point offset = getScreenPointFromTileLocation(board_.homeTile()
+						.getLocation());
+				for (MapSprite s : sprites_)
+					s.draw(gra, offset, scale_);
+			}
+			
+			// draw on the fps
 			gra.setColor(Color.BLACK);
-			gra.drawString(s, this.getWidth() - 549, this.getHeight()-109+ii*20);
-			gra.setColor(Color.WHITE);
-			gra.drawString(s, this.getWidth() - 550, this.getHeight()-110+ii*20);
-			ii++;
+			gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
+		
+			// draw the chat messages
+			Iterator<String> iter = ChatManager.getIterator();
+			int ii = 0;
+			while (iter.hasNext() && ii < 5){
+				String s = iter.next();
+				gra.setColor(Color.BLACK);
+				gra.drawString(s, this.getWidth() - 549, this.getHeight()-109+ii*20);
+				gra.setColor(Color.WHITE);
+				gra.drawString(s, this.getWidth() - 550, this.getHeight()-110+ii*20);
+				ii++;
+			}
 		}
 	}
 
