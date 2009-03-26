@@ -114,7 +114,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// Setup the Global chat, which will be available for both host_game and
 		// join_game, and therefore gets added to the main
 		chatArea_ = new JTextArea();
-
 		JScrollPane chatScroll_ = new JScrollPane(chatArea_);
 		chatScroll_.setLocation(new Point(410, 160));
 		chatScroll_.setSize(350, 300);
