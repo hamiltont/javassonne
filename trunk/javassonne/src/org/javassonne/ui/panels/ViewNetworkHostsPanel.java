@@ -267,6 +267,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			
 			ChatMessage cm = new ChatMessage(talkArea_.getText(), LocalHost
 					.getName());
 
@@ -274,7 +275,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().sendNotification(
 					Notification.SEND_GLOBAL_CHAT, cm);
 
-			talkArea_.setText("");
+			e.consume();
+			talkArea_.selectAll();
+			talkArea_.replaceSelection("");
 		}
 	}
 
@@ -287,7 +290,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	public void receiveGlobalChatMessage(Notification recvGlobalChat) {
 		ChatMessage cm = (ChatMessage) recvGlobalChat.argument();
 		chatArea_.setText(chatArea_.getText() + "\n" + cm.getSenderName()
-				+ ": " + cm.getMessage() + "\n");
+				+ ": " + cm.getMessage());
 	}
 	
 
@@ -295,6 +298,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			if(talkArea_.getText().equals("<Type here to chat to other players>")){
 				talkArea_.selectAll();
 				talkArea_.replaceSelection("");
+				talkArea_.removeMouseListener(this);
 			}
 		}
 }
