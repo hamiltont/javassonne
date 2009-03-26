@@ -18,18 +18,15 @@
 
 package org.javassonne.networking.impl;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
+import javax.swing.SwingUtilities;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -49,8 +46,8 @@ import com.thoughtworks.xstream.XStream;
  */
 public class LocalHostImpl implements RemoteHost {
 
-	private List<RemoteClient> connectedClients_;
-	private List<String> connectedClientURIs_;
+	private List<CachedClient> connectedClients_;
+
 	private RemoteHost.MODE currentMode_;
 	private static LocalHostImpl instance_ = null;
 
@@ -61,7 +58,7 @@ public class LocalHostImpl implements RemoteHost {
 	// this host can be connected to
 	private boolean clientsCanConnect_;
 
-	protected boolean isLocalHostStarted_;
+	// protected boolean isLocalHostStarted_;
 	private XStream xStream_;
 
 	public static LocalHostImpl getInstance() {
@@ -72,13 +69,11 @@ public class LocalHostImpl implements RemoteHost {
 
 	// TODO - this needs to get a hostName from the preferences manager
 	private LocalHostImpl() {
-		connectedClients_ = new ArrayList<RemoteClient>();
+		connectedClients_ = new ArrayList<CachedClient>();
 		clientsCanConnect_ = false;
 		URI_ = null;
 		currentMode_ = RemoteHost.MODE.IN_LOBBY;
-		isLocalHostStarted_ = false;
 		xStream_ = new XStream();
-		connectedClientURIs_ = new ArrayList<String>();
 
 		InetAddress addr = null;
 		try {
@@ -98,6 +93,7 @@ public class LocalHostImpl implements RemoteHost {
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void addClient(String clientURI) {
+		// Check we are open for connections
 		if (clientsCanConnect_ == false) {
 
 			String info = "LocalHostImpl: Client " + clientURI
@@ -109,25 +105,32 @@ public class LocalHostImpl implements RemoteHost {
 					Notification.LOG_ERROR, info);
 		}
 
+		RemoteClient rc = attemptToResolveClient(clientURI);
+		if (rc == null)
+			return;
+
+		CachedClient cc = new CachedClient(rc);
+		connectedClients_.add(cc);
+
+		String info = "LocalHostImpl: Client '" + cc.getName() + "' connected";
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.LOG_INFO, info);
+
+	}
+
+	public RemoteClient attemptToResolveClient(String clientURI) {
+		RemoteClient rc = null;
 		try {
-			RemoteClient c = (RemoteClient) RemotingUtils.lookupRMIService(
-					clientURI, RemoteClient.class);
-			connectedClients_.add(c);
-			connectedClientURIs_.add(clientURI);
-
-			String info = "LocalHostImpl: Client '" + c.getName()
-					+ "' connected";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-
+			rc = (RemoteClient) RemotingUtils.lookupRMIService(clientURI,
+					RemoteClient.class);
 		} catch (RemoteLookupFailureException e) {
 			String info = "LocalHostImpl could not resolve client at uri: "
 					+ clientURI;
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, info);
-			return;
+			return null;
 		} catch (RuntimeException e) {
 			String err = "LocalHostImpl - A RuntimeException occurred while adding "
 					+ "a client at URI: " + clientURI;
@@ -138,17 +141,24 @@ public class LocalHostImpl implements RemoteHost {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_ERROR, err);
+			return null;
 		}
-
+		return rc;
 	}
 
-	// TODO - insure this works
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void removeClient(String clientURI) {
-		if (connectedClientURIs_.contains(clientURI))
-			connectedClientURIs_.remove(clientURI);
+		for (Iterator<CachedClient> it = connectedClients_.iterator(); it
+				.hasNext();) {
+			CachedClient next = it.next();
+			// TODO - insure this works
+			if (next.getURI().equals(clientURI)) {
+				connectedClients_.remove(next);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -168,10 +178,23 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
+	// TODO- cleanup function
 	public String getURI() {
 		if (URI_ == null) {
 			HostStarter hs = new HostStarter();
-			hs.run();
+			try {
+				SwingUtilities.invokeAndWait(hs);
+			} catch (InterruptedException e) {
+				String err = "LocalHostImpl: interrupted while waiting on invokeAndWait()";
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				String err = "LocalHostImpl: exception thrown from run()";
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
+				e.printStackTrace();
+			}
 		}
 		return URI_;
 	}
@@ -181,21 +204,24 @@ public class LocalHostImpl implements RemoteHost {
 	 * 
 	 * @return true if the localhost is started, false otherwise
 	 */
-	public boolean isLocalHostStarted() {
-		return isLocalHostStarted_;
-	}
-
+	// public boolean isLocalHostStarted() {
+	// return isLocalHostStarted_;
+	// }
 	private boolean isClientConnected(String clientURI) {
-		if (connectedClientURIs_.contains(clientURI) == false)
-			return false;
-		return true;
+		for (Iterator<CachedClient> it = connectedClients_.iterator(); it
+				.hasNext();)
+			if (it.next().getURI().equals(clientURI))
+				return true;
+
+		// If we make it through all clients without finding...
+		return false;
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public void receiveNotificationFromClient(String serializedNotification,
-			String clientURI) {
+	public void receiveNotificationFromClient(final String serializedNotification,
+			final String clientURI) {
 
 		// If the client is not connected to us, we don't care
 		if (isClientConnected(clientURI) == false) {
@@ -209,17 +235,23 @@ public class LocalHostImpl implements RemoteHost {
 			return;
 		}
 
-		// Send the message out to all other clients
-		for (Iterator<RemoteClient> i = connectedClients_.iterator(); i
-				.hasNext();) {
-			RemoteClient curClient = i.next();
+		// Retransmit to all other clients
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				for (Iterator<CachedClient> it = connectedClients_.iterator(); it
+						.hasNext();) {
+					CachedClient cc = it.next();
 
-			// Do not send the message back out to the client that sent it to us
-			if (curClient.getURI().equals(clientURI))
-				continue;
+					// Don't send it back to the client it
+					// originated from
+					if (cc.getURI().equals(clientURI))
+						continue;
 
-			curClient.receiveNotificationFromHost(serializedNotification);
-		}
+					cc.receiveNotificationFromHost(serializedNotification);
+				}
+
+			}
+		});
 	}
 
 	/**
@@ -238,6 +270,7 @@ public class LocalHostImpl implements RemoteHost {
 		Notification n = (Notification) xStream_
 				.fromXML(serializedNotification);
 		String id = n.identifier();
+
 		if ((id != Notification.SEND_GLOBAL_CHAT)
 				&& (id != Notification.SEND_PRIVATE_CHAT))
 			NotificationManager.getInstance().sendNotification(n.identifier(),
@@ -246,22 +279,21 @@ public class LocalHostImpl implements RemoteHost {
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
-	 */	
+	 */
 	public void addHost(String hostURI) {
 		HostMonitor.getInstance().addHost(hostURI);
-		
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
-	 */	
+	 */
 	public void addHostNoConfirmation(String hostURI) {
 		HostMonitor.getInstance().addHostNoConfirmation(hostURI);
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
-	 */	
+	 */
 	public void addHostNoPropagation(String hostURI) {
 		HostMonitor.getInstance().addHostNoPropagation(hostURI);
 	}

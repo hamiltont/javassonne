@@ -18,15 +18,18 @@
 
 package org.javassonne.networking.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.jmdns.ServiceInfo;
+import javax.swing.SwingUtilities;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
 
 import com.thoughtworks.xstream.XStream;
@@ -42,7 +45,7 @@ import com.thoughtworks.xstream.XStream;
 public class Client implements RemoteClient {
 
 	private boolean connectedToHost_;
-	private RemoteHost connectedHost_;
+	private CachedHost connectedHost_;
 	private String clientURI_;
 	private Client instance_;
 	private XStream xStream_;
@@ -70,7 +73,8 @@ public class Client implements RemoteClient {
 	// TODO - list notifications that are illegal to send
 	// TODO - no one currently listens for RECV_PRIVATE_CHAT
 	public void receiveNotificationFromHost(String serializedNotification) {
-		Notification n = (Notification) xStream_.fromXML(serializedNotification);
+		Notification n = (Notification) xStream_
+				.fromXML(serializedNotification);
 		String info = "Received notification - " + n.identifier();
 
 		NotificationManager.getInstance().sendNotification(
@@ -108,7 +112,8 @@ public class Client implements RemoteClient {
 				Notification.LOG_INFO, info);
 
 		String serializedNotification = xStream_.toXML(n);
-		connectedHost_.receiveNotificationFromClient(serializedNotification, clientURI_);
+		connectedHost_.receiveNotificationFromClient(serializedNotification,
+				clientURI_);
 	}
 
 	/**
@@ -122,10 +127,26 @@ public class Client implements RemoteClient {
 			throw new RuntimeException("Client.java tried to connect to"
 					+ " a host, but it is already connected");
 
-		connectedHost_ = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
-				RemoteHost.class);
+		RemoteHost rh = HostMonitor.getInstance().attemptToResolveHost(hostURI);
+		connectedHost_ = new CachedHost(rh);
 
-		connectedHost_.addClient(clientURI_);
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					connectedHost_.addClient(clientURI_);
+				}
+			});
+		} catch (InterruptedException e) {
+			String err = "Client: interrupted while waiting on invokeAndWait()";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			String err = "Client: exception thrown from run()";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+			e.printStackTrace();
+		}
 
 		connectedToHost_ = true;
 	}
@@ -135,14 +156,43 @@ public class Client implements RemoteClient {
 			throw new RuntimeException("Client.java tried to disconnect from"
 					+ " a host, but it is not connected");
 
-		connectedHost_.removeClient(getURI());
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					connectedHost_.removeClient(getURI());
+				}
+			});
+		} catch (InterruptedException e) {
+			String err = "Client: interrupted while waiting on invokeAndWait()";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			String err = "Client: exception thrown from run()";
+			NotificationManager.getInstance().sendNotification(
+					Notification.LOG_ERROR, err);
+			e.printStackTrace();
+		}
+
 		connectedToHost_ = false;
 	}
 
 	public String getURI() {
 		if (clientURI_ == null) {
 			ClientStarter cs = new ClientStarter(this);
-			cs.run();
+			try {
+				SwingUtilities.invokeAndWait(cs);
+			} catch (InterruptedException e) {
+				String err = "Client: interrupted while waiting on invokeAndWait()";
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				String err = "Client: exception thrown from run()";
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
+				e.printStackTrace();
+			}
 		}
 		return clientURI_;
 	}

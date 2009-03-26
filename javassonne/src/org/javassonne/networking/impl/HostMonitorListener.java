@@ -62,6 +62,10 @@ public class HostMonitorListener implements ServiceListener {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
+		
+		// TODO - ensure e.getName and our internal names match up
+		String name = e.getName();
+		HostMonitor.getInstance().removeHost(name);
 	}
 
 	public void serviceResolved(ServiceEvent e) {
@@ -93,7 +97,7 @@ public class HostMonitorListener implements ServiceListener {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, hinfo);
-
+ 
 		HostMonitor.getInstance().addHost(hostURI);
 	}
 	

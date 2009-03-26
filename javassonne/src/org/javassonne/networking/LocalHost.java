@@ -52,8 +52,8 @@ public class LocalHost {
 		LocalHostImpl.getInstance().receiveNotificationFromClient(serializedNotification, clientURI);
 	}
 	
-	public static boolean isLocalHostStarted() {
-		return LocalHostImpl.getInstance().isLocalHostStarted();
-	}
+//	public static boolean isLocalHostStarted() {
+//		return LocalHostImpl.getInstance().isLocalHostStarted();
+//	}
 	
 }
