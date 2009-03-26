@@ -165,7 +165,14 @@ public class HostMonitor {
 			public void run() {
 				for (Iterator<CachedHost> it = cachedHostList_.iterator(); it
 						.hasNext();)
-					it.next().addHostNoPropagation(hostURI);
+				{
+					CachedHost next = it.next();
+					
+					// Forward the URL to everyone but the host
+					// it came from
+					if (next.getURI().equals(hostURI) == false)
+						next.addHostNoPropagation(hostURI);
+				}
 			}
 		});
 	}
