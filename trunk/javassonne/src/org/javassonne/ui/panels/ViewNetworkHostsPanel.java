@@ -274,11 +274,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().sendNotification(
 					Notification.SEND_GLOBAL_CHAT, cm);
 
-			// Add the message to our personal chat window
-			receiveGlobalChatMessage(new Notification(
-					Notification.RECV_GLOBAL_CHAT, new ChatMessage(talkArea_
-							.getText(), LocalHost.getName())));
-
 			talkArea_.setText("");
 		}
 	}

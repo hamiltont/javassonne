@@ -53,7 +53,7 @@ public class BoardController {
 	Tile tempLitTile_;
 	Tile tempPlacedTile_;
 	MeepleSprite tempPlacedMeeple_;
-	
+
 	TilePlacementSprite tempPlacementSprite_;
 	TileBoardGenIterator tempLocationIter_;
 
@@ -62,7 +62,7 @@ public class BoardController {
 
 	List<Tile.Region> currentRegionOptions_;
 	List<Tile.Quadrant> currentQuadrantOptions_;
-	
+
 	TileFeatureBindings bindings_;
 	List<Player> players_;
 	int currentPlayer_ = 0;
@@ -142,8 +142,6 @@ public class BoardController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
-		NotificationManager.getInstance().sendNotification(Notification.SCORE_TURN, tempLocationIter_);
-		
 		tempPlacedMeeple_ = null;
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
@@ -168,8 +166,10 @@ public class BoardController {
 					board_.addTemp(tempLocationIter_, tempPlacedTile_);
 
 					// show the confirm placement panel
-					MeepleColor c = players_.get(currentPlayer_).getMeepleColor();
-					HUDConfirmPlacementPanel confirmPanel = new HUDConfirmPlacementPanel(c);
+					MeepleColor c = players_.get(currentPlayer_)
+							.getMeepleColor();
+					HUDConfirmPlacementPanel confirmPanel = new HUDConfirmPlacementPanel(
+							c);
 					DisplayHelper.getInstance().add(confirmPanel,
 							DisplayHelper.Layer.PALETTE,
 							DisplayHelper.Positioning.TOP_CENTER);
@@ -199,7 +199,8 @@ public class BoardController {
 					// TODO: Determine which spots on the tile are valid meeple
 					// locations and populate the options arrays. This is dummy
 					// code:
-					tempPlacementSprite_.setRegionOptions(currentRegionOptions_);
+					tempPlacementSprite_
+							.setRegionOptions(currentRegionOptions_);
 
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
@@ -208,41 +209,41 @@ public class BoardController {
 
 			} catch (BoardPositionFilledException ex) {
 				// Bury this exception?
-				NotificationManager.getInstance().logError(
-						new Notification("PositionFilled", here.toString()
-								+ " is filled"));
+				String err = "PositionFilled" + here.toString() + " is filled";
+				NotificationManager.getInstance().sendNotification(
+						Notification.LOG_ERROR, err);
 				return;
 			}
 		}
 	}
 
 	public void placeMeeple(Notification n) {
-		
+
 		// the meeple is created in the map layer, because the map layer
 		// has more intimate knowledege of which region the drag ended on.
 		// (It can convert the pixel to the tile, and then to a region)
 		// Region / Quadrant is set. We just set everything else.
 		Meeple m = (Meeple) n.argument();
-		
-		if ((currentRegionOptions_.contains(m.getRegionOnTile())) &&
-			(m.getParentTile() == tempPlacedTile_)){
-			
+
+		if ((currentRegionOptions_.contains(m.getRegionOnTile()))
+				&& (m.getParentTile() == tempPlacedTile_)) {
+
 			// if they've already tried placing a meeple, remove it before
 			// allowing them to place another.
-			if (tempPlacedMeeple_ != null){
+			if (tempPlacedMeeple_ != null) {
 				NotificationManager.getInstance().sendNotification(
 						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 			}
-			
+
 			m.setPlayer(currentPlayer_);
-	
+
 			// add the meeple to the tile
 			tempPlacedTile_.setMeeple(m);
-	
+
 			// add the meeple sprite to the map layer so the guy is visible
-			tempPlacedMeeple_ = new MeepleSprite(m, players_.get(currentPlayer_)
-					.getMeepleColor());
-	
+			tempPlacedMeeple_ = new MeepleSprite(m, players_
+					.get(currentPlayer_).getMeepleColor());
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 			NotificationManager.getInstance().sendNotification(
@@ -257,11 +258,11 @@ public class BoardController {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
-		if (tempPlacedMeeple_ != null){
+		if (tempPlacedMeeple_ != null) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 		}
-		
+
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
 		tempLocationIter_ = null;

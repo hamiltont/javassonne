@@ -45,9 +45,6 @@ public class NotificationManager {
 	// Singleton implementation
 	protected NotificationManager() {
 		bindings_ = new HashMap<String, ArrayList<NotificationCallback>>();
-
-		this.addObserver(Notification.LOG_ERROR, this, "logError");
-		this.addObserver(Notification.LOG_WARNING, this, "logWarning");
 	}
 
 	public static NotificationManager getInstance() {
@@ -135,10 +132,10 @@ public class NotificationManager {
 
 		if (observers != null) {
 			// we have to do it this way in case any of the observers remove
-			// themselves from the observers list as we're iterating through the 
-			// array. The nice clean for loops require that the list is not 
+			// themselves from the observers list as we're iterating through the
+			// array. The nice clean for loops require that the list is not
 			// modified during iteration.
-			for (int ii = observers.size()-1; ii>=0; ii--) {
+			for (int ii = observers.size() - 1; ii >= 0; ii--) {
 				observers.get(ii).fire(n);
 			}
 		} else {
@@ -147,13 +144,5 @@ public class NotificationManager {
 
 			this.sendNotification(Notification.LOG_WARNING, msg);
 		}
-	}
-
-	public void logError(Notification n) {
-		System.err.println(n.argument().toString());
-	}
-
-	public void logWarning(Notification n) {
-		System.out.println(n.argument().toString());
 	}
 }

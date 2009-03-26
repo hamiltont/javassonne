@@ -79,7 +79,7 @@ public class HostMonitor {
 	public List<CachedHost> getHosts() {
 		return cachedHostList_;
 	}
-	
+
 	public List<String> getHostURIs() {
 		return hostURIs_;
 	}
@@ -87,13 +87,17 @@ public class HostMonitor {
 	public void sendOutGlobalChat(Notification sendMessage) {
 		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT,
 		// and send to all the known remote hosts
-		for (Iterator<RemoteHost> it = realHostList_.iterator(); it.hasNext();) {
-			RemoteHost next = it.next();
-			Notification recvMessage = new Notification(
-					Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
-			String serializedNotification = xStream_.toXML(recvMessage);
-			next.receiveNotification(serializedNotification);
-		}
+		Notification recvMessage = new Notification(
+				Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
+		String serializedNotification = xStream_.toXML(recvMessage);
+
+		for (Iterator<RemoteHost> it = realHostList_.iterator(); it.hasNext();)
+			it.next().receiveNotification(serializedNotification);
+
+		// Also send to ourselves so anyone listening for RECV_GLOBAL_CHAT will
+		// get this
+		NotificationManager.getInstance().sendNotification(
+				Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
 	}
 
 	public int numberOfHosts() {
@@ -110,21 +114,20 @@ public class HostMonitor {
 		cachedHostList_.add(new CachedHost(h));
 		hostURIs_.add(hostURI);
 	}
-	
+
 	public void addHostNoPropagation(String hostURI) {
 		RemoteHost h = attemptToResolveHost(hostURI);
 		if (h == null)
 			return;
 
-		// Request they add us without confirming 
+		// Request they add us without confirming
 		h.addHostNoConfirmation(LocalHost.getURI());
-		
+
 		// Add them for ourselves
 		realHostList_.add(h);
 		cachedHostList_.add(new CachedHost(h));
 		hostURIs_.add(hostURI);
 	}
-
 
 	public void addHost(String hostURI) {
 		// TODO - incorporate this code from earlier
@@ -205,7 +208,7 @@ public class HostMonitor {
 				break;
 			}
 		}
-		
+
 		// Remove from cachedHostList
 		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();) {
 			CachedHost next = it.next();
