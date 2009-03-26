@@ -366,13 +366,20 @@ public class GameController {
 		if (menu_.isShowing()) {
 			if (gameInProgress_)
 				DisplayHelper.getInstance().remove(menu_);
-		} else
+		} else{
+			//Make sure the instructions menu is hidden
+			NotificationManager.getInstance().sendNotification(Notification.TOGGLE_INSTRUCTIONS,0);
+			
 			DisplayHelper.getInstance().add(menu_, DisplayHelper.Layer.MODAL,
 					DisplayHelper.Positioning.CENTER);
+		}
 	}
 
-	public void toggleInstructions() {
-		if (instructions_.isShowing()) {
+	/*
+	 * Notification n:  optional Integer  0: hide, 1:show
+	 */
+	public void toggleInstructions(Notification n) {
+		if (instructions_.isShowing() || (n.argument() != null && ((Integer) n.argument()).equals(0))) {
 			DisplayHelper.getInstance().remove(instructions_);
 		} else
 			DisplayHelper.getInstance()
