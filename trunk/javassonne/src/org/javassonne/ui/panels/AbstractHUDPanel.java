@@ -74,7 +74,6 @@ MouseMotionListener {
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		addKeyListener(JKeyListener.getInstance());
 	}
 
 	public void setBackgroundScaleToFit(Boolean scale) {

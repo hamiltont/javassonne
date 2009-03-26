@@ -34,6 +34,7 @@ public class HUDShowInstructionsPanel extends AbstractHUDPanel implements
 		setOpaque(false);
 		setVisible(true);
 		setSize(448, 44);
+		setFocusable(false);
 
 		// Listen for a notification from the tile being dragged. If we
 		// receive this, we will close the instructions panel.

@@ -52,7 +52,8 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	public HUDPanel() {
 		super();
-		
+
+		setFocusable(false);
 		setBackgroundImagePath("images/hud_background.jpg");
 		setVisible(true);
 		setSize(144, 181);

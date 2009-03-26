@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -30,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,6 +45,7 @@ import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
+import org.javassonne.networking.ChatManager;
 import org.javassonne.ui.JKeyListener;
 
 /**
@@ -97,7 +100,10 @@ public class MapLayer extends JPanel implements MouseListener,
 
 		setSize(screenSize);
 		setDoubleBuffered(false);
-
+		setFocusable(true);
+		setFocusCycleRoot(true);
+		requestFocus();
+		
 		// Listen for notification setting our board model
 		NotificationManager n = NotificationManager.getInstance();
 		n.addObserver(Notification.BOARD_SET, this, "setBoard");
@@ -113,7 +119,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
 		n.addObserver(Notification.MEEPLE_DROPPED, this, "meepleDropped");
 		n.addObserver(Notification.SHIFT_BOARD, this, "shiftBoard");
-
+		n.addObserver(Notification.CHAT_TEXT_CHANGED, this, "repaint");
 		// Load the background image from disk
 		try {
 			backgroundTile_ = ImageIO.read(new File(
@@ -445,6 +451,14 @@ public class MapLayer extends JPanel implements MouseListener,
 		// draw on the fps
 		gra.setColor(Color.BLACK);
 		gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
+	
+		// draw the chat messages
+		Iterator<String> iter = ChatManager.getIterator();
+		int ii = 0;
+		while (iter.hasNext() && ii < 5){
+			gra.drawString(iter.next(), this.getWidth() - 500, this.getHeight()-110+ii*20);
+			ii++;
+		}
 	}
 
 	/**
@@ -649,20 +663,19 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public void shiftBoard(Notification n) {
 		int dx = 0, dy = 0;
-		String dir = (String) n.argument();
+		int code = (Integer) n.argument();
+		
 		// is the user pressing a direction key?
-		if (dir != null) {
-			if (dir == "Right")
-				dx = MAP_SHIFT_SPEED;
-			if (dir == "Left")
-				dx = -MAP_SHIFT_SPEED;
-			if (dir == "Up")
-				dy = -MAP_SHIFT_SPEED;
-			if (dir == "Down")
-				dy = MAP_SHIFT_SPEED;
-		}
+		if (code == KeyEvent.VK_RIGHT)
+			dx = MAP_SHIFT_SPEED;
+		if (code == KeyEvent.VK_LEFT)
+			dx = -MAP_SHIFT_SPEED;
+		if (code == KeyEvent.VK_UP)
+			dy = -MAP_SHIFT_SPEED;
+		if (code == KeyEvent.VK_DOWN)
+			dy = MAP_SHIFT_SPEED;
+		
 		setShift(dx, dy);
-
 	}
 
 }

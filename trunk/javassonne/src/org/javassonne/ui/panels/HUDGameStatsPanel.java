@@ -48,6 +48,7 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		setVisible(true);
 		setSize(380, 27 + 28 * players.size());
 		setLayout(null);
+		setFocusable(false);
 		setBackgroundImagePath("images/hud_stats_background.jpg");
 		setBackgroundScaleToFit(false);
 
@@ -115,8 +116,9 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 	
 	public void beginTurn(Notification n) {
 		// iterate through all the players and make sure their scores are valid
-		for (int ii = 0; ii < players_.size(); ii++)
-			scores_.get(ii).setText(String.valueOf(players_.get(ii).getScore()));
+		if (scores_.size() == players_.size())
+			for (int ii = 0; ii < players_.size(); ii++)
+				scores_.get(ii).setText(String.valueOf(players_.get(ii).getScore()));
 	}
 
 	// Overloaded the add() method to bind a key listener to any elements placed

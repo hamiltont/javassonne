@@ -187,9 +187,15 @@ public class ChatManager implements Iterable<String> {
 		return false;
 	}
 
-	public Iterator<String> iterator() {
-		if (mode_ == Mode.GLOBAL)
-			return globalMessages_.iterator();
-		return privateMessages_.iterator();
+	public static Iterator<String> getIterator() {
+		return getInstance().iterator();
 	}
+	
+	public Iterator<String> iterator() {
+		if (instance_.mode_ == Mode.GLOBAL)
+			return instance_.globalMessages_.iterator();
+		return instance_.privateMessages_.iterator();
+	}
+	
+	
 }

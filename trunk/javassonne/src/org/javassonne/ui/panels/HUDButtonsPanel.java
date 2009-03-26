@@ -52,6 +52,8 @@ public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener 
 		menuButton_.addActionListener(this);
 		menuButton_.setSize(65, 25);
 		menuButton_.setLocation(0, 0);
+		menuButton_.setFocusable(false);
+		
 		add(menuButton_);
 
 		zoomOutButton_ = new JButton(new ImageIcon("images/hud_zoom_out.jpg"));
@@ -59,6 +61,8 @@ public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener 
 		zoomOutButton_.addActionListener(this);
 		zoomOutButton_.setSize(35, 25);
 		zoomOutButton_.setLocation(72, 0);
+		zoomOutButton_.setFocusable(false);
+		
 		add(zoomOutButton_);
 
 		zoomInButton_ = new JButton(new ImageIcon("images/hud_zoom_in.jpg"));
@@ -66,6 +70,8 @@ public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener 
 		zoomInButton_.addActionListener(this);
 		zoomInButton_.setSize(35, 25);
 		zoomInButton_.setLocation(109, 0);
+		zoomInButton_.setFocusable(false);
+		
 		add(zoomInButton_);
 		
 		// Subscribe for notifications from the controller so we know when to

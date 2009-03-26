@@ -51,6 +51,7 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 		setVisible(true);
 		setSize(500, 300);
 		setLayout(new OverlayLayout(this));
+		setFocusable(false);
 
 		generalButtons_ = new JPanel();
 		generalButtons_.setOpaque(false);
@@ -64,15 +65,15 @@ public class MenuPanel extends AbstractHUDPanel implements ActionListener {
 
 		// add the buttons to the general buttons panel
 		addButtonToPanel("images/menu_new_game.jpg", Notification.NEW_GAME,
-				new Point(100, 95), generalButtons_);
+				new Point(100, 80), generalButtons_);
 		addButtonToPanel("images/menu_new_multiplayer_game.jpg", Notification.NEW_NW_GAME,
-				new Point(100, 140), generalButtons_);
-		addButtonToPanel("images/menu_show_instructions.jpg", Notification.TOGGLE_INSTRUCTIONS,
-				new Point(100, 185), generalButtons_);
+				new Point(100, 122), generalButtons_);
 		addButtonToPanel("images/menu_load_game.jpg", Notification.LOAD_GAME,
-				new Point(100, 230), generalButtons_);
+				new Point(100, 164), generalButtons_);
+		addButtonToPanel("images/menu_show_instructions.jpg", Notification.TOGGLE_INSTRUCTIONS,
+				new Point(100, 207), generalButtons_);
 		addButtonToPanel("images/menu_quit.jpg", Notification.QUIT,
-				new Point(100, 275), generalButtons_);
+				new Point(100, 250), generalButtons_);
 		
 		
 		// add the buttons to the inGame buttons panel
