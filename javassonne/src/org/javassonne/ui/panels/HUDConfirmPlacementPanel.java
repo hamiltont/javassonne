@@ -47,6 +47,7 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 		setSize(490, 100);
 		setVisible(true);
 		setOpaque(false);
+		setFocusable(false);
 		setBackgroundImagePath("images/hud_confirm_placement_background.jpg");
 
 		color_ = c;
@@ -57,6 +58,7 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 		endTurnButton_.addActionListener(this);
 		endTurnButton_.setSize(103, 38);
 		endTurnButton_.setLocation(375, 51);
+		endTurnButton_.setFocusable(false);
 		add(endTurnButton_);
 
 		cancelButton_ = new JButton(new ImageIcon("images/cancel.jpg"));
@@ -64,6 +66,7 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 		cancelButton_.addActionListener(this);
 		cancelButton_.setSize(103, 38);
 		cancelButton_.setLocation(375, 10);
+		cancelButton_.setFocusable(false);
 		add(cancelButton_);
 		
 		// listen for the endGame notice in case we need to remove ourselves
