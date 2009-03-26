@@ -99,62 +99,70 @@ public class HostMonitor {
 		return cachedHostList_.size();
 	}
 
-	public void addHostNoConfirmation(String hostURI) {
+	public boolean addHostNoConfirmation(String hostURI) {
 		System.out.println("HostMonitor: addHostNoConf(" + hostURI + ")");
 		if (isKnownHost(hostURI))
-			return;
-		
-		
+			return true;
+
 		RemoteHost h = attemptToResolveHost(hostURI);
 		if (h == null)
-			return;
+			return false;
 
 		// Add them for ourselves
 		addToCachedHostList(new CachedHost(h));
 		System.out.println("HostMonitor: host added");
+		return true;
 	}
 
-	public void addHostNoPropagation(String hostURI) {
+	public boolean addHostNoPropagation(String hostURI) {
 		System.out.println("HostMonitor: addHostNoProp(" + hostURI + ")");
 		if (isKnownHost(hostURI))
-			return;
-		
+			return true;
+
 		final RemoteHost host = attemptToResolveHost(hostURI);
 		if (host == null)
-			return;
+			return false;
 
 		// Request they add us without confirming
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				host.addHostNoConfirmation(LocalHost.getURI());
+				boolean canTheySeeMe = host.addHostNoConfirmation(LocalHost
+						.getURI());
+				if (canTheySeeMe == false)
+					sendFirewallNotification();
 			}
 		});
 
 		// Add them for ourselves
 		addToCachedHostList(new CachedHost(host));
 		System.out.println("HostMonitor: host added");
+		return true;
+	}
+	
+	// TODO asdf
+	private void sendFirewallNotification() {
+		System.out.println("HostMonitor: possible firewill detected");
 	}
 
 	private boolean isKnownHost(String hostURI) {
 		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();)
 			if (it.next().getURI().equals(hostURI))
 				return true;
-		
+
 		return false;
 	}
-	
+
 	private synchronized void addToCachedHostList(CachedHost h) {
 		if (isKnownHost(h.getURI()))
 			return;
 		cachedHostList_.add(h);
 	}
 
-	public void addHost(final String hostURI) {
+	public boolean addHost(final String hostURI) {
 		System.out.println("HostMonitor: addHost(" + hostURI + ")");
 		if (isKnownHost(hostURI))
-			return;
-		
-		
+			return true;
+
 		// Check if it is the localhost
 		if (hostURI.equals(LocalHost.getURI())) {
 			String info = "HostMonitor: Found localhost broadcast";
@@ -162,13 +170,13 @@ public class HostMonitor {
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, info);
 
-			return;
+			return true;
 		}
 
 		// Try to resolve host
 		final RemoteHost h = attemptToResolveHost(hostURI);
 		if (h == null)
-			return;
+			return false;
 
 		// Add them for ourselves
 		final CachedHost host = new CachedHost(h);
@@ -178,7 +186,9 @@ public class HostMonitor {
 		// Request they add us without confirming
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				host.addHostNoConfirmation(LocalHost.getURI());
+				boolean canTheySeeMe = host.addHostNoConfirmation(LocalHost.getURI());
+				if (canTheySeeMe == false)
+					sendFirewallNotification();
 			}
 		});
 
@@ -192,11 +202,14 @@ public class HostMonitor {
 
 					// Forward the URL to everyone but the host
 					// it came from
+					// We are only interested if they can see us, not
+					// hostURI, so we ignore the return here
 					if (next.getURI().equals(hostURI) == false)
 						next.addHostNoPropagation(hostURI);
 				}
 			}
 		});
+		return true;
 	}
 
 	public RemoteHost attemptToResolveHost(String hostURI) {
