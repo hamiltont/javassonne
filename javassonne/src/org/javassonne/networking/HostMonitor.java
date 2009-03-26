@@ -101,17 +101,23 @@ public class HostMonitor {
 
 	public void addHostNoConfirmation(String hostURI) {
 		System.out.println("HostMonitor: addHostNoConf(" + hostURI + ")");
+		if (isKnownHost(hostURI))
+			return;
+		
+		
 		RemoteHost h = attemptToResolveHost(hostURI);
 		if (h == null)
 			return;
 
 		// Add them for ourselves
-		cachedHostList_.add(new CachedHost(h));
+		addToCachedHostList(new CachedHost(h));
 		System.out.println("HostMonitor: host added");
 	}
 
 	public void addHostNoPropagation(String hostURI) {
 		System.out.println("HostMonitor: addHostNoProp(" + hostURI + ")");
+		if (isKnownHost(hostURI))
+			return;
 		
 		final RemoteHost host = attemptToResolveHost(hostURI);
 		if (host == null)
@@ -125,12 +131,29 @@ public class HostMonitor {
 		});
 
 		// Add them for ourselves
-		cachedHostList_.add(new CachedHost(host));
+		addToCachedHostList(new CachedHost(host));
 		System.out.println("HostMonitor: host added");
+	}
+
+	private boolean isKnownHost(String hostURI) {
+		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();)
+			if (it.next().getURI().equals(hostURI))
+				return true;
+		
+		return false;
+	}
+	
+	private synchronized void addToCachedHostList(CachedHost h) {
+		if (isKnownHost(h.getURI()))
+			return;
+		cachedHostList_.add(h);
 	}
 
 	public void addHost(final String hostURI) {
 		System.out.println("HostMonitor: addHost(" + hostURI + ")");
+		if (isKnownHost(hostURI))
+			return;
+		
 		
 		// Check if it is the localhost
 		if (hostURI.equals(LocalHost.getURI())) {
@@ -149,7 +172,7 @@ public class HostMonitor {
 
 		// Add them for ourselves
 		final CachedHost host = new CachedHost(h);
-		cachedHostList_.add(new CachedHost(h));
+		addToCachedHostList(new CachedHost(h));
 		System.out.println("HostMonitor: host added");
 
 		// Request they add us without confirming
@@ -164,10 +187,9 @@ public class HostMonitor {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				for (Iterator<CachedHost> it = cachedHostList_.iterator(); it
-						.hasNext();)
-				{
+						.hasNext();) {
 					CachedHost next = it.next();
-					
+
 					// Forward the URL to everyone but the host
 					// it came from
 					if (next.getURI().equals(hostURI) == false)
