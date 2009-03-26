@@ -28,8 +28,8 @@ import org.javassonne.networking.impl.RemoteHost.MODE;
  */
 public class LocalHost {
 
-	public static void addClient(String clientURI) {
-		LocalHostImpl.getInstance().addClient(clientURI);
+	public static boolean addClient(String clientURI) {
+		return LocalHostImpl.getInstance().addClient(clientURI);
 	}
 
 	public static boolean canClientsConnect() {

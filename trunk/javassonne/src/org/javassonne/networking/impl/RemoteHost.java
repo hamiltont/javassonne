@@ -42,7 +42,7 @@ public interface RemoteHost {
 	 * @param clientURI
 	 *            The URI of the client to add
 	 */
-	public void addClient(String clientURI);
+	public boolean addClient(String clientURI);
 
 	/**
 	 * Adds a host, requests that that host add us without sending a
@@ -52,7 +52,7 @@ public interface RemoteHost {
 	 * 
 	 * @param hostURI
 	 */
-	public void addHost(String hostURI);
+	public boolean addHost(String hostURI);
 
 	/**
 	 * Used to request that we add a host without also requesting that they add
@@ -61,7 +61,7 @@ public interface RemoteHost {
 	 * 
 	 * @param hostURI
 	 */
-	public void addHostNoConfirmation(String hostURI);
+	public boolean addHostNoConfirmation(String hostURI);
 
 	/**
 	 * This is used to request that we try to connect to a host (also making
@@ -70,7 +70,7 @@ public interface RemoteHost {
 	 * 
 	 * @param hostURI
 	 */
-	public void addHostNoPropagation(String hostURI);
+	public boolean addHostNoPropagation(String hostURI);
 
 	/**
 	 * If the client is currently considered to be connected to this host, this

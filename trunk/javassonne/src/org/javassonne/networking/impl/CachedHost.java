@@ -52,36 +52,36 @@ public class CachedHost implements RemoteHost {
 		return status_;
 	}
 
-	public void addClient(String clientURI) {
+	public boolean addClient(String clientURI) {
 		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
 		if (me == null)
-			return;
+			return false;
 		
-		me.addClient(clientURI);
+		return me.addClient(clientURI);
 	}
 
-	public void addHost(String hostURI) {
+	public boolean addHost(String hostURI) {
 		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
 		if (me == null)
-			return;
+			return false;
 		
-		me.addHost(hostURI);	
+		return me.addHost(hostURI);	
 	}
 
-	public void addHostNoConfirmation(String hostURI) {
+	public boolean addHostNoConfirmation(String hostURI) {
 		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
 		if (me == null)
-			return;
+			return false;
 		
-		me.addHostNoConfirmation(hostURI);
+		return me.addHostNoConfirmation(hostURI);
 	}
 
-	public void addHostNoPropagation(String hostURI) {
+	public boolean addHostNoPropagation(String hostURI) {
 		RemoteHost me = HostMonitor.getInstance().attemptToResolveHost(uri_);
 		if (me == null)
-			return;
+			return false;
 		
-		me.addHostNoPropagation(hostURI);
+		return me.addHostNoPropagation(hostURI);
 	}
 
 	public boolean canClientsConnect() {
