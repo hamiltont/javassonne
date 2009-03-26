@@ -23,21 +23,21 @@ Game Team:
 == 5th Build (Mar. 16 - Mar. 26) ==
 
 Game Team:
- * User can place meeple on the board during their turn using a small panel. (Ben)
- * User sees spots highlighted on the tile where meeple can be placed. Only valid placements are shown. (Ben)
- * User's meeple on cities, roads and cloisters are scored as the game progresses and features are finished (Kyle)
- * User's current score is displayed in the HUD on the bottom right along with turn information. (Ben)
- * User can view game rules from the main menu. (Adam)
- * User can choose the color they want to use when they enter their name (David)
- * User can see the game not minimize when they try to exit or load a saved game (Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can place meeple on the board during their turn using a small panel. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User sees spots highlighted on the tile where meeple can be placed. Only valid placements are shown. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User's meeple on cities, roads and cloisters are scored as the game progresses and features are finished (Kyle)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User's current score is displayed in the HUD on the bottom right along with turn information. (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can view game rules from the main menu. (Adam)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can choose the color they want to use when they enter their name (David)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see the game not minimize when they try to exit or load a saved game (Adam)
 
 
 Networking Team:
- * User can interact with the multiplayer game window by joining and hosting game (Hamy, Brian)
- * In addition to looking at users on the local network, user can type in IP address of a game server to join a game.  (Hamy, Brian)
- * Users will be able to chat with players in the global mutiplayer lobby (Hamy, Brian).
- * User can chat with others playing the same game by typing onto the game canvas. Text appears transparently and pressing enter sends it to the other players. (Hamy, Brian)
- * User can see what other players on the network are doing, and chat with them. (Hamy)
+ * User can interact with the multiplayer game window by joining and hosting game (Hamy)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can see join game button (Brian)
+ * In addition to looking at users on the local network, user can type in IP address of a game server to join a game. [Hamy has implemented this functionality, but interface is not complete.] (Hamy, Brian)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Users will be able to chat with players in the global mutiplayer lobby and see what they are doing. (Hamy, Brian).
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can chat with others playing the same game by typing onto the game canvas. Text appears transparently and pressing enter sends it to the other players. (Hamy, Ben)
 
 == 4th Build (Feb. 24 - Mar. 12) ==
 
