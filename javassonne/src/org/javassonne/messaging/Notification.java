@@ -50,12 +50,7 @@ public class Notification {
 	public static final String ZOOM_OUT = "NotificationGameZoomOut";
 	public static final String ZOOM_CHANGED = "NotificationGameZoomChanged";
 	public static final String SHIFT_BOARD = "NotificationBoardShift";
-	/*
-	public static final String SHIFT_BOARD_LEFT = "NotificationBoardShiftLeft";
-	public static final String SHIFT_BOARD_RIGHT = "NotificationBoardShiftRight";
-	public static final String SHIFT_BOARD_UP = "NotificationBoardShiftUp";
-	public static final String SHIFT_BOARD_DOWN = "NotificationBoardShiftDown";
-*/
+	
 	public static final String NEW_GAME = "NotificationNewGame";
 	public static final String NEW_NW_GAME = "NotificationNewNetworkGame";
 	public static final String START_GAME = "NotificationStartGame";
