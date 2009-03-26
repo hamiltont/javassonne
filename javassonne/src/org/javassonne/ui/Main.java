@@ -18,23 +18,28 @@
 
 package org.javassonne.ui;
 
+import java.rmi.RemoteException;
+
 import org.javassonne.logger.LogWatcher;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.networking.LocalHost;
+import org.javassonne.networking.impl.JmDNSSingleton;
+import org.javassonne.networking.impl.RemotingUtils;
 import org.javassonne.ui.controllers.GameController;
 import org.javassonne.ui.panels.LogPanel;
-
+import org.springframework.context.ApplicationEvent;
 
 public class Main {
 
 	public static void main(String args[]) {
 		// Create our LogWatcher
-		LogWatcher lw = new LogWatcher();		
-		
+		LogWatcher lw = new LogWatcher();
+
 		// Make sure our HostMonitor singleton is started
 		HostMonitor.getInstance();
-		
+
 		// create the application controller. This will handle starting a new
 		// game, etc...
 		GameController controller = new GameController();
@@ -51,9 +56,20 @@ public class Main {
 
 		// Display the log panel. This is for debugging purposes.
 		LogPanel.getInstance().setVisible(false);
-		
+
 		// Send a notification to the GameController to show the main menu
 		NotificationManager.getInstance().sendNotification(
 				Notification.TOGGLE_MAIN_MENU);
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				JmDNSSingleton.getJmDNS().close();
+				try {
+					RemotingUtils.shutdownService(LocalHost.getName());
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
