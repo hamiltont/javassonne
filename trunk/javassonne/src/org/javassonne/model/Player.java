@@ -102,6 +102,10 @@ public class Player {
 	public void setMeepleRemaining(int meepleRemaining) {
 		this.meepleRemaining_ = meepleRemaining;
 	}
+	
+	public void shiftMeepleRemaining(int shiftAmt){
+		this.meepleRemaining_ += shiftAmt;
+	}
 
 	public int getTurnNumber() {
 		return turnNumber_;

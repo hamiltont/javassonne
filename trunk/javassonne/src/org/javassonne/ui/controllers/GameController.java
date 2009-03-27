@@ -250,6 +250,12 @@ public class GameController {
 	public void scoreTurn(Notification n) {
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
+		
+		//Remove used merson from current player?
+		Meeple placed = iter.current().getMeeple();
+		if(placed != null){
+			players_.get(placed.getPlayer()).shiftMeepleRemaining(-1);
+		}
 
 		// Score completed features on this tile
 		RegionsCalc c = new RegionsCalc(deck_.tileFeatureBindings());
@@ -324,6 +330,8 @@ public class GameController {
 		for (Meeple m : regionMeeple) {
 			counts[m.getPlayer()] += 1;
 			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
+			//Give meeple back
+			players_.get(m.getPlayer()).shiftMeepleRemaining(1);
 		}
 
 		// only score if someone claimed it
