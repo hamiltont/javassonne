@@ -265,7 +265,10 @@ public class BoardController {
 		if (tempPlacedMeeple_ != null) {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+			tempPlacedTile_.getMeeple().setParentTile(null);
+			tempPlacedTile_.setMeeple(null);
 		}
+		
 
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
