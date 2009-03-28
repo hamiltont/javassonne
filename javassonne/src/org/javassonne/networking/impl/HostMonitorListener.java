@@ -63,7 +63,6 @@ public class HostMonitorListener implements ServiceListener {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
 		
-		// TODO - ensure e.getName and our internal names match up
 		String name = e.getName();
 		HostMonitor.getInstance().removeHost(name);
 	}
@@ -98,7 +97,7 @@ public class HostMonitorListener implements ServiceListener {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, hinfo);
  
-		HostMonitor.getInstance().addHost(hostURI);
+		HostMonitor.getInstance().resolveNewHost(hostURI);
 	}
 	
 	private class ServiceRequestor implements Runnable {

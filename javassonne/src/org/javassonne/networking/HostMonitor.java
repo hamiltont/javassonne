@@ -29,9 +29,13 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.impl.CachedHost;
 import org.javassonne.networking.impl.HostMonitorListener;
+import org.javassonne.networking.impl.HostResolver;
+import org.javassonne.networking.impl.HostResolverThreadPool;
 import org.javassonne.networking.impl.JmDNSSingleton;
 import org.javassonne.networking.impl.RemoteHost;
 import org.javassonne.networking.impl.RemotingUtils;
+import org.javassonne.networking.impl.RequestResolveMe;
+import org.javassonne.networking.impl.ShareHost;
 import org.springframework.remoting.RemoteLookupFailureException;
 
 import com.thoughtworks.xstream.XStream;
@@ -99,46 +103,32 @@ public class HostMonitor {
 		return cachedHostList_.size();
 	}
 
-	public boolean addHostNoConfirmation(String hostURI) {
-		System.out.println("HostMonitor: addHostNoConf(" + hostURI + ")");
-		if (isKnownHost(hostURI))
-			return true;
+	public void resolveHost(String hostURI) {
+		System.out.println("HostMonitor: resolveHost: " + hostURI);
+		if (isKnownHost(hostURI)) {
+			System.out.println("HostMonitor: resolveHost: Host " + hostURI
+					+ " already known");
+			return;
+		}
 
-		RemoteHost h = attemptToResolveHost(hostURI);
-		if (h == null)
-			return false;
-
-		// Add them for ourselves
-		addToCachedHostList(new CachedHost(h));
-		System.out.println("HostMonitor: host added");
-		return true;
+		HostResolverThreadPool.execute(new HostResolver(hostURI));
+		System.out.println("HostMonitor: resolveHost exiting");
 	}
 
-	public boolean addHostNoPropagation(String hostURI) {
-		System.out.println("HostMonitor: addHostNoProp(" + hostURI + ")");
-		if (isKnownHost(hostURI))
-			return true;
+	public void shareHost(String hostURI) {
+		System.out.println("HostMonitor: shareHost: " + hostURI);
+		if (isKnownHost(hostURI)) {
+			System.out.println("HostMonitor: shareHost: " + hostURI
+					+ " already known");
+			return;
+		}
 
-		final RemoteHost host = attemptToResolveHost(hostURI);
-		if (host == null)
-			return false;
-
-		// Request they add us without confirming
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				boolean canTheySeeMe = host.addHostNoConfirmation(LocalHost
-						.getURI());
-				if (canTheySeeMe == false)
-					sendFirewallNotification();
-			}
-		});
-
-		// Add them for ourselves
-		addToCachedHostList(new CachedHost(host));
-		System.out.println("HostMonitor: host added");
-		return true;
+		// Request they add us
+		HostResolverThreadPool
+				.execute(new RequestResolveMe(LocalHost.getURI()));
+		System.out.println("HostMonitor: shareHost exiting");
 	}
-	
+
 	// TODO asdf
 	private void sendFirewallNotification() {
 		System.out.println("HostMonitor: possible firewill detected");
@@ -152,16 +142,23 @@ public class HostMonitor {
 		return false;
 	}
 
-	private synchronized void addToCachedHostList(CachedHost h) {
+	public synchronized void addToCachedHostList(CachedHost h) {
 		if (isKnownHost(h.getURI()))
 			return;
 		cachedHostList_.add(h);
 	}
 
-	public boolean addHost(final String hostURI) {
-		System.out.println("HostMonitor: addHost(" + hostURI + ")");
-		if (isKnownHost(hostURI))
-			return true;
+	/**
+	 * Local call only! Remote hosts cannot call this method
+	 * @param hostURI
+	 */
+	public void resolveNewHost(String hostURI) {
+		System.out.println("HostMonitor: resolveNewHost: " + hostURI);
+		if (isKnownHost(hostURI)) {
+			System.out.println("HostMonitor: resolveNewHost: " + hostURI
+					+ " already known");
+			return;
+		}
 
 		// Check if it is the localhost
 		if (hostURI.equals(LocalHost.getURI())) {
@@ -170,46 +167,20 @@ public class HostMonitor {
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, info);
 
-			return true;
+			return;
 		}
 
-		// Try to resolve host
-		final RemoteHost h = attemptToResolveHost(hostURI);
-		if (h == null)
-			return false;
+		// TODO - here we should record their URI and set a timer for
+		// them to call us back (for firewall detection)
+		// TODO - or we could do this entirely in the RequestResolveMe thread?
+		// perhaps with a wait call!?
 
-		// Add them for ourselves
-		final CachedHost host = new CachedHost(h);
-		addToCachedHostList(new CachedHost(h));
-		System.out.println("HostMonitor: host added");
+		// Request that they add us
+		HostResolverThreadPool.execute(new RequestResolveMe(hostURI));
 
-		// Request they add us without confirming
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				boolean canTheySeeMe = host.addHostNoConfirmation(LocalHost.getURI());
-				if (canTheySeeMe == false)
-					sendFirewallNotification();
-			}
-		});
-
-		// Request all our known hosts to add them,
-		// without propagating the message farther
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				for (Iterator<CachedHost> it = cachedHostList_.iterator(); it
-						.hasNext();) {
-					CachedHost next = it.next();
-
-					// Forward the URL to everyone but the host
-					// it came from
-					// We are only interested if they can see us, not
-					// hostURI, so we ignore the return here
-					if (next.getURI().equals(hostURI) == false)
-						next.addHostNoPropagation(hostURI);
-				}
-			}
-		});
-		return true;
+		// Share the discovered service with our peers
+		HostResolverThreadPool.execute(new ShareHost(hostURI,
+				deepCopyCachedHosts()));
 	}
 
 	public RemoteHost attemptToResolveHost(String hostURI) {
@@ -238,13 +209,25 @@ public class HostMonitor {
 		return h;
 	}
 
+	private ArrayList<CachedHost> deepCopyCachedHosts() {
+		String deepCopy = xStream_.toXML(cachedHostList_);
+		return (ArrayList<CachedHost>) xStream_.fromXML(deepCopy);
+	}
+
 	public void removeHost(String name) {
 		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();) {
 			CachedHost next = it.next();
+			// TODO - change to name.equals(JavassonneHost_ + next.getName() )
+			// and verify
 			if (name.contains(next.getName())) {
 				cachedHostList_.remove(next);
 				break;
 			}
 		}
+	}
+	
+	// TODO - implement
+	public void receiveACK(String hostURI) {
+		System.out.println("HostMonitor: ACK received from " + hostURI);
 	}
 }

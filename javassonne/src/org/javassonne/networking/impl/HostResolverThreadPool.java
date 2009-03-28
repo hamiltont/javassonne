@@ -3,7 +3,7 @@
  *  http://code.google.com/p/javassonne/
  * 
  * @author [Add Name Here]
- * @date Mar 26, 2009
+ * @date Mar 27, 2009
  * 
  * Copyright 2009 Javassonne Team
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,28 @@
 
 package org.javassonne.networking.impl;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.rmi.server.RMISocketFactory;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-class TimeoutFactory extends RMISocketFactory {
-	private int timeout;
-	public TimeoutFactory(int timeout) {
-		this.timeout = timeout;
+public class HostResolverThreadPool {
+	private Executor executor_;
+	private static HostResolverThreadPool instance_ = null;
+	
+	private HostResolverThreadPool() {
+		executor_ = Executors.newCachedThreadPool();
 	}
-
-	public Socket createSocket(String host, int port) throws IOException {
-		Socket ret = getDefaultSocketFactory().createSocket(host, port);
-		ret.setSoTimeout(timeout);
-		return ret;
+	
+	private static HostResolverThreadPool getInstance() {
+		if (instance_ == null)
+			instance_ = new HostResolverThreadPool();
+		return instance_;
 	}
-	public ServerSocket createServerSocket(int port) throws IOException {
-		return getDefaultSocketFactory().createServerSocket(port);
+	
+	public static void execute(Runnable r) {
+		getInstance()._execute(r);
+	}
+	
+	private void _execute(Runnable r) {
+		executor_.execute(r);
 	}
 }

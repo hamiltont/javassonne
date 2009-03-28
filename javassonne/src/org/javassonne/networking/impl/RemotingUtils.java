@@ -33,13 +33,6 @@ public class RemotingUtils {
 			LOCAL_HOST = InetAddress.getLocalHost().getHostAddress();
 		} catch (Exception e) {
 		}
-		
-		try {
-			RMISocketFactory.setSocketFactory(new TimeoutFactory(500));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private static Map<String, RmiServiceExporter> serviceMap_ = new HashMap<String, RmiServiceExporter>();

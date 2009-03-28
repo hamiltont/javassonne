@@ -33,7 +33,7 @@ public class TestLauncher {
 	public static void main(String[] args) {
 
 		String hostURI = "rmi://129.59.82.77:5099/JavassonneHost_demetri-d5042f7";
-		HostMonitor.getInstance().addHost(hostURI);
+		//HostMonitor.getInstance().addHost(hostURI);
 		
 		
 		
