@@ -92,7 +92,7 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public boolean addClient(String clientURI) {
+	public void addClient(String clientURI) {
 		// Check we are open for connections
 		if (clientsCanConnect_ == false) {
 
@@ -107,7 +107,7 @@ public class LocalHostImpl implements RemoteHost {
 
 		RemoteClient rc = attemptToResolveClient(clientURI);
 		if (rc == null)
-			return false;
+			return;
 
 		CachedClient cc = new CachedClient(rc);
 		connectedClients_.add(cc);
@@ -116,8 +116,6 @@ public class LocalHostImpl implements RemoteHost {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
-		
-		return true;
 	}
 
 	public RemoteClient attemptToResolveClient(String clientURI) {
@@ -281,22 +279,22 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public boolean addHost(String hostURI) {
-		return HostMonitor.getInstance().addHost(hostURI);
+	public void resolveHost(String hostURI) {
+		HostMonitor.getInstance().resolveHost(hostURI);
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public boolean addHostNoConfirmation(String hostURI) {
-		return HostMonitor.getInstance().addHostNoConfirmation(hostURI);
+	public void shareHost(String hostURI) {
+		HostMonitor.getInstance().shareHost(hostURI);
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public boolean addHostNoPropagation(String hostURI) {
-		return HostMonitor.getInstance().addHostNoPropagation(hostURI);
+	public void receiveACK(String hostURI) {
+		HostMonitor.getInstance().receiveACK(hostURI);
 	}
 
 }

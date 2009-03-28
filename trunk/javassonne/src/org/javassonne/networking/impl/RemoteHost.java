@@ -42,35 +42,28 @@ public interface RemoteHost {
 	 * @param clientURI
 	 *            The URI of the client to add
 	 */
-	public boolean addClient(String clientURI);
+	public void addClient(String clientURI);
 
 	/**
-	 * Adds a host, requests that that host add us without sending a
-	 * confirmation addHost call, and then sends the new hosts to all of our
-	 * immediately connected hosts, requesting that none of them propagate the
-	 * hostURI further
+	 * Called by external hosts that can "see" us. They expect an ACK back in a
+	 * timely manner to know if we can also "see" them.
+	 * 
+	 * Internally we fire a HostResolver call to handle this
 	 * 
 	 * @param hostURI
+	 *            the URI of the remote host that contacted us
 	 */
-	public boolean addHost(String hostURI);
+	public void resolveHost(String hostURI);
 
 	/**
-	 * Used to request that we add a host without also requesting that they add
-	 * us. This is used when another host discovers us, and they would like to
-	 * ensure that we know about them (aka that the line of sight is two way)
+	 * Used by our peers to notify us of new network hosts. We try to get in
+	 * touch with the passed host using a RequestResolveMe event asking them to
+	 * call us back
 	 * 
 	 * @param hostURI
+	 *            the URI of the remote host that one of our peers knows about
 	 */
-	public boolean addHostNoConfirmation(String hostURI);
-
-	/**
-	 * This is used to request that we try to connect to a host (also making
-	 * sure they see us by performing a addNoConfirmation call on them). This
-	 * implements a version of a limited query flooding approach.
-	 * 
-	 * @param hostURI
-	 */
-	public boolean addHostNoPropagation(String hostURI);
+	public void shareHost(String hostURI);
 
 	/**
 	 * If the client is currently considered to be connected to this host, this
@@ -123,4 +116,16 @@ public interface RemoteHost {
 	 * ignore or act on these.
 	 */
 	public void receiveNotification(String serializedNotification);
+
+	/**
+	 * Receive a confirmation from a host that they could resolve us. This
+	 * indicates that there is a clear, two-way line of sight
+	 * 
+	 * This call typically results from the inside of a resolveHost call which
+	 * we initiated, probably from inside one of our RequestResolveMe calls
+	 * 
+	 * @param hostURI
+	 *            the URI of the host that was able to resolve this
+	 */
+	public void receiveACK(String hostURI);
 }
