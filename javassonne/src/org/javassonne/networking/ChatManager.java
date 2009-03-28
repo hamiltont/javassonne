@@ -46,7 +46,7 @@ public class ChatManager implements Iterable<String> {
 	private Mode mode_;
 
 	// Currently contains only alphanumeric, should prob add symbols
-	private static String allowed_ = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}<>,.?/\\|;':\"~`- ";
+	private static String allowed_ = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}<>,.?/\\|;':\"~` ";
 
 	private ChatManager() {
 		currentMessage_ = new StringBuffer();
