@@ -15,7 +15,7 @@
 == 6th Build (Mar. 30 - Apr. 9) ==
 
 Game Team:
- * User's meeple are scored at the end of the game (includes partially completed features and farms).
+ * User's meeple are scored at the end of the game (includes partially completed features and farms). (Kyle)
  * User can see an end-game screen that shows game statistics
  * User can save a local (not network) game to an XML file and load it later to resume play.
  * User can hear in-game sound effects. SoundManager listens for specific notifications and plays sounds for notifications.
