@@ -153,7 +153,11 @@ public class GameController {
 	public void startGame(Notification n) {
 		playerData_ = (InputPlayerDataPanel) n.argument();
 
-		if (!playerData_.validateColors(playerData_.getPlayerColors())) {
+		if (!playerData_.validatePlayerNames(playerData_.getPlayerNames())) {
+			JPopUp warning = new JPopUp(
+					"At least two player names must be entered");
+			warning.showMsg();
+		} else if (!playerData_.validateColors(playerData_.getPlayerColors())) {
 			JPopUp warning = new JPopUp("Each player must have a unique color");
 			warning.showMsg();
 		} else {
@@ -250,10 +254,10 @@ public class GameController {
 	public void scoreTurn(Notification n) {
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
-		
-		//Remove used merson from current player?
+
+		// Remove used merson from current player?
 		Meeple placed = iter.current().getMeeple();
-		if(placed != null){
+		if (placed != null) {
 			players_.get(placed.getPlayer()).shiftMeepleRemaining(-1);
 		}
 
@@ -330,7 +334,7 @@ public class GameController {
 		for (Meeple m : regionMeeple) {
 			counts[m.getPlayer()] += 1;
 			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
-			//Give meeple back
+			// Give meeple back
 			players_.get(m.getPlayer()).shiftMeepleRemaining(1);
 		}
 
@@ -382,20 +386,22 @@ public class GameController {
 		if (menu_.isShowing()) {
 			if (gameInProgress_)
 				DisplayHelper.getInstance().remove(menu_);
-		} else{
-			//Make sure the instructions menu is hidden
-			NotificationManager.getInstance().sendNotification(Notification.TOGGLE_INSTRUCTIONS,0);
-			
+		} else {
+			// Make sure the instructions menu is hidden
+			NotificationManager.getInstance().sendNotification(
+					Notification.TOGGLE_INSTRUCTIONS, 0);
+
 			DisplayHelper.getInstance().add(menu_, DisplayHelper.Layer.MODAL,
 					DisplayHelper.Positioning.CENTER);
 		}
 	}
 
 	/*
-	 * Notification n:  optional Integer  0: hide, 1:show
+	 * Notification n: optional Integer 0: hide, 1:show
 	 */
 	public void toggleInstructions(Notification n) {
-		if (instructions_.isShowing() || (n.argument() != null && ((Integer) n.argument()).equals(0))) {
+		if (instructions_.isShowing()
+				|| (n.argument() != null && ((Integer) n.argument()).equals(0))) {
 			DisplayHelper.getInstance().remove(instructions_);
 		} else
 			DisplayHelper.getInstance()
@@ -436,12 +442,6 @@ public class GameController {
 		for (String s : playerData_.getPlayerNames()) {
 			if (s.length() > 0) {
 				Player player = new Player(s);
-				player.setMeepleColor(playerData_.getPlayerColors().get(
-						playerCount));
-				players_.add(player);
-				playerCount++;
-			} else if (playerCount < 2) {
-				Player player = new Player();
 				player.setMeepleColor(playerData_.getPlayerColors().get(
 						playerCount));
 				players_.add(player);

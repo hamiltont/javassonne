@@ -207,6 +207,24 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		}
 	}
+	
+	public boolean validatePlayerNames(List<String> names)
+	{
+		int playerCount = 0;
+		
+		for (String s : names) {
+			if (s.length() > 0) {
+				playerCount++;
+			}
+		}
+		
+		if(playerCount < 2)
+		{
+			return false;
+		}
+		
+		return true;
+	}
 
 	public boolean validateColors(List<MeepleColor> colors) {
 		int playerCount = 0;
