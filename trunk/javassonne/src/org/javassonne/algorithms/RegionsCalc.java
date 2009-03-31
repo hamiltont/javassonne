@@ -24,9 +24,13 @@ package org.javassonne.algorithms;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
@@ -34,9 +38,9 @@ import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileFeatureBindings;
 
 /**
- * @author Kyle Prete Note: If the board this RegionsCalc is indirectly
- *         attached to is changed, the RegionsCalc must be destroyed as all its
- *         data is corrupt.
+ * @author Kyle Prete Note: If the board this RegionsCalc is indirectly attached
+ *         to is changed, the RegionsCalc must be destroyed as all its data is
+ *         corrupt.
  * 
  *         May enforce this by listening for board_changed events.
  */
@@ -44,10 +48,10 @@ public class RegionsCalc {
 
 	public RegionsCalc(TileFeatureBindings tfbRef) {
 		tileFeatureBindings_ = tfbRef;
-		marked_ = new HashMap<Point, HashMap<Tile.Region, Integer>>();
-		globalMeep_ = new HashMap<Point, HashMap<Tile.Region, List<Meeple>>>();
-		isComplete_ = new HashMap<Point, HashMap<Tile.Region, Boolean>>();
-		
+		marked_ = new HashMap<Point, EnumMap<Tile.Region, Integer>>();
+		globalMeep_ = new HashMap<Point, EnumMap<Tile.Region, List<Meeple>>>();
+		isComplete_ = new HashMap<Point, EnumMap<Tile.Region, Boolean>>();
+
 	}
 
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
@@ -57,9 +61,11 @@ public class RegionsCalc {
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
 			if (marked_.get(p) == null)
-				marked_.put(p, new HashMap<Tile.Region, Integer>());
-			globalMeep_.put(p, new HashMap<Tile.Region, List<Meeple>>());
-			isComplete_.put(p, new HashMap<Tile.Region, Boolean>());
+				marked_.put(p, new EnumMap<Tile.Region, Integer>(Tile.Region.class));
+			if (globalMeep_.get(p) == null)
+				globalMeep_.put(p, new EnumMap<Tile.Region, List<Meeple>>(Tile.Region.class));
+			if (isComplete_.get(p) == null)
+				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(Tile.Region.class));
 			for (Tile.Region r : list.get(p)) {
 				marked_.get(p).put(r, total);
 				globalMeep_.get(p).put(r, meeps);
@@ -116,7 +122,7 @@ public class RegionsCalc {
 				// never found null tile, so monastery is complete
 				if (marked_.get(iter.getLocation()) == null)
 					marked_.put(iter.getLocation(),
-							new HashMap<Tile.Region, Integer>());
+							new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 				marked_.get(iter.getLocation()).put(reg, 9);
 				return true;
 			}
@@ -128,7 +134,7 @@ public class RegionsCalc {
 		if (marked_.get(iter.getLocation()) == null)
 			marked_
 					.put(iter.getLocation(),
-							new HashMap<Tile.Region, Integer>());
+							new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 		marked_.get(iter.getLocation()).put(reg, 0);
 		if (list.get(iter.getLocation()) == null)
 			list.put(iter.getLocation(), new ArrayList<Tile.Region>());
@@ -184,7 +190,7 @@ public class RegionsCalc {
 	// If traverseRegion has touched given region of Tile at given location
 	// This function returns the size of the region, else, returns -1
 	public Integer getsizeOfRegion(Point loc, Tile.Region reg) {
-		HashMap<Tile.Region, Integer> tileRegions = marked_.get(loc);
+		Map<Tile.Region, Integer> tileRegions = marked_.get(loc);
 		if (tileRegions == null)
 			return -1;
 
@@ -197,20 +203,20 @@ public class RegionsCalc {
 
 	public List<Meeple> getMeepleList(Point loc, Tile.Region reg) {
 		ArrayList<Meeple> returnVal = new ArrayList<Meeple>();
-		HashMap<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
+		Map<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
 		if (tileRegions == null)
 			return returnVal;
 
 		List<Meeple> temp = tileRegions.get(reg);
 		if (temp == null)
 			return returnVal;
-
-		returnVal.addAll(tileRegions.get(reg));
+		
+		returnVal.addAll(temp);
 		return returnVal;
 	}
 
 	public boolean getRegionCompletion(Point loc, Tile.Region reg) {
-		HashMap<Tile.Region, Boolean> tileRegions = isComplete_.get(loc);
+		Map<Tile.Region, Boolean> tileRegions = isComplete_.get(loc);
 		if (tileRegions == null)
 			return false;
 		Boolean temp = tileRegions.get(reg);
@@ -220,9 +226,9 @@ public class RegionsCalc {
 	}
 
 	// Keeps track of touched locations
-	private HashMap<Point, HashMap<Tile.Region, Integer>> marked_;
-	private HashMap<Point, HashMap<Tile.Region, List<Meeple>>> globalMeep_;
-	private HashMap<Point, HashMap<Tile.Region, Boolean>> isComplete_;
+	private HashMap<Point, EnumMap<Tile.Region, Integer>> marked_;
+	private HashMap<Point, EnumMap<Tile.Region, List<Meeple>>> globalMeep_;
+	private HashMap<Point, EnumMap<Tile.Region, Boolean>> isComplete_;
 
 	private TileFeatureBindings tileFeatureBindings_;
 
