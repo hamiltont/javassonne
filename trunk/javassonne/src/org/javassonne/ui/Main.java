@@ -49,8 +49,7 @@ public class Main {
 		window.setVisible(true);
 
 		// set the display helper's layeredPane so that other controllers can
-		// add JPanels to
-		// the window really easily.
+		// add JPanels to the window really easily.
 		DisplayHelper.getInstance().setDesktopPane(
 				window.getDisplayDesktopPane());
 

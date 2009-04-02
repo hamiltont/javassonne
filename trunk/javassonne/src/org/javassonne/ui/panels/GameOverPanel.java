@@ -21,22 +21,23 @@ package org.javassonne.ui.panels;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
-import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.GameState;
 
 public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 	
-	public GameOverPanel(List<Player> players) {
+	public GameOverPanel() {
 		super();
+		
+		ArrayList<Player> players = GameState.getInstance().getPlayers();
 		
 		removeKeyListener(getKeyListeners()[0]);
 		

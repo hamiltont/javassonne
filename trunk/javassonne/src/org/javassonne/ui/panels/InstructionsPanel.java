@@ -27,21 +27,20 @@ import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.controls.JScrollablePicture;
 
-public class InstructionsPanel extends JPanel implements MouseListener {
+public class InstructionsPanel extends AbstractHUDPanel implements MouseListener {
 	private static final String GAME_INSTRUCTIONS_IMAGE = "images/game_instructions.jpg";
 
 	public InstructionsPanel() {
 		setOpaque(false);
 		setVisible(true);
-
+		setFocusable(false);
+		
 		// Get the image to use.
 		ImageIcon image = new ImageIcon(GAME_INSTRUCTIONS_IMAGE);
 
@@ -68,13 +67,12 @@ public class InstructionsPanel extends JPanel implements MouseListener {
 		add(pictureScrollPane);
 
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
-				this, "endGame");
+			this, "endGame");
 
 	}
 
 	public void endGame(Notification n) {
-		// close ourselves
-		DisplayHelper.getInstance().remove(this);
+		close();
 	}
 
 	/*

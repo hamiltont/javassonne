@@ -36,6 +36,7 @@ import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileFeatureBindings;
+import org.javassonne.ui.GameState;
 
 /**
  * @author Kyle Prete Note: If the board this RegionsCalc is indirectly attached
@@ -46,8 +47,7 @@ import org.javassonne.model.TileFeatureBindings;
  */
 public class RegionsCalc {
 
-	public RegionsCalc(TileFeatureBindings tfbRef) {
-		tileFeatureBindings_ = tfbRef;
+	public RegionsCalc() {
 		marked_ = new HashMap<Point, EnumMap<Tile.Region, Integer>>();
 		globalMeep_ = new HashMap<Point, EnumMap<Tile.Region, List<Meeple>>>();
 		isComplete_ = new HashMap<Point, EnumMap<Tile.Region, Boolean>>();
@@ -60,12 +60,14 @@ public class RegionsCalc {
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
 		int total = list.keySet().size();
 		for (Point p : list.keySet()) {
+
 			if (marked_.get(p) == null)
 				marked_.put(p, new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 			if (globalMeep_.get(p) == null)
 				globalMeep_.put(p, new EnumMap<Tile.Region, List<Meeple>>(Tile.Region.class));
 			if (isComplete_.get(p) == null)
 				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(Tile.Region.class));
+
 			for (Tile.Region r : list.get(p)) {
 				marked_.get(p).put(r, total);
 				globalMeep_.get(p).put(r, meeps);
@@ -170,9 +172,12 @@ public class RegionsCalc {
 		}
 		// if feature does not end traversal
 		// traverse to other regions in Tile except center
+		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
+				.tileFeatureBindings();
+
 		if (!iter.current().featureInRegion(reg).endsTraversal) {
 			for (Tile.Region r : Tile.Region.values()) {
-				if (tileFeatureBindings_.featuresBind(iter.current()
+				if (bindings_.featuresBind(iter.current()
 						.featureIdentifierInRegion(r), iter.current()
 						.featureIdentifierInRegion(reg))
 						&& !r.equals(Tile.Region.Center)) {
@@ -229,7 +234,5 @@ public class RegionsCalc {
 	private HashMap<Point, EnumMap<Tile.Region, Integer>> marked_;
 	private HashMap<Point, EnumMap<Tile.Region, List<Meeple>>> globalMeep_;
 	private HashMap<Point, EnumMap<Tile.Region, Boolean>> isComplete_;
-
-	private TileFeatureBindings tileFeatureBindings_;
 
 }

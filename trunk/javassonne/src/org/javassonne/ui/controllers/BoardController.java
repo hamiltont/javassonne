@@ -33,14 +33,13 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.BoardPositionFilledException;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.NotValidPlacementException;
-import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
-import org.javassonne.model.TileFeatureBindings;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.map.TilePlacementSprite;
 import org.javassonne.ui.panels.HUDConfirmPlacementPanel;
@@ -57,15 +56,8 @@ public class BoardController {
 	TilePlacementSprite tempPlacementSprite_;
 	TileBoardGenIterator tempLocationIter_;
 
-	Tile tileInHand_;
-	TileBoard board_;
-
 	List<Tile.Region> currentRegionOptions_;
 	List<Tile.Quadrant> currentQuadrantOptions_;
-
-	TileFeatureBindings bindings_;
-	List<Player> players_;
-	int currentPlayer_ = 0;
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -77,12 +69,7 @@ public class BoardController {
 	 *            begun.
 	 * @param players_
 	 */
-	public BoardController(TileBoard b, TileFeatureBindings bindings,
-			List<Player> players) {
-
-		board_ = b;
-		bindings_ = bindings;
-		players_ = players;
+	public BoardController() {
 
 		tempLitTile_ = new Tile();
 		try {
@@ -99,39 +86,19 @@ public class BoardController {
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
-		n.addObserver(Notification.TILE_IN_HAND_CHANGED, this,
-				"updateTileInHand");
-		n
-				.addObserver(Notification.SET_CURRENT_PLAYER, this,
-						"setCurrentPlayer");
-
-		// Now that we have a board object, we want to update the interface to
-		// show the board. Share our board_ object in a notification so the
-		// views can get it and display it.
-		NotificationManager.getInstance().sendNotification(
-				Notification.BOARD_SET, board_);
-
-	}
-
-	public void setCurrentPlayer(Notification n) {
-		currentPlayer_ = (Integer) n.argument();
+		n.addObserver(Notification.UPDATED_TILE_IN_HAND, this,"updateTileInHand");
 	}
 
 	public void endGame(Notification n) {
 		// Unsubscribe from notifications once the game has ended
 		NotificationManager.getInstance().removeObserver(this);
-
-		// let go of the board and the tileInhand. They should not be used
-		// once this notification is received and setting to null allows
-		// us to make sure this is followed.
-		board_ = null;
-		tileInHand_ = null;
 	}
 
 	public void endTurn(Notification n) {
 		// update the tile's status so that it is now permanent
 		try {
-			board_.removeTempStatus(tempLocationIter_);
+			GameState.getInstance().getBoard().removeTempStatus(
+					tempLocationIter_);
 		} catch (NotValidPlacementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -152,24 +119,27 @@ public class BoardController {
 	}
 
 	public void placeTile(Notification n) {
-		if (tileInHand_ != null) {
+		Tile tileInHand = GameState.getInstance().getTileInHand();
+		TileBoard board = GameState.getInstance().getBoard();
+		
+		if (tileInHand != null) {
 			Point here = (Point) (n.argument());
-			tempLocationIter_ = new TileBoardGenIterator(board_, here);
+			tempLocationIter_ = new TileBoardGenIterator(board, here);
 
 			try {
-				if (board_.isValidPlacement(tempLocationIter_, tileInHand_)) {
+				if (board.isValidPlacement(tempLocationIter_, tileInHand)) {
 
 					// remove the tile from our hand
-					tempPlacedTile_ = tileInHand_;
-					NotificationManager.getInstance().sendNotification(
-							Notification.TILE_IN_HAND_CHANGED, null);
-
+					tempPlacedTile_ = tileInHand;
+					GameState.getInstance().setTileInHand(null);
+					
 					// add the tile to the board
-					board_.removeTemps();
-					board_.addTemp(tempLocationIter_, tempPlacedTile_);
-
+					board.removeTemps();
+					board.addTemp(tempLocationIter_, tempPlacedTile_);
+					GameState.getInstance().setBoard(board);
+					
 					// show the confirm placement panel
-					MeepleColor c = players_.get(currentPlayer_)
+					MeepleColor c = GameState.getInstance().getCurrentPlayer()
 							.getMeepleColor();
 					HUDConfirmPlacementPanel confirmPanel = new HUDConfirmPlacementPanel(
 							c);
@@ -178,16 +148,11 @@ public class BoardController {
 							DisplayHelper.Positioning.TOP_CENTER);
 					confirmPanel.attachMeeplePanels();
 
-					// trigger an update of the board so the board is
-					// re-rendered with the new temp-tiles in place.
-					NotificationManager.getInstance().sendNotification(
-							Notification.BOARD_SET, board_);
-
 					// highlight the tile on the map and show placement options
 					tempPlacementSprite_ = new TilePlacementSprite(here);
 
 					// determine what regions of the tile are valid placements
-					RegionsCalc r = new RegionsCalc(bindings_);
+					RegionsCalc r = new RegionsCalc();
 					currentRegionOptions_ = new ArrayList<Tile.Region>();
 
 					for (Tile.Region region : Tile.Region.values()) {
@@ -239,14 +204,14 @@ public class BoardController {
 						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 			}
 
-			m.setPlayer(currentPlayer_);
+			m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
 
 			// add the meeple to the tile
 			tempPlacedTile_.setMeeple(m);
 
 			// add the meeple sprite to the map layer so the guy is visible
-			tempPlacedMeeple_ = new MeepleSprite(m, players_
-					.get(currentPlayer_).getMeepleColor());
+			MeepleColor c = GameState.getInstance().getCurrentPlayer().getMeepleColor();
+			tempPlacedMeeple_ = new MeepleSprite(m, c);
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
@@ -256,9 +221,9 @@ public class BoardController {
 	}
 
 	public void undoPlaceTile(Notification n) {
-		board_.removeTemps();
-		NotificationManager.getInstance().sendNotification(
-				Notification.TILE_IN_HAND_CHANGED, tempPlacedTile_);
+		GameState.getInstance().getBoard().removeTemps();
+		GameState.getInstance().setTileInHand(tempPlacedTile_);
+		
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
@@ -277,17 +242,18 @@ public class BoardController {
 
 	public void updateTileInHand(Notification n) {
 		Boolean shouldPopulateLocations = false;
-		Tile t = (Tile) n.argument();
+		
+		TileBoard board = GameState.getInstance().getBoard();
+		Tile tileInHand = GameState.getInstance().getTileInHand();
 
-		shouldPopulateLocations = ((tileInHand_ == null) || ((t != null) && (t
-				.getUniqueIdentifier() != tileInHand_.getUniqueIdentifier())));
-
-		tileInHand_ = t;
+		Boolean isLocal = GameState.getInstance().getCurrentPlayer().getIsLocal();
+		shouldPopulateLocations = ((tileInHand != null) && isLocal);
 
 		// Do we need to populate possible locations?
 		if (shouldPopulateLocations) {
 			try {
-				Set<TileBoardIterator> temp = board_.possiblePlacements(t);
+				board.removeTemps();
+				Set<TileBoardIterator> temp = board.possiblePlacements(tileInHand);
 
 				// If there are none, throw out TileInHand
 				if (temp.isEmpty()) {
@@ -299,9 +265,8 @@ public class BoardController {
 
 					// Otherwise, add the possibles
 				} else {
-					board_.addTemps(temp, tempLitTile_);
-					NotificationManager.getInstance().sendNotification(
-							Notification.BOARD_SET, board_);
+					board.addTemps(temp, tempLitTile_);
+					GameState.getInstance().setBoard(board);
 				}
 			} catch (BoardPositionFilledException e) {
 				// we really shouldn't get here if possible placements works

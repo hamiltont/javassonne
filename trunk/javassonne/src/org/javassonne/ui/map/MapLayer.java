@@ -46,6 +46,7 @@ import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.networking.ChatManager;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.JKeyListener;
 
 /**
@@ -54,7 +55,6 @@ import org.javassonne.ui.JKeyListener;
  */
 public class MapLayer extends JPanel implements MouseListener,
 		MouseMotionListener {
-	private TileBoard board_;
 	private BufferedImage backgroundTile_;
 
 	private BufferedImage boardBuffer_ = null;
@@ -106,7 +106,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		
 		// Listen for notification setting our board model
 		NotificationManager n = NotificationManager.getInstance();
-		n.addObserver(Notification.BOARD_SET, this, "setBoard");
+		n.addObserver(Notification.UPDATED_GAME_IN_PROGRESS, this, "updatedBoard");
+		n.addObserver(Notification.UPDATED_BOARD, this, "updatedBoard");
 		// Listen for end-game so we know we need to clear the board.
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		// Listen for notifications changing the zoom
@@ -142,7 +143,6 @@ public class MapLayer extends JPanel implements MouseListener,
 		// click listener so we can detect clicks.
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-
 		this.addKeyListener(JKeyListener.getInstance());
 
 		// create the buffers we need for drawing
@@ -203,7 +203,8 @@ public class MapLayer extends JPanel implements MouseListener,
 			updateTimer_ = null;
 		}
 
-		if (board_ == null)
+		TileBoard board = GameState.getInstance().getBoard();
+		if (board == null)
 			return;
 
 		// determine if the timer should be firing or not. If any of our sprites
@@ -240,8 +241,8 @@ public class MapLayer extends JPanel implements MouseListener,
 	// FOLLOWING GAME STATE
 	// ------------------------------------------------------------------------
 
-	public void setBoard(Notification n) {
-		board_ = (TileBoard) n.argument();
+	public void updatedBoard(Notification n) {
+		requestFocus();
 		renderBoard();
 		repaint();
 	}
@@ -250,7 +251,6 @@ public class MapLayer extends JPanel implements MouseListener,
 		// let go of the board. It should not be used once this notification
 		// is received and setting to null allows us to make sure this is
 		// followed.
-		board_ = null;
 		sprites_.clear();
 
 		// reset the board scroll offset, in case they start a new game
@@ -262,7 +262,8 @@ public class MapLayer extends JPanel implements MouseListener,
 	}
 
 	public void tileDropped(Notification n) {
-		if (board_ == null)
+		TileBoard board = GameState.getInstance().getBoard();
+		if (board == null)
 			return;
 
 		Point p = this.getTileAtScreenPoint((Point) n.argument());
@@ -272,7 +273,8 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public void meepleDropped(Notification n) {
 
-		if (board_ == null)
+		TileBoard board = GameState.getInstance().getBoard();
+		if (board == null)
 			return;
 
 		Point dropPoint = (Point) n.argument();
@@ -297,7 +299,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 		Meeple m = new Meeple();
 		m.setParentTileLocation(tileLocation);
-		m.setParentTile(board_.getTile(new TileBoardGenIterator(board_,
+		m.setParentTile(board.getTile(new TileBoardGenIterator(board,
 				tileLocation)));
 		m.setRegionOnTile(lowest);
 
@@ -373,10 +375,11 @@ public class MapLayer extends JPanel implements MouseListener,
 	 *            respectively.
 	 */
 	public void shiftView(Point amount) {
+		TileBoard board = GameState.getInstance().getBoard();
 		// paint the board background from the top left to the bottom
 		// right
-		Point topLeft = board_.getUpperLeftCorner().getLocation();
-		Point bottomRight = board_.getLowerRightCorner().getLocation();
+		Point topLeft = board.getUpperLeftCorner().getLocation();
+		Point bottomRight = board.getLowerRightCorner().getLocation();
 
 		// Compute the size of the board, size of the tiles, etc...
 		// and determine if we can actually move.
@@ -423,6 +426,8 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public synchronized void paint(Graphics gra) {
 
+		TileBoard board = GameState.getInstance().getBoard();
+		
 		int w = this.getWidth();
 		int h = this.getHeight();
 
@@ -441,9 +446,9 @@ public class MapLayer extends JPanel implements MouseListener,
 		}
 
 		// now draw all of the sprites
-		if (board_ != null){
+		if (board != null){
 			if (sprites_.size() > 0) {
-				Point offset = getScreenPointFromTileLocation(board_.homeTile()
+				Point offset = getScreenPointFromTileLocation(board.homeTile()
 						.getLocation());
 				for (MapSprite s : sprites_)
 					s.draw(gra, offset, scale_);
@@ -474,7 +479,9 @@ public class MapLayer extends JPanel implements MouseListener,
 	 * scrolls. It must be re-rendered when a new tile is added, etc..
 	 */
 	public void renderBoard() {
-		if (board_ == null) {
+		TileBoard board = GameState.getInstance().getBoard();
+		
+		if (board == null) {
 			Graphics gra = boardBuffer_.getGraphics();
 
 			// paint a solid background color
@@ -486,8 +493,8 @@ public class MapLayer extends JPanel implements MouseListener,
 		try {
 			// paint the board background from the top left to the bottom
 			// right
-			Point topLeft = board_.getUpperLeftCorner().getLocation();
-			Point bottomRight = board_.getLowerRightCorner().getLocation();
+			Point topLeft = board.getUpperLeftCorner().getLocation();
+			Point bottomRight = board.getLowerRightCorner().getLocation();
 
 			// Compute the size of the board, size of the tiles, etc...
 			int boardWidth = (int) (Math.abs(bottomRight.getX()
@@ -512,7 +519,7 @@ public class MapLayer extends JPanel implements MouseListener,
 			gra.fillRect(0, 0, bufferWidth, bufferHeight);
 
 			// get the tile iterator.
-			TileBoardIterator iter = board_.getUpperLeftCorner();
+			TileBoardIterator iter = board.getUpperLeftCorner();
 
 			// TODO: Right now, we're drawing every tile on the map, even if
 			// they are off to one side and not actually visible in the buffer.
@@ -555,6 +562,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public Point getTileAtScreenPoint(Point p) {
 
+		TileBoard board = GameState.getInstance().getBoard();
 		// determine which tile was clicked! First, get the width and height of
 		// a tile.
 		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
@@ -574,8 +582,8 @@ public class MapLayer extends JPanel implements MouseListener,
 
 		// that tile index is relative to the top left. We need to make the
 		// index relative to the home tile for it to be useful.
-		tileX += board_.getUpperLeftCorner().getLocation().getX();
-		tileY = (int) (board_.getUpperLeftCorner().getLocation().getY() - tileY);
+		tileX += board.getUpperLeftCorner().getLocation().getX();
+		tileY = (int) (board.getUpperLeftCorner().getLocation().getY() - tileY);
 
 		// send a notification!
 		String text = String.format("You clicked tile %d,%d", tileX, tileY);
@@ -606,14 +614,16 @@ public class MapLayer extends JPanel implements MouseListener,
 	}
 
 	public Point getScreenPointFromTileLocation(Point p) {
+		TileBoard board = GameState.getInstance().getBoard();
+		
 		int topLeftX = renderCenteringOffset_.x - renderOffset_.x
 				- paintOffset_.x - BUFFER_MAX_OFFSET_X;
 		int topLeftY = renderCenteringOffset_.y - renderOffset_.y
 				- paintOffset_.y - BUFFER_MAX_OFFSET_Y;
 
 		int tileSize = (int) (backgroundTile_.getWidth() * scale_);
-		int extraX = (int) ((-board_.getUpperLeftCorner().getLocation().getX() + p.x) * tileSize);
-		int extraY = (int) ((board_.getUpperLeftCorner().getLocation().getY() - p.y) * tileSize);
+		int extraX = (int) ((-board.getUpperLeftCorner().getLocation().getX() + p.x) * tileSize);
+		int extraY = (int) ((board.getUpperLeftCorner().getLocation().getY() - p.y) * tileSize);
 
 		return new Point(topLeftX + extraX, topLeftY + extraY);
 	}
@@ -624,7 +634,8 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public void mouseClicked(MouseEvent e) {
 
-		if (board_ == null)
+		TileBoard board = GameState.getInstance().getBoard();
+		if (board == null)
 			return;
 
 		this.requestFocusInWindow();
@@ -669,19 +680,23 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	public void shiftBoard(Notification n) {
 		int dx = 0, dy = 0;
-		int code = (Integer) n.argument();
-		
-		// is the user pressing a direction key?
-		if (code == KeyEvent.VK_RIGHT)
-			dx = MAP_SHIFT_SPEED;
-		if (code == KeyEvent.VK_LEFT)
-			dx = -MAP_SHIFT_SPEED;
-		if (code == KeyEvent.VK_UP)
-			dy = -MAP_SHIFT_SPEED;
-		if (code == KeyEvent.VK_DOWN)
-			dy = MAP_SHIFT_SPEED;
-		
-		setShift(dx, dy);
+		if (n.argument() != null){
+			int code = (Integer) n.argument();
+			
+			// is the user pressing a direction key?
+			if (code == KeyEvent.VK_RIGHT)
+				dx = MAP_SHIFT_SPEED;
+			if (code == KeyEvent.VK_LEFT)
+				dx = -MAP_SHIFT_SPEED;
+			if (code == KeyEvent.VK_UP)
+				dy = -MAP_SHIFT_SPEED;
+			if (code == KeyEvent.VK_DOWN)
+				dy = MAP_SHIFT_SPEED;
+			
+			setShift(dx, dy);
+		} else {
+			setShift(0, 0);
+		}
 	}
 
 }

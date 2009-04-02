@@ -42,6 +42,7 @@ import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.controls.JPopUp;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
 import org.javassonne.ui.panels.InstructionsPanel;
@@ -68,16 +69,8 @@ public class GameController {
 	private BoardController boardController_;
 	private HUDController hudController_;
 
-	private Boolean gameInProgress_ = false;
-
-	private MenuPanel menu_;
 	private InstructionsPanel instructions_;
-
-	private InputPlayerDataPanel playerData_;
-	private List<Player> players_;
-	private int currentPlayer_;
-
-	private TileDeck deck_;
+	private MenuPanel menu_;
 
 	/**
 	 * The default constructor takes no arguments and assumes a GameWindow has
@@ -110,7 +103,6 @@ public class GameController {
 		n.addObserver(Notification.SCORE_TURN, this, "scoreTurn");
 		n.addObserver(Notification.QUIT, this, "quitGame");
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
-		n.addObserver(Notification.PLAYER_DATA_RESET, this, "playerDataReset");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
 		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,
 				"toggleInstructions");
@@ -151,55 +143,68 @@ public class GameController {
 	 *            The notification object sent from the NotificationManager.
 	 */
 	public void startGame(Notification n) {
-		playerData_ = (InputPlayerDataPanel) n.argument();
+		// Game in progress!
+		InputPlayerDataPanel panel_ = (InputPlayerDataPanel) n.argument();
+		GameState.getInstance().startGameWithPlayers(panel_.getPlayers());
 
-		if (!playerData_.validatePlayerNames(playerData_.getPlayerNames())) {
-			JPopUp warning = new JPopUp(
-					"At least two player names must be entered");
-			warning.showMsg();
-		} else if (!playerData_.validateColors(playerData_.getPlayerColors())) {
-			JPopUp warning = new JPopUp("Each player must have a unique color");
-			warning.showMsg();
-		} else {
-			// Game in progress!
-			gameInProgress_ = true;
-			NotificationManager.getInstance().sendNotification(
-					Notification.TOGGLE_MAIN_MENU);
+		DisplayHelper.getInstance().remove(panel_);		
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_MAIN_MENU);
 
-			currentPlayer_ = 0;
-			loadPlayerData();
-
-			DisplayHelper.getInstance().remove(playerData_);
-
-			// Load all possible tiles
-			TileSerializer s = new TileSerializer();
-			TileSet set = s.loadTileSet("tilesets/standard.xml");
-			if (set == null) {
-				System.err.println("Tile set could not be found.");
-				System.exit(0);
-			}
-
-			// Populate the set into the deck. Note: you can have multiple
-			// copies of
-			// a tile in a deck, but not in a set
-			deck_ = new TileDeck();
-			deck_.addTileSet(set);
-			TileBoard board = new TileMapBoard(deck_);
-
-			// Create a BoardController to do the heavy lifting during gameplay.
-			// These two objects handle notifications from the UI (like rotate
-			// tile).
-			boardController_ = new BoardController(board, deck_
-					.tileFeatureBindings(), players_);
-			hudController_ = new HUDController(deck_, players_);
-
-			// See if the first person is playing on this computer. If they are,
-			// send the begin turn notification to activate the interface for
-			// them.
-			beginTurn();
+		// Load all possible tiles
+		TileSerializer s = new TileSerializer();
+		TileSet set = s.loadTileSet("tilesets/standard.xml");
+		if (set == null) {
+			System.err.println("Tile set could not be found.");
+			System.exit(0);
 		}
+		
+		// Populate the set into the deck. Note: you can have multiple copies of
+		// a tile in a deck, but not in a set
+		TileDeck deck = new TileDeck();
+		deck.addTileSet(set);
+		TileBoard board = new TileMapBoard(deck);
+		
+		GameState.getInstance().setBoard(board);
+		GameState.getInstance().setDeck(deck);
+
+        // Create a BoardController to do the heavy lifting during gameplay.
+        // These two objects handle notifications from the UI (like rotate
+        // tile).
+        boardController_ = new BoardController();
+        hudController_ = new HUDController();
+
+        // See if the first person is playing on this computer. If they are,
+        // send the begin turn notification to activate the interface for
+        // them.
+        beginTurn();
 	}
 
+	/**
+	 * Called when a turn is ended, and may be called again if the
+	 * BoardController finds the drawn tile unusable.
+	 * 
+	 */
+	public void beginTurn() {
+		// if the current player is playing on this machine, we need to enable
+		// the interface so they can place a tile. We do that by passing another
+		// notification
+		Player p = GameState.getInstance().getCurrentPlayer();
+	
+		if (p.getIsLocal() == true) {
+			// Draw the another tile!
+			TileDeck d = GameState.getInstance().getDeck();
+			Tile t = d.popRandomTile();
+			GameState.getInstance().setDeck(d);
+			
+			// Send notifications to attach our tileInHand to the view
+			GameState.getInstance().setTileInHand(t);
+			
+			NotificationManager.getInstance().sendNotification(
+					Notification.BEGIN_TURN, p);
+		}
+	}
+	
 	/**
 	 * Called when an END_GAME notification is received. This notification used
 	 * to be called EXIT_GAME, but it is now possible to end a game without
@@ -216,10 +221,6 @@ public class GameController {
 		// views from the screen.
 		boardController_ = null;
 		hudController_ = null;
-		gameInProgress_ = false;
-
-		playerData_ = null;
-		players_ = null;
 
 		Properties config = (Properties) n.argument();
 		if (config == null || !config.containsKey("hideMainMenu"))
@@ -237,21 +238,21 @@ public class GameController {
 		JPopUp dialogBox = new JPopUp("A game is currently in progress!");
 		String ans = dialogBox.promptUser(options);
 
-		if (ans == END_WITHOUT_SAVING)
+		if (ans == END_WITHOUT_SAVING){
+			GameState.getInstance().resetGameState();
 			NotificationManager.getInstance().sendNotification(
 					Notification.END_GAME);
+		}
 	}
 
 	public void endTurn(Notification n) {
 		// sent from the confirmPlacement panel when the user presses end turn.
 		// We want to advance the turn and change current player.
-		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
-		NotificationManager.getInstance().sendNotification(
-				Notification.SET_CURRENT_PLAYER, currentPlayer_);
-
+		GameState.getInstance().advanceCurrentPlayer();
 	}
 
 	public void scoreTurn(Notification n) {
+		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
 
@@ -262,7 +263,7 @@ public class GameController {
 		}
 
 		// Score completed features on this tile
-		RegionsCalc c = new RegionsCalc(deck_.tileFeatureBindings());
+		RegionsCalc c = new RegionsCalc();
 		for (Tile.Region r : Tile.Region.values()) {
 			c.traverseRegion(iter, r);
 			if (c.getRegionCompletion(iter.getLocation(), r)) {
@@ -329,6 +330,8 @@ public class GameController {
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
 			TileFeature regionFeatureType) {
 
+		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
+		
 		int counts[] = new int[players_.size()];
 		int maxCount = 0;
 		for (Meeple m : regionMeeple) {
@@ -351,42 +354,16 @@ public class GameController {
 		}
 	}
 
-	/**
-	 * Called when a turn is ended, and may be called again if the
-	 * BoardController finds the drawn tile unusable.
-	 * 
-	 */
-	public void beginTurn() {
-		// if the current player is playing on this machine, we need to enable
-		// the interface so they can place a tile. We do that by passing another
-		// notification
-		Player p = players_.get(currentPlayer_);
-
-		if (p.getIsLocal() == true) {
-			// Draw the another tile!
-			Tile t = deck_.popRandomTile();
-
-			// Send notification that we've modified the deck
-			NotificationManager.getInstance().sendNotification(
-					Notification.DECK_SET, deck_);
-
-			// Send notifications to attach our tileInHand to the view
-			NotificationManager.getInstance().sendNotification(
-					Notification.TILE_IN_HAND_CHANGED, t);
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.BEGIN_TURN, p);
-		}
-	}
-
 	public void toggleMainMenu(Notification n) {
 		// Determine whether the game is currently in progress
-		menu_.setGameInProgress(gameInProgress_);
-
+		
 		if (menu_.isShowing()) {
-			if (gameInProgress_)
-				DisplayHelper.getInstance().remove(menu_);
+			if (GameState.getInstance().getGameInProgress())
+				menu_.close();
+			
 		} else {
+			menu_.setGameInProgress(GameState.getInstance().getGameInProgress());
+				
 			// Make sure the instructions menu is hidden
 			NotificationManager.getInstance().sendNotification(
 					Notification.TOGGLE_INSTRUCTIONS, 0);
@@ -414,7 +391,6 @@ public class GameController {
 		// game play should be deleted.
 		boardController_ = null;
 		hudController_ = null;
-		gameInProgress_ = false;
 
 		// Return control to final shutdown process
 		System.exit(0);
@@ -428,30 +404,6 @@ public class GameController {
 	public void saveGame(Notification n) {
 		JPopUp p = new JPopUp("", "Select a location to save your game...");
 		File f = p.saveFileDialog();
-	}
-
-	private void loadPlayerData() {
-		players_ = new ArrayList<Player>();
-
-		// TODO: player colors should be passed in from the
-		// InputPlayerDataPanel.
-		// In the future, maybe this entire function should be in the panel, and
-		// then the gameController can just get a list of player objects?
-		int playerCount = 0;
-
-		for (String s : playerData_.getPlayerNames()) {
-			if (s.length() > 0) {
-				Player player = new Player(s);
-				player.setMeepleColor(playerData_.getPlayerColors().get(
-						playerCount));
-				players_.add(player);
-				playerCount++;
-			}
-		}
-	}
-
-	public void playerDataReset(Notification n) {
-		players_.clear();
 	}
 
 }

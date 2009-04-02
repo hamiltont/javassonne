@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.ui.DisplayHelper;
-import org.javassonne.ui.JKeyListener;
 
 /**
  * The AbstractHUDPanel provides basic functionality used in the game's HUD

@@ -23,7 +23,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -159,10 +158,10 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	private void addComboBoxToPanel(Point location, ImageIcon[] colors,
 			int selectedIndex, JPanel panel) {
 		JComboBox comboBox = new JComboBox(colors);
+		comboBox.setSelectedIndex(selectedIndex);
 		comboBox.addActionListener(this);
 		comboBox.setLocation(location);
 		comboBox.setSize(50, 38);
-		comboBox.setSelectedIndex(selectedIndex);
 		panel.add(comboBox);
 	}
 
@@ -199,8 +198,19 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().length() > 0) {
-			NotificationManager.getInstance().sendNotification(
-					e.getActionCommand(), this);
+			// see if the input in the panel is valid:
+			if (!validatePlayerNames()) {
+				JPopUp warning = new JPopUp(
+						"At least two player names must be entered");
+				warning.showMsg();
+			} else if (!validateColors()) {
+				JPopUp warning = new JPopUp(
+						"Each player must have a unique color");
+				warning.showMsg();
+			} else {
+				NotificationManager.getInstance().sendNotification(
+						e.getActionCommand(), this);
+			}
 		} else {
 			// user pressed cancel
 			DisplayHelper.getInstance().remove(this);
@@ -208,28 +218,29 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		}
 	}
 	
-	public boolean validatePlayerNames(List<String> names)
-	{
+
+	public boolean validatePlayerNames() {
+		List<String> names = this.getPlayerNames();
 		int playerCount = 0;
-		
+
 		for (String s : names) {
 			if (s.length() > 0) {
 				playerCount++;
 			}
 		}
-		
-		if(playerCount < 2)
-		{
+
+		if (playerCount < 2) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
-	public boolean validateColors(List<MeepleColor> colors) {
+	public boolean validateColors() {
 		int playerCount = 0;
+		List<MeepleColor> colors = this.getPlayerColors();
 		List<MeepleColor> temp = colors;
-		
+
 		for (String s : getPlayerNames()) {
 			if (s.length() > 0 || playerCount < 2) {
 				playerCount++;
@@ -250,4 +261,30 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 
 		return true;
 	}
+
+	// This function used to be in the GameController, but since the
+	// InputPlayerDataPanel
+	// has direct access to the information, it makes more sense for the logic
+	// of
+	// creating Player objects to happen here.
+	public ArrayList<Player> getPlayers() {
+		ArrayList<Player> players_ = new ArrayList<Player>();
+
+		int playerCount = 0;
+		for (String s : this.getPlayerNames()) {
+			if (s.length() > 0) {
+				Player player = new Player(s);
+				player.setMeepleColor(getPlayerColors().get(playerCount));
+				players_.add(player);
+				playerCount++;
+			} else if (playerCount < 2) {
+				Player player = new Player();
+				player.setMeepleColor(getPlayerColors().get(playerCount));
+				players_.add(player);
+				playerCount++;
+			}
+		}
+		return players_;
+	}
+
 }

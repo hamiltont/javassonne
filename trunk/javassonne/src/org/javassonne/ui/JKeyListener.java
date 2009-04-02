@@ -124,9 +124,9 @@ public class JKeyListener extends JFrame implements KeyListener, ActionListener 
 		else if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_LEFT || 
 				code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN)
 		{
-			if(keyStatus == "press")
+			if (keyStatus == "press")
 				NotificationManager.getInstance().sendNotification(Notification.SHIFT_BOARD, code);
-			else if(keyStatus == "release")
+			else if (keyStatus == "release")
 				NotificationManager.getInstance().sendNotification(Notification.SHIFT_BOARD, null);
 			
 		}
