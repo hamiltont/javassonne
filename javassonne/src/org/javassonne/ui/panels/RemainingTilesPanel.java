@@ -58,7 +58,7 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 		tileImageLabels_ = new ArrayList<JLabel>();
 
 		NotificationManager.getInstance().addObserver(
-				Notification.DECK_SET, this, "updateDeck");
+				Notification.UPDATED_DECK, this, "updatedDeck");
 		NotificationManager.getInstance().addObserver(
 				Notification.END_GAME, this, "endGame");
 	}
@@ -68,7 +68,7 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 		close();
 	}
 	
-	public void updateDeck(Notification n) {
+	public void updatedDeck(Notification n) {
 		TileDeck deck = (TileDeck) n.argument();
 		HashMap<Tile, Integer> remaining = deck.tilesRemainingByType();
 

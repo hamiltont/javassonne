@@ -39,7 +39,6 @@ public class Notification {
 	
 	public static final String MAX = "NotificationMaximize";
 
-	public static final String TILE_IN_HAND_CHANGED = "NotificationTileInHandChanged";
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
@@ -62,22 +61,23 @@ public class Notification {
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String TOGGLE_INSTRUCTIONS = "NotificationToggleInstructions";
 	
-	public static final String DECK_SET = "NotificationSetDeck";
-	public static final String BOARD_SET = "NotificationSetBoard";
+	public static final String UPDATED_DECK = "NotificationUpdatedDeck";
+	public static final String UPDATED_BOARD = "NotificationUpdatedBoard";
+	public static final String UPDATED_PLAYER_DATA = "NotificationUpdatedPlayerData";
+	public static final String UPDATED_CURRENT_PLAYER = "NotificationUpdatedCurrentPlayer";
+	public static final String UPDATED_PLAYERS = "NotificationUpdatedPlayers";
+	public static final String UPDATED_TILE_IN_HAND = "NotificationUpdatedTileInHand";
+	public static final String UPDATED_GAME_IN_PROGRESS = "NotificationUpdatedGameInProgress";
 	
 	public static final String PLACE_TILE = "NotificationClickAddTile";
 	public static final String PLACE_MEEPLE = "NotificationClickAddMeeple";
 	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
-	
-	public static final String PLAYER_DATA_CHANGED = "NotificationPlayerDataChanged";
-	public static final String PLAYER_DATA_RESET = "NotificationPlayerDataReset";
 	
 	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
 	public static final String SCORE_TURN = "NotificationScoreTurn";
-	public static final String SET_CURRENT_PLAYER = "SetCurrentPlayer";
 	
 	// Note that the RECV notifications will fire for local chat messages
 	public static final String SEND_PRIVATE_CHAT = "SendPrivateChat";

@@ -27,7 +27,6 @@ import javax.swing.JButton;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
 import org.javassonne.ui.map.MapLayer;
 
@@ -46,6 +45,7 @@ public class HUDButtonsPanel extends AbstractHUDPanel implements ActionListener 
 		setVisible(true);
 		setSize(144, 25);
 		setLayout(null);
+		setFocusable(false);
 		
 		menuButton_ = new JButton(new ImageIcon("images/hud_main_menu.jpg"));
 		menuButton_.setActionCommand(Notification.TOGGLE_MAIN_MENU);

@@ -25,16 +25,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
-import org.javassonne.model.TileDeck;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.JKeyListener;
-import org.javassonne.ui.DisplayHelper.Layer;
 
 /**
  * The primary JPanel in the HUD
@@ -73,10 +70,15 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		rotateLeft_.setSize(58,38);
 		add(rotateLeft_);
 		
+		Tile t = GameState.getInstance().getTileInHand();
+		if (t != null){
+			tilePanel_ = new DragTilePanel(t);
+			DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));	
+		}
 		// Subscribe for notifications from the controller so we know when to
 		// update ourselves!
 		NotificationManager.getInstance().addObserver(
-				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
+				Notification.UPDATED_TILE_IN_HAND, this, "updatedTileInHand");
 		NotificationManager.getInstance().addObserver(
 				Notification.END_GAME, this, "endGame");
 	}
@@ -103,7 +105,7 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 
 	// Notification Handlers
 
-	public void updateTileInHand(Notification n) {
+	public void updatedTileInHand(Notification n) {
 		Tile t = (Tile) n.argument();
 		
 		if (tilePanel_ == null){

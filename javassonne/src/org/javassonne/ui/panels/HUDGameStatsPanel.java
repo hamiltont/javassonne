@@ -20,7 +20,6 @@ package org.javassonne.ui.panels;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -28,13 +27,11 @@ import javax.swing.JLabel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.JKeyListener;
 import org.javassonne.ui.controls.JMeepleCount;
 
 public class HUDGameStatsPanel extends AbstractHUDPanel {
-
-	List<Player> players_;
-	int currentPlayer_;
 
 	ArrayList<JLabel> names_;
 	ArrayList<JLabel> scores_;
@@ -42,26 +39,24 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 
 	JLabel focus_;
 	
-	public HUDGameStatsPanel(List<Player> players) {
+	public HUDGameStatsPanel() {
 		super();
 
 		setVisible(true);
-		setSize(380, 27 + 28 * players.size());
+		setSize(380, 27 + 28 * GameState.getInstance().getPlayers().size());
 		setLayout(null);
 		setFocusable(false);
 		setBackgroundImagePath("images/hud_stats_background.jpg");
 		setBackgroundScaleToFit(false);
 
 		// store the array of players locally
-		players_ = players;
-		currentPlayer_ = 0;
 		names_ = new ArrayList<JLabel>();
 		scores_ = new ArrayList<JLabel>();
 		meeple_ = new ArrayList<JMeepleCount>();
 		
 		// create the labels and stuff for each of the player's stats
 		int y = 28;
-		for (Player p : players_) {
+		for (Player p : GameState.getInstance().getPlayers()) {
 			JLabel name = new JLabel(p.getName());
 			name.setLocation(6, y);
 			name.setSize(135, 22);
@@ -100,25 +95,21 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 	}
 
 	public void endGame(Notification n) {
-		// reset the players array to make sure it is not references
-		players_ = null;
 		close();
 	}
 
 	public void endTurn(Notification n) {
-		// sent from the confirmPlacement panel when the user presses end turn.
-		// We want to advance the turn and change current player.
-		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
-		
 		// move the selected player focus background
-		focus_.setLocation(0, 27 + currentPlayer_ * 28);	
+		focus_.setLocation(0, 27 + GameState.getInstance().getCurrentPlayerIndex() * 28);	
 	}
 	
 	public void beginTurn(Notification n) {
 		// iterate through all the players and make sure their scores are valid
-		if (scores_.size() == players_.size())
-			for (int ii = 0; ii < players_.size(); ii++)
-				scores_.get(ii).setText(String.valueOf(players_.get(ii).getScore()));
+		ArrayList<Player> players = GameState.getInstance().getPlayers();
+		
+		if (scores_.size() == players.size())
+			for (int ii = 0; ii < players.size(); ii++)
+				scores_.get(ii).setText(String.valueOf(players.get(ii).getScore()));
 	}
 
 	// Overloaded the add() method to bind a key listener to any elements placed

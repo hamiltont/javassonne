@@ -19,15 +19,13 @@
 package org.javassonne.ui.controllers;
 
 import java.awt.Point;
-import java.util.List;
 import java.util.Properties;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
-import org.javassonne.model.TileDeck;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.panels.GameOverPanel;
 import org.javassonne.ui.panels.HUDButtonsPanel;
 import org.javassonne.ui.panels.HUDGameStatsPanel;
@@ -45,10 +43,6 @@ import org.javassonne.ui.panels.RemainingTilesPanel;
  */
 public class HUDController {
 
-	TileDeck deck_;
-	List<Player> players_;
-	Tile tileInHand_;
-
 	RemainingTilesPanel hudRemainingTiles_;
 	HUDPanel hudPanel_;
 	HUDButtonsPanel hudButtons_;
@@ -59,19 +53,13 @@ public class HUDController {
 	 * The HUDController is created from the GameController when a new game is
 	 * started. The GameController passes the model objects so we can manipulate
 	 * them in response to changes in the view.
-	 * 
-	 * @param d
-	 *            The TileDeck. This will never be changed once the game has
-	 *            begun.
 	 */
-	public HUDController(TileDeck d, List<Player> players) {
-		deck_ = d;
-		players_ = players;
-		
+	public HUDController() {
+
 		hudRemainingTiles_ = new RemainingTilesPanel();
 		hudButtons_ = new HUDButtonsPanel();
 		hudPanel_ = new HUDPanel();
-		hudGameStats_ = new HUDGameStatsPanel(players_);
+		hudGameStats_ = new HUDGameStatsPanel();
 		hudInstructions_ = new HUDShowInstructionsPanel();
 
 		// Attach the remaining tiles panel to the top right
@@ -102,20 +90,15 @@ public class HUDController {
 				Notification.TILE_ROTATE_LEFT, this, "rotateTileInHandLeft");
 		NotificationManager.getInstance().addObserver(
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
-		NotificationManager.getInstance().addObserver(
-				Notification.TILE_IN_HAND_CHANGED, this, "updateTileInHand");
-		
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.BOARD_SET,
-				this, "gameOver");
-
+		NotificationManager.getInstance().addObserver(
+				Notification.UPDATED_BOARD, this, "gameOver");
 	}
-	
+
 	public void endGame(Notification n) {
 		// unregister ourselves so we no longer get notifications. A new
-		// HUDController
-		// will be created if a new game is started!
+		// HUDController will be created if a new game is started!
 		NotificationManager.getInstance().removeObserver(this);
 
 		// the panels all respond to this notification, and they remove
@@ -124,12 +107,6 @@ public class HUDController {
 		hudButtons_ = null;
 		hudPanel_ = null;
 		hudGameStats_ = null;
-
-		// let go of local variables related to game state. They should not be
-		// used once this notification is received and setting to null allows
-		// us to make sure this is followed.
-		deck_ = null;
-		tileInHand_ = null;
 	}
 
 	/**
@@ -138,10 +115,10 @@ public class HUDController {
 	 * views know that they should redraw the tile onscreen.
 	 */
 	public void rotateTileInHandLeft() {
-		if (tileInHand_ != null) {
-			tileInHand_.rotateLeft();
-			NotificationManager.getInstance().sendNotification(
-					Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		Tile t = GameState.getInstance().getTileInHand();
+		if (t != null) {
+			t.rotateLeft();
+			GameState.getInstance().setTileInHand(t);
 		}
 	}
 
@@ -151,15 +128,11 @@ public class HUDController {
 	 * letting the views know that they should redraw the tile onscreen.
 	 */
 	public void rotateTileInHandRight() {
-		if (tileInHand_ != null) {
-			tileInHand_.rotateRight();
-			NotificationManager.getInstance().sendNotification(
-					Notification.TILE_IN_HAND_CHANGED, tileInHand_);
+		Tile t = GameState.getInstance().getTileInHand();
+		if (t != null) {
+			t.rotateRight();
+			GameState.getInstance().setTileInHand(t);
 		}
-	}
-
-	public void updateTileInHand(Notification n) {
-		tileInHand_ = (Tile) n.argument();
 	}
 
 	/*
@@ -168,13 +141,11 @@ public class HUDController {
 	public void gameOver(Notification n) {
 
 		// Game Over Conditions: Tile End is Empty
-		if (deck_.tilesRemaining() != 0)
+		if (GameState.getInstance().getDeck().tilesRemaining() != 0)
 			return;
 
 		// Finish scoring
-		// TODO: calculate scores & update players_
-
-		GameOverPanel g = new GameOverPanel(players_);
+		GameOverPanel g = new GameOverPanel();
 
 		Properties config = new Properties();
 		config.setProperty("hideMainMenu", "true");
