@@ -53,14 +53,16 @@ public class TilePlacementSprite extends MapSprite {
 		setLocation(m.getBoardPointFromTileLocation(tileIndex_));
 	}
 
-	public void setRegionOptions(List<Region> currentRegionOptions_)
+	public void showRegionOptions(List<Region> currentRegionOptions_)
 	{
+		quadrantOptions_ = null;
 		regionOptions_ = currentRegionOptions_;
 	}
 	
-	public void setQuadrantOptions(ArrayList<Tile.Quadrant> a)
+	public void showQuadrantOptions(List<Tile.Quadrant> currentQuadrantOptions_)
 	{
-		quadrantOptions_ = a;
+		regionOptions_ = null;
+		quadrantOptions_ = currentQuadrantOptions_;
 	}
 	
 	@Override
@@ -69,21 +71,24 @@ public class TilePlacementSprite extends MapSprite {
 		int w = image_.getWidth();
 		int h = image_.getHeight();
 
-		for (Tile.Region r : regionOptions_) {
-			int x = (int) (x_ * scale + offset.x + (r.x - w / 2) * scale);
-			int y = (int) (y_ * scale + offset.y + (r.y - h / 2) * scale);
-			g.drawImage(image_, x, y, (int) (w * scale), (int) (h * scale),
-					null);
+		if (regionOptions_ != null){
+			for (Tile.Region r : regionOptions_) {
+				int x = (int) (x_ * scale + offset.x + (r.x - w / 2) * scale);
+				int y = (int) (y_ * scale + offset.y + (r.y - h / 2) * scale);
+				g.drawImage(image_, x, y, (int) (w * scale), (int) (h * scale),
+						null);
+			}
 		}
-
-		g.setColor(new Color(1, 1, 1, 0.5f));
-		for (Tile.Quadrant q : quadrantOptions_) {
-			int x = (int) (x_ * scale + offset.x + q.rect.getX() * scale);
-			int y = (int) (y_ * scale + offset.y + q.rect.getY() * scale);
-			g.fillRect(x, y, (int) (q.rect.getWidth() * scale), (int) (q.rect
-					.getHeight() * scale));
+		
+		if (quadrantOptions_ != null) {
+			g.setColor(new Color(1, 1, 1, 0.5f));
+			for (Tile.Quadrant q : quadrantOptions_) {
+				int x = (int) (x_ * scale + offset.x + q.rect.getX() * scale);
+				int y = (int) (y_ * scale + offset.y + q.rect.getY() * scale);
+				g.fillRect(x, y, (int) (q.rect.getWidth() * scale), (int) (q.rect
+						.getHeight() * scale));
+			}
 		}
-
 	}
 
 	@Override

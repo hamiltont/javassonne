@@ -23,15 +23,22 @@ import org.javassonne.model.Player.MeepleColor;
 
 public class DragMeeplePanel extends AbstractHUDPanel {
 
-	public DragMeeplePanel(MeepleColor c)
+	public DragMeeplePanel(MeepleColor c, String meepleType)
 	{
 		setSize(48, 52);
 		setOpaque(false);
-		setBackgroundImagePath(String.format("images/meeple_%d.png", c.value));
+		if (meepleType.equals("farmer")){
+			setBackgroundImagePath(String.format("images/meeple_flat_%d.png", c.value));
+			setDropNotification(Notification.MEEPLE_FARMER_DROPPED);
+			setDragNotification(Notification.MEEPLE_FARMER_DRAG_STARTED);
+		}else{
+			setBackgroundImagePath(String.format("images/meeple_%d.png", c.value));
+			setDropNotification(Notification.MEEPLE_VILLAGER_DROPPED);
+			setDragNotification(Notification.MEEPLE_VILLAGER_DRAG_STARTED);
+		}
 		setBackgroundScaleToFit(true);
 		
 		// make it so the user can drag and drop the tile
-		setDropNotification(Notification.MEEPLE_DROPPED);
 		setDraggable(true);
 	}
 }

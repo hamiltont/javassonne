@@ -42,7 +42,10 @@ public class Notification {
 	public static final String TILE_ROTATE_LEFT = "NotificationGameTileRotateLeft";
 	public static final String TILE_ROTATE_RIGHT = "NotificationGameTileRotateRight";
 	public static final String TILE_DROPPED = "NotificationTileDropped";
-	public static final String MEEPLE_DROPPED = "NotificationMeepleDropped";
+	public static final String MEEPLE_VILLAGER_DRAG_STARTED = "MeepleVillagerDragStart";
+	public static final String MEEPLE_VILLAGER_DROPPED = "NotificationVillagerDropped";
+	public static final String MEEPLE_FARMER_DRAG_STARTED = "MeepleFarmerDragStart";
+	public static final String MEEPLE_FARMER_DROPPED = "NotificationFarmerDropped";
 	public static final String TILE_UNUSABLE = "NotificationTileUnusable";
 	
 	public static final String ZOOM_IN = "NotificationGameZoomIn";
@@ -70,11 +73,13 @@ public class Notification {
 	public static final String UPDATED_GAME_IN_PROGRESS = "NotificationUpdatedGameInProgress";
 	
 	public static final String PLACE_TILE = "NotificationClickAddTile";
-	public static final String PLACE_MEEPLE = "NotificationClickAddMeeple";
+	public static final String PLACE_VILLAGER_MEEPLE = "PlaceVillagerMeeple";
+	public static final String PLACE_FARMER_MEEPLE = "PlaceFarmerMeeple";
 	public static final String UNDO_PLACE_TILE = "NotificationCancelTilePlacement";
 	
 	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
+	public static final String MAP_REDRAW = "NotificationMapRedraw";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
 	public static final String SCORE_TURN = "NotificationScoreTurn";
