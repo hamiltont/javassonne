@@ -40,6 +40,7 @@ import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
+import org.javassonne.ui.map.MapLayer;
 import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.map.TilePlacementSprite;
 import org.javassonne.ui.panels.HUDConfirmPlacementPanel;
@@ -82,11 +83,19 @@ public class BoardController {
 
 		NotificationManager n = NotificationManager.getInstance();
 		n.addObserver(Notification.PLACE_TILE, this, "placeTile");
-		n.addObserver(Notification.PLACE_MEEPLE, this, "placeMeeple");
+		n.addObserver(Notification.MEEPLE_FARMER_DRAG_STARTED, this,
+				"dragFarmer");
+		n.addObserver(Notification.PLACE_FARMER_MEEPLE, this, "placeFarmer");
+		n.addObserver(Notification.MEEPLE_VILLAGER_DRAG_STARTED, this,
+				"dragVillager");
+		n
+				.addObserver(Notification.PLACE_VILLAGER_MEEPLE, this,
+						"placeVillager");
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
-		n.addObserver(Notification.UPDATED_TILE_IN_HAND, this,"updateTileInHand");
+		n.addObserver(Notification.UPDATED_TILE_IN_HAND, this,
+				"updateTileInHand");
 	}
 
 	public void endGame(Notification n) {
@@ -121,7 +130,7 @@ public class BoardController {
 	public void placeTile(Notification n) {
 		Tile tileInHand = GameState.getInstance().getTileInHand();
 		TileBoard board = GameState.getInstance().getBoard();
-		
+
 		if (tileInHand != null) {
 			Point here = (Point) (n.argument());
 			tempLocationIter_ = new TileBoardGenIterator(board, here);
@@ -132,12 +141,12 @@ public class BoardController {
 					// remove the tile from our hand
 					tempPlacedTile_ = tileInHand;
 					GameState.getInstance().setTileInHand(null);
-					
+
 					// add the tile to the board
 					board.removeTemps();
 					board.addTemp(tempLocationIter_, tempPlacedTile_);
 					GameState.getInstance().setBoard(board);
-					
+
 					// show the confirm placement panel
 					MeepleColor c = GameState.getInstance().getCurrentPlayer()
 							.getMeepleColor();
@@ -165,11 +174,10 @@ public class BoardController {
 							currentRegionOptions_.add(region);
 					}
 
-					// TODO: Determine which spots on the tile are valid meeple
-					// locations and populate the options arrays. This is dummy
-					// code:
-					tempPlacementSprite_
-							.setRegionOptions(currentRegionOptions_);
+					// determine what quadrants of the tile are valid placements
+					currentQuadrantOptions_ = new ArrayList<Tile.Quadrant>();
+					currentQuadrantOptions_.add(Tile.Quadrant.BottomLeft);
+					currentQuadrantOptions_.add(Tile.Quadrant.TopLeft);
 
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
@@ -186,7 +194,22 @@ public class BoardController {
 		}
 	}
 
-	public void placeMeeple(Notification n) {
+	public void dragVillager(Notification n) {
+
+		// if they've already tried placing a meeple, remove it before
+		// allowing them to place another.
+		if (tempPlacedMeeple_ != null) {
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+		}
+
+		tempPlacementSprite_.showRegionOptions(currentRegionOptions_);
+		NotificationManager.getInstance().sendNotification(
+				Notification.MAP_REDRAW);
+
+	}
+
+	public void placeVillager(Notification n) {
 
 		// the meeple is created in the map layer, because the map layer
 		// has more intimate knowledege of which region the drag ended on.
@@ -210,20 +233,71 @@ public class BoardController {
 			tempPlacedTile_.setMeeple(m);
 
 			// add the meeple sprite to the map layer so the guy is visible
-			MeepleColor c = GameState.getInstance().getCurrentPlayer().getMeepleColor();
+			MeepleColor c = GameState.getInstance().getCurrentPlayer()
+					.getMeepleColor();
 			tempPlacedMeeple_ = new MeepleSprite(m, c);
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
-			NotificationManager.getInstance().sendNotification(
-					Notification.DRAG_PANEL_RESET);
 		}
+		NotificationManager.getInstance().sendNotification(
+				Notification.DRAG_PANEL_RESET);
+	}
+
+	public void dragFarmer(Notification n) {
+
+		// if they've already tried placing a meeple, remove it before
+		// allowing them to place another.
+		if (tempPlacedMeeple_ != null) {
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+		}
+
+		tempPlacementSprite_.showQuadrantOptions(currentQuadrantOptions_);
+		NotificationManager.getInstance().sendNotification(
+				Notification.MAP_REDRAW);
+
+	}
+
+	public void placeFarmer(Notification n) {
+
+		// the meeple is created in the map layer, because the map layer
+		// has more intimate knowledege of which region the drag ended on.
+		// (It can convert the pixel to the tile, and then to a region)
+		// Region / Quadrant is set. We just set everything else.
+		Meeple m = (Meeple) n.argument();
+
+		if ((currentQuadrantOptions_.contains(m.getQuadrantOnTile()))
+				&& (m.getParentTile() == tempPlacedTile_)) {
+
+			// if they've already tried placing a meeple, remove it before
+			// allowing them to place another.
+			if (tempPlacedMeeple_ != null) {
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+			}
+
+			m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
+
+			// add the meeple to the tile
+			tempPlacedTile_.setMeeple(m);
+
+			// add the meeple sprite to the map layer so the guy is visible
+			MeepleColor c = GameState.getInstance().getCurrentPlayer()
+					.getMeepleColor();
+			tempPlacedMeeple_ = new MeepleSprite(m, c);
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
+		}
+		NotificationManager.getInstance().sendNotification(
+				Notification.DRAG_PANEL_RESET);
 	}
 
 	public void undoPlaceTile(Notification n) {
 		GameState.getInstance().getBoard().removeTemps();
 		GameState.getInstance().setTileInHand(tempPlacedTile_);
-		
+
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
@@ -233,7 +307,6 @@ public class BoardController {
 			tempPlacedTile_.getMeeple().setParentTile(null);
 			tempPlacedTile_.setMeeple(null);
 		}
-		
 
 		tempPlacementSprite_ = null;
 		tempPlacedTile_ = null;
@@ -242,18 +315,20 @@ public class BoardController {
 
 	public void updateTileInHand(Notification n) {
 		Boolean shouldPopulateLocations = false;
-		
+
 		TileBoard board = GameState.getInstance().getBoard();
 		Tile tileInHand = GameState.getInstance().getTileInHand();
 
-		Boolean isLocal = GameState.getInstance().getCurrentPlayer().getIsLocal();
+		Boolean isLocal = GameState.getInstance().getCurrentPlayer()
+				.getIsLocal();
 		shouldPopulateLocations = ((tileInHand != null) && isLocal);
 
 		// Do we need to populate possible locations?
 		if (shouldPopulateLocations) {
 			try {
 				board.removeTemps();
-				Set<TileBoardIterator> temp = board.possiblePlacements(tileInHand);
+				Set<TileBoardIterator> temp = board
+						.possiblePlacements(tileInHand);
 
 				// If there are none, throw out TileInHand
 				if (temp.isEmpty()) {

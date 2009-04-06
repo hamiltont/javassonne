@@ -19,10 +19,9 @@
 package org.javassonne.ui.map;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.awt.geom.Rectangle2D;
 
 import org.javassonne.model.Meeple;
-import org.javassonne.model.Tile;
 import org.javassonne.model.Player.MeepleColor;
 
 public class MeepleSprite extends MapSprite {
@@ -37,16 +36,25 @@ public class MeepleSprite extends MapSprite {
 		color_ = meepleColor;
 		
 		setAnimating(false);
-		setImage(String.format("images/meeple_%d.png", meepleColor.value));
+		
+		if (m_.getQuadrantOnTile() != null)
+			setImage(String.format("images/meeple_flat_%d.png", meepleColor.value));
+		else
+			setImage(String.format("images/meeple_%d.png", meepleColor.value));
 	}
 	
 	public void addedToMap(MapLayer m) {
 		// determine where we should be located based on the tile we want to be
 		// on top of.
 		Point p = m.getBoardPointFromTileLocation(m_.getParentTileLocation());
-		p.x += m_.getRegionOnTile().x - this.getImage().getWidth() / 2;
-		p.y += m_.getRegionOnTile().y - this.getImage().getHeight() / 2;
-		
+		if (m_.getRegionOnTile() != null){
+			p.x += m_.getRegionOnTile().x - this.getImage().getWidth() / 2;
+			p.y += m_.getRegionOnTile().y - this.getImage().getHeight() / 2;
+		} else if (m_.getQuadrantOnTile() != null){
+			Rectangle2D r = m_.getQuadrantOnTile().rect;
+			p.x += r.getCenterX() - this.getImage().getWidth() / 2;
+			p.y += r.getCenterY() - this.getImage().getHeight() / 2;	
+		}
 		setLocation(p);
 	}
 }

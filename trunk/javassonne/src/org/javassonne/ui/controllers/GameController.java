@@ -271,6 +271,7 @@ public class GameController {
 						iter.current().featureInRegion(r));
 			}
 		}
+		
 		// Score cloisters - go right then move clockwise
 		// Note: do not need to recheck iter because it was checked above
 		TileBoardGenIterator temp = new TileBoardGenIterator(iter);

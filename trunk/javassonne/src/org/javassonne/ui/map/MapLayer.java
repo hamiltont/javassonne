@@ -116,9 +116,11 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Listen for notifications for adding and removing sprites
 		n.addObserver(Notification.MAP_ADD_SPRITE, this, "addSprite");
 		n.addObserver(Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
+		n.addObserver(Notification.MAP_REDRAW, this, "repaint");
 		// Listen for a notification from the tile or a meeple being dragged
 		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
-		n.addObserver(Notification.MEEPLE_DROPPED, this, "meepleDropped");
+		n.addObserver(Notification.MEEPLE_VILLAGER_DROPPED, this, "meepleVillagerDropped");
+		n.addObserver(Notification.MEEPLE_FARMER_DROPPED, this, "meepleFarmerDropped");
 		n.addObserver(Notification.SHIFT_BOARD, this, "shiftBoard");
 		n.addObserver(Notification.CHAT_TEXT_CHANGED, this, "repaint");
 		// Load the background image from disk
@@ -271,8 +273,8 @@ public class MapLayer extends JPanel implements MouseListener,
 				Notification.PLACE_TILE, p);
 	}
 
-	public void meepleDropped(Notification n) {
-
+	public void meepleVillagerDropped(Notification n)
+	{
 		TileBoard board = GameState.getInstance().getBoard();
 		if (board == null)
 			return;
@@ -303,9 +305,29 @@ public class MapLayer extends JPanel implements MouseListener,
 				tileLocation)));
 		m.setRegionOnTile(lowest);
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.PLACE_MEEPLE, m);
+		NotificationManager.getInstance().sendNotification(Notification.PLACE_VILLAGER_MEEPLE, m);
+	}
+	
+	public void meepleFarmerDropped(Notification n)
+	{
+		TileBoard board = GameState.getInstance().getBoard();
+		if (board == null)
+			return;
 
+		Point dropPoint = (Point) n.argument();
+		Point tileLocation = this.getTileAtScreenPoint((Point)dropPoint.clone());
+		Point offset = this.getOffsetWithinTileAtScreenPoint((Point)dropPoint.clone());
+
+		Meeple m = new Meeple();
+		m.setParentTileLocation(tileLocation);
+		m.setParentTile(board.getTile(new TileBoardGenIterator(board,
+				tileLocation)));
+		for (Tile.Quadrant q : Tile.Quadrant.values()) {
+			if (q.rect.contains(offset))
+				m.setQuadrantOnTile(q);
+		}
+
+		NotificationManager.getInstance().sendNotification(Notification.PLACE_FARMER_MEEPLE, m);
 	}
 
 	// ------------------------------------------------------------------------

@@ -67,7 +67,8 @@ MouseMotionListener {
 
 	private Boolean draggable_ = false;
 	private String draggableNotification_ = null;
-
+	private String dragStartNotification_ = null;
+	
 	public AbstractHUDPanel() {
 		super();
 
@@ -134,6 +135,10 @@ MouseMotionListener {
 		NotificationManager.getInstance().addObserver(Notification.DRAG_PANEL_RESET, this, "resetDrag");
 	}
 
+	public void setDragNotification(String notificationIdentifier) {
+		dragStartNotification_ = notificationIdentifier;
+	}
+	
 	public void setDropNotification(String notificationIdentifier) {
 		draggableNotification_ = notificationIdentifier;
 	}
@@ -184,8 +189,6 @@ MouseMotionListener {
 	}
 
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void mouseExited(MouseEvent e) {
@@ -200,6 +203,10 @@ MouseMotionListener {
 			if (resetLocation_ == null) 
 				resetLocation_ = this.getLocation();
 			repaint();
+
+			if (dragStartNotification_ != null)
+				NotificationManager.getInstance().sendNotification(
+					dragStartNotification_);
 		}
 	}
 
@@ -219,7 +226,8 @@ MouseMotionListener {
 			respondToClick_ = false;
 			mouseOffset_ = null;
 
-			NotificationManager.getInstance().sendNotification(
+			if (draggableNotification_ != null)
+				NotificationManager.getInstance().sendNotification(
 					draggableNotification_, clickLocation);
 		}
 	}
