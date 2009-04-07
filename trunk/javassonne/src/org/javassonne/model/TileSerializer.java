@@ -38,23 +38,23 @@ import com.thoughtworks.xstream.XStream;
  */
 public class TileSerializer {
 
-	private XStream xstream;
+	private XStream xstream_;
 
 	/**
 	 * sets up the xstream serializer with a few customizations to make the XML
 	 * cleaner in case we have to read it by hand
 	 */
 	public TileSerializer() {
-		xstream = new XStream();
-		xstream.alias("Tile", Tile.class);
-		xstream.alias("TileSet", TileSet.class);
-		xstream.alias("TileFeature", TileFeature.class);
-		xstream.alias("TileFeatureBindings", TileFeatureBindings.class);
+		xstream_ = new XStream();
+		xstream_.alias("Tile", Tile.class);
+		xstream_.alias("TileSet", TileSet.class);
+		xstream_.alias("TileFeature", TileFeature.class);
+		xstream_.alias("TileFeatureBindings", TileFeatureBindings.class);
 
 		// we don't want to serialize the images that have been cached in the
 		// tiles.
 		// These are stored separately in a folder full of JPEGs.
-		xstream.omitField(Tile.class, "image_");
+		xstream_.omitField(Tile.class, "image_");
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class TileSerializer {
 			while ((line = reader.readLine()) != null)
 				xml.append(line + "\n");
 
-			TileSet set = (TileSet) xstream.fromXML(xml.toString());
+			TileSet set = (TileSet) xstream_.fromXML(xml.toString());
 			set.associateFeaturesWithTiles();
 			set.loadTileImages();
 			return set;
@@ -105,7 +105,7 @@ public class TileSerializer {
 
 			// create the new file
 			BufferedWriter out = new BufferedWriter(new FileWriter(path, true));
-			out.write(xstream.toXML(set));
+			out.write(xstream_.toXML(set));
 			out.close();
 
 		} catch (Exception e) {
