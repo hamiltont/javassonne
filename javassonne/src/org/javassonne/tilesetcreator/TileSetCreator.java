@@ -35,6 +35,7 @@ import org.javassonne.model.Tile.Region;
  * @about The TileSetCreator allows you to create and edit tile sets by typing
  *        into the Console.
  */
+/*
 public class TileSetCreator {
 
 	public static TileSet currentSet = null;
@@ -312,3 +313,4 @@ public class TileSetCreator {
 		f.actsAsWall = (response.toLowerCase().startsWith("t"));
 	}
 }
+*/
