@@ -741,30 +741,30 @@
       </entry>
     </bindings__>
     <completionMultipliers__>
-      <entry>
-        <string>R</string>
-  		<string>1</string>
-  	  </entry>
-      <entry>
-        <string>RE</string>
-  		<string>1</string>
-  	  </entry>
-      <entry>
-        <string>F</string>
-  		<string>2</string>
-  	  </entry>
-      <entry>
-        <string>FC</string>
-  		<string>2</string>
-  	  </entry>
-      <entry>
-        <string>FM</string>
-  		<string>2</string>
-  	  </entry>
-      <entry>
-        <string>C</string>
-  		<string>1</string>
-  	  </entry>
+	  <entry>
+		<string>R</string>
+		<string>1</string>
+	  </entry>
+	  <entry>
+		<string>RE</string>
+		<string>1</string>
+	  </entry>
+	  <entry>
+		<string>F</string>
+		<string>2</string>
+	  </entry>
+	  <entry>
+		<string>FM</string>
+		<string>2</string>
+	  </entry>
+	  <entry>
+		<string>C</string>
+		<string>1</string>
+	  </entry>
+	  <entry>
+		<string>FC</string>
+		<string>2</string>
+	  </entry>
     </completionMultipliers__>
   </tileFeatureBindings__>
 </TileSet>

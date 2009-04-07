@@ -34,6 +34,15 @@ public class TileFeatureBindings {
 		return Integer.parseInt(completionMultipliers_.get(identifier));
 	}
 	
+	public void addCompletionMultiplierForFeature(String identifier, String multiplier)
+	{
+		completionMultipliers_.put(identifier, multiplier);
+	}
+
+	public void addCompletionMultipliers(TileFeatureBindings other) {
+		completionMultipliers_.putAll(other.completionMultipliers_);
+	}
+	
 	public Boolean featuresBind(String identifier1, String identifier2) {
 		if (bindings_.containsKey(identifier1))
 			return bindings_.get(identifier1).contains(identifier2);
