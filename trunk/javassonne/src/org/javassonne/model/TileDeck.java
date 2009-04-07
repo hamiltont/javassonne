@@ -62,6 +62,8 @@ public class TileDeck {
 			addTile(set.tileAtIndex(ii), set.tileCountAtIndex(ii));
 		}
 		tileFeatureBindings_.addFeatureBindings(set.tileFeatureBindings());
+		tileFeatureBindings_.addCompletionMultipliers(set.tileFeatureBindings());
+		
 		if (homeTile_ == null)
 			homeTile_ = set.homeTile();
 	}
