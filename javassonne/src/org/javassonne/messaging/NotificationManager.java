@@ -135,7 +135,8 @@ public class NotificationManager {
 			// themselves from the observers list as we're iterating through the
 			// array. The nice clean for loops require that the list is not
 			// modified during iteration.
-			for (int ii = observers.size() - 1; ii >= 0; ii--) {
+			int x = observers.size();
+			for (int ii = x - 1; ii >= 0; ii--) {
 				observers.get(ii).fire(n);
 			}
 		} else {

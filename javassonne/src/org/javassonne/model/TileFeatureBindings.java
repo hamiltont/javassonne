@@ -24,14 +24,14 @@ import java.util.HashMap;
 public class TileFeatureBindings {
 
 	HashMap<String, ArrayList<String>> bindings_ = new HashMap<String, ArrayList<String>>();
-	HashMap<String, Integer> completionMultipliers_ = new HashMap<String, Integer>();
+	HashMap<String, String> completionMultipliers_ = new HashMap<String, String>();
 	
 	public TileFeatureBindings() {
 	}
 
 	public Integer completionMultiplierForFeature(String identifier)
 	{
-		return completionMultipliers_.get(identifier);
+		return Integer.parseInt(completionMultipliers_.get(identifier));
 	}
 	
 	public Boolean featuresBind(String identifier1, String identifier2) {
