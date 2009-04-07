@@ -743,27 +743,27 @@
     <completionMultipliers__>
       <entry>
         <string>R</string>
-  		<int>1</int>
+  		<string>1</string>
   	  </entry>
       <entry>
         <string>RE</string>
-  		<int>1</int>
+  		<string>1</string>
   	  </entry>
       <entry>
         <string>F</string>
-  		<int>2</int>
+  		<string>2</string>
   	  </entry>
       <entry>
         <string>FC</string>
-  		<int>2</int>
+  		<string>2</string>
   	  </entry>
       <entry>
         <string>FM</string>
-  		<int>2</int>
+  		<string>2</string>
   	  </entry>
       <entry>
         <string>C</string>
-  		<int>1</int>
+  		<string>1</string>
   	  </entry>
     </completionMultipliers__>
   </tileFeatureBindings__>
