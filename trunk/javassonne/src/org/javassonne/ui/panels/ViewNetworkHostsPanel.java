@@ -72,6 +72,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String SHOW_HOST_PANEL = "Host_Game";
 	private static String JOIN_GAME = "Join_Game";
 
+	private boolean gameHasPassword_ = true;
+	
 	public ViewNetworkHostsPanel() {
 		super();
 
@@ -248,11 +250,13 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 
-			//if(0==0){//gameHasPassword == true){
-							//passwordPopUpWindow pw = new passwordPopUpWindow();
-						//}
-						//TO DO: actually join the game
-
+			/*if(gameHasPassword_ == true){
+				passwordPopUpPanel pw = new passwordPopUpPanel();
+				//if(pw.getPassword()==this.password)  --need a this.password
+				if(true){
+					//join game
+				}
+			}*/
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
