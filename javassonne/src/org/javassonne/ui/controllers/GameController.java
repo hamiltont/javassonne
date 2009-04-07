@@ -267,7 +267,7 @@ public class GameController {
 		for (Tile.Region r : Tile.Region.values()) {
 			c.traverseRegion(iter, r);
 			if (c.getRegionCompletion(iter.getLocation(), r)) {
-				scoreFeature(c.getsizeOfRegion(p, r), c.getMeepleList(p, r),
+				scoreFeature(c.getScoreOfRegion(p, r), c.getMeepleList(p, r),
 						iter.current().featureInRegion(r));
 			}
 		}
