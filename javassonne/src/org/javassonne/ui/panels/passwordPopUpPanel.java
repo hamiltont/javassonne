@@ -24,57 +24,74 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.OverlayLayout;
 
-public class passwordPopUpPanel extends AbstractHUDPanel {
+public class passwordPopUpPanel extends JFrame implements
+ActionListener{
 
 	//Action Commands
 	public static final String OK = "ok";
 	public static final String CANCEL = "cancel";
 	
-	private JPasswordField pwBox_;
-	private JPanel pwMain_;
+	private AbstractHUDPanel pwMain_ = new AbstractHUDPanel();
+	private JPasswordField  pwBox_;
+	
+	private String pw;
 	
 	public passwordPopUpPanel(){
 		
 		super();
 		
-		this.setVisible(true);
-		
+		//setBackgroundImagePath("images/password_background.jpg");
+		//setVisible(true);
+		//setLayout(new OverlayLayout(this));
 		setSize(300, 200);
+		//setAlignmentY(CENTER_ALIGNMENT);
+		//setAlignmentX(CENTER_ALIGNMENT);
 		
 		pwBox_ = new JPasswordField();
 		pwBox_.setSize(266, 20);
 		pwBox_.setLocation(100,150);
+		pwMain_.add(pwBox_);
 		
-		JButton ok = new JButton(new ImageIcon("images/host_join.png"));
-		ok.addActionListener((ActionListener) this);
+		JButton ok = new JButton(new ImageIcon("images/join_game.png"));
+		ok.addActionListener(this);
 		ok.setActionCommand(OK);
 		ok.setLocation(new Point(100,200));
 		ok.setSize(128, 48);
 		pwMain_.add(ok);
 		
 		JButton cancel = new JButton(new ImageIcon("images/host_cancel.png"));
-		cancel.addActionListener((ActionListener) this);
+		cancel.addActionListener(this);
 		cancel.setActionCommand(CANCEL);
 		cancel.setLocation(new Point(238,200));
 		cancel.setSize(128, 48);
 		pwMain_.add(cancel);
-		add(pwMain_);
+		
+		this.add(pwMain_);
+		this.pack();
+		this.setVisible(true);
 	}	
 	
-	public String actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("OK")){
-			return pwBox_.getPassword().toString();
+			pw = pwBox_.getPassword().toString();
 		}
 		else if(e.getActionCommand().equals("CANCEL")){
-			return null;
+			pw = null;
 		}
 		else{
-			return null;
+			pw = null;
 		}
 	}
+	
+	public String getPassword(){
+		return pw;
+	}
+	
 	public static void main(String args[])
 	{
 		passwordPopUpPanel pw = new passwordPopUpPanel();
