@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.javassonne.messaging.Notification;
-import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
@@ -48,7 +46,7 @@ import org.javassonne.ui.GameState;
 public class RegionsCalc {
 
 	public RegionsCalc() {
-		marked_ = new HashMap<Point, EnumMap<Tile.Region, Integer>>();
+		scoreOfReg_ = new HashMap<Point, EnumMap<Tile.Region, Integer>>();
 		globalMeep_ = new HashMap<Point, EnumMap<Tile.Region, List<Meeple>>>();
 		isComplete_ = new HashMap<Point, EnumMap<Tile.Region, Boolean>>();
 
@@ -57,19 +55,30 @@ public class RegionsCalc {
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
 		HashMap<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
 		ArrayList<Meeple> meeps = new ArrayList<Meeple>();
+		tempScore = 0;
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
-		int total = list.keySet().size();
+
 		for (Point p : list.keySet()) {
 
-			if (marked_.get(p) == null)
-				marked_.put(p, new EnumMap<Tile.Region, Integer>(Tile.Region.class));
+			if (scoreOfReg_.get(p) == null)
+				scoreOfReg_.put(p, new EnumMap<Tile.Region, Integer>(
+						Tile.Region.class));
 			if (globalMeep_.get(p) == null)
-				globalMeep_.put(p, new EnumMap<Tile.Region, List<Meeple>>(Tile.Region.class));
+				globalMeep_.put(p, new EnumMap<Tile.Region, List<Meeple>>(
+						Tile.Region.class));
 			if (isComplete_.get(p) == null)
-				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(Tile.Region.class));
+				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(
+						Tile.Region.class));
 
 			for (Tile.Region r : list.get(p)) {
-				marked_.get(p).put(r, total);
+				if (returnVal)
+					tempScore *= GameState
+							.getInstance()
+							.getDeck()
+							.tileFeatureBindings()
+							.completionMultiplierForFeature(
+									iter.current().featureIdentifierInRegion(r));
+				scoreOfReg_.get(p).put(r, tempScore);
 				globalMeep_.get(p).put(r, meeps);
 				isComplete_.get(p).put(r, returnVal);
 			}
@@ -87,7 +96,7 @@ public class RegionsCalc {
 		if (iter.current().featureInRegion(reg) == null)
 			return returnVal;
 		// else
-		if (getsizeOfRegion(iter.getLocation(), reg) != -1)
+		if (getScoreOfRegion(iter.getLocation(), reg) != -1)
 			return returnVal;
 		// else
 		if (reg.equals(Tile.Region.Center)) {
@@ -104,40 +113,47 @@ public class RegionsCalc {
 				list.get(iter.getLocation()).add(reg);
 				// check for completion
 				TileBoardGenIterator temp = new TileBoardGenIterator(iter);
-				if (temp.right().current() == null) {
-					return false;
-				} else if (temp.down().current() == null) {
-					return false;
-				} else if (temp.left().current() == null) {
-					return false;
-				} else if (temp.left().current() == null) {
-					return false;
-				} else if (temp.up().current() == null) {
-					return false;
-				} else if (temp.up().current() == null) {
-					return false;
-				} else if (temp.right().current() == null) {
-					return false;
-				} else if (temp.right().current() == null) {
-					return false;
+				++tempScore;
+				if (temp.right().current() != null) {
+					++tempScore;
+				} else if (temp.down().current() != null) {
+					++tempScore;
+				} else if (temp.left().current() != null) {
+					++tempScore;
+				} else if (temp.left().current() != null) {
+					++tempScore;
+				} else if (temp.up().current() != null) {
+					++tempScore;
+				} else if (temp.up().current() != null) {
+					++tempScore;
+				} else if (temp.right().current() != null) {
+					++tempScore;
+				} else if (temp.right().current() != null) {
+					++tempScore;
 				}
-				// never found null tile, so monastery is complete
-				if (marked_.get(iter.getLocation()) == null)
-					marked_.put(iter.getLocation(),
-							new EnumMap<Tile.Region, Integer>(Tile.Region.class));
-				marked_.get(iter.getLocation()).put(reg, 9);
-				return true;
+
+				if (scoreOfReg_.get(iter.getLocation()) == null)
+					scoreOfReg_
+							.put(iter.getLocation(),
+									new EnumMap<Tile.Region, Integer>(
+											Tile.Region.class));
+				scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
+				if (tempScore == 9)
+					return true;
+				else
+					return false;
 			}
 			// center feature is null - pass back returnVal
 			return returnVal;
 
 		}
 		// else{
-		if (marked_.get(iter.getLocation()) == null)
-			marked_
-					.put(iter.getLocation(),
-							new EnumMap<Tile.Region, Integer>(Tile.Region.class));
-		marked_.get(iter.getLocation()).put(reg, 0);
+		if (scoreOfReg_.get(iter.getLocation()) == null) {
+			scoreOfReg_.put(iter.getLocation(),
+					new EnumMap<Tile.Region, Integer>(Tile.Region.class));
+			tempScore += iter.current().featureInRegion(reg).pointValue;
+		}
+		scoreOfReg_.get(iter.getLocation()).put(reg, 0);
 		if (list.get(iter.getLocation()) == null)
 			list.put(iter.getLocation(), new ArrayList<Tile.Region>());
 		list.get(iter.getLocation()).add(reg);
@@ -194,8 +210,8 @@ public class RegionsCalc {
 
 	// If traverseRegion has touched given region of Tile at given location
 	// This function returns the size of the region, else, returns -1
-	public Integer getsizeOfRegion(Point loc, Tile.Region reg) {
-		Map<Tile.Region, Integer> tileRegions = marked_.get(loc);
+	public Integer getScoreOfRegion(Point loc, Tile.Region reg) {
+		Map<Tile.Region, Integer> tileRegions = scoreOfReg_.get(loc);
 		if (tileRegions == null)
 			return -1;
 
@@ -215,7 +231,7 @@ public class RegionsCalc {
 		List<Meeple> temp = tileRegions.get(reg);
 		if (temp == null)
 			return returnVal;
-		
+
 		returnVal.addAll(temp);
 		return returnVal;
 	}
@@ -231,8 +247,9 @@ public class RegionsCalc {
 	}
 
 	// Keeps track of touched locations
-	private HashMap<Point, EnumMap<Tile.Region, Integer>> marked_;
+	private HashMap<Point, EnumMap<Tile.Region, Integer>> scoreOfReg_;
 	private HashMap<Point, EnumMap<Tile.Region, List<Meeple>>> globalMeep_;
 	private HashMap<Point, EnumMap<Tile.Region, Boolean>> isComplete_;
+	private int tempScore;
 
 }
