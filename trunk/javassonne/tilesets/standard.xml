@@ -12,13 +12,13 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_12</uniqueIdentifier__>
@@ -34,8 +34,8 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>1</int>
         <int>2</int>
+        <int>1</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -61,8 +61,8 @@
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_2</uniqueIdentifier__>
@@ -78,11 +78,11 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
-        <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>true</boolean>
         <boolean>true</boolean>
         <boolean>false</boolean>
@@ -100,13 +100,13 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_4</uniqueIdentifier__>
@@ -149,8 +149,8 @@
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_6</uniqueIdentifier__>
@@ -171,8 +171,8 @@
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_7</uniqueIdentifier__>
@@ -188,8 +188,8 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
@@ -210,8 +210,8 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>1</int>
         <int>0</int>
+        <int>1</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -303,8 +303,8 @@
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_14</uniqueIdentifier__>
@@ -325,8 +325,8 @@
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>true</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_15</uniqueIdentifier__>
@@ -342,8 +342,8 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>1</int>
         <int>0</int>
+        <int>1</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -364,13 +364,13 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>2</int>
         <int>1</int>
+        <int>2</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_17</uniqueIdentifier__>
@@ -386,8 +386,8 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -430,13 +430,13 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_20</uniqueIdentifier__>
@@ -457,8 +457,8 @@
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_21</uniqueIdentifier__>
@@ -474,8 +474,8 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>1</int>
         <int>2</int>
+        <int>1</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -496,13 +496,13 @@
       <farms__>
         <int>0</int>
         <int>0</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
-        <boolean>false</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_23</uniqueIdentifier__>
@@ -518,8 +518,8 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -545,8 +545,8 @@
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_25</uniqueIdentifier__>
@@ -567,8 +567,8 @@
       </farms__>
       <farmWalls__>
         <boolean>true</boolean>
-        <boolean>true</boolean>
         <boolean>false</boolean>
+        <boolean>true</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_26</uniqueIdentifier__>
@@ -584,8 +584,8 @@
       <farms__>
         <int>0</int>
         <int>1</int>
-        <int>0</int>
         <int>1</int>
+        <int>0</int>
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
@@ -611,8 +611,8 @@
       </farms__>
       <farmWalls__>
         <boolean>false</boolean>
-        <boolean>false</boolean>
         <boolean>true</boolean>
+        <boolean>false</boolean>
         <boolean>false</boolean>
       </farmWalls__>
       <uniqueIdentifier__>tile_standard_28</uniqueIdentifier__>
@@ -652,42 +652,42 @@
     <TileFeature>
       <name>Road</name>
       <identifier>R</identifier>
-      <multiplier>0</multiplier>
+      <pointValue>1</pointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>RoadEnd</name>
       <identifier>RE</identifier>
-      <multiplier>0</multiplier>
+      <pointValue>1</pointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>true</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>Fort</name>
       <identifier>F</identifier>
-      <multiplier>0</multiplier>
+      <pointValue>1</pointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>FortCap</name>
       <identifier>FC</identifier>
-      <multiplier>0</multiplier>
+      <pointValue>1</pointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>true</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>FortWithMultiplier</name>
       <identifier>FM</identifier>
-      <multiplier>2</multiplier>
+      <pointValue>2</pointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
     <TileFeature>
       <name>Cloister</name>
       <identifier>C</identifier>
-      <multiplier>0</multiplier>
+      <pointValue>9</pointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
@@ -740,5 +740,31 @@
         </list>
       </entry>
     </bindings__>
+    <completionMultipliers__>
+      <entry>
+        <string>R</string>
+  		<int>1</int>
+  	  </entry>
+      <entry>
+        <string>RE</string>
+  		<int>1</int>
+  	  </entry>
+      <entry>
+        <string>F</string>
+  		<int>2</int>
+  	  </entry>
+      <entry>
+        <string>FC</string>
+  		<int>2</int>
+  	  </entry>
+      <entry>
+        <string>FM</string>
+  		<int>2</int>
+  	  </entry>
+      <entry>
+        <string>C</string>
+  		<int>1</int>
+  	  </entry>
+    </completionMultipliers__>
   </tileFeatureBindings__>
 </TileSet>

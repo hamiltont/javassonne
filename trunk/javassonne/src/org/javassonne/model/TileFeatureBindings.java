@@ -24,10 +24,16 @@ import java.util.HashMap;
 public class TileFeatureBindings {
 
 	HashMap<String, ArrayList<String>> bindings_ = new HashMap<String, ArrayList<String>>();
-
+	HashMap<String, Integer> completionMultipliers_ = new HashMap<String, Integer>();
+	
 	public TileFeatureBindings() {
 	}
 
+	public Integer completionMultiplierForFeature(String identifier)
+	{
+		return completionMultipliers_.get(identifier);
+	}
+	
 	public Boolean featuresBind(String identifier1, String identifier2) {
 		if (bindings_.containsKey(identifier1))
 			return bindings_.get(identifier1).contains(identifier2);
