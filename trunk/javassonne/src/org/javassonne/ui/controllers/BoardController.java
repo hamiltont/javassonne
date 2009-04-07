@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import org.javassonne.algorithms.QuadCalc;
 import org.javassonne.algorithms.RegionsCalc;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -40,7 +41,6 @@ import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
-import org.javassonne.ui.map.MapLayer;
 import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.map.TilePlacementSprite;
 import org.javassonne.ui.panels.HUDConfirmPlacementPanel;
@@ -175,10 +175,16 @@ public class BoardController {
 					}
 
 					// determine what quadrants of the tile are valid placements
+					QuadCalc q = new QuadCalc();
 					currentQuadrantOptions_ = new ArrayList<Tile.Quadrant>();
-					currentQuadrantOptions_.add(Tile.Quadrant.BottomLeft);
-					currentQuadrantOptions_.add(Tile.Quadrant.TopLeft);
-
+					
+					for (Tile.Quadrant quad : Tile.Quadrant.values()) {
+						q.traverseQuadrant(tempLocationIter_, quad);
+						List<Meeple> l = q.getMeepleList(tempLocationIter_.getLocation(), quad);
+						if (l.size() == 0)
+							currentQuadrantOptions_.add(quad);
+					}
+					
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_ADD_SPRITE, tempPlacementSprite_);
