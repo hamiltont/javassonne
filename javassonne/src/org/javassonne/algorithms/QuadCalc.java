@@ -68,6 +68,7 @@ public class QuadCalc {
 			return;
 		if (getNumCastles(iter.getLocation(), quad) != -1)
 			return;
+		
 		// else
 		if (marked_.get(iter.getLocation()) == null)
 			marked_.put(iter.getLocation(),
@@ -112,7 +113,6 @@ public class QuadCalc {
 			if(iter.current().farmInQuadrant(q)==currentQuad)
 				traverseQuadrant(iter,q,meeps,list);
 		}
-
 
 		return;
 	}

@@ -159,7 +159,6 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			int selectedIndex, JPanel panel) {
 		JComboBox comboBox = new JComboBox(colors);
 		comboBox.setSelectedIndex(selectedIndex);
-		comboBox.addActionListener(this);
 		comboBox.setLocation(location);
 		comboBox.setSize(50, 38);
 		panel.add(comboBox);
