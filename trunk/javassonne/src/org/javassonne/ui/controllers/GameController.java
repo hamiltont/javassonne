@@ -262,9 +262,12 @@ public class GameController {
 	}
 
 	public void scoreTurn(Notification n) {
-		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
+		
+		Meeple placed = iter.current().getMeeple();
+		GameState.getInstance().globalMeepleSet().add(placed);
+		
 
 		Set<Meeple> meeple = new HashSet<Meeple>();
 		// Score completed features on this tile
@@ -356,6 +359,10 @@ public class GameController {
 			// sprites that the meeple is attached to.
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE_GROUP, m);
+			
+			m.getParentTile().setMeeple(null);
+			m.setParentTile(null);
+			GameState.getInstance().globalMeepleSet().remove(m);
 		}
 
 		// only score if someone claimed it
