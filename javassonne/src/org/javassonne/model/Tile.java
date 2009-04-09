@@ -105,7 +105,8 @@ public class Tile {
 	private int[] farms_ = new int[4];
 	private boolean[] farmWalls_ = new boolean[4];
 	private String uniqueIdentifier_;
-
+	private String imageFolder_;
+	
 	// this is set by the TileSet when the image is loaded. We want to
 	// cache this, so the image is only loaded once from a file
 	private BufferedImage image_;
@@ -131,7 +132,8 @@ public class Tile {
 		
 		farmWalls_ = t.farmWalls_;
 		uniqueIdentifier_ = new String(t.getUniqueIdentifier());
-
+		imageFolder_ = t.imageFolder_;
+		
 		if (t.getImage() != null) {
 			BufferedImage other = t.getImage();
 			image_ = other.getSubimage(0, 0, other.getWidth(), other
@@ -139,6 +141,14 @@ public class Tile {
 		}
 	}
 
+	public String getImageFolder() {
+		return imageFolder_;
+	}
+	
+	public void setImageFolder(String tileImagesFolder_) {
+		imageFolder_ = tileImagesFolder_;
+	}
+	
 	/**
 	 * @param q
 	 *            The qudadrant you want the farm value for
@@ -391,6 +401,5 @@ public class Tile {
 	public int hashCode() {
 		return this.getUniqueIdentifier().hashCode();
 	}
-
 
 }

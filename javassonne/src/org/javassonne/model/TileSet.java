@@ -120,6 +120,7 @@ public class TileSet {
 				String identifier = t.getUniqueIdentifier();
 				BufferedImage img = ImageIO.read(new File(String.format(
 						"%s/%s.jpg", tileImagesFolder_, identifier)));
+				t.setImageFolder(tileImagesFolder_);
 				t.setImage(img);
 			}
 		} catch (IOException e) {
