@@ -16,12 +16,15 @@
 
 Game Team:
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>  User's meeple are scored at the end of the game (includes partially completed features, but not farms). (Kyle)
- * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Users meeple count is accurately shown in the lower left, and meeple are given back as features are completed in the game. (Ben, Kyle)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> Meeple count is accurately displayed in the lower left, and meeple are given back as features are completed in the game. (Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can place farmer meeple and valid placement regions on the tile are highlighted. (Kyle, Ben)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>  User can see an end-game screen that shows game statistics (Adam, David)
  * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/>  User can save a local (not network) game to an XML file. (Ben)
- * User can resume a local game by loading a saved game from an XML file. [This is done, but pending integration with the GameController] (Ben)
- * User can hear in-game sound effects. SoundManager listens for specific notifications and plays sounds for notifications. [This is functional, but only NotificationStartGame is currently registered. We need more sounds!] (Adam)
+ * User can resume a local game by loading a saved game from an XML file. [Pending integration with the GameController] (Ben)
+ * <img src='http://1sync.ontuet.com/images/layout/check_mark.gif'/> User can hear in-game sound effects. SoundManager listens for specific notifications and plays sounds for notifications. [This is functional, but only NotificationStartGame is currently registered. We need more sounds!] (Adam)
+
+Networking Team:
+
 
 == 5th Build (Mar. 16 - Mar. 26) ==
 
