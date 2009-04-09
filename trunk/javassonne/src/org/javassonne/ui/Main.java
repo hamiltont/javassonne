@@ -29,7 +29,6 @@ import org.javassonne.networking.impl.JmDNSSingleton;
 import org.javassonne.networking.impl.RemotingUtils;
 import org.javassonne.ui.controllers.GameController;
 import org.javassonne.ui.panels.LogPanel;
-import org.springframework.context.ApplicationEvent;
 
 public class Main {
 
@@ -39,6 +38,9 @@ public class Main {
 
 		// Make sure our HostMonitor singleton is started
 		HostMonitor.getInstance();
+
+		// Play start-up sound and initialize sound monitor
+		JSoundManager.getInstance().play(JSoundManager.START_UP);
 
 		// create the application controller. This will handle starting a new
 		// game, etc...
