@@ -19,10 +19,13 @@
 package org.javassonne.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Meeple;
 import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
@@ -40,6 +43,7 @@ public class GameState {
 	private Boolean gameInProgress_ = false;
 	private Tile tileInHand_;
 	private TileBoard board_;
+	private Set<Meeple> globalMeepleSet_ = new HashSet<Meeple>();
 
 	// Singelton implementation
 	// --------------------------------------------------------
@@ -130,6 +134,10 @@ public class GameState {
 
 	public ArrayList<Player> getPlayers() {
 		return players_;
+	}
+	
+	public Set<Meeple> globalMeepleSet() {
+		return globalMeepleSet_;
 	}
 
 	public void setPlayers(ArrayList<Player> players) {
