@@ -19,11 +19,21 @@
 package org.javassonne.ui.controllers;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
+import org.javassonne.algorithms.RegionsCalc;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Meeple;
+import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
+import org.javassonne.model.TileBoardGenIterator;
+import org.javassonne.model.TileBoardIterator;
+import org.javassonne.model.TileFeature;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.panels.GameOverPanel;
@@ -92,8 +102,8 @@ public class HUDController {
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		NotificationManager.getInstance().addObserver(
-				Notification.END_TURN, this, "gameOver");
+		NotificationManager.getInstance().addObserver(Notification.END_TURN,
+				this, "gameOver");
 	}
 
 	public void endGame(Notification n) {
@@ -146,13 +156,63 @@ public class HUDController {
 			return;
 
 		// TODO: Make sure final scoring has been calculated
+		Set<Meeple> scoredMeeple = new HashSet<Meeple>();
+		// Score completed features on this tile
+
+		for (Meeple m : GameState.getInstance().globalMeepleSet()) {
+			Tile.Region region;
+			Tile.Quadrant quadrant;
+
+			if ((region = m.getRegionOnTile()) != null) {
+				Point p = m.getParentTileLocation();
+				TileBoardIterator iter = new TileBoardGenIterator(GameState
+						.getInstance().getBoard(), p);
+				RegionsCalc c = new RegionsCalc();
+				c.traverseRegion(iter, region);
+
+				if (!scoredMeeple.containsAll(c.getMeepleList(p, region))) {
+					scoreFeature(c.getScoreOfRegion(p, region), c
+							.getMeepleList(p, region), iter.current()
+							.featureInRegion(region));
+					scoredMeeple.addAll(c.getMeepleList(p, region));
+				}
+			} else if((quadrant = m.getQuadrantOnTile()) != null){
+				//TODO: Finish quadrant scoring
+			}
+
+		}
+
 		GameOverPanel g = new GameOverPanel();
 
 		Properties config = new Properties();
 		config.setProperty("hideMainMenu", "true");
-		NotificationManager.getInstance().sendNotification(Notification.END_GAME, config);
+		NotificationManager.getInstance().sendNotification(
+				Notification.END_GAME, config);
 
 		DisplayHelper.getInstance().add(g, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
+	}
+
+	private void scoreFeature(Integer scoreOfRegion, List<Meeple> meepleList,
+			TileFeature featureInRegion) {
+		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
+
+		int counts[] = new int[players_.size()];
+		int maxCount = 0;
+		for (Meeple m : meepleList) {
+			counts[m.getPlayer()] += 1;
+			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
+		}
+
+		// only score if someone claimed it
+		if (maxCount > 0) {
+			for (int ii = 0; ii < players_.size(); ii++) {
+				if (counts[ii] == maxCount) {
+					// add to their score
+					players_.get(ii).shiftScore(scoreOfRegion);
+				}
+			}
+		}
+
 	}
 }
