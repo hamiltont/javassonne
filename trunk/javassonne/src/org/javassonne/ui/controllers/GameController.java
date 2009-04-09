@@ -19,8 +19,13 @@
 package org.javassonne.ui.controllers;
 
 import java.awt.Point;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -50,6 +55,8 @@ import org.javassonne.ui.panels.InputPlayerDataPanel;
 import org.javassonne.ui.panels.InstructionsPanel;
 import org.javassonne.ui.panels.MenuPanel;
 import org.javassonne.ui.panels.ViewNetworkHostsPanel;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * The GameController is the primary controller in the application. It is
@@ -165,14 +172,14 @@ public class GameController {
 		// a tile in a deck, but not in a set
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
-		TileBoard board = new TileMapBoard(deck);
-
 		// Uncomment to Test the Game Over functionality
-		//while(deck.tilesRemaining() > 1)
-		//	 deck.popRandomTile();
-		 
-		GameState.getInstance().setBoard(board);
+		while(deck.tilesRemaining() > 5)
+		deck.popRandomTile();
 		GameState.getInstance().setDeck(deck);
+		
+
+		TileBoard board = new TileMapBoard();
+		GameState.getInstance().setBoard(board);
 
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
@@ -208,7 +215,7 @@ public class GameController {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.BEGIN_TURN, p);
-			
+
 			// Toggle an update of the score board
 			NotificationManager.getInstance().sendNotification(
 					Notification.SCORE_UPDATE);
@@ -351,10 +358,10 @@ public class GameController {
 		for (Meeple m : regionMeeple) {
 			counts[m.getPlayer()] += 1;
 			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
-			
+
 			// Give meeple back
 			players_.get(m.getPlayer()).shiftMeepleRemaining(1);
-			
+
 			// Remove the meeple from the map by deleting the "group" of
 			// sprites that the meeple is attached to.
 			NotificationManager.getInstance().sendNotification(
@@ -425,11 +432,75 @@ public class GameController {
 	public void loadGame(Notification n) {
 		JPopUp p = new JPopUp("", "Select your saved game file...");
 		File f = p.openFileDialog();
+
+		StringBuilder contents = new StringBuilder();
+		try {
+			BufferedReader input =  new BufferedReader(new FileReader(f));
+			try {
+				String line = null;
+				while (( line = input.readLine()) != null){
+					contents.append(line);
+				}
+			}
+			finally {
+				input.close();
+			}
+		} catch (Exception e) {
+			
+		}
+        
+		XStream x = new XStream();
+		x.omitField(Tile.class, "image_");
+		HashMap<String, Object> map = (HashMap<String, Object>)x.fromXML(contents.toString());
+		
+		// Set gameState properties
+		GameState state = GameState.getInstance();
+		TileDeck deck = (TileDeck)map.get("deck");
+		TileBoard board = (TileBoard)map.get("board");
+		
+		deck.loadTileImages();
+		
+		state.setPlayers((ArrayList<Player>)map.get("players"));
+		state.setBoard(board);
+		state.setDeck(deck);
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.TOGGLE_MAIN_MENU);
+
+		// Create a BoardController to do the heavy lifting during gameplay.
+		// These two objects handle notifications from the UI (like rotate
+		// tile).
+		boardController_ = new BoardController();
+		hudController_ = new HUDController();
+
+		// See if the first person is playing on this computer. If they are,
+		// send the begin turn notification to activate the interface for
+		// them.
+		beginTurn();
 	}
 
 	public void saveGame(Notification n) {
 		JPopUp p = new JPopUp("", "Select a location to save your game...");
 		File f = p.saveFileDialog();
+
+		// serialize shit!
+		GameState state = GameState.getInstance();
+		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		map.put("board", state.getBoard());
+		map.put("deck", state.getDeck());
+		map.put("players", state.getPlayers());
+
+		XStream x = new XStream();
+		x.omitField(Tile.class, "image_");
+		
+		FileWriter fw;
+		try {
+			fw = new FileWriter(f);
+			x.toXML(map, fw);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

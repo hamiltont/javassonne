@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.javassonne.model.Tile.Region;
+import org.javassonne.ui.GameState;
 
 /**
  * @author pretekr
@@ -41,16 +42,14 @@ public class TileMapBoard implements TileBoard {
 	private TileBoardGenIterator upperLeft_;
 	private TileBoardGenIterator lowerRight_;
 	private HashSet<Point> tempTileLocations_;
-	private TileFeatureBindings tileFeatureBindings_;
 
-	public TileMapBoard(TileDeck deck) {
+	public TileMapBoard() {
 		upperLeft_ = new TileBoardGenIterator(this, new Point(-1, 1));
 		lowerRight_ = new TileBoardGenIterator(this, new Point(1, -1));
 		tempTileLocations_ = new HashSet<Point>();
 
 		data_ = new HashMap<Point, Tile>();
-		data_.put(new Point(0, 0), deck.homeTile());
-		tileFeatureBindings_ = deck.tileFeatureBindings();
+		data_.put(new Point(0, 0), GameState.getInstance().getDeck().homeTile());
 	}
 
 	/*
@@ -130,22 +129,24 @@ public class TileMapBoard implements TileBoard {
 			if (tempTileLocations_.contains(localIter.downCopy().getLocation()))
 				bottom = null;
 		
-			if (left != null && !tileFeatureBindings_.featuresBind(left
+			TileFeatureBindings b = GameState.getInstance().getDeck().tileFeatureBindings();
+			
+			if (left != null && !b.featuresBind(left
 							.featureInRegion(Region.Right), tile
 							.featureInRegion(Region.Left)))
 				return false;
 			// iterate up and check if features match
-			if (top != null && !tileFeatureBindings_.featuresBind(top
+			if (top != null && !b.featuresBind(top
 							.featureInRegion(Region.Bottom), tile
 							.featureInRegion(Region.Top)))
 				return false;
 			// iterate right and check if features match
-			if (right != null && !tileFeatureBindings_.featuresBind(right
+			if (right != null && !b.featuresBind(right
 							.featureInRegion(Region.Left), tile
 							.featureInRegion(Region.Right)))
 				return false;
 			// iterate down and check if features match
-			if (bottom != null && !tileFeatureBindings_.featuresBind(bottom
+			if (bottom != null && !b.featuresBind(bottom
 							.featureInRegion(Region.Top), tile
 							.featureInRegion(Region.Bottom)))
 				return false;

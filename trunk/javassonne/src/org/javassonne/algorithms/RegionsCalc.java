@@ -117,13 +117,12 @@ public class RegionsCalc {
 		}
 		// else
 		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
-		.tileFeatureBindings();
+			.tileFeatureBindings();
 
 		if (scoreOfReg_.get(iter.getLocation()) == null) {
 			scoreOfReg_.put(iter.getLocation(),
 					new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 		}
-		
 
 		scoreOfReg_.get(iter.getLocation()).put(reg, 0);
 		if (list.get(iter.getLocation()) == null)

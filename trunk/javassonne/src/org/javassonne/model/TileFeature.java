@@ -15,7 +15,8 @@ public class TileFeature {
 	
 	public boolean actsAsWall;
 	public boolean endsTraversal;
-	
+
+	public int farmPointValue;
 	public int pointValue;
 	
 	public TileFeature() {
@@ -23,6 +24,7 @@ public class TileFeature {
 		this.identifier = "U";
 		this.actsAsWall = false;
 		this.pointValue = 1;
+		this.farmPointValue = 0;
 		this.endsTraversal = false;
 	}
 
