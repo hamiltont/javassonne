@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -59,9 +60,14 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private JPanel main_;
 	private JPanel joinGamePanel_;
 	private JPanel hostGamePanel_;
+	private JPanel pwMain_;
 
 	private JTable availHostsTable_;
 	private JTable connectedHostsTable_;
+	
+	private String password_ = "";
+	private JPasswordField pwBoxJoin_;
+	private JPasswordField pwBoxSet_;
 
 	private JTextArea chatArea_;
 	private JTextArea talkArea_;
@@ -71,8 +77,10 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String SHOW_JOIN_PANEL = "Back";
 	private static String SHOW_HOST_PANEL = "Host_Game";
 	private static String JOIN_GAME = "Join_Game";
+	private static String CANCELPW = "Cancel_Password";
+	private static String SETPW = "Set_Password";
 
-	private boolean gameHasPassword_ = true;
+	private boolean gameHasPassword_ = false;
 	
 	public ViewNetworkHostsPanel() {
 		super();
@@ -99,6 +107,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.setLayout(null);
 		hostGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
 		hostGamePanel_.setSize(getWidth(), getHeight());
+		
+		pwMain_ = new JPanel();
+		pwMain_.setOpaque(false);
+		pwMain_.setLayout(null);
+		pwMain_.setAlignmentX(CENTER_ALIGNMENT);
+		pwMain_.setSize(getWidth(), getHeight());
 
 		NotificationManager.getInstance()
 				.addObserver(Notification.RECV_GLOBAL_CHAT, this,
@@ -210,6 +224,32 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		label1.setFont(new Font("Serif", Font.BOLD, 16));
 		label1.setSize(200, 20);
 		hostGamePanel_.add(label1);
+		
+		pwBoxSet_ = new JPasswordField();
+		pwBoxSet_.setSize(200, 20);
+		pwBoxSet_.setLocation(75,400);
+		hostGamePanel_.add(pwBoxSet_);
+		
+		JLabel enterPasswordLabel_ = new JLabel();
+		enterPasswordLabel_.setText("Set a password (optional):");
+		enterPasswordLabel_.setSize(266, 20);
+		enterPasswordLabel_.setLocation(75,370);
+		hostGamePanel_.add(enterPasswordLabel_);
+		
+		JButton setPw_ = new JButton(new ImageIcon("images/set_pw.png"));
+		setPw_.addActionListener(this);
+		setPw_.setActionCommand(SETPW);
+		setPw_.setLocation(new Point(285,397));
+		setPw_.setSize(64, 24);
+		hostGamePanel_.add(setPw_);
+		/*
+		JButton cancel = new JButton(new ImageIcon("images/host_cancel.png"));
+		cancel.addActionListener(this);
+		cancel.setActionCommand(CANCELPW);
+		cancel.setLocation(new Point(213,400));
+		cancel.setSize(128, 48);
+		pwMain_.add(cancel);
+		pwMain_.setVisible(false);*/
 
 		// Add some other options
 		// TODO - put game password option here
@@ -218,7 +258,39 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// Add the back button
 		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(
 				455, 543), hostGamePanel_);
-
+		
+		// ============================================
+		// Setup Password Panel
+		// ============================================
+		
+		pwBoxJoin_ = new JPasswordField();
+		pwBoxJoin_.setSize(266, 20);
+		pwBoxJoin_.setLocation(75,250);
+		pwMain_.add(pwBoxJoin_);
+		
+		JLabel passwordIns_ = new JLabel();
+		passwordIns_.setText("Please enter the password to join this game:");
+		passwordIns_.setSize(266, 20);
+		passwordIns_.setLocation(75,220);
+		pwMain_.add(passwordIns_);
+		
+		JButton ok = new JButton(new ImageIcon("images/join_game.png"));
+		ok.addActionListener(this);
+		ok.setActionCommand(JOIN_GAME);
+		ok.setLocation(new Point(75,300));
+		ok.setSize(128, 48);
+		pwMain_.add(ok);
+		
+		JButton cancel = new JButton(new ImageIcon("images/host_cancel.png"));
+		cancel.addActionListener(this);
+		cancel.setActionCommand(CANCELPW);
+		cancel.setLocation(new Point(213,300));
+		cancel.setSize(128, 48);
+		pwMain_.add(cancel);
+		pwMain_.setVisible(false);
+		
+		
+		main_.add(pwMain_);
 		main_.add(hostGamePanel_);
 		main_.add(joinGamePanel_);
 
@@ -250,14 +322,31 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 
-			/*if(gameHasPassword_ == true){
-				passwordPopUpPanel pw = new passwordPopUpPanel();
-				//if(pw.getPassword()==this.password)  --need a this.password
-				if(true){
+			if(gameHasPassword_ == true){
+				joinGamePanel_.setVisible(false);
+				hostGamePanel_.setVisible(false);
+				pwMain_.setVisible(true);
+				if(pwBoxJoin_.getPassword().toString().equals(this.password_)){
 					//join game
 				}
-			}*/
-		} else
+			}else{
+				//again, join game.
+			}
+		} else if(e.getActionCommand().equals(CANCELPW)){
+			joinGamePanel_.setVisible(true);
+			hostGamePanel_.setVisible(false);
+			pwMain_.setVisible(false);
+		}else if(e.getActionCommand().equals(SETPW)){
+			if(pwBoxSet_.getPassword().toString().length() == 0){
+				password_ = "";
+				gameHasPassword_ = false;
+			}
+			else{
+				password_ = pwBoxSet_.getPassword().toString();
+				gameHasPassword_ = true;
+			}
+		}
+		else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
 
