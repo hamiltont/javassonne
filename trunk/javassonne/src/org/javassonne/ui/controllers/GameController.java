@@ -208,6 +208,10 @@ public class GameController {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.BEGIN_TURN, p);
+			
+			// Toggle an update of the score board
+			NotificationManager.getInstance().sendNotification(
+					Notification.SCORE_UPDATE);
 		}
 	}
 
@@ -261,12 +265,6 @@ public class GameController {
 		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
-
-		// Remove used merson from current player?
-		Meeple placed = iter.current().getMeeple();
-		if (placed != null) {
-			players_.get(placed.getPlayer()).shiftMeepleRemaining(-1);
-		}
 
 		Set<Meeple> meeple = new HashSet<Meeple>();
 		// Score completed features on this tile
@@ -350,8 +348,14 @@ public class GameController {
 		for (Meeple m : regionMeeple) {
 			counts[m.getPlayer()] += 1;
 			maxCount = Math.max(maxCount, counts[m.getPlayer()]);
+			
 			// Give meeple back
 			players_.get(m.getPlayer()).shiftMeepleRemaining(1);
+			
+			// Remove the meeple from the map by deleting the "group" of
+			// sprites that the meeple is attached to.
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_REMOVE_SPRITE_GROUP, m);
 		}
 
 		// only score if someone claimed it

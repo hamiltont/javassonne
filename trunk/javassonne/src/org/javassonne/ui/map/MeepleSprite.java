@@ -35,6 +35,7 @@ public class MeepleSprite extends MapSprite {
 		m_ = m;
 		color_ = meepleColor;
 		
+		setGroup(m);
 		setAnimating(false);
 		
 		if (m_.getQuadrantOnTile() != null)

@@ -33,6 +33,7 @@ public class MapSprite {
 	protected BufferedImage image_;
 	protected Boolean shouldScaleImage_ = true;
 	protected Boolean animating_ = false;
+	protected Object group_ = "Unset";
 	
 	public MapSprite(int x, int y) {
 		x_ = x;
@@ -87,4 +88,14 @@ public class MapSprite {
 	public void update(MapLayer mapLayer) {
 		// default implementations do nothing
 	}
+
+	public Object getGroup() {
+		return group_;
+	}
+	
+	public void setGroup(Object group) {
+		group_ = group;	
+	}
+
+	
 }

@@ -204,8 +204,7 @@ public class BoardController {
 		// if they've already tried placing a meeple, remove it before
 		// allowing them to place another.
 		if (tempPlacedMeeple_ != null) {
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+			resetTempPlacedMeeple();
 		}
 
 		tempPlacementSprite_.showRegionOptions(currentRegionOptions_);
@@ -241,7 +240,14 @@ public class BoardController {
 			MeepleColor c = GameState.getInstance().getCurrentPlayer()
 					.getMeepleColor();
 			tempPlacedMeeple_ = new MeepleSprite(m, c);
-
+			
+			// decrement the player's meeple count
+			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
+			
+			// tell the scoreboard to update based on the new meeple count
+			NotificationManager.getInstance().sendNotification(
+					Notification.SCORE_UPDATE);
+			
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 		}
@@ -254,8 +260,7 @@ public class BoardController {
 		// if they've already tried placing a meeple, remove it before
 		// allowing them to place another.
 		if (tempPlacedMeeple_ != null) {
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+			resetTempPlacedMeeple();
 		}
 
 		tempPlacementSprite_.showQuadrantOptions(currentQuadrantOptions_);
@@ -292,6 +297,13 @@ public class BoardController {
 					.getMeepleColor();
 			tempPlacedMeeple_ = new MeepleSprite(m, c);
 
+			// decrement the player's meeple count
+			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
+			
+			// tell the scoreboard to update based on the new meeple count
+			NotificationManager.getInstance().sendNotification(
+					Notification.SCORE_UPDATE);
+			
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 		}
@@ -307,10 +319,7 @@ public class BoardController {
 				Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
 		if (tempPlacedMeeple_ != null) {
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
-			tempPlacedTile_.getMeeple().setParentTile(null);
-			tempPlacedTile_.setMeeple(null);
+			resetTempPlacedMeeple();
 		}
 
 		tempPlacementSprite_ = null;
@@ -354,5 +363,21 @@ public class BoardController {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void resetTempPlacedMeeple(){
+		NotificationManager.getInstance().sendNotification(
+				Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+
+		tempPlacedTile_.getMeeple().setParentTile(null);
+		tempPlacedTile_.setMeeple(null);
+		tempPlacedMeeple_ = null;
+		
+		// increment the player's meeple count
+		GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(1);
+		
+		// tell the scoreboard to update based on the new meeple count
+		NotificationManager.getInstance().sendNotification(
+				Notification.SCORE_UPDATE);
 	}
 }
