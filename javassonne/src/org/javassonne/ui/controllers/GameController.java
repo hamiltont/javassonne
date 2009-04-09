@@ -165,6 +165,10 @@ public class GameController {
 		deck.addTileSet(set);
 		TileBoard board = new TileMapBoard(deck);
 		
+		// Uncomment to Test the Game Over functionality
+		//while(deck.tilesRemaining() > 1)
+		//	 deck.popRandomTile();
+		 
 		GameState.getInstance().setBoard(board);
 		GameState.getInstance().setDeck(deck);
 

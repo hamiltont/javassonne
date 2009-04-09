@@ -39,7 +39,7 @@ public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 		
 		ArrayList<Player> players = GameState.getInstance().getPlayers();
 		
-		removeKeyListener(getKeyListeners()[0]);
+
 		
 		setVisible(true);
 		setSize(380, 300 + 28 * players.size());

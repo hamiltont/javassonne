@@ -93,7 +93,7 @@ public class HUDController {
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
 		NotificationManager.getInstance().addObserver(
-				Notification.UPDATED_BOARD, this, "gameOver");
+				Notification.END_TURN, this, "gameOver");
 	}
 
 	public void endGame(Notification n) {
@@ -136,6 +136,7 @@ public class HUDController {
 	}
 
 	/*
+	 * This method monitors the status of the game to determine if it's over.
 	 * The game has been completed! We must now finish scoring and end the game
 	 */
 	public void gameOver(Notification n) {
@@ -144,13 +145,13 @@ public class HUDController {
 		if (GameState.getInstance().getDeck().tilesRemaining() != 0)
 			return;
 
-		// Finish scoring
+		System.out.print("#");
+		// TODO: Finish scoring
 		GameOverPanel g = new GameOverPanel();
 
 		Properties config = new Properties();
 		config.setProperty("hideMainMenu", "true");
-		NotificationManager.getInstance().sendNotification(
-				Notification.END_GAME, config);
+		NotificationManager.getInstance().sendNotification(Notification.END_GAME, config);
 
 		DisplayHelper.getInstance().add(g, DisplayHelper.Layer.MODAL,
 				DisplayHelper.Positioning.CENTER);
