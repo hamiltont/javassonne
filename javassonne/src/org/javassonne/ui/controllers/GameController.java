@@ -21,8 +21,10 @@ package org.javassonne.ui.controllers;
 import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -147,7 +149,7 @@ public class GameController {
 		InputPlayerDataPanel panel_ = (InputPlayerDataPanel) n.argument();
 		GameState.getInstance().startGameWithPlayers(panel_.getPlayers());
 
-		DisplayHelper.getInstance().remove(panel_);		
+		DisplayHelper.getInstance().remove(panel_);
 		NotificationManager.getInstance().sendNotification(
 				Notification.TOGGLE_MAIN_MENU);
 
@@ -158,13 +160,13 @@ public class GameController {
 			System.err.println("Tile set could not be found.");
 			System.exit(0);
 		}
-		
+
 		// Populate the set into the deck. Note: you can have multiple copies of
 		// a tile in a deck, but not in a set
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		TileBoard board = new TileMapBoard(deck);
-		
+
 		// Uncomment to Test the Game Over functionality
 		//while(deck.tilesRemaining() > 1)
 		//	 deck.popRandomTile();
@@ -172,16 +174,16 @@ public class GameController {
 		GameState.getInstance().setBoard(board);
 		GameState.getInstance().setDeck(deck);
 
-        // Create a BoardController to do the heavy lifting during gameplay.
-        // These two objects handle notifications from the UI (like rotate
-        // tile).
-        boardController_ = new BoardController();
-        hudController_ = new HUDController();
+		// Create a BoardController to do the heavy lifting during gameplay.
+		// These two objects handle notifications from the UI (like rotate
+		// tile).
+		boardController_ = new BoardController();
+		hudController_ = new HUDController();
 
-        // See if the first person is playing on this computer. If they are,
-        // send the begin turn notification to activate the interface for
-        // them.
-        beginTurn();
+		// See if the first person is playing on this computer. If they are,
+		// send the begin turn notification to activate the interface for
+		// them.
+		beginTurn();
 	}
 
 	/**
@@ -194,21 +196,21 @@ public class GameController {
 		// the interface so they can place a tile. We do that by passing another
 		// notification
 		Player p = GameState.getInstance().getCurrentPlayer();
-	
+
 		if (p.getIsLocal() == true) {
 			// Draw the another tile!
 			TileDeck d = GameState.getInstance().getDeck();
 			Tile t = d.popRandomTile();
 			GameState.getInstance().setDeck(d);
-			
+
 			// Send notifications to attach our tileInHand to the view
 			GameState.getInstance().setTileInHand(t);
-			
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.BEGIN_TURN, p);
 		}
 	}
-	
+
 	/**
 	 * Called when an END_GAME notification is received. This notification used
 	 * to be called EXIT_GAME, but it is now possible to end a game without
@@ -242,7 +244,7 @@ public class GameController {
 		JPopUp dialogBox = new JPopUp("A game is currently in progress!");
 		String ans = dialogBox.promptUser(options);
 
-		if (ans == END_WITHOUT_SAVING){
+		if (ans == END_WITHOUT_SAVING) {
 			GameState.getInstance().resetGameState();
 			NotificationManager.getInstance().sendNotification(
 					Notification.END_GAME);
@@ -266,16 +268,22 @@ public class GameController {
 			players_.get(placed.getPlayer()).shiftMeepleRemaining(-1);
 		}
 
+		Set<Meeple> meeple = new HashSet<Meeple>();
 		// Score completed features on this tile
 		RegionsCalc c = new RegionsCalc();
 		for (Tile.Region r : Tile.Region.values()) {
 			c.traverseRegion(iter, r);
+		}
+		for (Tile.Region r : Tile.Region.values()) {
 			if (c.getRegionCompletion(iter.getLocation(), r)) {
-				scoreFeature(c.getScoreOfRegion(p, r), c.getMeepleList(p, r),
-						iter.current().featureInRegion(r));
+				if (!meeple.containsAll(c.getMeepleList(p, r))) {
+					scoreFeature(c.getScoreOfRegion(p, r), c
+							.getMeepleList(p, r), iter.current()
+							.featureInRegion(r));
+					meeple.addAll(c.getMeepleList(p, r));
+				}
 			}
 		}
-		
 		// Score cloisters - go right then move clockwise
 		// Note: do not need to recheck iter because it was checked above
 		TileBoardGenIterator temp = new TileBoardGenIterator(iter);
@@ -336,7 +344,7 @@ public class GameController {
 			TileFeature regionFeatureType) {
 
 		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
-		
+
 		int counts[] = new int[players_.size()];
 		int maxCount = 0;
 		for (Meeple m : regionMeeple) {
@@ -361,14 +369,16 @@ public class GameController {
 
 	public void toggleMainMenu(Notification n) {
 		// Determine whether the game is currently in progress
-		
+
 		if (menu_.isShowing()) {
 			if (GameState.getInstance().getGameInProgress())
 				menu_.close();
-			
+
 		} else {
-			menu_.setGameInProgress(GameState.getInstance().getGameInProgress());
-				
+			menu_
+					.setGameInProgress(GameState.getInstance()
+							.getGameInProgress());
+
 			// Make sure the instructions menu is hidden
 			NotificationManager.getInstance().sendNotification(
 					Notification.TOGGLE_INSTRUCTIONS, 0);
