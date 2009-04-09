@@ -653,6 +653,7 @@
       <name>Road</name>
       <identifier>R</identifier>
       <pointValue>1</pointValue>
+      <farmPointValue>0</farmPointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
@@ -660,6 +661,7 @@
       <name>RoadEnd</name>
       <identifier>RE</identifier>
       <pointValue>1</pointValue>
+      <farmPointValue>0</farmPointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>true</endsTraversal>
     </TileFeature>
@@ -667,6 +669,7 @@
       <name>Fort</name>
       <identifier>F</identifier>
       <pointValue>1</pointValue>
+      <farmPointValue>3</farmPointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
@@ -674,6 +677,7 @@
       <name>FortCap</name>
       <identifier>FC</identifier>
       <pointValue>1</pointValue>
+      <farmPointValue>3</farmPointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>true</endsTraversal>
     </TileFeature>
@@ -681,6 +685,7 @@
       <name>FortWithMultiplier</name>
       <identifier>FM</identifier>
       <pointValue>2</pointValue>
+      <farmPointValue>3</farmPointValue>
       <actsAsWall>true</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
@@ -688,6 +693,7 @@
       <name>Cloister</name>
       <identifier>C</identifier>
       <pointValue>9</pointValue>
+      <farmPointValue>0</farmPointValue>
       <actsAsWall>false</actsAsWall>
       <endsTraversal>false</endsTraversal>
     </TileFeature>
