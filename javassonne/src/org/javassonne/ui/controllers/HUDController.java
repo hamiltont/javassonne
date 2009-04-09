@@ -145,8 +145,7 @@ public class HUDController {
 		if (GameState.getInstance().getDeck().tilesRemaining() != 0)
 			return;
 
-		System.out.print("#");
-		// TODO: Finish scoring
+		// TODO: Make sure final scoring has been calculated
 		GameOverPanel g = new GameOverPanel();
 
 		Properties config = new Properties();
