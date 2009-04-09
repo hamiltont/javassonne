@@ -165,9 +165,8 @@ public class BoardController {
 					currentRegionOptions_ = new ArrayList<Tile.Region>();
 
 					for (Tile.Region region : Tile.Region.values()) {
-						List<Meeple> result;
 						r.traverseRegion(tempLocationIter_, region);
-						result = r.getMeepleList(tempLocationIter_
+						List<Meeple> result = r.getMeepleList(tempLocationIter_
 								.getLocation(), region);
 						if ((result.size() == 0)
 								&& (tempPlacedTile_.featureInRegion(region) != null))

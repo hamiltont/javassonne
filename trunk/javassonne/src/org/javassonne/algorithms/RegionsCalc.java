@@ -29,12 +29,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileFeatureBindings;
+import org.javassonne.model.Tile.Region;
 import org.javassonne.ui.GameState;
+import org.javassonne.ui.map.TilePlacementSprite;
 
 /**
  * @author Kyle Prete Note: If the board this RegionsCalc is indirectly attached
@@ -53,11 +57,22 @@ public class RegionsCalc {
 	}
 
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
-		HashMap<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
-		ArrayList<Meeple> meeps = new ArrayList<Meeple>();
+		Map<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
+		List<Meeple> meeps = new ArrayList<Meeple>();
 		tempScore = 0;
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
-
+		for (Point p : list.keySet()) {
+			Tile.Region r = list.get(p).get(0);
+				TileBoardIterator iterator = new TileBoardGenIterator(iter.getData(), p);
+				tempScore += iterator.current().featureInRegion(r).pointValue;
+			
+		}
+		
+		if (returnVal && iter.current().featureInRegion(reg) != null) {
+			tempScore *= GameState.getInstance().getDeck()
+					.tileFeatureBindings().completionMultiplierForFeature(
+							iter.current().featureIdentifierInRegion(reg));
+		}
 		for (Point p : list.keySet()) {
 
 			if (scoreOfReg_.get(p) == null)
@@ -69,18 +84,16 @@ public class RegionsCalc {
 			if (isComplete_.get(p) == null)
 				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(
 						Tile.Region.class));
-
+/*
+			TilePlacementSprite s = new TilePlacementSprite(p);
+			s.showRegionOptions(list.get(p));
+			NotificationManager.getInstance().sendNotification(Notification.MAP_ADD_SPRITE, s);
+	*/		
 			for (Tile.Region r : list.get(p)) {
-				if (returnVal)
-					tempScore *= GameState
-							.getInstance()
-							.getDeck()
-							.tileFeatureBindings()
-							.completionMultiplierForFeature(
-									iter.current().featureIdentifierInRegion(r));
 				scoreOfReg_.get(p).put(r, tempScore);
 				globalMeep_.get(p).put(r, meeps);
 				isComplete_.get(p).put(r, returnVal);
+				
 			}
 		}
 		return;
@@ -88,7 +101,7 @@ public class RegionsCalc {
 	}
 
 	private boolean traverseRegion(TileBoardIterator iter, Tile.Region reg,
-			List<Meeple> meeps, HashMap<Point, ArrayList<Tile.Region>> list,
+			List<Meeple> meeps, Map<Point, ArrayList<Tile.Region>> list,
 			boolean returnVal) {
 		if (iter.current() == null)
 			return false;
@@ -100,59 +113,18 @@ public class RegionsCalc {
 			return returnVal;
 		// else
 		if (reg.equals(Tile.Region.Center)) {
-
-			// test for not null
-			if (iter.current().featureInRegion(reg) != null) {
-				// meeple?
-				Meeple meep1 = iter.current().meepleInRegion(reg);
-				if (meep1 != null)
-					meeps.add(meep1);
-				// addme to list
-				if (list.get(iter.getLocation()) == null)
-					list.put(iter.getLocation(), new ArrayList<Tile.Region>());
-				list.get(iter.getLocation()).add(reg);
-				// check for completion
-				TileBoardGenIterator temp = new TileBoardGenIterator(iter);
-				++tempScore;
-				if (temp.right().current() != null) {
-					++tempScore;
-				} else if (temp.down().current() != null) {
-					++tempScore;
-				} else if (temp.left().current() != null) {
-					++tempScore;
-				} else if (temp.left().current() != null) {
-					++tempScore;
-				} else if (temp.up().current() != null) {
-					++tempScore;
-				} else if (temp.up().current() != null) {
-					++tempScore;
-				} else if (temp.right().current() != null) {
-					++tempScore;
-				} else if (temp.right().current() != null) {
-					++tempScore;
-				}
-
-				if (scoreOfReg_.get(iter.getLocation()) == null)
-					scoreOfReg_
-							.put(iter.getLocation(),
-									new EnumMap<Tile.Region, Integer>(
-											Tile.Region.class));
-				scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
-				if (tempScore == 9)
-					return true;
-				else
-					return false;
-			}
-			// center feature is null - pass back returnVal
-			return returnVal;
-
+			returnVal = traverseCenter(iter, reg, meeps, list, returnVal) && returnVal;
 		}
-		// else{
+		// else
+		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
+		.tileFeatureBindings();
+
 		if (scoreOfReg_.get(iter.getLocation()) == null) {
 			scoreOfReg_.put(iter.getLocation(),
 					new EnumMap<Tile.Region, Integer>(Tile.Region.class));
-			tempScore += iter.current().featureInRegion(reg).pointValue;
 		}
+		
+
 		scoreOfReg_.get(iter.getLocation()).put(reg, 0);
 		if (list.get(iter.getLocation()) == null)
 			list.put(iter.getLocation(), new ArrayList<Tile.Region>());
@@ -188,8 +160,6 @@ public class RegionsCalc {
 		}
 		// if feature does not end traversal
 		// traverse to other regions in Tile except center
-		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
-				.tileFeatureBindings();
 
 		if (!iter.current().featureInRegion(reg).endsTraversal) {
 			for (Tile.Region r : Tile.Region.values()) {
@@ -206,6 +176,55 @@ public class RegionsCalc {
 		return returnVal;
 		// }
 
+	}
+
+	private boolean traverseCenter(TileBoardIterator iter, Region reg,
+			List<Meeple> meeps, Map<Point, ArrayList<Region>> list,
+			boolean returnVal) {
+		// test for not null
+		if (iter.current().featureInRegion(reg) != null) {
+			// meeple?
+			Meeple meep1 = iter.current().meepleInRegion(reg);
+			if (meep1 != null)
+				meeps.add(meep1);
+			// addme to list
+			if (list.get(iter.getLocation()) == null)
+				list.put(iter.getLocation(), new ArrayList<Tile.Region>());
+			list.get(iter.getLocation()).add(reg);
+			// check for completion
+			TileBoardGenIterator temp = new TileBoardGenIterator(iter);
+			++tempScore;
+			if (temp.right().current() != null) {
+				++tempScore;
+			} else if (temp.down().current() != null) {
+				++tempScore;
+			} else if (temp.left().current() != null) {
+				++tempScore;
+			} else if (temp.left().current() != null) {
+				++tempScore;
+			} else if (temp.up().current() != null) {
+				++tempScore;
+			} else if (temp.up().current() != null) {
+				++tempScore;
+			} else if (temp.right().current() != null) {
+				++tempScore;
+			} else if (temp.right().current() != null) {
+				++tempScore;
+			}
+
+			if (scoreOfReg_.get(iter.getLocation()) == null)
+				scoreOfReg_
+						.put(iter.getLocation(),
+								new EnumMap<Tile.Region, Integer>(
+										Tile.Region.class));
+			scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
+			if (tempScore == 9)
+				return true;
+			else
+				return false;
+		}
+		// center feature is null - pass back returnVal
+		return returnVal;
 	}
 
 	// If traverseRegion has touched given region of Tile at given location
