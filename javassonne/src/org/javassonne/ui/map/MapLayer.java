@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -58,7 +59,7 @@ public class MapLayer extends JPanel implements MouseListener,
 	private BufferedImage backgroundTile_;
 
 	private BufferedImage boardBuffer_ = null;
-	private ArrayList<MapSprite> sprites_ = null;
+	private HashMap<Object, ArrayList<MapSprite>> sprites_ = null;
 
 	private Timer updateTimer_ = null;
 	private long updateLastMilliseconds_ = 0;
@@ -116,6 +117,7 @@ public class MapLayer extends JPanel implements MouseListener,
 		// Listen for notifications for adding and removing sprites
 		n.addObserver(Notification.MAP_ADD_SPRITE, this, "addSprite");
 		n.addObserver(Notification.MAP_REMOVE_SPRITE, this, "removeSprite");
+		n.addObserver(Notification.MAP_REMOVE_SPRITE_GROUP, this, "removeSpriteGroup");
 		n.addObserver(Notification.MAP_REDRAW, this, "repaint");
 		// Listen for a notification from the tile or a meeple being dragged
 		n.addObserver(Notification.TILE_DROPPED, this, "tileDropped");
@@ -155,38 +157,61 @@ public class MapLayer extends JPanel implements MouseListener,
 		renderBoard();
 
 		// create the sprites array
-		sprites_ = new ArrayList<MapSprite>();
+		sprites_ = new HashMap<Object, ArrayList<MapSprite>>();
 	}
 
 	// ------------------------------------------------------------------------
 	// SPRITE MANAGEMENT AND BOARD ANIMATION
 	// ------------------------------------------------------------------------
 
-	public void addSprite(MapSprite s) {
-		sprites_.add(s);
+	public void addSprite(MapSprite s, Object group) {
+		ArrayList<MapSprite> g = sprites_.get(group);
+		if (g == null) g = new ArrayList<MapSprite>();
+		sprites_.put(group, g);
+		
+		s.setGroup(group);
+		g.add(s);
+		
 		recalculateUpdateFrequency();
 	}
 
 	public void addSprite(Notification n) {
 		MapSprite s = (MapSprite) n.argument();
-		this.addSprite(s);
+		this.addSprite(s, s.getGroup());
 		s.addedToMap(this);
 	}
 
 	public void removeSprite(MapSprite s) {
-		sprites_.remove(s);
+		Object groupKey = s.getGroup();
+		ArrayList<MapSprite> group = sprites_.get(groupKey);
+		if (group != null){
+			group.remove(s);
+			if (group.size() == 0)
+				sprites_.remove(groupKey);
+		}
 		recalculateUpdateFrequency();
 	}
 
 	public void removeSprite(Notification n) {
 		this.removeSprite((MapSprite) n.argument());
 	}
+	
+	public void removeSpriteGroup(Object group) {
+		sprites_.remove(group);
+	}
+	
+	public void removeSpriteGroup(Notification n) {
+		this.removeSpriteGroup((Object)n.argument());
+	}
 
 	protected void update() {
 		// we need to iterate through the list backwards in case
 		// any of the sprites remove themselves.
-		for (int ii = sprites_.size() - 1; ii >= 0; ii--) {
-			sprites_.get(ii).update(this);
+		for (Object group : sprites_.keySet()) {
+			ArrayList<MapSprite> s = sprites_.get(group);
+			for (int ii = s.size() - 1; ii >= 0; ii--) {
+				s.get(ii).update(this);
+			}
 		}
 
 		if (mapShift_ != null)
@@ -215,10 +240,12 @@ public class MapLayer extends JPanel implements MouseListener,
 		// 2 FPS will do.
 
 		Boolean spriteActive = false;
-		for (MapSprite s : sprites_) {
-			if (s.isAnimating()) {
-				spriteActive = true;
-				break;
+		for (Object group : sprites_.keySet()) {
+			for (MapSprite s : sprites_.get(group)) {
+				if (s.isAnimating()) {
+					spriteActive = true;
+					break;
+				}
 			}
 		}
 
@@ -472,8 +499,12 @@ public class MapLayer extends JPanel implements MouseListener,
 			if (sprites_.size() > 0) {
 				Point offset = getScreenPointFromTileLocation(board.homeTile()
 						.getLocation());
-				for (MapSprite s : sprites_)
-					s.draw(gra, offset, scale_);
+				
+				for (Object group : sprites_.keySet()) {
+					for (MapSprite s : sprites_.get(group)) {
+						s.draw(gra, offset, scale_);
+					}
+				}
 			}
 			
 			// draw on the fps

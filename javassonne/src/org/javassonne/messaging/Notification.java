@@ -79,6 +79,7 @@ public class Notification {
 	
 	public static final String MAP_ADD_SPRITE = "NotificationMapAddSprite";
 	public static final String MAP_REMOVE_SPRITE = "NotificationMapRemoveSprite";
+	public static final String MAP_REMOVE_SPRITE_GROUP = "NotificationMapRemoveSpriteGroup";
 	public static final String MAP_REDRAW = "NotificationMapRedraw";
 	public static final String BEGIN_TURN = "NotificationBeginTurn";
 	public static final String END_TURN = "NotificationEndTurn";
@@ -96,6 +97,7 @@ public class Notification {
 	
 	// Local only:
 	public static final String DRAG_PANEL_RESET = "ResetDragPanel";
+	public static final String SCORE_UPDATE = "NotificationScoreUpdate";
 	
 	
 	private String identifier_;

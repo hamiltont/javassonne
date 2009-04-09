@@ -88,28 +88,25 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 		// update ourselves!
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.END_TURN,
-				this, "endTurn");
-		NotificationManager.getInstance().addObserver(Notification.BEGIN_TURN,
-				this, "beginTurn");
+		NotificationManager.getInstance().addObserver(Notification.SCORE_UPDATE,
+				this, "reload");
 	}
 
 	public void endGame(Notification n) {
 		close();
 	}
-
-	public void endTurn(Notification n) {
-		// move the selected player focus background
-		focus_.setLocation(0, 27 + GameState.getInstance().getCurrentPlayerIndex() * 28);	
-	}
 	
-	public void beginTurn(Notification n) {
+	public void reload(Notification n) {
 		// iterate through all the players and make sure their scores are valid
 		ArrayList<Player> players = GameState.getInstance().getPlayers();
+
+		focus_.setLocation(0, 27 + GameState.getInstance().getCurrentPlayerIndex() * 28);	
 		
 		if (scores_.size() == players.size())
-			for (int ii = 0; ii < players.size(); ii++)
+			for (int ii = 0; ii < players.size(); ii++){
 				scores_.get(ii).setText(String.valueOf(players.get(ii).getScore()));
+				meeple_.get(ii).setCount(players.get(ii).getMeepleRemaining());
+			}
 	}
 
 	// Overloaded the add() method to bind a key listener to any elements placed
