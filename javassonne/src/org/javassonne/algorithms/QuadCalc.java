@@ -30,12 +30,13 @@ import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.Tile.Quadrant;
 import org.javassonne.model.TileBoardGenIterator;
+import org.javassonne.ui.GameState;
 
 public class QuadCalc {
 
 	public QuadCalc() {
 
-		marked_ = new HashMap<Point, EnumMap<Tile.Quadrant, Integer>>();
+		numCastles_ = new HashMap<Point, EnumMap<Tile.Quadrant, Integer>>();
 		globalMeep_ = new HashMap<Point, EnumMap<Tile.Quadrant, List<Meeple>>>();
 
 	}
@@ -45,17 +46,34 @@ public class QuadCalc {
 		ArrayList<Meeple> meeps = new ArrayList<Meeple>();
 		traverseQuadrant(iter, quad, meeps, list);
 		// TODO: Get total as # completed castles
-		int total = list.keySet().size();
+		int total = 0;
+		RegionsCalc c = new RegionsCalc();
 		for (Point p : list.keySet()) {
-			if (marked_.get(p) == null)
-				marked_.put(p, new EnumMap<Tile.Quadrant, Integer>(
+			TileBoardIterator iterNew = new TileBoardGenIterator(GameState
+					.getInstance().getBoard(), p);
+			for (Tile.Quadrant q : list.get(p)) {
+				for (Tile.Region r : Tile.Region.values()) {
+					if (iterNew.current().featureInRegion(r) != null
+							&& iterNew.current().featureInRegion(r).farmPointValue != 0
+							&& c.getScoreOfRegion(p, r) == -1
+							&& r.isAdjacentTo(q)) {
+						c.traverseRegion(iterNew, r);
+						if (c.getRegionCompletion(p, r))
+							total += iterNew.current().featureInRegion(r).farmPointValue;
+					}
+				}
+			}
+		}
+		for (Point p : list.keySet()) {
+			if (numCastles_.get(p) == null)
+				numCastles_.put(p, new EnumMap<Tile.Quadrant, Integer>(
 						Tile.Quadrant.class));
 			if (globalMeep_.get(p) == null)
 				globalMeep_.put(p, new EnumMap<Tile.Quadrant, List<Meeple>>(
 						Tile.Quadrant.class));
-			for (Tile.Quadrant r : list.get(p)) {
-				marked_.get(p).put(r, total);
-				globalMeep_.get(p).put(r, meeps);
+			for (Tile.Quadrant q : list.get(p)) {
+				numCastles_.get(p).put(q, total);
+				globalMeep_.get(p).put(q, meeps);
 			}
 		}
 		return;
@@ -68,50 +86,58 @@ public class QuadCalc {
 			return;
 		if (getNumCastles(iter.getLocation(), quad) != -1)
 			return;
-		
+
 		// else
-		if (marked_.get(iter.getLocation()) == null)
-			marked_.put(iter.getLocation(),
+		if (numCastles_.get(iter.getLocation()) == null)
+			numCastles_.put(iter.getLocation(),
 					new EnumMap<Tile.Quadrant, Integer>(Tile.Quadrant.class));
-		marked_.get(iter.getLocation()).put(quad, 0);
+		numCastles_.get(iter.getLocation()).put(quad, 0);
 		if (list.get(iter.getLocation()) == null)
 			list.put(iter.getLocation(), new ArrayList<Tile.Quadrant>());
 		list.get(iter.getLocation()).add(quad);
 		Meeple current = iter.current().meepleInQuadrant(quad);
 		if (current != null)
 			meeps.add(current);
-		
+
 		boolean leftWall = iter.current().farmWallInRegion(Tile.Region.Left);
 		boolean upWall = iter.current().farmWallInRegion(Tile.Region.Top);
 		boolean rightWall = iter.current().farmWallInRegion(Tile.Region.Right);
 		boolean downWall = iter.current().farmWallInRegion(Tile.Region.Bottom);
-		//traverse to next Tile(s)
-		if(quad.equals(Tile.Quadrant.TopLeft)){
-			if(!leftWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).leftCopy(), Tile.Quadrant.TopRight, meeps, list); 
-			if(!upWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).upCopy(), Tile.Quadrant.BottomLeft, meeps, list); 
-		} else if(quad.equals(Tile.Quadrant.TopRight)){
-			if(!rightWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).rightCopy(), Tile.Quadrant.TopLeft, meeps, list); 
-			if(!upWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).upCopy(), Tile.Quadrant.BottomRight, meeps, list); 
-		} else if(quad.equals(Tile.Quadrant.BottomLeft)){
-			if(!leftWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).leftCopy(), Tile.Quadrant.BottomRight, meeps, list); 
-			if(!downWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).downCopy(), Tile.Quadrant.TopLeft, meeps, list); 
-		} else if(quad.equals(Tile.Quadrant.BottomRight)){
-			if(!rightWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).rightCopy(), Tile.Quadrant.BottomLeft, meeps, list); 
-			if(!downWall)
-				traverseQuadrant(((TileBoardGenIterator)iter).downCopy(), Tile.Quadrant.TopRight, meeps, list); 
-		} 
-		//traverse to other quadrants that connect to current
+		// traverse to next Tile(s)
+		if (quad.equals(Tile.Quadrant.TopLeft)) {
+			if (!leftWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).leftCopy(),
+						Tile.Quadrant.TopRight, meeps, list);
+			if (!upWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).upCopy(),
+						Tile.Quadrant.BottomLeft, meeps, list);
+		} else if (quad.equals(Tile.Quadrant.TopRight)) {
+			if (!rightWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).rightCopy(),
+						Tile.Quadrant.TopLeft, meeps, list);
+			if (!upWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).upCopy(),
+						Tile.Quadrant.BottomRight, meeps, list);
+		} else if (quad.equals(Tile.Quadrant.BottomLeft)) {
+			if (!leftWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).leftCopy(),
+						Tile.Quadrant.BottomRight, meeps, list);
+			if (!downWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).downCopy(),
+						Tile.Quadrant.TopLeft, meeps, list);
+		} else if (quad.equals(Tile.Quadrant.BottomRight)) {
+			if (!rightWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).rightCopy(),
+						Tile.Quadrant.BottomLeft, meeps, list);
+			if (!downWall)
+				traverseQuadrant(((TileBoardGenIterator) iter).downCopy(),
+						Tile.Quadrant.TopRight, meeps, list);
+		}
+		// traverse to other quadrants that connect to current
 		int currentQuad = iter.current().farmInQuadrant(quad);
-		for(Tile.Quadrant q : Tile.Quadrant.values()){
-			if(iter.current().farmInQuadrant(q)==currentQuad)
-				traverseQuadrant(iter,q,meeps,list);
+		for (Tile.Quadrant q : Tile.Quadrant.values()) {
+			if (iter.current().farmInQuadrant(q) == currentQuad)
+				traverseQuadrant(iter, q, meeps, list);
 		}
 
 		return;
@@ -120,7 +146,7 @@ public class QuadCalc {
 	// If traverseQuadrant has touched given Quadrant of Tile at given location
 	// This function returns the size of the Quadrant, else, returns -1
 	public Integer getNumCastles(Point loc, Tile.Quadrant quad) {
-		Map<Tile.Quadrant, Integer> tileQuadrants = marked_.get(loc);
+		Map<Tile.Quadrant, Integer> tileQuadrants = numCastles_.get(loc);
 		if (tileQuadrants == null)
 			return -1;
 
@@ -146,7 +172,7 @@ public class QuadCalc {
 	}
 
 	// Keeps track of touched locations
-	private HashMap<Point, EnumMap<Tile.Quadrant, Integer>> marked_;
+	private HashMap<Point, EnumMap<Tile.Quadrant, Integer>> numCastles_;
 	private HashMap<Point, EnumMap<Tile.Quadrant, List<Meeple>>> globalMeep_;
 
 }

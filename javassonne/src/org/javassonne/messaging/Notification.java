@@ -60,6 +60,7 @@ public class Notification {
 	public static final String SAVE_GAME = "NotificationSaveGame";
 	public static final String ATTEMPT_END_GAME = "NotificationAttemptEndGame";
 	public static final String END_GAME = "NotificationEndGame";
+	public static final String GAME_OVER = "NotificationGameOver";
 	public static final String QUIT = "NotificationQuit";
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String TOGGLE_INSTRUCTIONS = "NotificationToggleInstructions";

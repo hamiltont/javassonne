@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.javassonne.algorithms.QuadCalc;
 import org.javassonne.algorithms.RegionsCalc;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -102,7 +103,7 @@ public class HUDController {
 				Notification.TILE_ROTATE_RIGHT, this, "rotateTileInHandRight");
 		NotificationManager.getInstance().addObserver(Notification.END_GAME,
 				this, "endGame");
-		NotificationManager.getInstance().addObserver(Notification.END_TURN,
+		NotificationManager.getInstance().addObserver(Notification.GAME_OVER,
 				this, "gameOver");
 	}
 
@@ -151,9 +152,6 @@ public class HUDController {
 	 */
 	public void gameOver(Notification n) {
 
-		// Game Over Conditions: Tile End is Empty
-		if (GameState.getInstance().getDeck().tilesRemaining() != 0)
-			return;
 
 		// TODO: Make sure final scoring has been calculated
 		Set<Meeple> scoredMeeple = new HashSet<Meeple>();
@@ -172,12 +170,21 @@ public class HUDController {
 
 				if (!scoredMeeple.containsAll(c.getMeepleList(p, region))) {
 					scoreFeature(c.getScoreOfRegion(p, region), c
-							.getMeepleList(p, region), iter.current()
-							.featureInRegion(region));
+							.getMeepleList(p, region));
 					scoredMeeple.addAll(c.getMeepleList(p, region));
 				}
 			} else if((quadrant = m.getQuadrantOnTile()) != null){
-				//TODO: Finish quadrant scoring
+				Point p = m.getParentTileLocation();
+				TileBoardIterator iter = new TileBoardGenIterator(GameState
+						.getInstance().getBoard(), p);
+				QuadCalc c = new QuadCalc();
+				c.traverseQuadrant(iter, quadrant);
+
+				if (!scoredMeeple.containsAll(c.getMeepleList(p, quadrant))) {
+					scoreFeature(c.getNumCastles(p, quadrant), c
+							.getMeepleList(p, quadrant));
+					scoredMeeple.addAll(c.getMeepleList(p, quadrant));
+				}
 			}
 
 		}
@@ -193,8 +200,7 @@ public class HUDController {
 				DisplayHelper.Positioning.CENTER);
 	}
 
-	private void scoreFeature(Integer scoreOfRegion, List<Meeple> meepleList,
-			TileFeature featureInRegion) {
+	private void scoreFeature(Integer scoreOfRegion, List<Meeple> meepleList) {
 		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
 
 		int counts[] = new int[players_.size()];
