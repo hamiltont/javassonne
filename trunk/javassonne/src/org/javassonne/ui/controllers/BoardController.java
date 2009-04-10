@@ -112,14 +112,19 @@ public class BoardController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Meeple placed = tempLocationIter_.current().getMeeple();
+		GameState.getInstance().globalMeepleSet().add(placed);
 
 		// remove the placement sprite if it exists
 		if (tempPlacementSprite_ != null)
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
-
-		NotificationManager.getInstance().sendNotification(
-				Notification.SCORE_TURN, tempLocationIter_);
+		
+			NotificationManager.getInstance().sendNotification(
+					Notification.SCORE_TURN, tempLocationIter_);
+		
+		GameState.getInstance().advanceCurrentPlayer();
 
 		tempPlacedMeeple_ = null;
 		tempPlacementSprite_ = null;
@@ -176,14 +181,15 @@ public class BoardController {
 					// determine what quadrants of the tile are valid placements
 					QuadCalc q = new QuadCalc();
 					currentQuadrantOptions_ = new ArrayList<Tile.Quadrant>();
-					
+
 					for (Tile.Quadrant quad : Tile.Quadrant.values()) {
 						q.traverseQuadrant(tempLocationIter_, quad);
-						List<Meeple> l = q.getMeepleList(tempLocationIter_.getLocation(), quad);
+						List<Meeple> l = q.getMeepleList(tempLocationIter_
+								.getLocation(), quad);
 						if (l.size() == 0)
 							currentQuadrantOptions_.add(quad);
 					}
-					
+
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_ADD_SPRITE, tempPlacementSprite_);
@@ -240,14 +246,14 @@ public class BoardController {
 			MeepleColor c = GameState.getInstance().getCurrentPlayer()
 					.getMeepleColor();
 			tempPlacedMeeple_ = new MeepleSprite(m, c);
-			
+
 			// decrement the player's meeple count
 			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-			
+
 			// tell the scoreboard to update based on the new meeple count
 			NotificationManager.getInstance().sendNotification(
 					Notification.SCORE_UPDATE);
-			
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 		}
@@ -299,11 +305,11 @@ public class BoardController {
 
 			// decrement the player's meeple count
 			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-			
+
 			// tell the scoreboard to update based on the new meeple count
 			NotificationManager.getInstance().sendNotification(
 					Notification.SCORE_UPDATE);
-			
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 		}
@@ -365,17 +371,17 @@ public class BoardController {
 		}
 	}
 
-	private void resetTempPlacedMeeple(){
+	private void resetTempPlacedMeeple() {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 
 		tempPlacedTile_.getMeeple().setParentTile(null);
 		tempPlacedTile_.setMeeple(null);
 		tempPlacedMeeple_ = null;
-		
+
 		// increment the player's meeple count
 		GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(1);
-		
+
 		// tell the scoreboard to update based on the new meeple count
 		NotificationManager.getInstance().sendNotification(
 				Notification.SCORE_UPDATE);

@@ -24,6 +24,7 @@ import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileDeck;
 import org.javassonne.model.TileMapBoard;
+import org.javassonne.ui.GameState;
 
 public class TileMapBoardTests extends TestCase {
 
@@ -39,7 +40,8 @@ public class TileMapBoardTests extends TestCase {
 		super.setUp();
 		//sets hometile
 		td.addTile(homeTile, 1);
-		board_ = new TileMapBoard(td);
+		GameState.getInstance().setDeck(td);
+		board_ = new TileMapBoard();
 		TileBoardGenIterator home = (TileBoardGenIterator) board_.homeTile();
 		board_.addTemp(home.leftCopy(), leftTile);
 		board_.addTemp(home.rightCopy(), rightTile);

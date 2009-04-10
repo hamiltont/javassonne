@@ -70,6 +70,20 @@ public class Tile {
 			this.x = x;
 			this.y = y;
 		}
+		
+		public boolean isAdjacentTo(Tile.Quadrant quad){
+			if(this.equals(Tile.Region.Left))
+				return quad.equals(Tile.Quadrant.BottomLeft) || quad.equals(Tile.Quadrant.TopLeft);
+			else if(this.equals(Tile.Region.Top))
+				return quad.equals(Tile.Quadrant.TopLeft) || quad.equals(Tile.Quadrant.TopRight);
+			else if(this.equals(Tile.Region.Right))
+				return quad.equals(Tile.Quadrant.BottomRight) || quad.equals(Tile.Quadrant.TopRight);
+			else if(this.equals(Tile.Region.Bottom))
+				return quad.equals(Tile.Quadrant.BottomLeft) || quad.equals(Tile.Quadrant.BottomRight);
+			else
+				return false;				
+		}
+		
 	}
 
 	/**
@@ -96,6 +110,19 @@ public class Tile {
 		Quadrant(int i, Rectangle2D rect) {
 			this.index = i;
 			this.rect = rect;
+		}
+		
+		public boolean isAdjacentTo(Tile.Region reg){
+			if(reg.equals(Tile.Region.Left))
+				return this.equals(Tile.Quadrant.BottomLeft) || this.equals(Tile.Quadrant.TopLeft);
+			else if(reg.equals(Tile.Region.Top))
+				return this.equals(Tile.Quadrant.TopLeft) || this.equals(Tile.Quadrant.TopRight);
+			else if(reg.equals(Tile.Region.Right))
+				return this.equals(Tile.Quadrant.BottomRight) || this.equals(Tile.Quadrant.TopRight);
+			else if(reg.equals(Tile.Region.Bottom))
+				return this.equals(Tile.Quadrant.BottomLeft) || this.equals(Tile.Quadrant.BottomRight);
+			else
+				return false;				
 		}
 	}
 

@@ -108,7 +108,6 @@ public class GameController {
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.LOAD_GAME, this, "loadGame");
 		n.addObserver(Notification.SAVE_GAME, this, "saveGame");
-		n.addObserver(Notification.END_TURN, this, "endTurn");
 		n.addObserver(Notification.SCORE_TURN, this, "scoreTurn");
 		n.addObserver(Notification.QUIT, this, "quitGame");
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
@@ -173,8 +172,8 @@ public class GameController {
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		// Uncomment to Test the Game Over functionality
-		while(deck.tilesRemaining() > 5)
-		deck.popRandomTile();
+		//while(deck.tilesRemaining() > 5)
+		//	deck.popRandomTile();
 		GameState.getInstance().setDeck(deck);
 		
 
@@ -262,18 +261,11 @@ public class GameController {
 		}
 	}
 
-	public void endTurn(Notification n) {
-		// sent from the confirmPlacement panel when the user presses end turn.
-		// We want to advance the turn and change current player.
-		GameState.getInstance().advanceCurrentPlayer();
-	}
-
 	public void scoreTurn(Notification n) {
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
 		
-		Meeple placed = iter.current().getMeeple();
-		GameState.getInstance().globalMeepleSet().add(placed);
+		
 		
 
 		Set<Meeple> meeple = new HashSet<Meeple>();
@@ -345,7 +337,10 @@ public class GameController {
 					Tile.Region.Center));
 		}
 
-		beginTurn();
+		if(GameState.getInstance().getDeck().tilesRemaining() == 0)
+			NotificationManager.getInstance().sendNotification(Notification.GAME_OVER);
+		else
+			beginTurn();
 	}
 
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
