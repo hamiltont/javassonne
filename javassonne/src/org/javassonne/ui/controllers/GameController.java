@@ -51,6 +51,7 @@ import org.javassonne.networking.LocalHost;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.controls.JPopUp;
+import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
 import org.javassonne.ui.panels.InstructionsPanel;
 import org.javassonne.ui.panels.MenuPanel;
@@ -264,9 +265,6 @@ public class GameController {
 	public void scoreTurn(Notification n) {
 		TileBoardIterator iter = (TileBoardIterator) n.argument();
 		Point p = iter.getLocation();
-		
-		
-		
 
 		Set<Meeple> meeple = new HashSet<Meeple>();
 		// Score completed features on this tile
@@ -388,9 +386,8 @@ public class GameController {
 				menu_.close();
 
 		} else {
-			menu_
-					.setGameInProgress(GameState.getInstance()
-							.getGameInProgress());
+			menu_.setGameInProgress(GameState.getInstance()
+				.getGameInProgress());
 
 			// Make sure the instructions menu is hidden
 			NotificationManager.getInstance().sendNotification(
@@ -428,6 +425,11 @@ public class GameController {
 		JPopUp p = new JPopUp("", "Select your saved game file...");
 		File f = p.openFileDialog();
 
+		// if the user does not select a file, cancel
+		if (f == null)
+			return;
+		
+		// read the file into a string
 		StringBuilder contents = new StringBuilder();
 		try {
 			BufferedReader input =  new BufferedReader(new FileReader(f));
@@ -443,7 +445,11 @@ public class GameController {
 		} catch (Exception e) {
 			
 		}
-        
+
+		// close the main menu
+		menu_.close();
+
+		// unserialize the string
 		XStream x = new XStream();
 		x.omitField(Tile.class, "image_");
 		HashMap<String, Object> map = (HashMap<String, Object>)x.fromXML(contents.toString());
@@ -453,21 +459,28 @@ public class GameController {
 		TileDeck deck = (TileDeck)map.get("deck");
 		TileBoard board = (TileBoard)map.get("board");
 		
-		deck.loadTileImages();
+		ArrayList<Player> players = (ArrayList<Player>)map.get("players");
 		
-		state.setPlayers((ArrayList<Player>)map.get("players"));
+		state.setPlayers(players);
+		state.setCurrentPlayer((Integer)map.get("currentPlayer"));
+		state.setTileInHand((Tile)map.get("tileInHand"));
+		state.setGlobalMeepleSet((Set<Meeple>)map.get("meeple"));
+		state.setGameInProgress(true);
 		state.setBoard(board);
 		state.setDeck(deck);
-
-		NotificationManager.getInstance().sendNotification(
-				Notification.TOGGLE_MAIN_MENU);
 
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
 		// tile).
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
-
+		
+		// re-attach meeple sprites on the map where they belong
+		for (Meeple s : state.globalMeepleSet()){	
+			MeepleSprite sprite = new MeepleSprite(s,players.get(s.getPlayer()).getMeepleColor());
+			NotificationManager.getInstance().sendNotification(Notification.MAP_ADD_SPRITE, sprite);
+		}
+		
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
@@ -478,6 +491,10 @@ public class GameController {
 		JPopUp p = new JPopUp("", "Select a location to save your game...");
 		File f = p.saveFileDialog();
 
+		// make sure we have the file extension
+		if (!f.getName().endsWith(".javassonne"))
+			f = new File(f.getAbsolutePath()+".javassonne");
+		
 		// serialize shit!
 		GameState state = GameState.getInstance();
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -485,7 +502,10 @@ public class GameController {
 		map.put("board", state.getBoard());
 		map.put("deck", state.getDeck());
 		map.put("players", state.getPlayers());
-
+		map.put("tileInHand", state.getTileInHand());
+		map.put("currentPlayer", state.getCurrentPlayerIndex());
+		map.put("meeple", state.globalMeepleSet());
+		
 		XStream x = new XStream();
 		x.omitField(Tile.class, "image_");
 		

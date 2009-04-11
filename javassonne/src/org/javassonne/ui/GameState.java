@@ -79,6 +79,9 @@ public class GameState {
 
 	public void advanceCurrentPlayer() {
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_CURRENT_PLAYER, getCurrentPlayer());
 	}
 
 	// Getters and Setter Functions
@@ -132,14 +135,20 @@ public class GameState {
 				Notification.UPDATED_BOARD, board);
 	}
 
-	public ArrayList<Player> getPlayers() {
-		return players_;
-	}
-	
 	public Set<Meeple> globalMeepleSet() {
 		return globalMeepleSet_;
 	}
 
+
+	public void setGlobalMeepleSet(Set<Meeple> set) {
+		globalMeepleSet_ = set;
+		
+	}
+
+	public ArrayList<Player> getPlayers() {
+		return players_;
+	}
+	
 	public void setPlayers(ArrayList<Player> players) {
 		players_ = players;
 		
