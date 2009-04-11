@@ -70,11 +70,6 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		rotateLeft_.setSize(58,38);
 		add(rotateLeft_);
 		
-		Tile t = GameState.getInstance().getTileInHand();
-		if (t != null){
-			tilePanel_ = new DragTilePanel(t);
-			DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));	
-		}
 		// Subscribe for notifications from the controller so we know when to
 		// update ourselves!
 		NotificationManager.getInstance().addObserver(

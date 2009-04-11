@@ -133,23 +133,4 @@ public class TileDeck {
 		return homeTile_;
 	}
 
-	/**
-	 * This function should be called before gameplay starts. It loads images
-	 * for each tile from the tileImagesFolder_ and caches them in the tile
-	 * objects.
-	 */
-	public void loadTileImages() {
-		try {
-			for (Tile t : this.tiles_) {
-				String identifier = t.getUniqueIdentifier();
-				String path = String.format("%s%s.jpg", t.getImageFolder(), identifier);
-				
-				BufferedImage img = ImageIO.read(new File(path));
-				t.setImage(img);
-			}
-		} catch (IOException e) {
-			System.err
-					.println("The tile images could not be loaded. One or more tiles may not have images.");
-		}
-	}
 }

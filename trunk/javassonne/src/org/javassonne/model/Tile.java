@@ -22,7 +22,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 /**
  * The Tile class is used to represent a single tile in the game. Tiles are
@@ -137,7 +141,12 @@ public class Tile {
 	// this is set by the TileSet when the image is loaded. We want to
 	// cache this, so the image is only loaded once from a file
 	private BufferedImage image_;
-
+	
+	// We don't need to keep rotation unless the game is saved and loaded
+	// from a file. In that case, we need to know how many times the tile has 
+	// been rotated so we can restore the image.
+	private int rotation_ = 0;
+	
 	// Meeple can be attached to tiles in regions or quadrants, but only
 	// one meeple will ever be on the tile at once. IMPORTANT:
 	// The meeple knows which region or quadrant it is on.
@@ -283,7 +292,20 @@ public class Tile {
 	 * @return The currently cached image for this tile, if available
 	 */
 	public BufferedImage getImage() {
-		return image_;
+		if (image_ != null)
+			return image_;
+		else{
+			try {
+				String path = String.format("%s%s.jpg", imageFolder_, uniqueIdentifier_);
+				image_ = ImageIO.read(new File(path));
+				for (int ii = 0; ii < rotation_; ii++){
+					this.rotateImage(1);
+				}
+			} catch (IOException e) {
+				System.err.println("The tile image could not be loaded.");
+			}
+			return image_;
+		}
 	}
 
 	/**
@@ -399,7 +421,12 @@ public class Tile {
 		features_ = tempFeatures;
 		farms_ = tempFarms;
 		farmWalls_ = tempWalls;
+		rotation_ = (rotation_ + direction) % 4;
+		
+		rotateImage(direction);
+	}
 
+	public void rotateImage(int direction) {
 		int angle = direction * 90;
 
 		// rotate our image, if it exists
@@ -413,7 +440,7 @@ public class Tile {
 			image_ = op.filter(image_, null);
 		}
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		if (other.getClass().equals(Tile.class)) {

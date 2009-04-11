@@ -90,6 +90,8 @@ public class HUDGameStatsPanel extends AbstractHUDPanel {
 				this, "endGame");
 		NotificationManager.getInstance().addObserver(Notification.SCORE_UPDATE,
 				this, "reload");
+		NotificationManager.getInstance().addObserver(Notification.UPDATED_CURRENT_PLAYER,
+				this, "reload");
 	}
 
 	public void endGame(Notification n) {
