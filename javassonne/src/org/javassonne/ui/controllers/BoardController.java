@@ -207,6 +207,7 @@ public class BoardController {
 
 	public void dragVillager(Notification n) {
 
+		
 		// if they've already tried placing a meeple, remove it before
 		// allowing them to place another.
 		if (tempPlacedMeeple_ != null) {
@@ -220,6 +221,7 @@ public class BoardController {
 	}
 
 	public void placeVillager(Notification n) {
+		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
 
 		// the meeple is created in the map layer, because the map layer
 		// has more intimate knowledege of which region the drag ended on.
@@ -259,6 +261,7 @@ public class BoardController {
 		}
 		NotificationManager.getInstance().sendNotification(
 				Notification.DRAG_PANEL_RESET);
+		}
 	}
 
 	public void dragFarmer(Notification n) {
@@ -276,6 +279,7 @@ public class BoardController {
 	}
 
 	public void placeFarmer(Notification n) {
+		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
 
 		// the meeple is created in the map layer, because the map layer
 		// has more intimate knowledege of which region the drag ended on.
@@ -315,6 +319,7 @@ public class BoardController {
 		}
 		NotificationManager.getInstance().sendNotification(
 				Notification.DRAG_PANEL_RESET);
+		}
 	}
 
 	public void undoPlaceTile(Notification n) {
