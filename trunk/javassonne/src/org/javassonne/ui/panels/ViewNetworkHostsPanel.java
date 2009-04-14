@@ -44,6 +44,7 @@ import javax.swing.event.TableModelListener;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.AvailableNetworkHosts;
+import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
@@ -59,31 +60,33 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	private JPanel main_;
 
-	// TODO - FLIP THESE TWO PANELS! 
 	/**
-	 * Shown when a user is attempting to host their own game
+	 * Shown when a user is thinking of joining another hosts game
 	 */
 	private JPanel joinGamePanel_;
 
 	/**
-	 * Shown when the user is thinking of joining another host's game
+	 * Shown when the user is hosting their own game
 	 */
 	private JPanel hostGamePanel_;
 
 	private JTable availHostsTable_;
 	private JTable connectedHostsTable_;
 
-	private JTextArea pwBoxJoin_;
+	private JTextArea passwordText_;
 
 	private JTextArea chatArea_;
 	private JTextArea talkArea_;
+	
+	private JTextArea enterIP_;
 
 	// Action commands for buttons
 	private static String CANCEL = "Cancel";
 	private static String SHOW_JOIN_PANEL = "Back";
 	private static String SHOW_HOST_PANEL = "Host_Game";
 	private static String JOIN_GAME = "Join_Game";
-	private static String CANCELPW = "Cancel_Password";
+	private static String SET_PASS = "Set_Password";
+	private static String ENTER_IP = "Enter_new_IP";
 
 	private boolean gameHasPassword_ = false;
 
@@ -165,6 +168,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		main_.add(talkScroll_);
 	}
 
+	/**
+	 * Shown when a user is thinking of joining another hosts game
+	 */
 	private void setupJoinPanel() {
 
 		joinGamePanel_ = new JPanel();
@@ -180,18 +186,32 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		availHostsTable_.setModel(tableModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availHostsTable_.repaint();
-		// hosts_table_.setSize(600, 360);
 
 		// Make it scroll able
 		JScrollPane hostsScroll = new JScrollPane(availHostsTable_);
-		hostsScroll.setSize(350, 350);
+		hostsScroll.setSize(350, 320);
 		hostsScroll.setLocation(new Point(40, 160));
 		availHostsTable_.setSize(hostsScroll.getWidth(), hostsScroll
 				.getHeight());
 		joinGamePanel_.add(hostsScroll);
 
+		// Add a text area for them to enter in an IP
+		enterIP_ = new JTextArea();
+		enterIP_.setSize(300,30);
+		enterIP_.setLocation(new Point(40,480));
+		enterIP_.setText("<enter an IP you would like to find>");
+		joinGamePanel_.add(enterIP_);
+	
+		// Add a button for the IP entry
+		JButton setPw_ = new JButton("GO");
+		setPw_.setActionCommand(ENTER_IP);
+		setPw_.addActionListener(this);
+		setPw_.setLocation(new Point(340, 480));
+		setPw_.setSize(75, 30);
+		joinGamePanel_.add(setPw_);
+		
 		// Add a label
-		JLabel label = new JLabel("Hosts Table");
+		JLabel label = new JLabel("Connected Hosts");
 		label.setLocation(new Point(45, 130));
 		label.setFont(new Font("Serif", Font.BOLD, 16));
 		label.setSize(200, 20);
@@ -201,12 +221,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		addButtonToPanel("images/join_game.png", JOIN_GAME,
 				new Point(600, 543), joinGamePanel_);
 
-		// Add the Create game button
+		// Add the Host game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
 				455, 543), joinGamePanel_);
 
 	}
 
+	/**
+	 * Shown when a user is hosting a game
+	 */
 	private void setupHostPanel() {
 
 		hostGamePanel_ = new JPanel();
@@ -235,7 +258,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.add(connectedScroll);
 
 		// Add a label
-		JLabel label1 = new JLabel("Connected Hosts");
+		JLabel label1 = new JLabel("Connected Clients");
 		label1.setLocation(new Point(45, 130));
 		label1.setFont(new Font("Serif", Font.BOLD, 16));
 		label1.setSize(200, 20);
@@ -249,23 +272,14 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 		JButton setPw_ = new JButton(new ImageIcon("images/set_pw.png"));
 		setPw_.addActionListener(this);
-		setPw_.setLocation(new Point(285, 397));
-		setPw_.setSize(64, 24);
+		setPw_.setLocation(new Point(300, 395));
+		setPw_.setSize(75, 30);
 		hostGamePanel_.add(setPw_);
-		/*
-		 * JButton cancel = new JButton(new
-		 * ImageIcon("images/host_cancel.png")); cancel.addActionListener(this);
-		 * cancel.setActionCommand(CANCELPW); cancel.setLocation(new
-		 * Point(213,400)); cancel.setSize(128, 48); pwMain_.add(cancel);
-		 * pwMain_.setVisible(false);
-		 */
 
-		pwBoxJoin_ = new JTextArea();
-		//266, 20
-		pwBoxJoin_.setSize(500, 500);
-		pwBoxJoin_.setLocation(75, 250);
-		pwBoxJoin_.setVisible(true);
-		hostGamePanel_.add(pwBoxJoin_);
+		passwordText_ = new JTextArea();
+		passwordText_.setSize(220,20);
+		passwordText_.setLocation(75, 400);
+		hostGamePanel_.add(passwordText_);
 		
 		// Add some other options
 		// TODO - put game password option here
@@ -313,9 +327,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			} else {
 				// again, join game.
 			}
-		} else if (e.getActionCommand().equals(CANCELPW)) {
-			joinGamePanel_.setVisible(true);
-			hostGamePanel_.setVisible(false);
+		} else if (e.getActionCommand().equals(SET_PASS)) {
+			// Set the password
+		} else if (e.getActionCommand().equals(ENTER_IP)) {
+			HostMonitor.resolveNewHost(enterIP_.getText());
+			
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
