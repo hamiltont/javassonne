@@ -35,7 +35,7 @@ public class HostMonitorListener implements ServiceListener {
 				Notification.LOG_INFO, info);
 
 		// We only care if this is a Javassonne host
-		if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
+		if (e.getName().contains(HostImpl.SERVICENAME) == false)
 			return;
 
 		// Cut out instances of
@@ -75,7 +75,7 @@ public class HostMonitorListener implements ServiceListener {
 				Notification.LOG_INFO, rinfo);
 
 		// We only care if this is a Javassonne host
-		if (e.getName().contains(LocalHostImpl.SERVICENAME) == false)
+		if (e.getName().contains(HostImpl.SERVICENAME) == false)
 			return;
 
 		ServiceInfo info = e.getInfo();

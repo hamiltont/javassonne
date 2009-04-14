@@ -53,15 +53,15 @@ public class HostStarter extends TimerTask {
 			e1.printStackTrace();
 		}
 
-		LocalHostImpl.getInstance().URI_ = "rmi://" + local_host + ":"
+		HostImpl.getInstance().myURI_ = "rmi://" + local_host + ":"
 				+ info.getPort() + "/" + info.getName();
 
 		// As long as we detect that we are a duplicate,
 		// try to force the old original to close and
 		// give us our name back
-		while (LocalHostImpl.getInstance().URI_.matches(".+\\(\\d+\\)") == true) {
+		while (HostImpl.getInstance().myURI_.matches(".+\\(\\d+\\)") == true) {
 			String dup = "HostStarter: Detected that we have a duplicate "
-					+ "name, '" + LocalHostImpl.getInstance().URI_ + "'";
+					+ "name, '" + HostImpl.getInstance().myURI_ + "'";
 			
 			NotificationManager.getInstance().sendNotification(
 					Notification.LOG_INFO, dup);
@@ -69,7 +69,7 @@ public class HostStarter extends TimerTask {
 			// Shutdown any previous service
 			try {
 				RemotingUtils.shutdownService(RemoteHost.SERVICENAME + "_"
-						+ LocalHostImpl.getInstance().rmiSafeName_);
+						+ HostImpl.getInstance().rmiSafeName_);
 			} catch (RemoteException e) {
 				String err = "HostStarter in LocalHostImpl: A RemoteException occurred while starting";
 				err += "\n" + e.getMessage();
@@ -83,7 +83,7 @@ public class HostStarter extends TimerTask {
 
 			// Try to re-create our RMI
 			info = createRMI();
-			LocalHostImpl.getInstance().URI_ = "rmi://" + info.getHostAddress()
+			HostImpl.getInstance().myURI_ = "rmi://" + info.getHostAddress()
 					+ ":" + info.getPort() + "/" + info.getName();
 		}
 
@@ -104,7 +104,7 @@ public class HostStarter extends TimerTask {
 		}
 
 		String info2 = "HostStarter: Clients can connect to: "
-				+ LocalHostImpl.getInstance().URI_;
+				+ HostImpl.getInstance().myURI_;
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info2);
@@ -116,9 +116,9 @@ public class HostStarter extends TimerTask {
 	private ServiceInfo createRMI() {
 		ServiceInfo info = null;
 		try {
-			info = RemotingUtils.exportRMIService(LocalHostImpl.getInstance(),
+			info = RemotingUtils.exportRMIService(HostImpl.getInstance(),
 					RemoteHost.class, RemoteHost.SERVICENAME + "_"
-							+ LocalHostImpl.getInstance().rmiSafeName_);
+							+ HostImpl.getInstance().rmiSafeName_);
 		} catch (RemoteException e) {
 			String err = "A RemoteException occurred when exporting host RMI";
 			err += "\n" + e.getMessage();

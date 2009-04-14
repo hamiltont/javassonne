@@ -35,12 +35,40 @@ public class CachedClient implements RemoteClient {
 		return uri_;
 	}
 
-	public void receiveNotificationFromHost(String serializedNotification) {
-		RemoteClient me = LocalHostImpl.getInstance().attemptToResolveClient(uri_);
-		if (me == null)
-			return;
-		
-		me.receiveNotificationFromHost(serializedNotification);
+	public void receiveNotificationFromHost(final String serializedNotification) {
+		ThreadPool.execute(new Runnable() {
+			public void run() {
+				RemoteClient me = ClientResolver.attemptToResolveClient(uri_);
+				if (me == null)
+					return;
+				
+				me.receiveNotificationFromHost(serializedNotification);
+			}
+		});
+	}
+
+	public void addClientACK() {
+		ThreadPool.execute(new Runnable() {
+			public void run() {
+				RemoteClient me = ClientResolver.attemptToResolveClient(uri_);
+				if (me == null)
+					return;
+				
+				me.addClientACK();
+			}
+		});		
+	}
+
+	public void addClientNAK() {
+		ThreadPool.execute(new Runnable() {
+			public void run() {
+				RemoteClient me = ClientResolver.attemptToResolveClient(uri_);
+				if (me == null)
+					return;
+				
+				me.addClientNAK();
+			}
+		});		
 	}
 
 }

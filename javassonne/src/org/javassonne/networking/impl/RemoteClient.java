@@ -18,7 +18,6 @@
 
 package org.javassonne.networking.impl;
 
-
 /**
  * This is the networking only interface of the client. Only put functions here
  * that a remote host or client should be able to call.
@@ -51,4 +50,16 @@ public interface RemoteClient {
 	 * @return the name of this player in the game
 	 */
 	public String getName();
+
+	/**
+	 * Used for a host to let a client know that it has been added to the list
+	 * of connected clients
+	 */
+	public void addClientACK();
+
+	/**
+	 * Used for a host to let a client know that it has been refused entry into
+	 * the list of connected clients
+	 */
+	public void addClientNAK();
 }

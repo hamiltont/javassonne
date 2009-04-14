@@ -18,7 +18,7 @@
 
 package org.javassonne.networking;
 
-import org.javassonne.networking.impl.LocalHostImpl;
+import org.javassonne.networking.impl.HostImpl;
 import org.javassonne.ui.GameState.Mode;
 
 /**
@@ -34,28 +34,28 @@ public class LocalHost {
 	 * @ see org.javassonne.networking.impl.RemoteHost
 	 */
 	public static void addClient(String clientURI) {
-		LocalHostImpl.getInstance().addClient(clientURI);
+		HostImpl.getInstance().addClient(clientURI);
 	}
 
 	/**
 	 * @ see org.javassonne.networking.impl.RemoteHost
 	 */
 	public static String getName() {
-		return LocalHostImpl.getInstance().getName();
+		return HostImpl.getInstance().getName();
 	}
 
 	/**
 	 * @ see org.javassonne.networking.impl.RemoteHost
 	 */
 	public static Mode getStatus() {
-		return LocalHostImpl.getInstance().getStatus();
+		return HostImpl.getInstance().getStatus();
 	}
 
 	/**
 	 * @ see org.javassonne.networking.impl.RemoteHost
 	 */
 	public static String getURI() {
-		return LocalHostImpl.getInstance().getURI();
+		return HostImpl.getInstance().getURI();
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class LocalHost {
 	 */
 	public static void receiveNotification(String serializedNotification,
 			String clientURI) {
-		LocalHostImpl.getInstance().receiveNotificationFromClient(
+		HostImpl.getInstance().receiveNotificationFromClient(
 				serializedNotification, clientURI);
 	}
 }
