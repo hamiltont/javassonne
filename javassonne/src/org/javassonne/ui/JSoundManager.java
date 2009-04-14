@@ -31,8 +31,12 @@ import sun.audio.AudioStream;
 public class JSoundManager {
 
 	public static final String TADA = "sounds/tada.wav";
-	public static final String START_UP = "sounds/startup.wav";
+	public static final String PICKUP = "sounds/pickup.wav";
+	public static final String ROTATE = "sounds/rotate.wav";
+	public static final String PLACE = "sounds/place.wav";
 	public static final String ERROR = "sounds/error.wav";
+	public static final String CONFIRM = "sounds/confirm.wav";
+	public static final String CANCEL = "sounds/cancel.wav";
 
 	private Properties registered_ = new Properties();
 
@@ -47,6 +51,16 @@ public class JSoundManager {
 	// notification is triggered
 	protected JSoundManager() {
 		// List of sounds to bind with notification on game start
+		register_sound(Notification.START_GAME, TADA);
+		register_sound(Notification.TILE_DROPPED, PLACE);
+		register_sound(Notification.MEEPLE_VILLAGER_DROPPED, PLACE);
+		register_sound(Notification.MEEPLE_FARMER_DROPPED, PLACE);
+		register_sound(Notification.MEEPLE_FARMER_DRAG_STARTED, PICKUP);
+		register_sound(Notification.MEEPLE_VILLAGER_DRAG_STARTED, PICKUP);
+		register_sound(Notification.TILE_ROTATE_LEFT, ROTATE);
+		register_sound(Notification.TILE_ROTATE_RIGHT, ROTATE);
+		register_sound(Notification.END_TURN, CONFIRM);
+        register_sound(Notification.UNDO_PLACE_TILE, CANCEL);
 		register_sound(Notification.START_GAME, TADA);
 		
 	}

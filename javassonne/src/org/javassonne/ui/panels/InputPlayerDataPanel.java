@@ -92,20 +92,21 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 				new Point(492, 543), generalButtons_);
 
 		// add the labels to labels_ panel
-		addLabelToPanel(new Point(200, 150), "Player 1", labels_);
-		addLabelToPanel(new Point(200, 195), "Player 2", labels_);
-		addLabelToPanel(new Point(200, 240), "Player 3", labels_);
-		addLabelToPanel(new Point(200, 285), "Player 4", labels_);
-		addLabelToPanel(new Point(200, 330), "Player 5", labels_);
-		addLabelToPanel(new Point(200, 375), "Player 6", labels_);
+		int offset = 165;
+		addLabelToPanel(new Point(200, 0+offset), "Player 1", labels_);
+		addLabelToPanel(new Point(200, 45+offset), "Player 2", labels_);
+		addLabelToPanel(new Point(200, 90+offset), "Player 3", labels_);
+		addLabelToPanel(new Point(200, 135+offset), "Player 4", labels_);
+		addLabelToPanel(new Point(200, 180+offset), "Player 5", labels_);
+		addLabelToPanel(new Point(200, 225+offset), "Player 6", labels_);
 
 		// add text boxes to the textFields_ panel
-		addTextBoxToPanel(new Point(250, 150), textFields_);
-		addTextBoxToPanel(new Point(250, 195), textFields_);
-		addTextBoxToPanel(new Point(250, 240), textFields_);
-		addTextBoxToPanel(new Point(250, 285), textFields_);
-		addTextBoxToPanel(new Point(250, 330), textFields_);
-		addTextBoxToPanel(new Point(250, 375), textFields_);
+		addTextBoxToPanel(new Point(255, 0+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 45+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 90+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 135+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 180+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 225+offset), textFields_);
 
 		// place MeepleColors into ImageIcon array
 		ImageIcon[] colors = new ImageIcon[MeepleColor.values().length];
@@ -116,12 +117,12 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		}
 
 		// add combo boxes to comboBoxes_ panel
-		addComboBoxToPanel(new Point(550, 150), colors, 0, comboBoxes_);
-		addComboBoxToPanel(new Point(550, 195), colors, 1, comboBoxes_);
-		addComboBoxToPanel(new Point(550, 240), colors, 2, comboBoxes_);
-		addComboBoxToPanel(new Point(550, 285), colors, 3, comboBoxes_);
-		addComboBoxToPanel(new Point(550, 330), colors, 4, comboBoxes_);
-		addComboBoxToPanel(new Point(550, 375), colors, 5, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 0+offset), colors, 0, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 45+offset), colors, 1, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 90+offset), colors, 2, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 135+offset), colors, 3, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 180+offset), colors, 4, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 225+offset), colors, 5, comboBoxes_);
 
 		// add panels
 		add(textFields_);
@@ -160,7 +161,16 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		JComboBox comboBox = new JComboBox(colors);
 		comboBox.setSelectedIndex(selectedIndex);
 		comboBox.setLocation(location);
+		// determine whether we need to fake full screen.
 		comboBox.setSize(50, 38);
+		
+		try {
+			String os = System.getProperty("os.name");
+			if (os.equals("Mac OS X"))
+				comboBox.setSize(65, 38);
+		} catch (Exception e) {
+			// who cares?
+		}
 		panel.add(comboBox);
 	}
 
