@@ -39,6 +39,7 @@ import org.javassonne.model.Player;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.JKeyListener;
+import org.javassonne.ui.JSoundManager;
 import org.javassonne.ui.controls.JPopUp;
 
 public class InputPlayerDataPanel extends AbstractHUDPanel implements
@@ -209,13 +210,16 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		if (e.getActionCommand().length() > 0) {
 			// see if the input in the panel is valid:
 			if (!validatePlayerNames()) {
+				// Play error sound and initialize sound monitor
 				JPopUp warning = new JPopUp(
 						"At least two player names must be entered");
 				warning.showMsg();
+				NotificationManager.getInstance().sendNotification(Notification.ERROR);
 			} else if (!validateColors()) {
 				JPopUp warning = new JPopUp(
 						"Each player must have a unique color");
 				warning.showMsg();
+				NotificationManager.getInstance().sendNotification(Notification.ERROR);
 			} else {
 				NotificationManager.getInstance().sendNotification(
 						e.getActionCommand(), this);

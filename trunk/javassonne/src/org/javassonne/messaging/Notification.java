@@ -100,6 +100,9 @@ public class Notification {
 	public static final String DRAG_PANEL_RESET = "ResetDragPanel";
 	public static final String SCORE_UPDATE = "NotificationScoreUpdate";
 	
+	// System Notifications
+	public static final String ERROR = "Error";
+	
 	
 	private String identifier_;
 	private Object argument_;

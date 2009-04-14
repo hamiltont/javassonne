@@ -52,6 +52,9 @@ public class JSoundManager {
 	protected JSoundManager() {
 		// List of sounds to bind with notification on game start
 		register_sound(Notification.START_GAME, TADA);
+
+		register_sound(Notification.ERROR, ERROR);
+
 		register_sound(Notification.TILE_DROPPED, PLACE);
 		register_sound(Notification.MEEPLE_VILLAGER_DROPPED, PLACE);
 		register_sound(Notification.MEEPLE_FARMER_DROPPED, PLACE);
@@ -60,9 +63,9 @@ public class JSoundManager {
 		register_sound(Notification.TILE_ROTATE_LEFT, ROTATE);
 		register_sound(Notification.TILE_ROTATE_RIGHT, ROTATE);
 		register_sound(Notification.END_TURN, CONFIRM);
-        register_sound(Notification.UNDO_PLACE_TILE, CANCEL);
+		register_sound(Notification.UNDO_PLACE_TILE, CANCEL);
 		register_sound(Notification.START_GAME, TADA);
-		
+
 	}
 
 	// Provide access to singleton
