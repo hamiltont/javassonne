@@ -44,7 +44,7 @@ public class CachedHost implements RemoteHost {
 		// Start a timer to update this hosts status
 		ThreadPool.execute(new Runnable() {
 			public void run() {
-				Timer t = new Timer("Cached Host Updater - " + uri_);
+				Timer t = new Timer("Cached Host Updater - " + uri_, true);
 				t.scheduleAtFixedRate(new TimerTask() {
 					public void run() {
 						update();
