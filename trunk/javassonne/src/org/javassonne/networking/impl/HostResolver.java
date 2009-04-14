@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 27, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,15 +18,19 @@
 
 package org.javassonne.networking.impl;
 
+import org.javassonne.logger.LogSender;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
+import org.springframework.remoting.RemoteLookupFailureException;
 
 /**
- * Try to resolve and ACK unknown host who has contacted us On success, send
- * host.sendACK() to confirm to them they are open for connections
+ * Try to resolve and acknowledge an unknown host who has contacted us. On
+ * success, send host.sendACK() to confirm to them they are open for connections
  * 
  * Called by resolveHost to handle resolution and ACK when another host requests
- * we add them using the resolveHost call
+ * we add them
+ * 
+ * @author Hamilton Turner
  */
 public class HostResolver implements Runnable {
 	private String hostURI_;
@@ -47,12 +51,12 @@ public class HostResolver implements Runnable {
 	// Resolve host, send ACK, create cached host, HostMonitor.add(cachedHost)
 	// No matter the outcome, when we are done remove from pending hosts
 	private void resolveNewHost() {
-		RemoteHost h = HostMonitor.getInstance().attemptToResolveHost(hostURI_);
-		System.out.println("HostResolver: trying to resolve host " + hostURI_);
+		RemoteHost h = HostResolver.attemptToResolveHost(hostURI_);
+		LogSender.sendInfo("HostResolver: trying to resolve host " + hostURI_);
 
 		// We cannot resolve them, give up
 		if (h == null) {
-			System.out.println("HostResolver: resolve failed for " + hostURI_);
+			LogSender.sendErr("HostResolver: resolve failed for " + hostURI_);
 			return;
 		}
 
@@ -61,8 +65,25 @@ public class HostResolver implements Runnable {
 
 		// Add them to our hostMonitor
 		CachedHost ch = new CachedHost(h);
-		HostMonitor.getInstance().addToCachedHostList(ch);
+		HostMonitor.addToCachedHostList(ch);
 
-		System.out.println("HostResolver: resolve succeeded for " + hostURI_);
+		LogSender.sendInfo("HostResolver: resolve succeeded for " + hostURI_);
 	}
+
+	public static RemoteHost attemptToResolveHost(String hostURI) {
+		RemoteHost h = null;
+		try {
+			h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
+					RemoteHost.class);
+
+		} catch (RemoteLookupFailureException e) {
+			LogSender.sendInfo("HostMonitor could not resolve host at uri: "
+					+ hostURI);
+
+			return null;
+		}
+
+		return h;
+	}
+
 }

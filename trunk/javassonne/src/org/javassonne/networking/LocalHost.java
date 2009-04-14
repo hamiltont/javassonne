@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 21, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -19,40 +19,51 @@
 package org.javassonne.networking;
 
 import org.javassonne.networking.impl.LocalHostImpl;
-import org.javassonne.networking.impl.RemoteHost.MODE;
+import org.javassonne.ui.GameState.Mode;
 
-/*
- * A Helper class that lets other developers very easily connect to the Local Host 
- * object
+/**
+ * Lets other developers very easily connect to the Local Host object
+ * 
+ * This is just a callthru to LocalHostImpl
+ * 
+ * @author Hamilton Turner
  */
 public class LocalHost {
 
+	/**
+	 * @ see org.javassonne.networking.impl.RemoteHost
+	 */
 	public static void addClient(String clientURI) {
 		LocalHostImpl.getInstance().addClient(clientURI);
 	}
 
-	public static boolean canClientsConnect() {
-		return LocalHostImpl.getInstance().canClientsConnect();
-	}
-
+	/**
+	 * @ see org.javassonne.networking.impl.RemoteHost
+	 */
 	public static String getName() {
 		return LocalHostImpl.getInstance().getName();
 	}
 
-	public static MODE getStatus() {
+	/**
+	 * @ see org.javassonne.networking.impl.RemoteHost
+	 */
+	public static Mode getStatus() {
 		return LocalHostImpl.getInstance().getStatus();
 	}
 
+	/**
+	 * @ see org.javassonne.networking.impl.RemoteHost
+	 */
 	public static String getURI() {
 		return LocalHostImpl.getInstance().getURI();
 	}
 
-	public static void receiveNotification(String serializedNotification, String clientURI) {	
-		LocalHostImpl.getInstance().receiveNotificationFromClient(serializedNotification, clientURI);
+	/**
+	 * @ see org.javassonne.networking.impl.RemoteHost
+	 */
+	public static void receiveNotification(String serializedNotification,
+			String clientURI) {
+		LocalHostImpl.getInstance().receiveNotificationFromClient(
+				serializedNotification, clientURI);
 	}
-	
-//	public static boolean isLocalHostStarted() {
-//		return LocalHostImpl.getInstance().isLocalHostStarted();
-//	}
-	
 }

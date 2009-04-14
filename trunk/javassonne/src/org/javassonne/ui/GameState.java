@@ -20,7 +20,6 @@ package org.javassonne.ui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.javassonne.messaging.Notification;
@@ -30,7 +29,6 @@ import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileDeck;
-import org.javassonne.model.Player.MeepleColor;
 
 public class GameState {
 
@@ -44,7 +42,20 @@ public class GameState {
 	private Tile tileInHand_;
 	private TileBoard board_;
 	private Set<Meeple> globalMeepleSet_ = new HashSet<Meeple>();
+	private Mode mode_;
 
+	// TODO - Make GameState listeners for appropriate Notifications, so that 
+	// 		  the Mode is automatically updated
+	public static enum Mode {
+		PLAYING_GAME("Playing"), IDLE ("Idle"), IN_LOBBY("In the lobby");
+		// Paused game, or currently playing the game but stepped out
+		public final String text;
+		
+		Mode(String s) {
+			text = s;
+		}
+	}
+	
 	// Singelton implementation
 	// --------------------------------------------------------
 	protected GameState() {
@@ -108,6 +119,11 @@ public class GameState {
 
 	public void setGameInProgress(boolean b) {
 		gameInProgress_ = b;
+		
+		if (b)
+			setMode(Mode.PLAYING_GAME);
+		else
+			setMode(Mode.IN_LOBBY);
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_GAME_IN_PROGRESS, getCurrentPlayer());
@@ -166,6 +182,14 @@ public class GameState {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_TILE_IN_HAND, t);
+	}
+	
+	public Mode getMode() {
+		return mode_;
+	}
+	
+	public void setMode(Mode m) {
+		mode_ = m;
 	}
 
 }

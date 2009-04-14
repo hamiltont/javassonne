@@ -21,17 +21,17 @@ package org.javassonne.networking.impl;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class HostResolverThreadPool {
+public class ThreadPool {
 	private Executor executor_;
-	private static HostResolverThreadPool instance_ = null;
+	private static ThreadPool instance_ = null;
 	
-	private HostResolverThreadPool() {
+	private ThreadPool() {
 		executor_ = Executors.newCachedThreadPool();
 	}
 	
-	private static HostResolverThreadPool getInstance() {
+	private static ThreadPool getInstance() {
 		if (instance_ == null)
-			instance_ = new HostResolverThreadPool();
+			instance_ = new ThreadPool();
 		return instance_;
 	}
 	

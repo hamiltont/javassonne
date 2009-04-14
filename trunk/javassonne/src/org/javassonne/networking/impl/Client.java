@@ -29,7 +29,6 @@ import javax.swing.SwingUtilities;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
 
 import com.thoughtworks.xstream.XStream;
@@ -127,7 +126,7 @@ public class Client implements RemoteClient {
 			throw new RuntimeException("Client.java tried to connect to"
 					+ " a host, but it is already connected");
 
-		RemoteHost rh = HostMonitor.getInstance().attemptToResolveHost(hostURI);
+		RemoteHost rh = HostResolver.attemptToResolveHost(hostURI);
 		connectedHost_ = new CachedHost(rh);
 
 		try {

@@ -37,7 +37,7 @@ public class Main {
 		LogWatcher lw = new LogWatcher();
 
 		// Make sure our HostMonitor singleton is started
-		HostMonitor.getInstance();
+		HostMonitor.numberOfHosts();
 
 		// Play start-up sound and initialize sound monitor
 		JSoundManager.getInstance().play(JSoundManager.START_UP);

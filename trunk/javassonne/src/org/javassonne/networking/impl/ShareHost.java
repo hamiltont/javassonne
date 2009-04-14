@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 27, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -21,19 +21,26 @@ package org.javassonne.networking.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.javassonne.networking.HostMonitor;
+import org.javassonne.logger.LogSender;
 
 /**
- * Iterate over myHosts, calling myHost.shareHost(host)
+ * Passes along the URI of a new host we learned of, either by discovering them
+ * ourselves, or by being contacted by them. We iterate over myHosts, calling
+ * myHost.shareHost(host) so that each host attempts to resolve the 'new' host.
+ * Note that we never try to resolve the host here, that is not our
+ * responsibility. We are just passing it along
  * 
- * Called by local resolveNewHost to let our peers know we see a host Called by
- * resolveHost to let our peers know about a host that sees us
+ * Called by local HostMonitor when we find a new host, to let our peers know we
+ * see a host. (aka we found the new host first, and are sharing it)
+ * 
+ * Called by resolveHost to let our peers know about a host that sees us. (aka
+ * the new host contacted us, so we are letting everyone else know about them)
+ * 
+ * @author Hamilton Turner
  */
-
 public class ShareHost implements Runnable {
 
 	private String hostURI_;
-	private RemoteHost host_;
 	private ArrayList<CachedHost> otherHosts_;
 
 	public ShareHost(String hostURI, ArrayList<CachedHost> otherHosts) {
@@ -42,51 +49,17 @@ public class ShareHost implements Runnable {
 	}
 
 	public void run() {
-		host_ = HostMonitor.getInstance().attemptToResolveHost(hostURI_);
-		System.out.println("ShareHost: trying to resolve host " + hostURI_);
 
-		// We cannot resolve them, give up
-		if (host_ == null) {
-			System.out.println("ShareHost: resolve failed for " + hostURI_);
-			return;
-		}
-
-		CachedHost ch = new CachedHost(host_);
-		HostMonitor.getInstance().addToCachedHostList(ch);
-
-		RemoteHost nextRH;
 		for (Iterator<CachedHost> it = otherHosts_.iterator(); it.hasNext();) {
 			CachedHost nextCH = it.next();
-			nextRH = HostMonitor.getInstance().attemptToResolveHost(
-					nextCH.getURI());
 
-			// Do not accidentally prop themselves back to them
-			if (nextRH == null)
-				continue;
-			else if (nextCH.getURI().equals(hostURI_)) {
-				System.out.println("ShareHost: Found " + hostURI_
-						+ " already in the otherHosts (pending hosts needed!)");
-			}
-
-			nextRH.shareHost(hostURI_);
-		}
-
-		System.out.println("ShareHost: Shared " + hostURI_);
-	}
-
-	private void addHostWithoutPropagating() {
-		RemoteHost nextRH;
-		for (Iterator<CachedHost> it = otherHosts_.iterator(); it.hasNext();) {
-			CachedHost nextCH = it.next();
-			nextRH = HostMonitor.getInstance().attemptToResolveHost(
-					nextCH.getURI());
-
-			// Do not accidentally prop themselves back to them
-			if ((nextRH == null) || nextCH.getURI().equals(hostURI_))
+			// Do not accidentally send themselves back to them
+			if (nextCH.getURI().equals(hostURI_))
 				continue;
 
-			nextRH.shareHost(hostURI_);
+			nextCH.shareHost(hostURI_);
 		}
-	}
 
+		LogSender.sendInfo("ShareHost: Shared " + hostURI_);
+	}
 }
