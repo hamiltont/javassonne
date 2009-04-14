@@ -34,41 +34,66 @@ import org.javassonne.model.Tile.Region;
 import org.javassonne.ui.GameState;
 
 /**
- * @author Kyle Prete Note: If the board this RegionsCalc is indirectly attached
- *         to is changed, the RegionsCalc must be destroyed as all its data is
- *         corrupt.
+ * Calculates Region Scores
  * 
- *         May enforce this by listening for board_changed events.
+ * Note: If the board this RegionsCalc is indirectly attached to is changed, the
+ * RegionsCalc must be destroyed as all its data is corrupt - cached data is not
+ * updated.
+ * 
+ * TODO: Enforce this by listening for board_changed events?
  */
 public class RegionsCalc {
 
 	public RegionsCalc() {
+		// Initialize data structures
 		scoreOfReg_ = new HashMap<Point, EnumMap<Tile.Region, Integer>>();
 		globalMeep_ = new HashMap<Point, EnumMap<Tile.Region, List<Meeple>>>();
 		isComplete_ = new HashMap<Point, EnumMap<Tile.Region, Boolean>>();
 
 	}
 
+	/*
+	 * External function for calculating region values for given region and
+	 * connecting regions. Delegates most of calculation to private recursive
+	 * function.
+	 */
 	public void traverseRegion(TileBoardIterator iter, Tile.Region reg) {
+		// Initialize recursion variables for compounding list of
+		// tile-regions, etc.
 		Map<Point, ArrayList<Tile.Region>> list = new HashMap<Point, ArrayList<Tile.Region>>();
 		List<Meeple> meeps = new ArrayList<Meeple>();
-		tempScore = 0;
+		int tempScore = 0;
+
+		// Call recursive function - returnVal is whether or not region is
+		// completed.
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
+
+		// Calculate point value of region
 		for (Point p : list.keySet()) {
 			Tile.Region r = list.get(p).get(0);
 			TileBoardIterator iterator = new TileBoardGenIterator(iter
 					.getData(), p);
+			// all similar regions on a Tile should have the same feature/point
+			// value
+			// This is NOT enforced by the model.
 			tempScore += iterator.current().featureInRegion(r).pointValue;
-
 		}
 
+		// If current region is complete, multiply score by completion
+		// multiplier
 		if (returnVal && iter.current().featureInRegion(reg) != null) {
 			tempScore *= GameState.getInstance().getDeck()
 					.tileFeatureBindings().completionMultiplierForFeature(
 							iter.current().featureIdentifierInRegion(reg));
 		}
-		for (Point p : list.keySet()) {
 
+		/*
+		 * Now we update our global data structures This update will do nothing
+		 * if we've already touched the entrance quadrant because the recursive
+		 * function will have returned without modifying list or meeps
+		 */
+		for (Point p : list.keySet()) {
+			// Make sure we don't try to put in a null data structure
 			if (scoreOfReg_.get(p) == null)
 				scoreOfReg_.put(p, new EnumMap<Tile.Region, Integer>(
 						Tile.Region.class));
@@ -78,12 +103,7 @@ public class RegionsCalc {
 			if (isComplete_.get(p) == null)
 				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(
 						Tile.Region.class));
-			/*
-			 * TilePlacementSprite s = new TilePlacementSprite(p);
-			 * s.showRegionOptions(list.get(p));
-			 * NotificationManager.getInstance(
-			 * ).sendNotification(Notification.MAP_ADD_SPRITE, s);
-			 */
+
 			for (Tile.Region r : list.get(p)) {
 				scoreOfReg_.get(p).put(r, tempScore);
 				globalMeep_.get(p).put(r, meeps);
@@ -92,69 +112,73 @@ public class RegionsCalc {
 			}
 		}
 		return;
-
 	}
 
+	// Private recursive function for calculating Region values
 	private boolean traverseRegion(TileBoardIterator iter, Tile.Region reg,
 			List<Meeple> meeps, Map<Point, ArrayList<Tile.Region>> list,
 			boolean returnVal) {
+		// Base case 1: off edge of board
 		if (iter.current() == null)
 			return false;
-		// else if current feature is null, quit
+		// Base case 2: region is null (poor input)
 		if (iter.current().featureInRegion(reg) == null)
 			return returnVal;
-		// else
+		// Base case 3: already touched this region
 		if (getScoreOfRegion(iter.getLocation(), reg) != -1)
 			return returnVal;
-		// else
+		/*
+		 * Base case 4: "traversing" a center feature - these don't go past Tile
+		 * boundaries but are based on Tiles surrounding current
+		 */
 		if (reg.equals(Tile.Region.Center)) {
-			returnVal = traverseCenter(iter, reg, meeps, list, returnVal)
+			return traverseCenter(iter, reg, meeps, list, returnVal)
 					&& returnVal;
 		}
 		// else
+
 		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
 				.tileFeatureBindings();
 
+		// "touch" this Region globally ...
 		if (scoreOfReg_.get(iter.getLocation()) == null) {
 			scoreOfReg_.put(iter.getLocation(),
 					new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 		}
-
 		scoreOfReg_.get(iter.getLocation()).put(reg, 0);
+		// ... and locally
 		if (list.get(iter.getLocation()) == null)
 			list.put(iter.getLocation(), new ArrayList<Tile.Region>());
 		list.get(iter.getLocation()).add(reg);
+
+		// If there's a merson here, add it to our local list
 		Meeple current = iter.current().meepleInRegion(reg);
 		if (current != null)
 			meeps.add(current);
 
-		Tile.Region newReg;
 		// traverse to next tile
 		if (reg.equals(Tile.Region.Left)) {
-			newReg = Tile.Region.Right;
 			returnVal = traverseRegion(
-					((TileBoardGenIterator) iter).leftCopy(), newReg, meeps,
-					list, returnVal)
+					((TileBoardGenIterator) iter).leftCopy(),
+					Tile.Region.Right, meeps, list, returnVal)
 					&& returnVal;
 		} else if (reg.equals(Tile.Region.Right)) {
-			newReg = Tile.Region.Left;
 			returnVal = traverseRegion(((TileBoardGenIterator) iter)
-					.rightCopy(), newReg, meeps, list, returnVal)
+					.rightCopy(), Tile.Region.Left, meeps, list, returnVal)
 					&& returnVal;
 		} else if (reg.equals(Tile.Region.Top)) {
-			newReg = Tile.Region.Bottom;
 			returnVal = traverseRegion(((TileBoardGenIterator) iter).upCopy(),
-					newReg, meeps, list, returnVal)
+					Tile.Region.Bottom, meeps, list, returnVal)
 					&& returnVal;
 		} else if (reg.equals(Tile.Region.Bottom)) {
-			newReg = Tile.Region.Top;
 			returnVal = traverseRegion(
-					((TileBoardGenIterator) iter).downCopy(), newReg, meeps,
-					list, returnVal)
+					((TileBoardGenIterator) iter).downCopy(), Tile.Region.Top,
+					meeps, list, returnVal)
 					&& returnVal;
 		}
+
 		// if feature does not end traversal
-		// traverse to other regions in Tile except center
+		// traverse to other regions in Tile (except center)
 
 		if (!iter.current().featureInRegion(reg).endsTraversal) {
 			for (Tile.Region r : Tile.Region.values()) {
@@ -169,10 +193,10 @@ public class RegionsCalc {
 		}
 
 		return returnVal;
-		// }
 
 	}
 
+	// Helper function for calculating Center score
 	private boolean traverseCenter(TileBoardIterator iter, Region reg,
 			List<Meeple> meeps, Map<Point, ArrayList<Region>> list,
 			boolean returnVal) {
@@ -182,13 +206,11 @@ public class RegionsCalc {
 			Meeple meep1 = iter.current().meepleInRegion(reg);
 			if (meep1 != null)
 				meeps.add(meep1);
-			// addme to list
-			if (list.get(iter.getLocation()) == null)
-				list.put(iter.getLocation(), new ArrayList<Tile.Region>());
-			list.get(iter.getLocation()).add(reg);
-			// check for completion
+
+			// add a point for each non-null Tile surrounding this one
+			// (including itself)
 			TileBoardGenIterator temp = new TileBoardGenIterator(iter);
-			++tempScore;
+			int tempScore = 1;
 			if (temp.right().current() != null) {
 				++tempScore;
 			} else if (temp.down().current() != null) {
@@ -207,10 +229,13 @@ public class RegionsCalc {
 				++tempScore;
 			}
 
+			// Touch globally
 			if (scoreOfReg_.get(iter.getLocation()) == null)
 				scoreOfReg_.put(iter.getLocation(),
 						new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 			scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
+
+			// If completely surrounded, it is complete
 			if (tempScore == 9)
 				return true;
 			else
@@ -234,6 +259,11 @@ public class RegionsCalc {
 		return temp;
 	}
 
+	/*
+	 * If traverseRegion has touched given Region of Tile at given location and
+	 * it has a nonempty meeple list claiming it, this function returns the list
+	 * of meeple, else returns empty list
+	 */
 	public List<Meeple> getMeepleList(Point loc, Tile.Region reg) {
 		ArrayList<Meeple> returnVal = new ArrayList<Meeple>();
 		Map<Tile.Region, List<Meeple>> tileRegions = globalMeep_.get(loc);
@@ -248,6 +278,11 @@ public class RegionsCalc {
 		return returnVal;
 	}
 
+	/*
+	 * If traverseRegion has touched given Region of Tile at given location,
+	 * this function returns whether or not the Region is complete, else returns
+	 * false
+	 */
 	public boolean getRegionCompletion(Point loc, Tile.Region reg) {
 		Map<Tile.Region, Boolean> tileRegions = isComplete_.get(loc);
 		if (tileRegions == null)
@@ -258,10 +293,17 @@ public class RegionsCalc {
 		return temp;
 	}
 
-	// Keeps track of touched locations
+	/*
+	 * Keeps track of touched locations. These store data collected when
+	 * traversing and make it available to the accessors. Also, the recursive
+	 * function can quit if we've already traversed this region with this
+	 * calculator - this saves time if the function is accidentally called twice
+	 * (i.e. easier code to traverse all), but causes problems if the data is
+	 * dirty. Therefore, a RegionsCalc should be thrown away if Tiles are being
+	 * added to board.
+	 */
 	private HashMap<Point, EnumMap<Tile.Region, Integer>> scoreOfReg_;
 	private HashMap<Point, EnumMap<Tile.Region, List<Meeple>>> globalMeep_;
 	private HashMap<Point, EnumMap<Tile.Region, Boolean>> isComplete_;
-	private int tempScore;
 
 }
