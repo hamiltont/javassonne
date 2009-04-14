@@ -18,7 +18,6 @@
 
 package org.javassonne.ui.panels;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Player;
 import org.javassonne.ui.GameState;
+import org.javassonne.ui.controls.JMeepleCount;
 
 public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 	
@@ -39,41 +39,73 @@ public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 		
 		ArrayList<Player> players = GameState.getInstance().getPlayers();
 		
-
-		
 		setVisible(true);
-		setSize(380, 300 + 28 * players.size());
+		setFocusable(false);
+		setSize(655, 512);
 		setLayout(null);
-		setBackgroundImagePath("images/menu_background.jpg");
-		setBackgroundScaleToFit(false);
-		JLabel go = new JLabel("Game Over!");
-		go.setLocation(100,80);
-		go.setSize(100, 20);
-		add(go);
+		setBackgroundImagePath("images/game_over_background_flat.png");
 		
-		// create the labels and stuff for each of the player's stats
-		int y = 100;
-		for (Player p : players){
-			JLabel name = new JLabel(p.getName());
-			name.setLocation(6, y);
-			name.setSize(135, 22);
-			add(name);
-			
-			JLabel score = new JLabel(String.valueOf(p.getScore()));
-			score.setLocation(144, y);
-			score.setSize(65, 22);
-			add(score);
-			
-			y+= 28;
+		// find player(s) with highest score
+		int highest = -1;
+		ArrayList<Player> highestPlayers = new ArrayList<Player>();
+		for (Player p :players){
+			if (p.getScore() > highest){
+				highestPlayers.clear();
+				highestPlayers.add(p);
+				highest = p.getScore();
+			}
+			if (p.getScore() == highest){
+				highestPlayers.add(p);
+			}	
 		}
 		
+		// create the labels and stuff for each of the player's stats
+		int y = 125+24;
+		for (Player p : players){
+			JLabel name = new JLabel(p.getName());
+			name.setLocation(146+27, y);
+			name.setSize(135, 22);
+			add(name);
+
+			JLabel score = new JLabel(String.valueOf(p.getScore()));
+			score.setLocation(440, y);
+			score.setSize(65, 22);
+			add(score);
+
+			JMeepleCount meeple = new JMeepleCount(p.getMeepleColor().value);
+			meeple.setLocation(146, y);
+			meeple.setSize(24, 24);
+			add(meeple);
+			meeple.setCount(1);
+			
+			if (highestPlayers.contains(p)){
+				JLabel focus = new JLabel(new ImageIcon("images/hud_stats_focus_background.png"));
+				focus.setSize(362, 26);
+				focus.setLocation(145, y);
+				focus.setOpaque(false);
+				add(focus);
+			}
+			
+			y += 28;
+		}
+		
+		// add jpanel behind the player stats so we get a pretty background
+		AbstractHUDPanel panel = new AbstractHUDPanel();
+		panel.setLocation(145,123);
+		panel.setSize(362, 25 + 28 * GameState.getInstance().getPlayers().size());
+		panel.setLayout(null);
+		panel.setFocusable(false);
+		panel.setBackgroundImagePath("images/game_over_stats_background.jpg");
+		panel.setBackgroundScaleToFit(false);
+		add(panel);
+		
 		// add the buttons to the general buttons panel
-			JButton b = new JButton(new ImageIcon("images/menu_new_game.jpg"));
-			b.setLocation(new Point(50, y + 10));
-			b.addActionListener(this);
-			b.setActionCommand(Notification.END_GAME);
-			b.setSize(279, 38);
-			add(b);
+		JButton b = new JButton(new ImageIcon("images/menu_exit.jpg"));
+		b.setLocation(192, 434);
+		b.addActionListener(this);
+		b.setActionCommand("Exit");
+		b.setSize(279, 38);
+		add(b);
 	}
 
 	/*
@@ -85,9 +117,11 @@ public class GameOverPanel extends AbstractHUDPanel implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		this.setVisible(false);
-		if (e.getActionCommand().length() > 0)
-			NotificationManager.getInstance()
-				.sendNotification(e.getActionCommand());
+		if (e.getActionCommand().equals("Exit"))
+			close();
+			GameState.getInstance().resetGameState();
+			NotificationManager.getInstance().sendNotification(
+				Notification.END_GAME);
 	}
 	
 }

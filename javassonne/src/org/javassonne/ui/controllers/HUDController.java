@@ -160,7 +160,7 @@ public class HUDController {
 		for (Meeple m : GameState.getInstance().globalMeepleSet()) {
 			Tile.Region region;
 			Tile.Quadrant quadrant;
-
+			
 			if ((region = m.getRegionOnTile()) != null) {
 				Point p = m.getParentTileLocation();
 				TileBoardIterator iter = new TileBoardGenIterator(GameState
