@@ -27,9 +27,9 @@ public class TileBoardGenIterator implements TileBoardIterator {
 
 	/**
 	 * @param data
-	 *            - reference to TileBoard where data is stored
+	 *            reference to TileBoard where data is stored
 	 * @param point
-	 *            - Point location of current location
+	 *            Point location of current location
 	 */
 	public TileBoardGenIterator(TileBoard data, Point point) {
 		data_ = data;
@@ -38,7 +38,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 
 	/**
 	 * @param old
-	 *            - TileBoardIterator to copy from
+	 *            TileBoardIterator to copy from
 	 */
 	public TileBoardGenIterator(TileBoardIterator old) {
 		data_ = old.getData();
@@ -56,7 +56,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - moves iterator down in board and returns reference to itself
+	 * @return moves iterator down in board and returns reference to itself
 	 */
 	public TileBoardIterator down() {
 		// previousLocation_ = location_;
@@ -66,14 +66,14 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved down
+	 * @return reference to copy of iterator, moved down
 	 */
 	public TileBoardIterator downCopy() {
 		return (new TileBoardGenIterator(this)).down();
 	}
 
 	/**
-	 * @return - moves iterator left in board and returns reference to itself
+	 * @return moves iterator left in board and returns reference to itself
 	 */
 	public TileBoardIterator left() {
 		// previousLocation_ = location_;
@@ -83,7 +83,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved left
+	 * @return reference to copy of iterator, moved left
 	 */
 	public TileBoardIterator leftCopy() {
 		return (new TileBoardGenIterator(this)).left();
@@ -102,14 +102,14 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved right
+	 * @return reference to copy of iterator, moved right
 	 */
 	public TileBoardIterator rightCopy() {
 		return (new TileBoardGenIterator(this)).right();
 	}
 
 	/**
-	 * @return - moves iterator up in board and returns reference to itself
+	 * @return moves iterator up in board and returns reference to itself
 	 */
 	public TileBoardIterator up() {
 		// previousLocation_ = location_;
@@ -119,7 +119,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved up
+	 * @return reference to copy of iterator, moved up
 	 */
 	public TileBoardIterator upCopy() {
 		return (new TileBoardGenIterator(this)).up();
@@ -151,7 +151,6 @@ public class TileBoardGenIterator implements TileBoardIterator {
 		return false;
 	}
 
-	// Advances iterator to start of next row
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -165,8 +164,7 @@ public class TileBoardGenIterator implements TileBoardIterator {
 	}
 
 	/**
-	 * @return - returns reference to copy of iterator, moved to start of next
-	 *         row
+	 * @return reference to copy of iterator, moved to start of next row
 	 */
 	public TileBoardIterator nextRowCopy() {
 		return (new TileBoardGenIterator(this)).nextRow();

@@ -16,10 +16,6 @@
  *  permissions and limitations under the License. 
  */
 
-/**
- * 
- */
-
 package org.javassonne.algorithms;
 
 import java.awt.Point;
@@ -29,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.javassonne.messaging.Notification;
-import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoardGenIterator;
@@ -38,7 +32,6 @@ import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileFeatureBindings;
 import org.javassonne.model.Tile.Region;
 import org.javassonne.ui.GameState;
-import org.javassonne.ui.map.TilePlacementSprite;
 
 /**
  * @author Kyle Prete Note: If the board this RegionsCalc is indirectly attached
@@ -63,11 +56,12 @@ public class RegionsCalc {
 		boolean returnVal = traverseRegion(iter, reg, meeps, list, true);
 		for (Point p : list.keySet()) {
 			Tile.Region r = list.get(p).get(0);
-				TileBoardIterator iterator = new TileBoardGenIterator(iter.getData(), p);
-				tempScore += iterator.current().featureInRegion(r).pointValue;
-			
+			TileBoardIterator iterator = new TileBoardGenIterator(iter
+					.getData(), p);
+			tempScore += iterator.current().featureInRegion(r).pointValue;
+
 		}
-		
+
 		if (returnVal && iter.current().featureInRegion(reg) != null) {
 			tempScore *= GameState.getInstance().getDeck()
 					.tileFeatureBindings().completionMultiplierForFeature(
@@ -84,16 +78,17 @@ public class RegionsCalc {
 			if (isComplete_.get(p) == null)
 				isComplete_.put(p, new EnumMap<Tile.Region, Boolean>(
 						Tile.Region.class));
-/*
-			TilePlacementSprite s = new TilePlacementSprite(p);
-			s.showRegionOptions(list.get(p));
-			NotificationManager.getInstance().sendNotification(Notification.MAP_ADD_SPRITE, s);
-	*/		
+			/*
+			 * TilePlacementSprite s = new TilePlacementSprite(p);
+			 * s.showRegionOptions(list.get(p));
+			 * NotificationManager.getInstance(
+			 * ).sendNotification(Notification.MAP_ADD_SPRITE, s);
+			 */
 			for (Tile.Region r : list.get(p)) {
 				scoreOfReg_.get(p).put(r, tempScore);
 				globalMeep_.get(p).put(r, meeps);
 				isComplete_.get(p).put(r, returnVal);
-				
+
 			}
 		}
 		return;
@@ -113,11 +108,12 @@ public class RegionsCalc {
 			return returnVal;
 		// else
 		if (reg.equals(Tile.Region.Center)) {
-			returnVal = traverseCenter(iter, reg, meeps, list, returnVal) && returnVal;
+			returnVal = traverseCenter(iter, reg, meeps, list, returnVal)
+					&& returnVal;
 		}
 		// else
 		TileFeatureBindings bindings_ = GameState.getInstance().getDeck()
-			.tileFeatureBindings();
+				.tileFeatureBindings();
 
 		if (scoreOfReg_.get(iter.getLocation()) == null) {
 			scoreOfReg_.put(iter.getLocation(),
@@ -212,10 +208,8 @@ public class RegionsCalc {
 			}
 
 			if (scoreOfReg_.get(iter.getLocation()) == null)
-				scoreOfReg_
-						.put(iter.getLocation(),
-								new EnumMap<Tile.Region, Integer>(
-										Tile.Region.class));
+				scoreOfReg_.put(iter.getLocation(),
+						new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 			scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
 			if (tempScore == 9)
 				return true;

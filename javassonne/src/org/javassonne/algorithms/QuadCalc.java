@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Kyle Prete
  * @date Apr 1, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -27,9 +27,9 @@ import java.util.Map;
 
 import org.javassonne.model.Meeple;
 import org.javassonne.model.Tile;
+import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.Tile.Quadrant;
-import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.ui.GameState;
 
 public class QuadCalc {

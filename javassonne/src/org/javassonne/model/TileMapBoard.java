@@ -26,18 +26,9 @@ import java.util.Set;
 import org.javassonne.model.Tile.Region;
 import org.javassonne.ui.GameState;
 
-/**
- * @author pretekr
- * 
- */
-// TODO A class description is really required here. It would also be REALLY
-// useful to have some example code here, or how you expect this class to be
-// used
+// Game board stored as a HashMap of Points -> Tiles with accessors and helper functions.
 public class TileMapBoard implements TileBoard {
 
-	// TODO I changed the format here to make this easier to read
-	// Some descriptions on the members would be helpful (what is
-	// tempTileLocations for, without reading the code?)
 	private HashMap<Point, Tile> data_;
 	private TileBoardGenIterator upperLeft_;
 	private TileBoardGenIterator lowerRight_;
@@ -49,7 +40,9 @@ public class TileMapBoard implements TileBoard {
 		tempTileLocations_ = new HashSet<Point>();
 
 		data_ = new HashMap<Point, Tile>();
-		data_.put(new Point(0, 0), GameState.getInstance().getDeck().homeTile());
+		data_
+				.put(new Point(0, 0), GameState.getInstance().getDeck()
+						.homeTile());
 	}
 
 	/*
@@ -116,38 +109,40 @@ public class TileMapBoard implements TileBoard {
 			Tile top = localIter.upCopy().current();
 			Tile right = localIter.rightCopy().current();
 			Tile bottom = localIter.downCopy().current();
-			
+
 			// we want to make sure the tiles we're looking at in the adjacent
 			// squares are not temp. tiles. This could lead to illeigal "feature
 			// bindings" and this function returning false unnecessarily.
 			if (tempTileLocations_.contains(localIter.leftCopy().getLocation()))
 				left = null;
-			if (tempTileLocations_.contains(localIter.rightCopy().getLocation()))
+			if (tempTileLocations_
+					.contains(localIter.rightCopy().getLocation()))
 				right = null;
 			if (tempTileLocations_.contains(localIter.upCopy().getLocation()))
 				top = null;
 			if (tempTileLocations_.contains(localIter.downCopy().getLocation()))
 				bottom = null;
-		
-			TileFeatureBindings b = GameState.getInstance().getDeck().tileFeatureBindings();
-			
-			if (left != null && !b.featuresBind(left
-							.featureInRegion(Region.Right), tile
+
+			TileFeatureBindings b = GameState.getInstance().getDeck()
+					.tileFeatureBindings();
+
+			if (left != null
+					&& !b.featuresBind(left.featureInRegion(Region.Right), tile
 							.featureInRegion(Region.Left)))
 				return false;
 			// iterate up and check if features match
-			if (top != null && !b.featuresBind(top
-							.featureInRegion(Region.Bottom), tile
+			if (top != null
+					&& !b.featuresBind(top.featureInRegion(Region.Bottom), tile
 							.featureInRegion(Region.Top)))
 				return false;
 			// iterate right and check if features match
-			if (right != null && !b.featuresBind(right
-							.featureInRegion(Region.Left), tile
+			if (right != null
+					&& !b.featuresBind(right.featureInRegion(Region.Left), tile
 							.featureInRegion(Region.Right)))
 				return false;
 			// iterate down and check if features match
-			if (bottom != null && !b.featuresBind(bottom
-							.featureInRegion(Region.Top), tile
+			if (bottom != null
+					&& !b.featuresBind(bottom.featureInRegion(Region.Top), tile
 							.featureInRegion(Region.Bottom)))
 				return false;
 			// make sure at least one of the adjacent tiles exists
@@ -255,8 +250,8 @@ public class TileMapBoard implements TileBoard {
 	}
 
 	public void removeTempAtLocation(TileBoardIterator iter) {
-		//if it exists as a temp location, remove it, else do nothing
-		if (tempTileLocations_.remove(iter.getLocation())) 
+		// if it exists as a temp location, remove it, else do nothing
+		if (tempTileLocations_.remove(iter.getLocation()))
 			data_.remove(iter.getLocation());
 	}
 
