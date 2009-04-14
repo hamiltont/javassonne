@@ -53,10 +53,10 @@ public class ClientImpl implements RemoteClient {
 		connectingToHost_.set(false);
 		host_ = null;
 		myURI_ = null;
-		connectionTimer_ = new Timer("Client Connection Timer");
+		connectionTimer_ = new Timer("Client Connection Timer", true);
 		xStream_ = new XStream();
 
-		Timer t = new Timer("Client Starter");
+		Timer t = new Timer("Client Starter", true);
 		t.schedule(new ClientStarter(this), 0);
 
 		// We handle giving private chat messages to the host

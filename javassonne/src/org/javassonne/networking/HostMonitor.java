@@ -245,7 +245,7 @@ public class HostMonitor {
 		// TODO - create firewall notification
 
 		final String hostURI = h.getURI();
-		Timer t = new Timer("Pending Host - " + h.getURI());
+		Timer t = new Timer("Pending Host - " + h.getURI(), true);
 		t.schedule(new TimerTask() {
 			public void run() {
 				// If they have not ACK'ed us yet, something is amiss

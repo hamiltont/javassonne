@@ -74,7 +74,7 @@ public class HostImpl implements RemoteHost {
 		realName_ = addr.getHostName();
 		rmiSafeName_ = realName_.replace(' ', '_');
 
-		Timer t = new Timer("Host Starter");
+		Timer t = new Timer("Host Starter", true);
 		t.schedule(new HostStarter(), 0);
 	}
 
