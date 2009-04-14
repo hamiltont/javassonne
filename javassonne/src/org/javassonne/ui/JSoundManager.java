@@ -32,6 +32,7 @@ public class JSoundManager {
 
 	public static final String TADA = "sounds/tada.wav";
 	public static final String START_UP = "sounds/startup.wav";
+	public static final String ERROR = "sounds/error.wav";
 
 	private Properties registered_ = new Properties();
 
@@ -45,8 +46,9 @@ public class JSoundManager {
 	// Sounds can observe notifications and thus be played when the associated
 	// notification is triggered
 	protected JSoundManager() {
-		// Attach sounds to notifications
+		// List of sounds to bind with notification on game start
 		register_sound(Notification.START_GAME, TADA);
+		
 	}
 
 	// Provide access to singleton
@@ -58,8 +60,8 @@ public class JSoundManager {
 	}
 
 	/*
-	 * Args:  name : (string)  the location of the sound file
-	 *                  ie:   JSoundManager.START_UP
+	 * Args: name : (string) the location of the sound file ie:
+	 * JSoundManager.START_UP
 	 */
 	public void play(String name) {
 		try {
@@ -70,7 +72,7 @@ public class JSoundManager {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/*
 	 * This function provides the callback method for the Pub-Sub notification
 	 */
@@ -78,7 +80,6 @@ public class JSoundManager {
 		play(registered_.getProperty(n.identifier()));
 	}
 
-	
 	/*
 	 * Bind a sound to a notification by adding it as an observer
 	 */
