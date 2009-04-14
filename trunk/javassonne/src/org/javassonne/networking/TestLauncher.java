@@ -19,7 +19,7 @@
 package org.javassonne.networking;
 
 import org.javassonne.messaging.Notification;
-import org.javassonne.networking.impl.Client;
+import org.javassonne.networking.impl.ClientImpl;
 import org.javassonne.networking.impl.RemoteHost;
 import org.javassonne.networking.impl.RemotingUtils;
 

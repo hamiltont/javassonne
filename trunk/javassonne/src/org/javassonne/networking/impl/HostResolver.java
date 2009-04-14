@@ -77,7 +77,7 @@ public class HostResolver implements Runnable {
 					RemoteHost.class);
 
 		} catch (RemoteLookupFailureException e) {
-			LogSender.sendInfo("HostMonitor could not resolve host at uri: "
+			LogSender.sendInfo("HostResolver could not resolve host at uri: "
 					+ hostURI);
 
 			return null;

@@ -18,22 +18,18 @@
 
 package org.javassonne.networking.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Timer;
 
-import javax.swing.SwingUtilities;
-
+import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
-import org.springframework.remoting.RemoteLookupFailureException;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -46,26 +42,26 @@ import com.thoughtworks.xstream.XStream;
  * 
  * @author Hamilton Turner
  */
-public class LocalHostImpl implements RemoteHost {
+public class HostImpl implements RemoteHost {
 
 	private ArrayList<CachedClient> connectedClients_;
-	private static LocalHostImpl instance_ = null;
+	private static HostImpl instance_ = null;
 
-	protected String URI_;
+	protected String myURI_;
 	private String realName_;
 	protected String rmiSafeName_;
 	private XStream xStream_;
 
-	public static LocalHostImpl getInstance() {
+	public static HostImpl getInstance() {
 		if (instance_ == null)
-			instance_ = new LocalHostImpl();
+			instance_ = new HostImpl();
 		return instance_;
 	}
 
-	// TODO - this needs to get a hostName from the preferences manager
-	private LocalHostImpl() {
+	// TODO - this needs to get a name from the preferences manager
+	private HostImpl() {
 		connectedClients_ = new ArrayList<CachedClient>();
-		URI_ = null;
+		myURI_ = null;
 		xStream_ = new XStream();
 
 		InetAddress addr = null;
@@ -85,66 +81,48 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public void addClient(String clientURI) {
-		// Check we are open for connections
-		// TODO - add in a way to check that the client can connect (see Game
-		// State)
+	public void addClient(final String clientURI) {
+		// Check if we are waiting for clients
+		if (GameState.getInstance().getMode() != Mode.WAITING) {
+			ThreadPool.execute(new Runnable() {
+				public void run() {
+					RemoteClient c = ClientResolver
+							.attemptToResolveClient(clientURI);
+					if (c == null)
+						return;
 
-		
-		// TODO - make this asynchronous!
-		RemoteClient rc = attemptToResolveClient(clientURI);
-		if (rc == null)
-			return;
+					// Refuse their connection
+					c.addClientNAK();
 
-		CachedClient cc = new CachedClient(rc);
-		connectedClients_.add(cc);
+					LogSender.sendInfo("HostImpl: Client '" + clientURI
+							+ "' refused");
+				}
 
-		String info = "LocalHostImpl: Client '" + cc.getName() + "' connected";
+			});
+		} else {
+			RemoteClient c = ClientResolver.attemptToResolveClient(clientURI);
+			if (c == null)
+				return;
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, info);
-	}
+			// Let them know we accepted them
+			c.addClientACK();
 
-	public RemoteClient attemptToResolveClient(String clientURI) {
-		RemoteClient rc = null;
-		try {
-			rc = (RemoteClient) RemotingUtils.lookupRMIService(clientURI,
-					RemoteClient.class);
-		} catch (RemoteLookupFailureException e) {
-			String info = "LocalHostImpl could not resolve client at uri: "
-					+ clientURI;
+			// Add them to our list
+			CachedClient cc = new CachedClient(c);
+			synchronized (connectedClients_) {
+				connectedClients_.add(cc);
+			}
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-			return null;
-		} catch (RuntimeException e) {
-			String err = "LocalHostImpl - A RuntimeException occurred while adding "
-					+ "a client at URI: " + clientURI;
-			err += "\n" + e.getMessage();
-			err += "\nStack Trace: \n";
-			for (int i = 0; i < e.getStackTrace().length; i++)
-				err += e.getStackTrace()[i] + "\n";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
-			return null;
+			LogSender.sendInfo("HostImpl: Client '" + cc.getName()
+					+ "' connected");
 		}
-		return rc;
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void removeClient(String clientURI) {
-		for (Iterator<CachedClient> it = connectedClients_.iterator(); it
-				.hasNext();) {
-			CachedClient next = it.next();
-			// TODO - insure this works
-			if (next.getURI().equals(clientURI)) {
-				connectedClients_.remove(next);
-				break;
-			}
-		}
+		// TODO - implement me
 	}
 
 	/**
@@ -160,31 +138,22 @@ public class LocalHostImpl implements RemoteHost {
 	// TODO- cleanup function by referencing the Preferences and building the
 	// URI we should have
 	public String getURI() {
-		if (URI_ == null) {
-			HostStarter hs = new HostStarter();
-			try {
-				SwingUtilities.invokeAndWait(hs);
-			} catch (InterruptedException e) {
-				String err = "LocalHostImpl: interrupted while waiting on invokeAndWait()";
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				String err = "LocalHostImpl: exception thrown from run()";
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
-				e.printStackTrace();
-			}
-		}
-		return URI_;
+		return myURI_;
 	}
 
-	// TODO - may have to remove the return value here
+	/**
+	 * Helper function that lets us know from a URI if a client is connected
+	 * 
+	 * @param clientURI
+	 * @return
+	 */
 	private boolean isClientConnected(String clientURI) {
-		for (Iterator<CachedClient> it = connectedClients_.iterator(); it
-				.hasNext();)
-			if (it.next().getURI().equals(clientURI))
-				return true;
+		synchronized (connectedClients_) {
+			for (Iterator<CachedClient> it = connectedClients_.iterator(); it
+					.hasNext();)
+				if (it.next().getURI().equals(clientURI))
+					return true;
+		}
 
 		// If we make it through all clients without finding...
 		return false;
@@ -198,31 +167,30 @@ public class LocalHostImpl implements RemoteHost {
 
 		// If the client is not connected to us, we don't care
 		if (isClientConnected(clientURI) == false) {
-			String info = "LocalHostImpl: Client '" + clientURI
+			LogSender.sendInfo("HostImpl: Client '" + clientURI
 					+ "' tried to send us a notification, "
-					+ "but was not connected to us. Notification ignored";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-
+					+ "but was not connected to us. Notification ignored");
 			return;
 		}
 
 		// Retransmit to all other clients
-		SwingUtilities.invokeLater(new Runnable() {
+		// Should probably put this into a class, and pass a deep-copied
+		// connectedClients
+		ThreadPool.execute(new Runnable() {
 			public void run() {
-				for (Iterator<CachedClient> it = connectedClients_.iterator(); it
-						.hasNext();) {
-					CachedClient cc = it.next();
+				synchronized (connectedClients_) {
+					for (Iterator<CachedClient> it = connectedClients_
+							.iterator(); it.hasNext();) {
+						CachedClient cc = it.next();
 
-					// Don't send it back to the client it
-					// originated from
-					if (cc.getURI().equals(clientURI))
-						continue;
+						// Don't send it back to the client it
+						// originated from
+						if (cc.getURI().equals(clientURI))
+							continue;
 
-					cc.receiveNotificationFromHost(serializedNotification);
+						cc.receiveNotificationFromHost(serializedNotification);
+					}
 				}
-
 			}
 		});
 	}

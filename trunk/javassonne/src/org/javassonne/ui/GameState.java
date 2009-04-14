@@ -44,18 +44,19 @@ public class GameState {
 	private List<Meeple> globalMeepleSet_ = new ArrayList<Meeple>();
 	private Mode mode_;
 
-	// TODO - Make GameState listeners for appropriate Notifications, so that 
-	// 		  the Mode is automatically updated
+	// TODO - Make GameState listeners for appropriate Notifications, so that
+	// the Mode is automatically updated
 	public static enum Mode {
-		PLAYING_GAME("Playing"), IDLE ("Idle"), IN_LOBBY("In the lobby");
+		PLAYING_GAME("Playing"), IDLE("Idle"), IN_LOBBY("In the lobby"), WAITING(
+				"Waiting for players");
 		// Paused game, or currently playing the game but stepped out
 		public final String text;
-		
+
 		Mode(String s) {
 			text = s;
 		}
 	}
-	
+
 	// Singelton implementation
 	// --------------------------------------------------------
 	protected GameState() {
@@ -108,7 +109,7 @@ public class GameState {
 
 	public void setCurrentPlayer(int i) {
 		currentPlayer_ = i;
-		
+
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_CURRENT_PLAYER, getCurrentPlayer());
 	}
@@ -119,7 +120,7 @@ public class GameState {
 
 	public void setGameInProgress(boolean b) {
 		gameInProgress_ = b;
-		
+
 		if (b)
 			setMode(Mode.PLAYING_GAME);
 		else
@@ -135,7 +136,7 @@ public class GameState {
 
 	public void setDeck(TileDeck deck) {
 		deck_ = deck;
-		
+
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_DECK, deck);
 	}
@@ -146,7 +147,7 @@ public class GameState {
 
 	public void setBoard(TileBoard board) {
 		board_ = board;
-		
+
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_BOARD, board);
 	}
@@ -163,18 +164,18 @@ public class GameState {
 		globalMeepleSet_.add(meeple);
 		
 	}
-	
+
 	public void removeMeepleFromGlobalMeepleSet(Meeple meeple) {
-		globalMeepleSet_.remove(meeple);
+        globalMeepleSet_.remove(meeple);
 	}
-	
+
+
 	public ArrayList<Player> getPlayers() {
 		return players_;
 	}
-	
+
 	public void setPlayers(ArrayList<Player> players) {
 		players_ = players;
-		
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_PLAYERS, players);
@@ -190,11 +191,11 @@ public class GameState {
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_TILE_IN_HAND, t);
 	}
-	
+
 	public Mode getMode() {
 		return mode_;
 	}
-	
+
 	public void setMode(Mode m) {
 		mode_ = m;
 	}
