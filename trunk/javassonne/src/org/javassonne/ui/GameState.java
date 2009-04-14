@@ -19,7 +19,7 @@
 package org.javassonne.ui;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.javassonne.messaging.Notification;
@@ -41,7 +41,7 @@ public class GameState {
 	private Boolean gameInProgress_ = false;
 	private Tile tileInHand_;
 	private TileBoard board_;
-	private Set<Meeple> globalMeepleSet_ = new HashSet<Meeple>();
+	private List<Meeple> globalMeepleSet_ = new ArrayList<Meeple>();
 	private Mode mode_;
 
 	// TODO - Make GameState listeners for appropriate Notifications, so that 
@@ -151,16 +151,23 @@ public class GameState {
 				Notification.UPDATED_BOARD, board);
 	}
 
-	public Set<Meeple> globalMeepleSet() {
+	public List<Meeple> globalMeepleSet() {
 		return globalMeepleSet_;
 	}
 
-
-	public void setGlobalMeepleSet(Set<Meeple> set) {
-		globalMeepleSet_ = set;
-		
+	public void setGlobalMeepleSet(List<Meeple> list) {
+		globalMeepleSet_ = list;		
 	}
 
+	public void addMeepleToGlobalMeepleSet(Meeple meeple) {
+		globalMeepleSet_.add(meeple);
+		
+	}
+	
+	public void removeMeepleFromGlobalMeepleSet(Meeple meeple) {
+		globalMeepleSet_.remove(meeple);
+	}
+	
 	public ArrayList<Player> getPlayers() {
 		return players_;
 	}

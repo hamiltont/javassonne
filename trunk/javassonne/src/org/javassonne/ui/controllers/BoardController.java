@@ -113,9 +113,11 @@ public class BoardController {
 			e.printStackTrace();
 		}
 		
-		Meeple placed = tempLocationIter_.current().getMeeple();
-		GameState.getInstance().globalMeepleSet().add(placed);
-
+			Meeple placed = tempLocationIter_.current().getMeeple();
+			if (placed != null)
+				GameState.getInstance().addMeepleToGlobalMeepleSet(placed);
+		
+		
 		// remove the placement sprite if it exists
 		if (tempPlacementSprite_ != null)
 			NotificationManager.getInstance().sendNotification(

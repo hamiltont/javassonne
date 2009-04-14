@@ -173,11 +173,10 @@ public class GameController {
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		// Uncomment to Test the Game Over functionality
-		//while(deck.tilesRemaining() > 5)
-		//	deck.popRandomTile();
+		while(deck.tilesRemaining() > 5)
+			deck.popRandomTile();
 		GameState.getInstance().setDeck(deck);
 		
-
 		TileBoard board = new TileMapBoard();
 		GameState.getInstance().setBoard(board);
 
@@ -360,9 +359,9 @@ public class GameController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE_GROUP, m);
 			
+			GameState.getInstance().removeMeepleFromGlobalMeepleSet(m);
 			m.getParentTile().setMeeple(null);
 			m.setParentTile(null);
-			GameState.getInstance().globalMeepleSet().remove(m);
 		}
 
 		// only score if someone claimed it
@@ -464,7 +463,7 @@ public class GameController {
 		state.setPlayers(players);
 		state.setCurrentPlayer((Integer)map.get("currentPlayer"));
 		state.setTileInHand((Tile)map.get("tileInHand"));
-		state.setGlobalMeepleSet((Set<Meeple>)map.get("meeple"));
+		state.setGlobalMeepleSet((List<Meeple>)map.get("meeple"));
 		state.setGameInProgress(true);
 		state.setBoard(board);
 		state.setDeck(deck);

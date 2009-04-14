@@ -102,7 +102,9 @@ public class Meeple {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj.getClass() != this.getClass())
+		if (obj == null)
+			return false;
+		else if (obj.getClass() != this.getClass())
 			return false;
 		else {
 			Meeple obj2 = (Meeple) obj;
