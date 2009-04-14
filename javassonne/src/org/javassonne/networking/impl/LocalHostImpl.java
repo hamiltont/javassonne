@@ -31,6 +31,8 @@ import javax.swing.SwingUtilities;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.ui.GameState;
+import org.javassonne.ui.GameState.Mode;
 import org.springframework.remoting.RemoteLookupFailureException;
 
 import com.thoughtworks.xstream.XStream;
@@ -39,26 +41,19 @@ import com.thoughtworks.xstream.XStream;
  * The implementation of our local host. Note that the LocalHost class is an
  * easy way to call through to all of these classes
  * 
- * Internally this keeps a small local cache of client URI's, which allows us to
- * prevent many redundant network calls
+ * Note that this class seriously needs work. It works, but not really well and
+ * not the way we would like it to
  * 
  * @author Hamilton Turner
  */
 public class LocalHostImpl implements RemoteHost {
 
-	private List<CachedClient> connectedClients_;
-
-	private RemoteHost.MODE currentMode_;
+	private ArrayList<CachedClient> connectedClients_;
 	private static LocalHostImpl instance_ = null;
 
 	protected String URI_;
 	private String realName_;
 	protected String rmiSafeName_;
-	// A flag that indicates whether or not
-	// this host can be connected to
-	private boolean clientsCanConnect_;
-
-	// protected boolean isLocalHostStarted_;
 	private XStream xStream_;
 
 	public static LocalHostImpl getInstance() {
@@ -70,9 +65,7 @@ public class LocalHostImpl implements RemoteHost {
 	// TODO - this needs to get a hostName from the preferences manager
 	private LocalHostImpl() {
 		connectedClients_ = new ArrayList<CachedClient>();
-		clientsCanConnect_ = false;
 		URI_ = null;
-		currentMode_ = RemoteHost.MODE.IN_LOBBY;
 		xStream_ = new XStream();
 
 		InetAddress addr = null;
@@ -94,17 +87,11 @@ public class LocalHostImpl implements RemoteHost {
 	 */
 	public void addClient(String clientURI) {
 		// Check we are open for connections
-		if (clientsCanConnect_ == false) {
+		// TODO - add in a way to check that the client can connect (see Game
+		// State)
 
-			String info = "LocalHostImpl: Client " + clientURI
-					+ " attempted  to "
-					+ "connect to our host while our host was not "
-					+ "accepting connections";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, info);
-		}
-
+		
+		// TODO - make this asynchronous!
 		RemoteClient rc = attemptToResolveClient(clientURI);
 		if (rc == null)
 			return;
@@ -163,13 +150,6 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public boolean canClientsConnect() {
-		return clientsCanConnect_;
-	}
-
-	/**
-	 * @see org.javassonne.networking.impl.RemoteHost
-	 */
 	public String getName() {
 		return realName_;
 	}
@@ -177,7 +157,8 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	// TODO- cleanup function
+	// TODO- cleanup function by referencing the Preferences and building the
+	// URI we should have
 	public String getURI() {
 		if (URI_ == null) {
 			HostStarter hs = new HostStarter();
@@ -198,14 +179,7 @@ public class LocalHostImpl implements RemoteHost {
 		return URI_;
 	}
 
-	/**
-	 * Useful for other classes to know if the localhost is ready to go
-	 * 
-	 * @return true if the localhost is started, false otherwise
-	 */
-	// public boolean isLocalHostStarted() {
-	// return isLocalHostStarted_;
-	// }
+	// TODO - may have to remove the return value here
 	private boolean isClientConnected(String clientURI) {
 		for (Iterator<CachedClient> it = connectedClients_.iterator(); it
 				.hasNext();)
@@ -219,8 +193,8 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	public void receiveNotificationFromClient(final String serializedNotification,
-			final String clientURI) {
+	public void receiveNotificationFromClient(
+			final String serializedNotification, final String clientURI) {
 
 		// If the client is not connected to us, we don't care
 		if (isClientConnected(clientURI) == false) {
@@ -256,9 +230,8 @@ public class LocalHostImpl implements RemoteHost {
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
-	// TODO - make this work
-	public MODE getStatus() {
-		return this.currentMode_;
+	public Mode getStatus() {
+		return GameState.getInstance().getMode();
 	}
 
 	/**
@@ -280,21 +253,20 @@ public class LocalHostImpl implements RemoteHost {
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void resolveHost(String hostURI) {
-		HostMonitor.getInstance().resolveHost(hostURI);
+		HostMonitor.resolveHost(hostURI);
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void shareHost(String hostURI) {
-		HostMonitor.getInstance().shareHost(hostURI);
+		HostMonitor.shareHost(hostURI);
 	}
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void receiveACK(String hostURI) {
-		HostMonitor.getInstance().receiveACK(hostURI);
+		HostMonitor.receiveACK(hostURI);
 	}
-
 }

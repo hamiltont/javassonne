@@ -64,7 +64,7 @@ public class HostMonitorListener implements ServiceListener {
 				Notification.LOG_INFO, info);
 		
 		String name = e.getName();
-		HostMonitor.getInstance().removeHost(name);
+		HostMonitor.removeHost(name);
 	}
 
 	public void serviceResolved(ServiceEvent e) {
@@ -97,7 +97,7 @@ public class HostMonitorListener implements ServiceListener {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, hinfo);
  
-		HostMonitor.getInstance().resolveNewHost(hostURI);
+		HostMonitor.resolveNewHost(hostURI);
 	}
 	
 	private class ServiceRequestor implements Runnable {

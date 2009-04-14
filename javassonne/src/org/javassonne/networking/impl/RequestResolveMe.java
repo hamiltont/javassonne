@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Hamilton Turner
  * @date Mar 27, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -18,18 +18,25 @@
 
 package org.javassonne.networking.impl;
 
+import org.javassonne.logger.LogSender;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
 
 /**
- * Ask other clients to attempt to resolve us, and send us an ACK if they
- * succeed Calls host.resolveHost(myURI)
  * 
- * Called by resolveNewHost, to initiate a connection with a host Called by
- * shareHost, to initiate a connection with a host
+ * Asks another host to attempt to resolve us, and send us an ACK if they
+ * succeed.
  * 
+ * Called by HostMonitor - resolveNewHost when we discover a new host......
+ * Called by HostMonitor - shareHost when we are passed a possible new peer's
+ * URI
+ * 
+ * Note that this is only called when we learn of an previously unknown host,
+ * and would like to let them know we are here. This is not called if some
+ * previously unknown host contacts us
+ * 
+ * @author Hamilton Turner
  */
-
 public class RequestResolveMe implements Runnable {
 	private String hostURI_;
 
@@ -49,26 +56,29 @@ public class RequestResolveMe implements Runnable {
 	}
 
 	private void resolveMe() {
-		System.out.println("RequestResolveMe: trying to resolve host "
+		LogSender.sendInfo("RequestResolveMe: trying to resolve host "
 				+ hostURI_);
-		RemoteHost h = HostMonitor.getInstance().attemptToResolveHost(hostURI_);
+
+		RemoteHost h = HostResolver.attemptToResolveHost(hostURI_);
 
 		// We cannot resolve them, give up
 		if (h == null) {
-			System.out.println("RequestResolveMe: resolve failed for "
+			LogSender.sendInfo("RequestResolveMe: resolve failed for "
 					+ hostURI_);
 			return;
 		}
 
 		// Let them know we can see them
-		// TODO - put a timer here somehow!
 		h.resolveHost(LocalHost.getURI());
 
-		// Add them to our hostMonitor
-		CachedHost ch = new CachedHost(h);
-		HostMonitor.getInstance().addToCachedHostList(ch);
+		// Add them to the pending hosts list!
+		HostMonitor.addToPendingHosts(new CachedHost(h));
+		
+		// NOTE: If they ACK us, then they will be added to the cached host list,
+		// 		 but that is the handled in HostMonitor
 
-		System.out.println("RequestResolveMe: resolve succeeded for "
-				+ hostURI_);
+		LogSender.sendInfo("RequestResolveMe: resolve succeeded for "
+				+ hostURI_ + ", added to pending hosts");
 	}
+
 }

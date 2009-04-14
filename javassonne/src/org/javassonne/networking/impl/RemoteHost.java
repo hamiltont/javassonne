@@ -18,21 +18,16 @@
 
 package org.javassonne.networking.impl;
 
-import java.util.List;
+import org.javassonne.ui.GameState.Mode;
 
 /**
  * This is the networking only interface of the host. Only put functions here
- * that a remote host or client should be able to call.
+ * that a remote host (or client) should be able to call.
  * 
  * @author Hamilton Turner
  */
 public interface RemoteHost {
 	public static final String SERVICENAME = "JavassonneHost";
-
-	public static enum MODE {
-		PLAYING_LOCAL_GAME, PLAYING_NETWORK_GAME, IN_LOBBY, IDLE
-		// Paused game, or currently playing the game but stepped out
-	}
 
 	/**
 	 * Add a client to a list of internal "connected" clients. Note that
@@ -75,13 +70,6 @@ public interface RemoteHost {
 	public void removeClient(String clientURI);
 
 	/**
-	 * Asks the host if it is ready to accept client connections
-	 * 
-	 * @return true if clients can connect, false otherwise
-	 */
-	public boolean canClientsConnect();
-
-	/**
 	 * Gets the name of this Host
 	 * 
 	 * @return hostname
@@ -100,7 +88,7 @@ public interface RemoteHost {
 	 * 
 	 * @return host status
 	 */
-	public RemoteHost.MODE getStatus();
+	public Mode getStatus();
 
 	/**
 	 * Used for clients to talk to the host. The host internally chooses to

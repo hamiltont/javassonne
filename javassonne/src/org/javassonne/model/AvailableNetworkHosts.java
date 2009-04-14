@@ -92,7 +92,7 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 			return tableData_.get(rowIndex).getURI();
 		case 2:
 		default:
-			return tableData_.get(rowIndex).getStatus();
+			return tableData_.get(rowIndex).getStatus().text;
 		}
 	}
 
@@ -113,8 +113,8 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 	}
 
 	private void updateData() {
-		if (tableData_.equals(HostMonitor.getInstance().getHosts()) == false) {
-			tableData_ = HostMonitor.getInstance().getHosts();
+		if (tableData_.equals(HostMonitor.getHosts()) == false) {
+			tableData_ = HostMonitor.getHosts();
 			notifyListeners();
 		}
 	}

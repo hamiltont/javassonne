@@ -19,35 +19,41 @@
 package org.javassonne.networking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.jmdns.JmDNS;
-import javax.swing.SwingUtilities;
 
+import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.impl.CachedHost;
 import org.javassonne.networking.impl.HostMonitorListener;
 import org.javassonne.networking.impl.HostResolver;
-import org.javassonne.networking.impl.HostResolverThreadPool;
+import org.javassonne.networking.impl.ThreadPool;
 import org.javassonne.networking.impl.JmDNSSingleton;
-import org.javassonne.networking.impl.RemoteHost;
-import org.javassonne.networking.impl.RemotingUtils;
 import org.javassonne.networking.impl.RequestResolveMe;
 import org.javassonne.networking.impl.ShareHost;
-import org.springframework.remoting.RemoteLookupFailureException;
 
 import com.thoughtworks.xstream.XStream;
 
 /**
+ * Keeps track of all host comings and goings, and handles ensuring there is 2
+ * way line-of-sight (LOS). Also plays nicely with peers, by sharing all 'new'
+ * hosts to all of our immediate peers.
+ * 
  * Because this guy keeps track of all known hosts, he is also responsible for
  * sending global chat messages to them.
  * 
- * HostMonitor is guaranteed to add hosts only if it can resolve those hosts.
+ * All resolving of hosts is done in separate threads, using RequestResolveMe,
+ * ShareHost, and HostResolver
  */
 public class HostMonitor {
-	private List<CachedHost> cachedHostList_;
+	private List<CachedHost> cachedHosts_;
+	private HashMap<String, CachedHost> pendingHosts_;
 	private static HostMonitor instance_ = null;
 	private XStream xStream_;
 
@@ -58,7 +64,8 @@ public class HostMonitor {
 				.addServiceListener("_rmi._tcp.local.",
 						new HostMonitorListener());
 
-		cachedHostList_ = new ArrayList<CachedHost>();
+		cachedHosts_ = new ArrayList<CachedHost>();
+		pendingHosts_ = new HashMap<String, CachedHost>();
 		xStream_ = new XStream();
 
 		// We will handle sending chats to all known hosts
@@ -68,166 +75,286 @@ public class HostMonitor {
 	}
 
 	// Singleton for our HostMonitor instance.
-	public static HostMonitor getInstance() {
+	private static HostMonitor getInstance() {
 		if (instance_ == null)
 			instance_ = new HostMonitor();
 		return instance_;
 	}
 
-	public List<CachedHost> getHosts() {
-		return cachedHostList_;
+	/**
+	 * @return the list of currently connected hosts
+	 */
+	public static List<CachedHost> getHosts() {
+		return getInstance()._getHosts();
 	}
 
+	private List<CachedHost> _getHosts() {
+		return cachedHosts_;
+	}
+
+	/**
+	 * Allows the NotificationManager to let us know a SEND_GLOBAL_CHAT message
+	 * was send
+	 * 
+	 * @param sendMessage
+	 */
 	public void sendOutGlobalChat(Notification sendMessage) {
 		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT,
 		// and send to all the known remote hosts
 		Notification recvMessage = new Notification(
 				Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
-		final String serializedNotification = xStream_.toXML(recvMessage);
+		String serializedNotification = xStream_.toXML(recvMessage);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				for (Iterator<CachedHost> it = cachedHostList_.iterator(); it
-						.hasNext();)
-					it.next().receiveNotification(serializedNotification);
-			}
-		});
+		for (Iterator<CachedHost> it = cachedHosts_.iterator(); it.hasNext();)
+			it.next().receiveNotification(serializedNotification);
 
-		// Also send to ourselves so anyone listening for RECV_GLOBAL_CHAT will
-		// get this
+		// Also send to ourselves for classes listening for RECV_GLOBAL_CHAT
 		NotificationManager.getInstance().sendNotification(
 				Notification.RECV_GLOBAL_CHAT, sendMessage.argument());
 	}
 
-	public int numberOfHosts() {
-		return cachedHostList_.size();
+	/**
+	 * Returns the number of hosts that we have verified as having two way line
+	 * of sight
+	 * 
+	 * @return
+	 */
+	public static int numberOfHosts() {
+		return getInstance()._numberOfHosts();
 	}
 
-	public void resolveHost(String hostURI) {
-		System.out.println("HostMonitor: resolveHost: " + hostURI);
+	private int _numberOfHosts() {
+		return cachedHosts_.size();
+	}
+
+	/**
+	 * Used for another Host to ask us to resolve them. We will send them an ACK
+	 * if we can see them (informing them of 2 way LOS). Also, we will notify
+	 * all of our current peers that we found a new host
+	 * 
+	 * @param hostURI
+	 */
+	public static void resolveHost(String hostURI) {
+		getInstance()._resolveHost(hostURI);
+	}
+
+	private void _resolveHost(String hostURI) {
+		LogSender.sendInfo("HostMonitor: resolveHost: " + hostURI);
+
 		if (isKnownHost(hostURI)) {
-			System.out.println("HostMonitor: resolveHost: Host " + hostURI
+			LogSender.sendInfo("HostMonitor: resolveHost: Host " + hostURI
 					+ " already known");
 			return;
 		}
 
-		HostResolverThreadPool.execute(new HostResolver(hostURI));
-		System.out.println("HostMonitor: resolveHost exiting");
+		ThreadPool.execute(new HostResolver(hostURI));
+
+		ThreadPool.execute(new ShareHost(hostURI, deepCopyCachedHosts()));
+
+		LogSender.sendInfo("HostMonitor: resolveHost exiting");
 	}
 
-	public void shareHost(String hostURI) {
-		System.out.println("HostMonitor: shareHost: " + hostURI);
+	/**
+	 * Called by one of our current peers to inform us of a host that they
+	 * believe to be new/available. We will attempt to resolve the host
+	 * 
+	 * @param hostURI
+	 */
+	public static void shareHost(String hostURI) {
+		getInstance()._shareHost(hostURI);
+	}
+
+	private void _shareHost(String hostURI) {
+		LogSender.sendInfo("HostMonitor: shareHost: " + hostURI);
+
 		if (isKnownHost(hostURI)) {
-			System.out.println("HostMonitor: shareHost: " + hostURI
+			LogSender.sendInfo("HostMonitor: shareHost: " + hostURI
 					+ " already known");
 			return;
 		}
 
 		// Request they add us
-		HostResolverThreadPool
-				.execute(new RequestResolveMe(LocalHost.getURI()));
-		System.out.println("HostMonitor: shareHost exiting");
+		ThreadPool.execute(new RequestResolveMe(LocalHost.getURI()));
+
+		LogSender.sendInfo("HostMonitor: shareHost exiting");
 	}
 
-	// TODO asdf
-	private void sendFirewallNotification() {
-		System.out.println("HostMonitor: possible firewill detected");
-	}
-
+	/**
+	 * Quick way to check if a host is already known
+	 * 
+	 * @param hostURI
+	 * @return true = host known, false = host unknown
+	 */
 	private boolean isKnownHost(String hostURI) {
-		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();)
+		for (Iterator<CachedHost> it = cachedHosts_.iterator(); it.hasNext();)
 			if (it.next().getURI().equals(hostURI))
 				return true;
 
 		return false;
 	}
 
-	public synchronized void addToCachedHostList(CachedHost h) {
-		if (isKnownHost(h.getURI()))
+	/**
+	 * Called by HostResolver when we know there is 2 way LOS between us and the
+	 * host who contacted us, requesting we resolve them.
+	 * 
+	 * Because we can be resolving many hosts at one time, this is synchronized.
+	 * 
+	 * @param ch
+	 *            The CachedHost to add
+	 */
+	public static void addToCachedHostList(CachedHost ch) {
+		getInstance()._addToCachedHostList(ch);
+	}
+
+	private synchronized void _addToCachedHostList(CachedHost ch) {
+		if (isKnownHost(ch.getURI()))
 			return;
-		cachedHostList_.add(h);
+		cachedHosts_.add(ch);
 	}
 
 	/**
-	 * Local call only! Remote hosts cannot call this method
+	 * Called by RequestResolveMe when we know we can resolve a host, but we are
+	 * not sure they can resolve us
+	 * 
 	 * @param hostURI
 	 */
-	public void resolveNewHost(String hostURI) {
-		System.out.println("HostMonitor: resolveNewHost: " + hostURI);
+	public static void addToPendingHosts(CachedHost h) {
+		getInstance()._addToPendingHosts(h);
+	}
+
+	private void _addToPendingHosts(CachedHost h) {
+		synchronized (pendingHosts_) {
+			if (pendingHosts_.containsKey(h.getURI()) == true)
+				return;
+
+			pendingHosts_.put(h.getURI(), h);
+		}
+
+		// Schedule to check if we have received an ACK from them
+		// TODO - make sure 5 seconds is a decent time
+		// TODO - create firewall notification
+
+		final String hostURI = h.getURI();
+		Timer t = new Timer("Pending Host - " + h.getURI());
+		t.schedule(new TimerTask() {
+			public void run() {
+				// If they have not ACK'ed us yet, something is amiss
+				synchronized (pendingHosts_) {
+					if (pendingHosts_.containsKey(hostURI))
+						LogSender.sendErr("FIREWALL: from " + hostURI);
+				}
+				// Kill this timer
+				cancel();
+			}
+
+		}, 5000);
+	}
+
+	/**
+	 * Called by the HostMonitorListener, when it discovers a new host and we
+	 * should attempt to contact that host
+	 * 
+	 * @param hostURI
+	 */
+	public static void resolveNewHost(String hostURI) {
+		getInstance()._resolveNewHost(hostURI);
+	}
+
+	private void _resolveNewHost(String hostURI) {
+		LogSender.sendInfo("HostMonitor: resolveNewHost: " + hostURI);
+
+		// Check if it is the localhost
+		if (hostURI.equals(LocalHost.getURI())) {
+			LogSender.sendInfo("HostMonitor: Found localhost broadcast");
+
+			return;
+		}
+
 		if (isKnownHost(hostURI)) {
-			System.out.println("HostMonitor: resolveNewHost: " + hostURI
+			LogSender.sendInfo("HostMonitor: resolveNewHost: " + hostURI
 					+ " already known");
 			return;
 		}
 
-		// Check if it is the localhost
-		if (hostURI.equals(LocalHost.getURI())) {
-			String info = "HostMonitor: Found localhost broadcast";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-
-			return;
-		}
-
-		// TODO - here we should record their URI and set a timer for
-		// them to call us back (for firewall detection)
-		// TODO - or we could do this entirely in the RequestResolveMe thread?
-		// perhaps with a wait call!?
-
 		// Request that they add us
-		HostResolverThreadPool.execute(new RequestResolveMe(hostURI));
+		ThreadPool.execute(new RequestResolveMe(hostURI));
 
 		// Share the discovered service with our peers
-		HostResolverThreadPool.execute(new ShareHost(hostURI,
-				deepCopyCachedHosts()));
+		ThreadPool.execute(new ShareHost(hostURI, deepCopyCachedHosts()));
+
+		LogSender.sendInfo("HostMonitor: resolveNewHost: " + hostURI
+				+ " exiting");
 	}
 
-	public RemoteHost attemptToResolveHost(String hostURI) {
-		RemoteHost h = null;
-		try {
-			h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
-					RemoteHost.class);
-		} catch (RemoteLookupFailureException e) {
-			String info = "HostMonitor could not resolve host at uri: "
-					+ hostURI;
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info);
-			return null;
-		} catch (RuntimeException e) {
-			String err = "HostMonitor: A RuntimeException occurred while adding a host";
-			err += "\n" + e.getMessage();
-			err += "\nStack Trace: \n";
-			for (int i = 0; i < e.getStackTrace().length; i++)
-				err += e.getStackTrace()[i] + "\n";
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
-			return null;
-		}
-		return h;
-	}
-
+	/**
+	 * Used to pass the internal CachedHost list to our asynchronous share
+	 * requests. If we do not deep copy them, then they might be iterating over
+	 * the internal array while someone else is adding or removing elements
+	 * 
+	 * @return
+	 */
 	private ArrayList<CachedHost> deepCopyCachedHosts() {
-		String deepCopy = xStream_.toXML(cachedHostList_);
+		String deepCopy = xStream_.toXML(cachedHosts_);
 		return (ArrayList<CachedHost>) xStream_.fromXML(deepCopy);
 	}
 
-	public void removeHost(String name) {
-		for (Iterator<CachedHost> it = cachedHostList_.iterator(); it.hasNext();) {
+	/**
+	 * Used for HostMonitorListener to inform us that a service was removed
+	 * 
+	 * @param name
+	 */
+	public static void removeHost(String name) {
+		getInstance()._removeHost(name);
+	}
+
+	private void _removeHost(String name) {
+		LogSender.sendInfo("HostMonitor: removeHost: Host '" + name
+				+ "' removed");
+
+		for (Iterator<CachedHost> it = cachedHosts_.iterator(); it.hasNext();) {
 			CachedHost next = it.next();
 			// TODO - change to name.equals(JavassonneHost_ + next.getName() )
 			// and verify
 			if (name.contains(next.getName())) {
-				cachedHostList_.remove(next);
+				synchronized (pendingHosts_) {
+					pendingHosts_.remove(next.getURI());
+				}
+				cachedHosts_.remove(next);
 				break;
 			}
 		}
+
 	}
-	
-	// TODO - implement
-	public void receiveACK(String hostURI) {
-		System.out.println("HostMonitor: ACK received from " + hostURI);
+
+	/**
+	 * A remote host calls this to let us know that it can resolve us. This
+	 * allows us to detect if we have a firewall blocking others from connecting
+	 * to us
+	 * 
+	 * @param hostURI
+	 */
+	public static void receiveACK(String hostURI) {
+		getInstance()._receiveACK(hostURI);
+	}
+
+	private void _receiveACK(String hostURI) {
+		LogSender.sendInfo("HostMonitor: receiveACK: Received from " + hostURI);
+		// TODO - make this work, and then record some sample connection times
+		// . after we have some samples, we can add a timer above in
+		// resolveNewHost
+
+		CachedHost ch = null;
+		synchronized (pendingHosts_) {
+			ch = pendingHosts_.remove(hostURI);
+		}
+
+		if (ch == null) {
+			LogSender
+					.sendErr("HostMonitor - receiveACK - host was not in pending hosts, ignoring ACK");
+			return;
+		}
+
+		cachedHosts_.add(ch);
+		LogSender.sendInfo("HostMonitor: receiveACK: Added " + hostURI);
 	}
 }
