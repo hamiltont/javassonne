@@ -39,8 +39,8 @@ public class Main {
 		// Make sure our HostMonitor singleton is started
 		HostMonitor.numberOfHosts();
 
-		// Play start-up sound and initialize sound monitor
-		JSoundManager.getInstance().play(JSoundManager.START_UP);
+		// Initialize sound monitor
+		JSoundManager.getInstance();
 
 		// create the application controller. This will handle starting a new
 		// game, etc...
