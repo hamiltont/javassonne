@@ -32,18 +32,18 @@ public class JSoundManager {
 
 	public static final String TADA = "sounds/tada.wav";
 	public static final String START_UP = "sounds/startup.wav";
-	
+
 	private Properties registered_ = new Properties();
-	
+
 	/**
-	 * Class functions to listen for key presses on any component it is attached
-	 * to. Key presses of significance will notify observers via the messaging
-	 * system
+	 * Class functions play sounds through the client's speakers
 	 */
-	
+
 	private static final long serialVersionUID = 1L;
 	private static JSoundManager instance_ = null;
 
+	// Sounds can observe notifications and thus be played when the associated
+	// notification is triggered
 	protected JSoundManager() {
 		// Attach sounds to notifications
 		register_sound(Notification.START_GAME, TADA);
@@ -57,6 +57,10 @@ public class JSoundManager {
 		return instance_;
 	}
 
+	/*
+	 * Args:  name : (string)  the location of the sound file
+	 *                  ie:   JSoundManager.START_UP
+	 */
 	public void play(String name) {
 		try {
 			InputStream in = new FileInputStream(name);
@@ -67,12 +71,20 @@ public class JSoundManager {
 		}
 	}
 	
-	public void play_notification(Notification n){
+	/*
+	 * This function provides the callback method for the Pub-Sub notification
+	 */
+	public void play_notification(Notification n) {
 		play(registered_.getProperty(n.identifier()));
 	}
+
 	
-	public void register_sound(String notification_name, String sound_name){
+	/*
+	 * Bind a sound to a notification by adding it as an observer
+	 */
+	public void register_sound(String notification_name, String sound_name) {
 		registered_.setProperty(notification_name, sound_name);
-		NotificationManager.getInstance().addObserver(notification_name, this, "play_notification");
+		NotificationManager.getInstance().addObserver(notification_name, this,
+				"play_notification");
 	}
 }
