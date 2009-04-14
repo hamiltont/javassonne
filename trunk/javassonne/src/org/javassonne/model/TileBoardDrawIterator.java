@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author KgetYle Prete
+ * @author Kyle Prete
  * @date Jan 25, 2009
  * 
  * CopgetYright 2009 Javassonne Team
@@ -20,31 +20,44 @@ package org.javassonne.model;
 
 import java.awt.Point;
 
-//THIS IS NOT DONE!!!
-// TODO: add comments, and test
-
 public class TileBoardDrawIterator implements TileBoardIterator {
 	private TileBoard data_;
 	private Point location_;
 
+	/**
+	 * @param data TileBoard this Iterator refers to
+	 * @param point Point location this Iterator is pointing to
+	 */
 	public TileBoardDrawIterator(TileBoard data, Point point) {
 		data_ = data;
 		location_ = point;
 	}
 
+	/**
+	 * @param old TileBoardIterator to copy
+	 */
 	public TileBoardDrawIterator(TileBoardIterator old) {
 		data_ = old.getData();
 		location_ = old.getLocation();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#current()
+	 */
 	public Tile current() {
 		return data_.getTile(this);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#getLocation()
+	 */
 	public Point getLocation() {
 		return location_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#outOfBounds()
+	 */
 	public boolean outOfBounds() {
 		Point upLeft = data_.getUpperLeftCorner().getLocation();
 		Point lowRight = data_.getLowerRightCorner().getLocation();
@@ -57,7 +70,9 @@ public class TileBoardDrawIterator implements TileBoardIterator {
 		return false;
 	}
 
-	// Advances iterator to start of next row
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#nextRow()
+	 */
 	public TileBoardDrawIterator nextRow() {
 		location_ = new Point((int) (data_.getUpperLeftCorner().getLocation()
 				.getX()), (int) (location_.getY() - 1));
@@ -65,14 +80,21 @@ public class TileBoardDrawIterator implements TileBoardIterator {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#getData()
+	 */
 	public TileBoard getData() {
 		return data_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javassonne.model.TileBoardIterator#right()
+	 */
 	public TileBoardIterator right() {
-		location_ = new Point((int) (location_.getX() + 1), (int) (location_.getY()));
-		if(outOfBounds())
-			return nextRow();		
+		location_ = new Point((int) (location_.getX() + 1), (int) (location_
+				.getY()));
+		if (outOfBounds())
+			return nextRow();
 		return this;
 	}
 }

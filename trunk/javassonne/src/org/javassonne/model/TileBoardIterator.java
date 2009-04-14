@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Kyle Prete
  * @date Jan 25, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -23,32 +23,32 @@ import java.awt.Point;
 public interface TileBoardIterator {
 
 	/**
-	 * @return - Tile iterator current points to
+	 * @return Tile this iterator currently points to
 	 */
 	public abstract Tile current();
 
 	/**
-	 * @return - reference to itself moved right in board
+	 * @return reference to itself moved right in board
 	 */
 	public abstract TileBoardIterator right();
 
 	/**
-	 * @return - reference to itself moved to start of next row
+	 * @return reference to itself moved to start of next row
 	 */
 	public abstract TileBoardIterator nextRow();
 
 	/**
-	 * @return - Point denoting coordinates of current() in board
+	 * @return Point denoting coordinates of current() in board
 	 */
 	public abstract Point getLocation();
 
 	/**
-	 * @return - reference to TileBoard TileBoardIterator belongs to
+	 * @return reference to TileBoard this iterator belongs to
 	 */
 	public abstract TileBoard getData();
 
 	/**
-	 * @return - true if TileBoardIterator is out of the bounds of the TileBoard
+	 * @return true if TileBoardIterator is out of the bounds of the TileBoard
 	 */
 	public abstract boolean outOfBounds();
 

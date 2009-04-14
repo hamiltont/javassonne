@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author [Add Name Here]
+ * @author Kyle Prete
  * @date Jan 21, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -38,7 +38,7 @@ public class TileMapBoardTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//sets hometile
+		// sets hometile
 		td.addTile(homeTile, 1);
 		GameState.getInstance().setDeck(td);
 		board_ = new TileMapBoard();
@@ -48,25 +48,25 @@ public class TileMapBoardTests extends TestCase {
 		board_.addTemp(home.upCopy(), upTile);
 		board_.addTemp(home.downCopy(), downTile);
 	}
-	
-	public void testIterCopy(){
+
+	public void testIterCopy() {
 		TileBoardGenIterator home = (TileBoardGenIterator) board_.homeTile();
 		TileBoardGenIterator right = (TileBoardGenIterator) home.rightCopy();
 		assertTrue(!home.equals(right));
-		assertTrue(home.equals((TileBoardGenIterator)right.left()));
-		
+		assertTrue(home.equals((TileBoardGenIterator) right.left()));
+
 		TileBoardGenIterator left = (TileBoardGenIterator) home.leftCopy();
 		assertTrue(!home.equals(left));
-		assertTrue(home.equals((TileBoardGenIterator)left.right()));
-		
+		assertTrue(home.equals((TileBoardGenIterator) left.right()));
+
 		TileBoardGenIterator up = (TileBoardGenIterator) home.upCopy();
 		assertTrue(!home.equals(up));
-		assertTrue(home.equals((TileBoardGenIterator)up.down()));
-		
+		assertTrue(home.equals((TileBoardGenIterator) up.down()));
+
 		TileBoardGenIterator down = (TileBoardGenIterator) home.downCopy();
 		assertTrue(!home.equals(down));
-		assertTrue(home.equals((TileBoardGenIterator)down.up()));
-		
+		assertTrue(home.equals((TileBoardGenIterator) down.up()));
+
 	}
 
 	public void testIterator() {

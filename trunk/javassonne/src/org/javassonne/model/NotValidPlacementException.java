@@ -2,7 +2,7 @@
  * Javassonne 
  *  http://code.google.com/p/javassonne/
  * 
- * @author pretekr
+ * @author Kyle Prete
  * @date Feb 5, 2009
  * 
  * Copyright 2009 Javassonne Team
@@ -14,10 +14,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
  *  implied. See the License for the specific language governing 
  *  permissions and limitations under the License. 
- */
-
-/**
- * 
  */
 
 package org.javassonne.model;
@@ -40,7 +36,7 @@ public class NotValidPlacementException extends Exception {
 	public NotValidPlacementException() {
 		super("The selected position is not valid for placement");
 	}
-	
+
 	public Point getLocation() {
 		return location_;
 	}
