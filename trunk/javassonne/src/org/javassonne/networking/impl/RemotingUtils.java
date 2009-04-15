@@ -37,7 +37,7 @@ public class RemotingUtils {
 
 	private static Map<String, RmiServiceExporter> serviceMap_ = new HashMap<String, RmiServiceExporter>();
 
-	public static final int DEFAULT_PORT = 5099;
+	public static final int DEFAULT_PORT = 5199;
 
 	/**
 	 * This method takes an object and exposes it as a remove RMI service. The

@@ -18,6 +18,8 @@
 
 package org.javassonne.networking.impl;
 
+import java.util.ArrayList;
+
 import org.javassonne.logger.LogSender;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
@@ -33,6 +35,8 @@ import org.springframework.remoting.RemoteLookupFailureException;
  * @author Hamilton Turner
  */
 public class HostResolver implements Runnable {
+	private static ArrayList<String> pendingResolves_ = new ArrayList<String>();
+
 	private String hostURI_;
 
 	// Resolve host,
@@ -71,6 +75,20 @@ public class HostResolver implements Runnable {
 	}
 
 	public static RemoteHost attemptToResolveHost(String hostURI) {
+
+
+		synchronized (pendingResolves_) {
+			// If we are already resolving them, do not continue
+			if (pendingResolves_.contains(hostURI)) {
+				LogSender.sendInfo("HostResolver - Found " + hostURI
+						+ " in pending, returning null");
+				return null;
+			}
+			
+			// If we are not, add them and continue			
+			pendingResolves_.add(hostURI);
+		}
+
 		RemoteHost h = null;
 		try {
 			h = (RemoteHost) RemotingUtils.lookupRMIService(hostURI,
@@ -79,11 +97,14 @@ public class HostResolver implements Runnable {
 		} catch (RemoteLookupFailureException e) {
 			LogSender.sendInfo("HostResolver could not resolve host at uri: "
 					+ hostURI);
+		}
 
-			return null;
+		synchronized (pendingResolves_) {
+			pendingResolves_.remove(hostURI);
 		}
 
 		return h;
+
 	}
 
 }
