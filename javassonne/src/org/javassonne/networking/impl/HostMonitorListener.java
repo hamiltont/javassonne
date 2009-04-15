@@ -18,16 +18,10 @@
 
 package org.javassonne.networking.impl;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
-import javax.jmdns.impl.JmDNSImpl;
-import javax.jmdns.impl.ServiceEventImpl;
-import javax.jmdns.impl.ServiceInfoImpl;
 
 import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
@@ -35,6 +29,8 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
 
 public class HostMonitorListener implements ServiceListener {
+	private static JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
+	
 	public void serviceAdded(ServiceEvent e) {
 		String info = "HostMonitorListener: Found service " + e.getName();
 
@@ -122,7 +118,7 @@ public class HostMonitorListener implements ServiceListener {
 
 		public void run() {
 			LogSender.sendInfo("ServiceRequstor - entered");
-			JmDNSSingleton.getJmDNS().requestServiceInfo(event_.getType(),
+			jmdns_.requestServiceInfo(event_.getType(),
 					event_.getName());
 			LogSender.sendInfo("ServiceRequstor - exited");
 		}
