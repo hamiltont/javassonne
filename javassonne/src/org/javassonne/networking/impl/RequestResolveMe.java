@@ -68,17 +68,16 @@ public class RequestResolveMe implements Runnable {
 			return;
 		}
 
-		// Let them know we can see them
-		h.resolveHost(LocalHost.getURI());
-
 		// Add them to the pending hosts list!
 		HostMonitor.addToPendingHosts(new CachedHost(h));
 		
 		// NOTE: If they ACK us, then they will be added to the cached host list,
 		// 		 but that is the handled in HostMonitor
-
 		LogSender.sendInfo("RequestResolveMe: resolve succeeded for "
 				+ hostURI_ + ", added to pending hosts");
+		
+		// Let them know we can see them
+		h.resolveHost(LocalHost.getURI());
 	}
 
 }

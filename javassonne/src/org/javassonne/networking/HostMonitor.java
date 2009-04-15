@@ -56,7 +56,7 @@ public class HostMonitor {
 	private HashMap<String, CachedHost> pendingHosts_;
 	private static HostMonitor instance_ = null;
 	private XStream xStream_;
-	
+
 	// TODO - remove me!
 	private long time_;
 
@@ -104,7 +104,7 @@ public class HostMonitor {
 	public static void sendOutGlobalChat(Notification sendMessage) {
 		getInstance()._sendOutGlobalChat(sendMessage);
 	}
-	
+
 	private void _sendOutGlobalChat(Notification sendMessage) {
 		// Convert the SEND_GLOBAL_CHAT to at RECV_GLOBAL_CHAT,
 		// and send to all the known remote hosts
@@ -217,6 +217,9 @@ public class HostMonitor {
 		if (isKnownHost(ch.getURI()))
 			return;
 		cachedHosts_.add(ch);
+
+		LogSender.sendInfo("HostMonitor - Added CachedHost:" + ch.getName()
+				+ ", " + ch.getStatus());
 	}
 
 	/**
@@ -239,7 +242,7 @@ public class HostMonitor {
 
 		// TODO - remove me
 		time_ = System.currentTimeMillis();
-		
+
 		// Schedule to check if we have received an ACK from them
 		// TODO - make sure 5 seconds is a decent time
 		// TODO - create firewall notification
@@ -363,8 +366,8 @@ public class HostMonitor {
 					.sendErr("HostMonitor - receiveACK - host was not in pending hosts, ignoring ACK");
 			return;
 		}
-		
-		//TODO - remove me
+
+		// TODO - remove me
 		time_ = System.currentTimeMillis() - time_;
 		LogSender.sendInfo("HostMonitor - time found to be " + time_);
 
