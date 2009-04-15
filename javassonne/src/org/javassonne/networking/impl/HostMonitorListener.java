@@ -18,11 +18,18 @@
 
 package org.javassonne.networking.impl;
 
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
-import javax.swing.SwingUtilities;
+import javax.jmdns.impl.JmDNSImpl;
+import javax.jmdns.impl.ServiceEventImpl;
+import javax.jmdns.impl.ServiceInfoImpl;
 
+import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.networking.HostMonitor;
@@ -53,7 +60,13 @@ public class HostMonitorListener implements ServiceListener {
 			return;
 		}
 
-		SwingUtilities.invokeLater(new ServiceRequestor(e));
+		// because Service requestor calls on JmDNS, we need to 
+		// ensure that the servicerequestor is run in a different thread
+		// from the one jmdns is in. 
+		// 
+		
+		Thread t = new Thread(new ServiceRequestor(e), "ServiceRequestor");
+		t.run();
 	}
 
 	public void serviceRemoved(ServiceEvent e) {
@@ -108,8 +121,10 @@ public class HostMonitorListener implements ServiceListener {
 		}
 
 		public void run() {
+			LogSender.sendInfo("ServiceRequstor - entered");
 			JmDNSSingleton.getJmDNS().requestServiceInfo(event_.getType(),
 					event_.getName());
+			LogSender.sendInfo("ServiceRequstor - exited");
 		}
 	}
 }

@@ -24,16 +24,19 @@ import java.net.UnknownHostException;
 
 import javax.jmdns.JmDNS;
 
+import org.javassonne.logger.LogSender;
+
 public class JmDNSSingleton {
 
 	private static JmDNS jmdns_ = null;
 
-	private JmDNSSingleton() {}
+	private JmDNSSingleton() {
+	}
 
 	public static JmDNS getJmDNS() {
 		if (jmdns_ == null) {
 			try {
-				
+
 				try {
 					InetAddress localHost = InetAddress.getLocalHost();
 					jmdns_ = JmDNS.create(localHost);
@@ -42,7 +45,7 @@ public class JmDNSSingleton {
 					e1.printStackTrace();
 					jmdns_ = JmDNS.create();
 				}
-				
+
 			} catch (IOException e) {
 				System.out
 						.println("An IOException occurred when creating jmdns");
@@ -51,6 +54,8 @@ public class JmDNSSingleton {
 			}
 		}
 
+		LogSender.sendInfo("Thread '" + Thread.currentThread().getName()
+				+ "' is accessing JmDNS");
 		return jmdns_;
 	}
 }

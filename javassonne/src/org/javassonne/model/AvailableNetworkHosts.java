@@ -85,15 +85,18 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch (columnIndex) {
-		case 0:
-			return tableData_.get(rowIndex).getName();
-		case 1:
-			return tableData_.get(rowIndex).getURI();
-		case 2:
-		default:
-			return tableData_.get(rowIndex).getStatus().text;
+		synchronized (tableData_) {
+			switch (columnIndex) {
+			case 0:
+				return tableData_.get(rowIndex).getName();
+			case 1:
+				return tableData_.get(rowIndex).getURI();
+			case 2:
+			default:
+				return tableData_.get(rowIndex).getStatus().text;
+			}
 		}
+
 	}
 
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -113,9 +116,12 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 	}
 
 	private void updateData() {
-		if (tableData_.equals(HostMonitor.getHosts()) == false) {
-			tableData_ = HostMonitor.getHosts();
-			notifyListeners();
+		synchronized (tableData_) {
+			if (tableData_.equals(HostMonitor.getHosts()) == false) {
+
+				tableData_ = HostMonitor.getHosts();
+				notifyListeners();
+			}
 		}
 	}
 

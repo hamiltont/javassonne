@@ -60,6 +60,7 @@ public class ShareHost implements Runnable {
 			nextCH.shareHost(hostURI_);
 		}
 
-		LogSender.sendInfo("ShareHost: Shared " + hostURI_);
+		LogSender.sendInfo("ShareHost: Shared " + hostURI_ + " with "
+				+ otherHosts_.size() + " others");
 	}
 }
