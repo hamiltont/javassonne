@@ -93,7 +93,12 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 				return tableData_.get(rowIndex).getURI();
 			case 2:
 			default:
-				return tableData_.get(rowIndex).getStatus().text;
+				try {
+					return tableData_.get(rowIndex).getStatus().text;
+				} catch (Exception e) {
+					System.out.print(true);
+					return null;
+				}
 			}
 		}
 
