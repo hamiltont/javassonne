@@ -27,6 +27,7 @@ import java.util.TimerTask;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
+import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 
@@ -53,6 +54,7 @@ public class HostStarter extends TimerTask {
 			e1.printStackTrace();
 		}
 
+		LogSender.sendInfo("HS - at first myURI");
 		HostImpl.getInstance().myURI_ = "rmi://" + local_host + ":"
 				+ info.getPort() + "/" + info.getName();
 
@@ -68,6 +70,7 @@ public class HostStarter extends TimerTask {
 		
 			// Shutdown any previous service
 			try {
+				LogSender.sendInfo("HS - shutting down old serv");
 				RemotingUtils.shutdownService(RemoteHost.SERVICENAME + "_"
 						+ HostImpl.getInstance().rmiSafeName_);
 			} catch (RemoteException e) {
@@ -82,14 +85,18 @@ public class HostStarter extends TimerTask {
 			}
 
 			// Try to re-create our RMI
+			LogSender.sendInfo("HS - RE - creating RMI");
 			info = createRMI();
+			LogSender.sendInfo("HS - at second myURI");
 			HostImpl.getInstance().myURI_ = "rmi://" + info.getHostAddress()
 					+ ":" + info.getPort() + "/" + info.getName();
 		}
 
 		// Broadcast the created service
+		LogSender.sendInfo("HS - get JmDNS");
 		JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
 		try {
+			LogSender.sendInfo("HS - registering serv");
 			jmdns_.registerService(info);
 		} catch (IOException e) {
 			String err = "An IOException occurred when registering a service with jmdns";
@@ -110,15 +117,18 @@ public class HostStarter extends TimerTask {
 				Notification.LOG_INFO, info2);
 
 		// Cancel this timer task
+		LogSender.sendInfo("HS - cancelling");
 		cancel();
 	}
 
 	private ServiceInfo createRMI() {
 		ServiceInfo info = null;
 		try {
+			LogSender.sendInfo("HS - Exporting RMI");
 			info = RemotingUtils.exportRMIService(HostImpl.getInstance(),
 					RemoteHost.class, RemoteHost.SERVICENAME + "_"
 							+ HostImpl.getInstance().rmiSafeName_);
+			LogSender.sendInfo("HS - Done exporting");
 		} catch (RemoteException e) {
 			String err = "A RemoteException occurred when exporting host RMI";
 			err += "\n" + e.getMessage();

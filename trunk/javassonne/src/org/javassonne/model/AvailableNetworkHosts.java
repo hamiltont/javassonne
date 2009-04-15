@@ -51,7 +51,7 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 		updateData();
 
 		// Schedule ourselves to update
-		Timer t = new Timer("NetworkHosts UpdateData Timer");
+		Timer t = new Timer("AvailableNetworkHosts Model Updater");
 		t.scheduleAtFixedRate(this, 0, 1000);
 	}
 

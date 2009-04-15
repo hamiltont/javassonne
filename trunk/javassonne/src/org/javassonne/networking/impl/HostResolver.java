@@ -76,7 +76,6 @@ public class HostResolver implements Runnable {
 
 	public static RemoteHost attemptToResolveHost(String hostURI) {
 
-
 		synchronized (pendingResolves_) {
 			// If we are already resolving them, do not continue
 			if (pendingResolves_.contains(hostURI)) {
