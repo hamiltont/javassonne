@@ -33,8 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.OverlayLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -45,7 +45,6 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.AvailableNetworkHosts;
 import org.javassonne.model.ConnectedClients;
 import org.javassonne.networking.HostMonitor;
-import org.javassonne.networking.LocalClient;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
@@ -59,16 +58,8 @@ import org.javassonne.ui.DisplayHelper;
 public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		ActionListener, KeyListener, ListSelectionListener, TableModelListener {
 
-	private JPanel main_;
-
-	/**
-	 * Shown when a user is thinking of joining another hosts game
-	 */
+	// Subpanels
 	private JPanel joinGamePanel_;
-
-	/**
-	 * Shown when the user is hosting their own game
-	 */
 	private JPanel hostGamePanel_;
 
 	private JTable availHostsTable_;
@@ -77,9 +68,9 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private JTextArea passwordText_;
 
 	private JTextArea chatArea_;
-	private JTextArea talkArea_;
-	
-	private JTextArea enterIP_;
+	private JTextField chatMessageField_;
+
+	private JTextField ipaddressField_;
 
 	// Action commands for buttons
 	private static String CANCEL = "Cancel";
@@ -89,82 +80,65 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String SET_PASS = "Set_Password";
 	private static String ENTER_IP = "Enter_new_IP";
 
+	private boolean gameHasPassword_ = false;
+
 	public ViewNetworkHostsPanel() {
 		super();
 
 		setBackgroundImagePath("images/multiplayer_lobby_background.jpg");
 		setVisible(true);
-		setLayout(new OverlayLayout(this));
+		setLayout(null);
 		setSize(800, 600);
-		setAlignmentY(CENTER_ALIGNMENT);
-
-		main_ = new JPanel();
-		main_.setOpaque(false);
-		main_.setLayout(null);
-		main_.setAlignmentX(CENTER_ALIGNMENT);
 
 		// Add components to main that should be present for both
 		setupCommonComponents();
 
-		NotificationManager.getInstance()
-				.addObserver(Notification.RECV_GLOBAL_CHAT, this,
-						"receiveGlobalChatMessage");
+		NotificationManager n = NotificationManager.getInstance();
+		n.addObserver(Notification.RECV_GLOBAL_CHAT, this,
+				"receiveGlobalChatMessage");
 
 		setupJoinPanel();
-
 		setupHostPanel();
+
 		hostGamePanel_.setVisible(false);
-
-		// ============================================
-		// Setup Password Panel
-		// ============================================
-
-		main_.add(hostGamePanel_);
-		main_.add(joinGamePanel_);
-
-		add(main_);
 	}
 
 	private void setupCommonComponents() {
-		// ============================================
-		// Setup Main Panel
-		// ============================================
-
 		// Add Buttons that will be present for both
 		// the join game panel, and the host game
-		addButtonToPanel("images/host_cancel.png", CANCEL, new Point(55, 543),
-				main_);
+		addButtonToPanel("images/host_cancel.png", CANCEL, new Point(40, 547),
+				this);
 
 		// Setup the Global chat, which will be available for both host_game and
 		// join_game, and therefore gets added to the main
 		chatArea_ = new JTextArea();
-		JScrollPane chatScroll_ = new JScrollPane(chatArea_);
-		chatScroll_.setLocation(new Point(410, 160));
-		chatScroll_.setSize(350, 300);
 		chatArea_.setEditable(false);
 		chatArea_.setWrapStyleWord(true);
 		chatArea_.setLineWrap(true);
 		chatArea_.setCaretPosition(chatArea_.getDocument().getLength());
-		main_.add(chatScroll_);
+
+		JScrollPane chatScroll_ = new JScrollPane(chatArea_);
+		chatScroll_.setLocation(new Point(40, 363));
+		chatScroll_.setSize(720, 138);
+		add(chatScroll_);
 
 		// Add a chat label
 		JLabel clabel = new JLabel("Global Chat");
-		clabel.setLocation(new Point(415, 130));
-		clabel.setFont(new Font("Serif", Font.BOLD, 16));
-		clabel.setSize(200, 20);
-		main_.add(clabel);
+		clabel.setLocation(new Point(44, 342));
+		clabel.setFont(new Font("Serif", Font.BOLD, 20));
+		clabel.setSize(200, 25);
+		add(clabel);
 
 		// Add a chat text input area
-		talkArea_ = new JTextArea("<Type here to chat to other players>");
-		JScrollPane talkScroll_ = new JScrollPane(talkArea_);
-		talkScroll_.setLocation(new Point(410, 461));
-		talkScroll_.setSize(349, 50);
-		talkArea_.setWrapStyleWord(true);
-		talkArea_.setLineWrap(true);
-		talkArea_.addKeyListener(this);
-		talkArea_.addMouseListener(this);
-		talkArea_.setCaretPosition(talkArea_.getDocument().getLength());
-		main_.add(talkScroll_);
+		chatMessageField_ = new JTextField(
+				"<Type here to chat to other players>");
+		chatMessageField_.addKeyListener(this);
+		chatMessageField_.addMouseListener(this);
+		chatMessageField_.setCaretPosition(chatMessageField_.getDocument()
+				.getLength());
+		chatMessageField_.setLocation(40, 506);
+		chatMessageField_.setSize(720, 33);
+		add(chatMessageField_);
 	}
 
 	/**
@@ -175,9 +149,10 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinGamePanel_ = new JPanel();
 		joinGamePanel_.setOpaque(false);
 		joinGamePanel_.setLayout(null);
-		joinGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
-		joinGamePanel_.setSize(getWidth(), getHeight());
-
+		joinGamePanel_.setSize(720, 220);
+		joinGamePanel_.setLocation(40, 122);
+		add(joinGamePanel_);
+		
 		// Create the hosts table
 		AvailableNetworkHosts tableModel = new AvailableNetworkHosts();
 		availHostsTable_ = new JTable();
@@ -185,44 +160,52 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availHostsTable_.repaint();
 		tableModel.addTableModelListener(this);
-		
-		// Make it scroll able
-		JScrollPane hostsScroll = new JScrollPane(availHostsTable_);
-		hostsScroll.setSize(350, 320);
-		hostsScroll.setLocation(new Point(40, 160));
-		availHostsTable_.setSize(hostsScroll.getWidth(), hostsScroll
-				.getHeight());
-		joinGamePanel_.add(hostsScroll);
+
+		// Make it scrollable
+		JScrollPane availHostsTableContainer = new JScrollPane(availHostsTable_);
+		availHostsTableContainer.setLocation(0, 20);
+		availHostsTableContainer.setSize(720, 150);
+		availHostsTable_.setSize(availHostsTableContainer.getWidth(),
+				availHostsTableContainer.getHeight());
+		joinGamePanel_.add(availHostsTableContainer);
+
+		// Add a label
+		JLabel ipLabel = new JLabel("Add by IP Address:");
+		ipLabel.setLocation(new Point(4, 182));
+		ipLabel.setFont(new Font("Serif", Font.BOLD, 14));
+		ipLabel.setSize(200, 25);
+		joinGamePanel_.add(ipLabel);
 
 		// Add a text area for them to enter in an IP
-		enterIP_ = new JTextArea();
-		enterIP_.setSize(300,30);
-		enterIP_.setLocation(new Point(40,480));
-		enterIP_.setText("<enter an IP you would like to find>");
-		joinGamePanel_.add(enterIP_);
-	
+		ipaddressField_ = new JTextField();
+		ipaddressField_.setSize(202, 30);
+		ipaddressField_.setLocation(126, 179);
+		ipaddressField_.setText("<enter an IP you would like to find>");
+		ipaddressField_.addMouseListener(this);
+		joinGamePanel_.add(ipaddressField_);
+
 		// Add a button for the IP entry
-		JButton setPw_ = new JButton("GO");
-		setPw_.setActionCommand(ENTER_IP);
-		setPw_.addActionListener(this);
-		setPw_.setLocation(new Point(340, 480));
-		setPw_.setSize(75, 30);
-		joinGamePanel_.add(setPw_);
-		
+		JButton ipAddressGo = new JButton("GO");
+		ipAddressGo.setActionCommand(ENTER_IP);
+		ipAddressGo.addActionListener(this);
+		ipAddressGo.setLocation(new Point(320, 179));
+		ipAddressGo.setSize(50, 30);
+		joinGamePanel_.add(ipAddressGo);
+
 		// Add a label
-		JLabel label = new JLabel("Connected Hosts");
-		label.setLocation(new Point(45, 130));
-		label.setFont(new Font("Serif", Font.BOLD, 16));
-		label.setSize(200, 20);
+		JLabel label = new JLabel("Available Players");
+		label.setLocation(new Point(5, 0));
+		label.setFont(new Font("Serif", Font.BOLD, 20));
+		label.setSize(200, 25);
 		joinGamePanel_.add(label);
 
 		// Add the Join game button
 		addButtonToPanel("images/join_game.png", JOIN_GAME,
-				new Point(600, 543), joinGamePanel_);
+				new Point(477, 175), joinGamePanel_);
 
 		// Add the Host game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
-				455, 543), joinGamePanel_);
+				602, 175), joinGamePanel_);
 
 	}
 
@@ -234,57 +217,40 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_ = new JPanel();
 		hostGamePanel_.setOpaque(false);
 		hostGamePanel_.setLayout(null);
-		hostGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
-		hostGamePanel_.setSize(getWidth(), getHeight());
-
+		hostGamePanel_.setSize(720, 220);
+		hostGamePanel_.setLocation(40, 122);
+		add(hostGamePanel_);
+		
 		// Create the hosts table
-		ConnectedClients clients = new ConnectedClients();
+		ConnectedClients provider = new ConnectedClients();
 		connectedClientsTable_ = new JTable();
-		connectedClientsTable_.setModel(clients);
-		connectedClientsTable_
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		connectedClientsTable_.setModel(provider);
+		connectedClientsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		connectedClientsTable_.repaint();
-		clients.addTableModelListener(this);
+		provider.addTableModelListener(this);
 
-		// Make it scroll able
-		JScrollPane connectedScroll = new JScrollPane(connectedClientsTable_);
-		connectedScroll.setSize(350, 200);
-		connectedScroll.setLocation(new Point(40, 160));
-		connectedClientsTable_.setSize(connectedScroll.getWidth(),
-				connectedScroll.getHeight());
-		hostGamePanel_.add(connectedScroll);
+		// Make it scrollable
+		JScrollPane container = new JScrollPane(availHostsTable_);
+		container.setLocation(0, 20);
+		container.setSize(720, 150);
+		availHostsTable_.setSize(container.getWidth(),
+				container.getHeight());
+		hostGamePanel_.add(container);
 
 		// Add a label
-		JLabel label1 = new JLabel("Connected Clients");
-		label1.setLocation(new Point(45, 130));
-		label1.setFont(new Font("Serif", Font.BOLD, 16));
-		label1.setSize(200, 20);
-		hostGamePanel_.add(label1);
+		JLabel label = new JLabel("Players in Game");
+		label.setLocation(new Point(5, 0));
+		label.setFont(new Font("Serif", Font.BOLD, 20));
+		label.setSize(200, 25);
+		hostGamePanel_.add(label);
 
-		JLabel enterPasswordLabel_ = new JLabel();
-		enterPasswordLabel_.setText("Set a password (optional):");
-		enterPasswordLabel_.setSize(266, 20);
-		enterPasswordLabel_.setLocation(75, 370);
-		hostGamePanel_.add(enterPasswordLabel_);
-
-		JButton setPw_ = new JButton(new ImageIcon("images/set_pw.png"));
-		setPw_.addActionListener(this);
-		setPw_.setLocation(new Point(300, 395));
-		setPw_.setSize(75, 30);
-		hostGamePanel_.add(setPw_);
-
-		passwordText_ = new JTextArea();
-		passwordText_.setSize(220,20);
-		passwordText_.setLocation(75, 400);
-		hostGamePanel_.add(passwordText_);
-		
-		// Add some other options
-		// TODO - put game password option here
-		// TODO - put Boot Player button here
-		// Add the back button
+		// Add the cancel game button
 		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(
-				455, 543), hostGamePanel_);
-
+				0, 175), hostGamePanel_);
+		
+		// Add the go button
+		addButtonToPanel("images/join_game.png", JOIN_GAME,
+				new Point(0, 175), hostGamePanel_);
 	}
 
 	private void addButtonToPanel(String imgPath, String notification,
@@ -293,7 +259,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		b.addActionListener(this);
 		b.setActionCommand(notification);
 		b.setLocation(location);
-		b.setSize(128, 48);
+		b.setSize(118, 38);
 		panel.add(b);
 	}
 
@@ -311,15 +277,18 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
-			int selected = connectedClientsTable_.getSelectedRow();
-			// TODO - after ben fixes the update problem, make this dynamic!
-			String hostURI = (String)connectedClientsTable_.getModel().getValueAt(1, 2);
-			LocalClient.connectToHost(hostURI);
+
+			if (gameHasPassword_ == true) {
+				joinGamePanel_.setVisible(false);
+				hostGamePanel_.setVisible(false);
+			} else {
+				// again, join game.
+			}
 		} else if (e.getActionCommand().equals(SET_PASS)) {
 			// Set the password
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
-			HostMonitor.resolveNewHost(enterIP_.getText());
-			
+			HostMonitor.resolveNewHost(ipaddressField_.getText());
+
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
@@ -332,18 +301,19 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void tableChanged(TableModelEvent e) {
-		// We need the checks for != null just in case we have not fully started yet
+		// We need the checks for != null just in case we have not fully started
+		// yet
 		if (joinGamePanel_.isVisible() == true)
 			if (availHostsTable_ != null)
 				availHostsTable_.repaint();
-		else if (connectedClientsTable_ != null)
+			else if (connectedClientsTable_ != null)
 				connectedClientsTable_.repaint();
 	}
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
-			ChatMessage cm = new ChatMessage(talkArea_.getText(), LocalHost
+			ChatMessage cm = new ChatMessage(chatMessageField_.getText(), LocalHost
 					.getName());
 
 			// Send the message for the benefit of everyone else
@@ -351,8 +321,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 					Notification.SEND_GLOBAL_CHAT, cm);
 
 			e.consume();
-			talkArea_.selectAll();
-			talkArea_.replaceSelection("");
+			chatMessageField_.selectAll();
+			chatMessageField_.replaceSelection("");
 		}
 	}
 
@@ -369,10 +339,13 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void mouseClicked(MouseEvent m) {
-		if (talkArea_.getText().equals("<Type here to chat to other players>")) {
-			talkArea_.selectAll();
-			talkArea_.replaceSelection("");
-			talkArea_.removeMouseListener(this);
+		if (m.getSource().getClass() == JTextField.class){
+			JTextField field = (JTextField) m.getSource();
+			if (field.getText().substring(0, 1).equals("<")) {
+				field.selectAll();
+				field.replaceSelection("");
+				field.removeMouseListener(this);
+			}
 		}
 	}
 }
