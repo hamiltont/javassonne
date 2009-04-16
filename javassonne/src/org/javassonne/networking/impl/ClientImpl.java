@@ -117,13 +117,16 @@ public class ClientImpl implements RemoteClient {
 				connectedToHost_.set(false);
 				connectingToHost_.set(true);
 
+				// Save them for later
+				if (host_ == null)
+					host_ = new CachedHost(rh);
+				else
+					synchronized (host_) {
+						host_ = new CachedHost(rh);
+					}
+
 				// Ask them to add us
 				rh.addClient(myURI_);
-
-				// Save them for later
-				synchronized (host_) {
-					host_ = new CachedHost(rh);
-				}
 
 				// Start the timer
 				synchronized (connectionTimer_) {
@@ -136,7 +139,7 @@ public class ClientImpl implements RemoteClient {
 								// TODO - Implement a few more connection
 								// attempts here
 							}
-							
+
 							// Cancel the timer
 							cancel();
 						}
@@ -159,6 +162,7 @@ public class ClientImpl implements RemoteClient {
 
 				// Ask them to remove us
 				rh.removeClient(myURI_);
+				host_ = null;
 
 				// Update our variables
 				connectedToHost_.set(false);
@@ -182,7 +186,7 @@ public class ClientImpl implements RemoteClient {
 	public void receiveNotificationFromHost(String serializedNotification) {
 		if (connectedToHost_.get() == false)
 			return;
-		
+
 		Notification n = (Notification) xStream_
 				.fromXML(serializedNotification);
 
@@ -200,7 +204,7 @@ public class ClientImpl implements RemoteClient {
 	public void sendChatMessageToHost(Notification sendPrivChat) {
 		if (connectedToHost_.get() == false)
 			return;
-		
+
 		ChatMessage cm = (ChatMessage) sendPrivChat.argument();
 
 		LogSender.sendInfo("ClientImpl - Sending message " + cm.getMessage()

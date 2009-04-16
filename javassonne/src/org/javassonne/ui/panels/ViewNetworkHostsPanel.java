@@ -45,6 +45,7 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.AvailableNetworkHosts;
 import org.javassonne.model.ConnectedClients;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.networking.LocalClient;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
@@ -273,9 +274,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
-
-			// TODO: Join game
-
+			int selected = availHostsTable_.getSelectedRow();
+			// TODO - make this dynamic! (once selected works)
+			String hostURI = (String)availHostsTable_.getModel().getValueAt(0, 1);
+			LocalClient.connectToHost(hostURI);
+			
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
 			HostMonitor.resolveNewHost(ipaddressField_.getText());
 
