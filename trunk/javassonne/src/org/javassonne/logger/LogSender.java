@@ -18,6 +18,11 @@
 
 package org.javassonne.logger;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 
@@ -29,9 +34,22 @@ import org.javassonne.messaging.NotificationManager;
  * 
  */
 public class LogSender {
+	private static boolean printLogsDirectedToFile_ = false;
+	private static boolean showInfoLogs = false;
+	
+	private static File logInfo = new File("LogInfo-Javassonne.txt");
+	private static FileWriter output;
+	static {
+		try {
+			output = new FileWriter(logInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void sendInfo(String info) {
-		NotificationManager.getInstance().sendNotification(
+		if (showInfoLogs)
+			NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
 	}
 
@@ -45,5 +63,20 @@ public class LogSender {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_WARNING, warn);
 
+	}
+
+	public static void sendInfoToFile(String info) {
+		try {
+			if (!logInfo.exists())
+				logInfo.createNewFile();
+			
+			output.append(info);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (printLogsDirectedToFile_)
+			sendInfo(info);
 	}
 }

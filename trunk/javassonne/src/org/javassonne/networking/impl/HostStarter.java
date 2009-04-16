@@ -64,8 +64,7 @@ public class HostStarter extends TimerTask {
 			String dup = "HostStarter: Detected that we have a duplicate "
 					+ "name, '" + HostImpl.getInstance().myURI_ + "'";
 			
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, dup);
+			LogSender.sendWarn(dup);
 		
 			// Shutdown any previous service
 			try {
@@ -78,8 +77,7 @@ public class HostStarter extends TimerTask {
 				for (int i = 0; i < e.getStackTrace().length; i++)
 					err += e.getStackTrace()[i] + "\n";
 
-				NotificationManager.getInstance().sendNotification(
-						Notification.LOG_ERROR, err);
+				LogSender.sendErr(err);
 			}
 
 			// Try to re-create our RMI
@@ -100,15 +98,13 @@ public class HostStarter extends TimerTask {
 			for (int i = 0; i < e.getStackTrace().length; i++)
 				err += e.getStackTrace()[i] + "\n";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
+			LogSender.sendErr(err);
 		}
 
 		String info2 = "HostStarter: Clients can connect to: "
 				+ HostImpl.getInstance().myURI_;
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, info2);
+		LogSender.sendInfo(info2);
 
 		// Cancel this timer task
 		cancel();
@@ -127,8 +123,7 @@ public class HostStarter extends TimerTask {
 			for (int i = 0; i < e.getStackTrace().length; i++)
 				err += e.getStackTrace()[i] + "\n";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
+			LogSender.sendErr(err);
 
 		} catch (UnknownHostException e) {
 			String err = "An UnknownHostException occurred when exporting host RMI";
@@ -137,8 +132,7 @@ public class HostStarter extends TimerTask {
 			for (int i = 0; i < e.getStackTrace().length; i++)
 				err += e.getStackTrace()[i] + "\n";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
+			LogSender.sendErr(err);
 		} catch (Exception e) {
 			String err = "Something bad happened internally in RMI";
 			err += "\n" + e.getMessage();
@@ -146,8 +140,7 @@ public class HostStarter extends TimerTask {
 			for (int i = 0; i < e.getStackTrace().length; i++)
 				err += e.getStackTrace()[i] + "\n";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_ERROR, err);
+			LogSender.sendErr(err);
 		}
 		return info;
 	}

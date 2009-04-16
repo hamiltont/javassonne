@@ -34,8 +34,7 @@ public class HostMonitorListener implements ServiceListener {
 	public void serviceAdded(ServiceEvent e) {
 		String info = "HostMonitorListener: Found service " + e.getName();
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, info);
+		LogSender.sendInfo(info);
 
 		// We only care if this is a Javassonne host
 		if (e.getName().contains(HostImpl.SERVICENAME) == false)
@@ -50,8 +49,7 @@ public class HostMonitorListener implements ServiceListener {
 			String info2 = "HostMonitorListener: Determined that service '"
 					+ e.getName() + "' is a duplicate, ignoring";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, info2);
+			LogSender.sendWarn(info2);
 
 			return;
 		}
@@ -61,18 +59,14 @@ public class HostMonitorListener implements ServiceListener {
 		// from the one jmdns is in.
 		// 
 
-		LogSender.sendInfo("HMListener - requesting using thread "
-				+ Thread.currentThread().getName());
 		jmdns_.requestServiceInfo(e.getType(), e.getName(), 1000);
-		LogSender.sendInfo("HMListener - requested");
 	}
 
 	public void serviceRemoved(ServiceEvent e) {
 		String info = "HostMonitorListener: Service '" + e.getName()
 				+ "' removed";
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, info);
+		LogSender.sendInfo(info);
 
 		String name = e.getName();
 		HostMonitor.removeHost(name);
@@ -82,8 +76,7 @@ public class HostMonitorListener implements ServiceListener {
 		String rinfo = "HostMonitorListener: Service '" + e.getName()
 				+ "' resolved";
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, rinfo);
+		LogSender.sendInfo(rinfo);
 
 		// We only care if this is a Javassonne host
 		if (e.getName().contains(HostImpl.SERVICENAME) == false)
@@ -94,8 +87,8 @@ public class HostMonitorListener implements ServiceListener {
 			String sinfo = "HostMonitorListener: Service '" + e.getName()
 					+ "' failed to get info on";
 
-			NotificationManager.getInstance().sendNotification(
-					Notification.LOG_INFO, sinfo);
+			LogSender.sendWarn(sinfo);
+			
 			return;
 		}
 
@@ -105,21 +98,8 @@ public class HostMonitorListener implements ServiceListener {
 		String hinfo = "HostMonitorListener: Service '" + e.getName()
 				+ "' has URI of: " + hostURI;
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.LOG_INFO, hinfo);
+		LogSender.sendInfo(hinfo);
 
 		HostMonitor.resolveNewHost(hostURI);
-	}
-
-	private class ServiceRequestor implements Runnable {
-		private ServiceEvent event_;
-
-		public ServiceRequestor(ServiceEvent e) {
-			event_ = e;
-		}
-
-		public void run() {
-			jmdns_.requestServiceInfo(event_.getType(), event_.getName());
-		}
 	}
 }
