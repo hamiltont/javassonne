@@ -182,7 +182,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinGamePanel_.add(ipaddressField_);
 
 		// Add a button for the IP entry
-		JButton ipAddressGo = new JButton("GO");
+		JButton ipAddressGo = new JButton(new ImageIcon("images/host_add_by_ip.jpg"));
 		ipAddressGo.setActionCommand(ENTER_IP);
 		ipAddressGo.addActionListener(this);
 		ipAddressGo.setLocation(new Point(320, 179));
