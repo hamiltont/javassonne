@@ -224,45 +224,46 @@ public class BoardController {
 
 	public void placeVillager(Notification n) {
 		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
-
-		// the meeple is created in the map layer, because the map layer
-		// has more intimate knowledege of which region the drag ended on.
-		// (It can convert the pixel to the tile, and then to a region)
-		// Region / Quadrant is set. We just set everything else.
-		Meeple m = (Meeple) n.argument();
-
-		if ((currentRegionOptions_.contains(m.getRegionOnTile()))
-				&& (m.getParentTile() == tempPlacedTile_)) {
-
-			// if they've already tried placing a meeple, remove it before
-			// allowing them to place another.
-			if (tempPlacedMeeple_ != null) {
+	
+			// the meeple is created in the map layer, because the map layer
+			// has more intimate knowledege of which region the drag ended on.
+			// (It can convert the pixel to the tile, and then to a region)
+			// Region / Quadrant is set. We just set everything else.
+			Meeple m = (Meeple) n.argument();
+	
+			if ((currentRegionOptions_.contains(m.getRegionOnTile()))
+					&& (m.getParentTile() == tempPlacedTile_)) {
+	
+				// if they've already tried placing a meeple, remove it before
+				// allowing them to place another.
+				if (tempPlacedMeeple_ != null) {
+					NotificationManager.getInstance().sendNotification(
+							Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+				}
+	
+				m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
+	
+				// add the meeple to the tile
+				tempPlacedTile_.setMeeple(m);
+	
+				// add the meeple sprite to the map layer so the guy is visible
+				MeepleColor c = GameState.getInstance().getCurrentPlayer()
+						.getMeepleColor();
+				tempPlacedMeeple_ = new MeepleSprite(m, c);
+	
+				// decrement the player's meeple count
+				GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
+	
+				// tell the scoreboard to update based on the new meeple count
 				NotificationManager.getInstance().sendNotification(
-						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+						Notification.SCORE_UPDATE);
+	
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
+
+				NotificationManager.getInstance().sendNotification(
+						Notification.DRAG_PANEL_RESET);
 			}
-
-			m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
-
-			// add the meeple to the tile
-			tempPlacedTile_.setMeeple(m);
-
-			// add the meeple sprite to the map layer so the guy is visible
-			MeepleColor c = GameState.getInstance().getCurrentPlayer()
-					.getMeepleColor();
-			tempPlacedMeeple_ = new MeepleSprite(m, c);
-
-			// decrement the player's meeple count
-			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-
-			// tell the scoreboard to update based on the new meeple count
-			NotificationManager.getInstance().sendNotification(
-					Notification.SCORE_UPDATE);
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
-		}
-		NotificationManager.getInstance().sendNotification(
-				Notification.DRAG_PANEL_RESET);
 		}
 	}
 
@@ -282,45 +283,46 @@ public class BoardController {
 
 	public void placeFarmer(Notification n) {
 		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
-
-		// the meeple is created in the map layer, because the map layer
-		// has more intimate knowledege of which region the drag ended on.
-		// (It can convert the pixel to the tile, and then to a region)
-		// Region / Quadrant is set. We just set everything else.
-		Meeple m = (Meeple) n.argument();
-
-		if ((currentQuadrantOptions_.contains(m.getQuadrantOnTile()))
-				&& (m.getParentTile() == tempPlacedTile_)) {
-
-			// if they've already tried placing a meeple, remove it before
-			// allowing them to place another.
-			if (tempPlacedMeeple_ != null) {
+		
+			// the meeple is created in the map layer, because the map layer
+			// has more intimate knowledege of which region the drag ended on.
+			// (It can convert the pixel to the tile, and then to a region)
+			// Region / Quadrant is set. We just set everything else.
+			Meeple m = (Meeple) n.argument();
+		
+			if ((currentQuadrantOptions_.contains(m.getQuadrantOnTile()))
+					&& (m.getParentTile() == tempPlacedTile_)) {
+		
+				// if they've already tried placing a meeple, remove it before
+				// allowing them to place another.
+				if (tempPlacedMeeple_ != null) {
+					NotificationManager.getInstance().sendNotification(
+							Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+				}
+		
+				m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
+		
+				// add the meeple to the tile
+				tempPlacedTile_.setMeeple(m);
+		
+				// add the meeple sprite to the map layer so the guy is visible
+				MeepleColor c = GameState.getInstance().getCurrentPlayer()
+						.getMeepleColor();
+				tempPlacedMeeple_ = new MeepleSprite(m, c);
+		
+				// decrement the player's meeple count
+				GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
+		
+				// tell the scoreboard to update based on the new meeple count
 				NotificationManager.getInstance().sendNotification(
-						Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
+						Notification.SCORE_UPDATE);
+		
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
+			
+				NotificationManager.getInstance().sendNotification(
+						Notification.DRAG_PANEL_RESET);
 			}
-
-			m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
-
-			// add the meeple to the tile
-			tempPlacedTile_.setMeeple(m);
-
-			// add the meeple sprite to the map layer so the guy is visible
-			MeepleColor c = GameState.getInstance().getCurrentPlayer()
-					.getMeepleColor();
-			tempPlacedMeeple_ = new MeepleSprite(m, c);
-
-			// decrement the player's meeple count
-			GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-
-			// tell the scoreboard to update based on the new meeple count
-			NotificationManager.getInstance().sendNotification(
-					Notification.SCORE_UPDATE);
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
-		}
-		NotificationManager.getInstance().sendNotification(
-				Notification.DRAG_PANEL_RESET);
 		}
 	}
 

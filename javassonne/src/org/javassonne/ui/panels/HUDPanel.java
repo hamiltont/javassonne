@@ -105,7 +105,8 @@ public class HUDPanel extends AbstractHUDPanel implements ActionListener {
 		
 		if (tilePanel_ == null){
 			tilePanel_ = new DragTilePanel(t);
-			DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));	
+            tilePanel_.setResetLocation(this.getX()+12, this.getY()+9);
+			DisplayHelper.getInstance().add(tilePanel_, DisplayHelper.Layer.DRAG, new Point(this.getX()+12, this.getY()+9));
 		}
 		tilePanel_.setTile(t);
 		

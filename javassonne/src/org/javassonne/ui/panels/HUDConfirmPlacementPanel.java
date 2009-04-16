@@ -84,10 +84,12 @@ public class HUDConfirmPlacementPanel extends AbstractHUDPanel implements
 		// create drag meeple panels
 		placeFarmer_ = new DragMeeplePanel(color_, "farmer");
 		Point location1 = new Point(this.getLocation().x + 50,this.getLocation().y + 16);
+        placeFarmer_.setResetLocation(location1);
 		DisplayHelper.getInstance().add(placeFarmer_, DisplayHelper.Layer.DRAG, location1);
 
 		placeVillager_ = new DragMeeplePanel(color_, "villager");
 		Point location2 = new Point(this.getLocation().x + 255,this.getLocation().y + 16);
+        placeVillager_.setResetLocation(location2);
 		DisplayHelper.getInstance().add(placeVillager_, DisplayHelper.Layer.DRAG, location2);
 	}
 	
