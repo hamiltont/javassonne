@@ -30,7 +30,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -44,7 +43,9 @@ import javax.swing.event.TableModelListener;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.AvailableNetworkHosts;
+import org.javassonne.model.ConnectedClients;
 import org.javassonne.networking.HostMonitor;
+import org.javassonne.networking.LocalClient;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
@@ -71,7 +72,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private JPanel hostGamePanel_;
 
 	private JTable availHostsTable_;
-	private JTable connectedHostsTable_;
+	private JTable connectedClientsTable_;
 
 	private JTextArea passwordText_;
 
@@ -87,8 +88,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String JOIN_GAME = "Join_Game";
 	private static String SET_PASS = "Set_Password";
 	private static String ENTER_IP = "Enter_new_IP";
-
-	private boolean gameHasPassword_ = false;
 
 	public ViewNetworkHostsPanel() {
 		super();
@@ -238,21 +237,20 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.setAlignmentX(CENTER_ALIGNMENT);
 		hostGamePanel_.setSize(getWidth(), getHeight());
 
-		// TODO - create a model for the HostGame
 		// Create the hosts table
-		AvailableNetworkHosts change_me = new AvailableNetworkHosts();
-		connectedHostsTable_ = new JTable();
-		connectedHostsTable_.setModel(change_me);
-		connectedHostsTable_
+		ConnectedClients clients = new ConnectedClients();
+		connectedClientsTable_ = new JTable();
+		connectedClientsTable_.setModel(clients);
+		connectedClientsTable_
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		connectedHostsTable_.repaint();
-		change_me.addTableModelListener(this);
+		connectedClientsTable_.repaint();
+		clients.addTableModelListener(this);
 
 		// Make it scroll able
-		JScrollPane connectedScroll = new JScrollPane(connectedHostsTable_);
+		JScrollPane connectedScroll = new JScrollPane(connectedClientsTable_);
 		connectedScroll.setSize(350, 200);
 		connectedScroll.setLocation(new Point(40, 160));
-		connectedHostsTable_.setSize(connectedScroll.getWidth(),
+		connectedClientsTable_.setSize(connectedScroll.getWidth(),
 				connectedScroll.getHeight());
 		hostGamePanel_.add(connectedScroll);
 
@@ -313,19 +311,10 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
-
-			if (gameHasPassword_ == true) {
-				joinGamePanel_.setVisible(false);
-				hostGamePanel_.setVisible(false);
-				// pwMain_.setVisible(true);
-				// if
-				// (pwBoxJoin_.getPassword().toString().equals(this.password_))
-				// {
-				// join game
-				// }
-			} else {
-				// again, join game.
-			}
+			int selected = connectedClientsTable_.getSelectedRow();
+			// TODO - after ben fixes the update problem, make this dynamic!
+			String hostURI = (String)connectedClientsTable_.getModel().getValueAt(1, 2);
+			LocalClient.connectToHost(hostURI);
 		} else if (e.getActionCommand().equals(SET_PASS)) {
 			// Set the password
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
@@ -347,8 +336,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		if (joinGamePanel_.isVisible() == true)
 			if (availHostsTable_ != null)
 				availHostsTable_.repaint();
-		else if (connectedHostsTable_ != null)
-				connectedHostsTable_.repaint();
+		else if (connectedClientsTable_ != null)
+				connectedClientsTable_.repaint();
 	}
 
 	public void keyPressed(KeyEvent e) {

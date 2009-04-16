@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 
 import org.javassonne.logger.LogSender;
@@ -141,6 +142,12 @@ public class HostImpl implements RemoteHost {
 	// URI we should have
 	public String getURI() {
 		return myURI_;
+	}
+	
+	public List<CachedClient> getConnectedClients() {
+		synchronized (connectedClients_) {
+			return connectedClients_;
+		}
 	}
 
 	/**

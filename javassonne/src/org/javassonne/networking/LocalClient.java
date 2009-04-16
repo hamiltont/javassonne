@@ -42,5 +42,9 @@ public class LocalClient  {
 	public static void receiveNotificationFromHost(String serializedNotification) {
 		ClientImpl.getInstance().receiveNotificationFromHost(serializedNotification);
 	}
+	
+	public static void connectToHost(String hostURI){
+		ClientImpl.getInstance().connectToHost(hostURI);
+	}
 
 }

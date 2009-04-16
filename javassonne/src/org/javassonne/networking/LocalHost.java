@@ -18,6 +18,9 @@
 
 package org.javassonne.networking;
 
+import java.util.List;
+
+import org.javassonne.networking.impl.CachedClient;
 import org.javassonne.networking.impl.HostImpl;
 import org.javassonne.ui.GameState.Mode;
 
@@ -29,13 +32,6 @@ import org.javassonne.ui.GameState.Mode;
  * @author Hamilton Turner
  */
 public class LocalHost {
-
-	/**
-	 * @ see org.javassonne.networking.impl.RemoteHost
-	 */
-	public static void addClient(String clientURI) {
-		HostImpl.getInstance().addClient(clientURI);
-	}
 
 	/**
 	 * @ see org.javassonne.networking.impl.RemoteHost
@@ -65,5 +61,9 @@ public class LocalHost {
 			String clientURI) {
 		HostImpl.getInstance().receiveNotificationFromClient(
 				serializedNotification, clientURI);
+	}
+	
+	public static List<CachedClient> getConnectedClients() {
+		return HostImpl.getInstance().getConnectedClients();
 	}
 }

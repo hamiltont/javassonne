@@ -49,8 +49,8 @@ public class ClientImpl implements RemoteClient {
 	private static ClientImpl instance_ = null;
 
 	private ClientImpl() {
-		connectedToHost_.set(false);
-		connectingToHost_.set(false);
+		connectedToHost_ = new AtomicBoolean(false);
+		connectingToHost_ = new AtomicBoolean(false);
 		host_ = null;
 		myURI_ = null;
 		connectionTimer_ = new Timer("Client Connection Timer", true);
