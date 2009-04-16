@@ -60,6 +60,7 @@ public class GameState {
 	// Singelton implementation
 	// --------------------------------------------------------
 	protected GameState() {
+		mode_ = Mode.WAITING;
 	}
 
 	// Provide access to singleton

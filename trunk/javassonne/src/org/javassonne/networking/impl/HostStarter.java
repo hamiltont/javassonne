@@ -120,7 +120,6 @@ public class HostStarter extends TimerTask {
 			info = RemotingUtils.exportRMIService(HostImpl.getInstance(),
 					RemoteHost.class, RemoteHost.SERVICENAME + "_"
 							+ HostImpl.getInstance().rmiSafeName_);
-			LogSender.sendInfo("HS - Done exporting");
 		} catch (RemoteException e) {
 			String err = "A RemoteException occurred when exporting host RMI";
 			err += "\n" + e.getMessage();
