@@ -94,20 +94,20 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 
 		// add the labels to labels_ panel
 		int offset = 165;
-		addLabelToPanel(new Point(200, 0+offset), "Player 1", labels_);
-		addLabelToPanel(new Point(200, 45+offset), "Player 2", labels_);
-		addLabelToPanel(new Point(200, 90+offset), "Player 3", labels_);
-		addLabelToPanel(new Point(200, 135+offset), "Player 4", labels_);
-		addLabelToPanel(new Point(200, 180+offset), "Player 5", labels_);
-		addLabelToPanel(new Point(200, 225+offset), "Player 6", labels_);
+		addLabelToPanel(new Point(200, 0 + offset), "Player 1", labels_);
+		addLabelToPanel(new Point(200, 45 + offset), "Player 2", labels_);
+		addLabelToPanel(new Point(200, 90 + offset), "Player 3", labels_);
+		addLabelToPanel(new Point(200, 135 + offset), "Player 4", labels_);
+		addLabelToPanel(new Point(200, 180 + offset), "Player 5", labels_);
+		addLabelToPanel(new Point(200, 225 + offset), "Player 6", labels_);
 
 		// add text boxes to the textFields_ panel
-		addTextBoxToPanel(new Point(255, 0+offset), textFields_);
-		addTextBoxToPanel(new Point(255, 45+offset), textFields_);
-		addTextBoxToPanel(new Point(255, 90+offset), textFields_);
-		addTextBoxToPanel(new Point(255, 135+offset), textFields_);
-		addTextBoxToPanel(new Point(255, 180+offset), textFields_);
-		addTextBoxToPanel(new Point(255, 225+offset), textFields_);
+		addTextBoxToPanel(new Point(255, 0 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 45 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 90 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 135 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 180 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 225 + offset), textFields_);
 
 		// place MeepleColors into ImageIcon array
 		ImageIcon[] colors = new ImageIcon[MeepleColor.values().length];
@@ -118,12 +118,12 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		}
 
 		// add combo boxes to comboBoxes_ panel
-		addComboBoxToPanel(new Point(545, 0+offset), colors, 0, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 45+offset), colors, 1, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 90+offset), colors, 2, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 135+offset), colors, 3, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 180+offset), colors, 4, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 225+offset), colors, 5, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 0 + offset), colors, 0, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 45 + offset), colors, 1, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 90 + offset), colors, 2, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 135 + offset), colors, 3, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 180 + offset), colors, 4, comboBoxes_);
+		addComboBoxToPanel(new Point(545, 225 + offset), colors, 5, comboBoxes_);
 
 		// add panels
 		add(textFields_);
@@ -164,7 +164,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		comboBox.setLocation(location);
 		// determine whether we need to fake full screen.
 		comboBox.setSize(50, 38);
-		
+
 		try {
 			String os = System.getProperty("os.name");
 			if (os.equals("Mac OS X"))
@@ -175,6 +175,8 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		panel.add(comboBox);
 	}
 
+	// This function does return empty text too, so other methods that use
+	// getPlayerNames() need to take that into consideration
 	public List<String> getPlayerNames() {
 		List<String> list = new ArrayList<String>();
 
@@ -183,7 +185,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		for (Component c : textFields_.getComponents()) {
 			list.add(((JTextField) c).getText());
 		}
-		// TODO: Does this return empty text too?
+
 		return list;
 	}
 
@@ -193,7 +195,11 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		// for each Component/JComboBox in comboBoxes add the color selected to
 		// the list
 		for (Component c : comboBoxes_.getComponents()) {
-			list.add(MeepleColor.values()[((JComboBox) c).getSelectedIndex()]);
+			if (getPlayerNames().get(((JComboBox) c).getSelectedIndex())
+					.length() > 0) {
+				list.add(MeepleColor.values()[((JComboBox) c)
+						.getSelectedIndex()]);
+			}
 		}
 
 		return list;
@@ -211,15 +217,17 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			// see if the input in the panel is valid:
 			if (!validatePlayerNames()) {
 				// Play error sound and initialize sound monitor
-				NotificationManager.getInstance().sendNotification(Notification.ERROR);
-				
+				NotificationManager.getInstance().sendNotification(
+						Notification.ERROR);
+
 				JPopUp warning = new JPopUp(
 						"At least two player names must be entered");
 				warning.showMsg();
 			} else if (!validateColors()) {
 				// Play error sound and initialize sound monitor
-				NotificationManager.getInstance().sendNotification(Notification.ERROR);
-				
+				NotificationManager.getInstance().sendNotification(
+						Notification.ERROR);
+
 				JPopUp warning = new JPopUp(
 						"Each player must have a unique color");
 				warning.showMsg();
@@ -233,8 +241,9 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		}
 	}
-	
 
+	// Checks to see if there are at least two player names provided
+	// by the user
 	public boolean validatePlayerNames() {
 		List<String> names = this.getPlayerNames();
 		int playerCount = 0;
@@ -252,13 +261,15 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		return true;
 	}
 
+	// Checks to see if the user provided a unique color for each player name
+	// provided
 	public boolean validateColors() {
 		int playerCount = 0;
 		List<MeepleColor> colors = this.getPlayerColors();
 		List<MeepleColor> temp = colors;
 
 		for (String s : getPlayerNames()) {
-			if (s.length() > 0 || playerCount < 2) {
+			if (s.length() > 0) {
 				playerCount++;
 			}
 		}
@@ -279,10 +290,8 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	}
 
 	// This function used to be in the GameController, but since the
-	// InputPlayerDataPanel
-	// has direct access to the information, it makes more sense for the logic
-	// of
-	// creating Player objects to happen here.
+	// InputPlayerDataPanel has direct access to the information, it makes
+	// more sense for the logic of creating Player objects to happen here.
 	public ArrayList<Player> getPlayers() {
 		ArrayList<Player> players_ = new ArrayList<Player>();
 
