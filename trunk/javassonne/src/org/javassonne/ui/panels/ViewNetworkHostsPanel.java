@@ -106,6 +106,13 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// the join game panel, and the host game
 		addButtonToPanel("images/host_cancel.png", CANCEL, new Point(40, 547),
 				this);
+		
+		// Add your IP address
+		JLabel ipAddy = new JLabel(LocalHost.getURI());
+		ipAddy.setLocation(new Point(200, 557));
+		ipAddy.setFont(new Font("Serif", Font.BOLD, 12));
+		ipAddy.setSize(500, 25);
+		add(ipAddy);
 
 		// Setup the Global chat, which will be available for both host_game and
 		// join_game, and therefore gets added to the main
