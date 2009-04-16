@@ -62,25 +62,22 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private JPanel joinGamePanel_;
 	private JPanel hostGamePanel_;
 
+	// Tables
 	private JTable availHostsTable_;
 	private JTable connectedClientsTable_;
 
-	private JTextArea passwordText_;
-
+	// Fields
 	private JTextArea chatArea_;
 	private JTextField chatMessageField_;
-
 	private JTextField ipaddressField_;
 
 	// Action commands for buttons
 	private static String CANCEL = "Cancel";
-	private static String SHOW_JOIN_PANEL = "Back";
+	private static String SHOW_JOIN_PANEL = "Cancel_Host_Game";
 	private static String SHOW_HOST_PANEL = "Host_Game";
 	private static String JOIN_GAME = "Join_Game";
-	private static String SET_PASS = "Set_Password";
+	private static String START_GAME = "Start_Game";
 	private static String ENTER_IP = "Enter_new_IP";
-
-	private boolean gameHasPassword_ = false;
 
 	public ViewNetworkHostsPanel() {
 		super();
@@ -200,13 +197,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinGamePanel_.add(label);
 
 		// Add the Join game button
-		addButtonToPanel("images/join_game.png", JOIN_GAME,
+		addButtonToPanel("images/join_game.jpg", JOIN_GAME,
 				new Point(477, 175), joinGamePanel_);
 
 		// Add the Host game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
 				602, 175), joinGamePanel_);
-
 	}
 
 	/**
@@ -230,7 +226,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		provider.addTableModelListener(this);
 
 		// Make it scrollable
-		JScrollPane container = new JScrollPane(availHostsTable_);
+		JScrollPane container = new JScrollPane(connectedClientsTable_);
 		container.setLocation(0, 20);
 		container.setSize(720, 150);
 		availHostsTable_.setSize(container.getWidth(),
@@ -249,7 +245,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 				0, 175), hostGamePanel_);
 		
 		// Add the go button
-		addButtonToPanel("images/join_game.png", JOIN_GAME,
+		addButtonToPanel("images/host_start_game.png", START_GAME,
 				new Point(0, 175), hostGamePanel_);
 	}
 
@@ -278,14 +274,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 
-			if (gameHasPassword_ == true) {
-				joinGamePanel_.setVisible(false);
-				hostGamePanel_.setVisible(false);
-			} else {
-				// again, join game.
-			}
-		} else if (e.getActionCommand().equals(SET_PASS)) {
-			// Set the password
+			// TODO: Join game
+
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
 			HostMonitor.resolveNewHost(ipaddressField_.getText());
 
