@@ -61,7 +61,7 @@ public class HostMonitorListener implements ServiceListener {
 		// from the one jmdns is in.
 		// 
 
-		LogSender.sendInfo("HMListener - requesting using Thread "
+		LogSender.sendInfo("HMListener - requesting using thread "
 				+ Thread.currentThread().getName());
 		jmdns_.requestServiceInfo(e.getType(), e.getName());
 		LogSender.sendInfo("HMListener - requested");

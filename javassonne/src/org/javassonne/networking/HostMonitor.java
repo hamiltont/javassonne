@@ -63,9 +63,11 @@ public class HostMonitor {
 	private HostMonitor() {
 		// Using service discovery service
 		JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
-		jmdns_
-				.addServiceListener("_rmi._tcp.local.",
-						new HostMonitorListener());
+		HostMonitorListener hml = new HostMonitorListener();
+		LogSender.sendInfo("HostMonitor - Created HML in thread "
+				+ Thread.currentThread().getName());
+
+		jmdns_.addServiceListener("_rmi._tcp.local.", hml);
 
 		cachedHosts_ = new ArrayList<CachedHost>();
 		pendingHosts_ = new HashMap<String, CachedHost>();
