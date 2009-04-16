@@ -54,8 +54,6 @@ public class JmDNSSingleton {
 			}
 		}
 
-		LogSender.sendInfo("Thread '" + Thread.currentThread().getName()
-				+ "' is accessing JmDNS");
 		return jmdns_;
 	}
 }
