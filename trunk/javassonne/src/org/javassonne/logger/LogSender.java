@@ -18,7 +18,6 @@
 
 package org.javassonne.logger;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,7 +55,6 @@ public class LogSender {
 	public static void sendErr(String err) {
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_ERROR, err);
-
 	}
 
 	public static void sendWarn(String warn) {
