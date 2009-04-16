@@ -30,7 +30,7 @@ import org.javassonne.networking.HostMonitor;
 
 public class HostMonitorListener implements ServiceListener {
 	private static JmDNS jmdns_ = JmDNSSingleton.getJmDNS();
-	
+
 	public void serviceAdded(ServiceEvent e) {
 		String info = "HostMonitorListener: Found service " + e.getName();
 
@@ -56,13 +56,15 @@ public class HostMonitorListener implements ServiceListener {
 			return;
 		}
 
-		// because Service requestor calls on JmDNS, we need to 
+		// because Service requestor calls on JmDNS, we need to
 		// ensure that the servicerequestor is run in a different thread
-		// from the one jmdns is in. 
+		// from the one jmdns is in.
 		// 
-		
-		Thread t = new Thread(new ServiceRequestor(e), "ServiceRequestor");
-		t.run();
+
+		LogSender.sendInfo("HMListener - requesting using Thread "
+				+ Thread.currentThread().getName());
+		jmdns_.requestServiceInfo(e.getType(), e.getName());
+		LogSender.sendInfo("HMListener - requested");
 	}
 
 	public void serviceRemoved(ServiceEvent e) {
@@ -71,7 +73,7 @@ public class HostMonitorListener implements ServiceListener {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, info);
-		
+
 		String name = e.getName();
 		HostMonitor.removeHost(name);
 	}
@@ -105,10 +107,10 @@ public class HostMonitorListener implements ServiceListener {
 
 		NotificationManager.getInstance().sendNotification(
 				Notification.LOG_INFO, hinfo);
- 
+
 		HostMonitor.resolveNewHost(hostURI);
 	}
-	
+
 	private class ServiceRequestor implements Runnable {
 		private ServiceEvent event_;
 
@@ -117,8 +119,7 @@ public class HostMonitorListener implements ServiceListener {
 		}
 
 		public void run() {
-			jmdns_.requestServiceInfo(event_.getType(),
-					event_.getName());
+			jmdns_.requestServiceInfo(event_.getType(), event_.getName());
 		}
 	}
 }
