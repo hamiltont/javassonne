@@ -211,15 +211,18 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 			// see if the input in the panel is valid:
 			if (!validatePlayerNames()) {
 				// Play error sound and initialize sound monitor
+				NotificationManager.getInstance().sendNotification(Notification.ERROR);
+				
 				JPopUp warning = new JPopUp(
 						"At least two player names must be entered");
 				warning.showMsg();
-				NotificationManager.getInstance().sendNotification(Notification.ERROR);
 			} else if (!validateColors()) {
+				// Play error sound and initialize sound monitor
+				NotificationManager.getInstance().sendNotification(Notification.ERROR);
+				
 				JPopUp warning = new JPopUp(
 						"Each player must have a unique color");
 				warning.showMsg();
-				NotificationManager.getInstance().sendNotification(Notification.ERROR);
 			} else {
 				NotificationManager.getInstance().sendNotification(
 						e.getActionCommand(), this);
@@ -287,11 +290,6 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		for (String s : this.getPlayerNames()) {
 			if (s.length() > 0) {
 				Player player = new Player(s);
-				player.setMeepleColor(getPlayerColors().get(playerCount));
-				players_.add(player);
-				playerCount++;
-			} else if (playerCount < 2) {
-				Player player = new Player();
 				player.setMeepleColor(getPlayerColors().get(playerCount));
 				players_.add(player);
 				playerCount++;
