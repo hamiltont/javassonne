@@ -117,11 +117,8 @@ public class HostMonitorListener implements ServiceListener {
 		}
 
 		public void run() {
-			LogSender.sendInfo("ServiceRequstor - entered by " + Thread.currentThread().getName());
-			
 			jmdns_.requestServiceInfo(event_.getType(),
 					event_.getName());
-			LogSender.sendInfo("ServiceRequstor - exited by " + Thread.currentThread().getName());
 		}
 	}
 }
