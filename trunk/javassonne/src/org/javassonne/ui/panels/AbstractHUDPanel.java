@@ -54,7 +54,7 @@ MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	private BufferedImage backgroundOriginal_ = null;
 	private BufferedImage background_ = null;
-	private Timer timer_;
+	private Timer animationTimer_;
 	private float alpha_ = 1.0f;
 
 	private boolean scaleToFit_ = true;
@@ -196,17 +196,22 @@ MouseMotionListener {
 
 	}
 
+	public void setResetLocation(Point l) {
+		System.out.println(String.format("reset location set %d,%d", l.x, l.y));
+		resetLocation_ = l;
+	}
+	
+	public void setResetLocation(int x, int y) {
+		System.out.println("reset location set");
+		resetLocation_ = new Point(x,y);
+	}
+
 	public void mousePressed(MouseEvent e) {
 		if ((respondToClick_) && (draggable_)) {
-			if (resetTimer_ != null)
-				resetTimer_.cancel();
-			if (resetLocation_ == null) 
-				resetLocation_ = this.getLocation();
 			repaint();
-
 			if (dragStartNotification_ != null)
 				NotificationManager.getInstance().sendNotification(
-					dragStartNotification_);
+						dragStartNotification_);
 		}
 	}
 
@@ -238,30 +243,33 @@ MouseMotionListener {
 	public void close() {
 		NotificationManager.getInstance().removeObserver(this);
 		DisplayHelper.getInstance().remove(this);
-		if (timer_ != null)
-			timer_.cancel();
+		if (animationTimer_ != null)
+			animationTimer_.cancel();
 	}
 
 	public void fadeOut() {
-		if (timer_ != null)
-			timer_.cancel();
-		timer_ = new Timer();
-		timer_.schedule(new FadeTimer(-0.05f), 0, 20);
+		if (animationTimer_ != null)
+			animationTimer_.cancel();
+		animationTimer_ = new Timer();
+		animationTimer_.schedule(new FadeTimer(-0.05f), 0, 20);
 	}
 
 	public void fadeIn() {
 		setBackgroundAlpha(0.0f);
-		if (timer_ != null)
-			timer_.cancel();
-		timer_ = new Timer();
-		timer_.schedule(new FadeTimer(0.05f), 0, 20);
+		if (animationTimer_ != null)
+			animationTimer_.cancel();
+		animationTimer_ = new Timer();
+		animationTimer_.schedule(new FadeTimer(0.05f), 0, 20);
 	}
 
 	public void resetDrag() {
-		if (resetLocation_ != null) setLocation(resetLocation_);
+		if (resetLocation_!= null) setLocation(resetLocation_);
 		setBackgroundAlpha(1.0f);
-		if (resetTimer_ != null) resetTimer_.cancel();
 		respondToClick_ = true;
+		if (resetTimer_ != null){
+			resetTimer_.cancel();
+			resetTimer_ = null;
+		}
 	}
 	
 	// TIMERS
@@ -307,7 +315,7 @@ MouseMotionListener {
 			// if we are now in the starting location, make us opaque again and
 			// stop the timer from firing. Also set the location to the exact
 			// one, just in case.
-			if (x <= resetLocation_.x || y <= resetLocation_.y) {
+			if (Math.abs(x - resetLocation_.x) < 20.0 || Math.abs(y - resetLocation_.y) < 20.0) {
 				resetDrag();
 			}
 		}
