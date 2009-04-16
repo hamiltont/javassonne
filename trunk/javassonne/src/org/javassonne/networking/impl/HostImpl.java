@@ -98,7 +98,7 @@ public class HostImpl implements RemoteHost {
 					c.addClientNAK();
 
 					LogSender.sendInfo("HostImpl: Client '" + clientURI
-							+ "' refused");
+							+ "' refused, we were not in WAITING mode");
 				}
 
 			});
@@ -113,7 +113,8 @@ public class HostImpl implements RemoteHost {
 			// Add them to our list
 			CachedClient cc = new CachedClient(c);
 			synchronized (connectedClients_) {
-				connectedClients_.add(cc);
+				if (isClientConnected(clientURI) == false)
+					connectedClients_.add(cc);
 			}
 
 			LogSender.sendInfo("HostImpl: Client '" + cc.getName()
