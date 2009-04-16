@@ -181,12 +181,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 		// Create the hosts table
 		AvailableNetworkHosts tableModel = new AvailableNetworkHosts();
-		tableModel.addTableModelListener(this);
 		availHostsTable_ = new JTable();
 		availHostsTable_.setModel(tableModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availHostsTable_.repaint();
-
+		tableModel.addTableModelListener(this);
+		
 		// Make it scroll able
 		JScrollPane hostsScroll = new JScrollPane(availHostsTable_);
 		hostsScroll.setSize(350, 320);
@@ -241,13 +241,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// TODO - create a model for the HostGame
 		// Create the hosts table
 		AvailableNetworkHosts change_me = new AvailableNetworkHosts();
-		change_me.addTableModelListener(this);
 		connectedHostsTable_ = new JTable();
 		connectedHostsTable_.setModel(change_me);
 		connectedHostsTable_
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		connectedHostsTable_.repaint();
-		// hosts_table_.setSize(600, 360);
+		change_me.addTableModelListener(this);
 
 		// Make it scroll able
 		JScrollPane connectedScroll = new JScrollPane(connectedHostsTable_);
@@ -344,10 +343,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void tableChanged(TableModelEvent e) {
+		// We need the checks for != null just in case we have not fully started yet
 		if (joinGamePanel_.isVisible() == true)
-			availHostsTable_.repaint();
-		else
-			connectedHostsTable_.repaint();
+			if (availHostsTable_ != null)
+				availHostsTable_.repaint();
+		else if (connectedHostsTable_ != null)
+				connectedHostsTable_.repaint();
 	}
 
 	public void keyPressed(KeyEvent e) {

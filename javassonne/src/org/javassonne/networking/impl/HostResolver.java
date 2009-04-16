@@ -102,6 +102,9 @@ public class HostResolver implements Runnable {
 			pendingResolves_.remove(hostURI);
 		}
 
+		if (h == null)
+			HostMonitor.removeHost(hostURI);
+		
 		return h;
 
 	}

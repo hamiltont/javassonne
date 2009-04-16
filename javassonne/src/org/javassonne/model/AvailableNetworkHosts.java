@@ -122,12 +122,9 @@ public class AvailableNetworkHosts extends TimerTask implements TableModel {
 
 	private void updateData() {
 		synchronized (tableData_) {
-			if (tableData_.equals(HostMonitor.getHosts()) == false) {
-
-				tableData_ = HostMonitor.getHosts();
-				notifyListeners();
-			}
+			tableData_ = HostMonitor.getHosts();
 		}
+		notifyListeners();
 	}
 
 	private void notifyListeners() {

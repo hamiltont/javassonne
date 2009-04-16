@@ -318,19 +318,22 @@ public class HostMonitor {
 	 * 
 	 * @param name
 	 */
-	public static void removeHost(String name) {
-		getInstance()._removeHost(name);
+	public static void removeHost(String uriOrName) {
+		getInstance()._removeHost(uriOrName);
 	}
 
-	private void _removeHost(String name) {
-		LogSender.sendInfo("HostMonitor: removeHost: Host '" + name
-				+ "' removed");
-
+	private void _removeHost(String uriOrName) {
 		for (Iterator<CachedHost> it = cachedHosts_.iterator(); it.hasNext();) {
 			CachedHost next = it.next();
 			// TODO - change to name.equals(JavassonneHost_ + next.getName() )
 			// and verify
-			if (name.contains(next.getName())) {
+
+
+			if (uriOrName.equals(next.getURI())
+					|| uriOrName.equals(next.getName())) {
+				LogSender.sendInfo("HostMonitor: removeHost: Host '"
+						+ uriOrName + "' removed");
+
 				synchronized (pendingHosts_) {
 					pendingHosts_.remove(next.getURI());
 				}
