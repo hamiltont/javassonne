@@ -28,9 +28,16 @@ import org.javassonne.ui.controls.JScrollablePicture;
 public class JSplashScreen extends JFrame {
 
 	private static final String SPLASH_IMAGE = "images/menu_background.jpg";
-
+	private static final String ICON_IMAGE = "images/icon.png";
+	
 	public JSplashScreen() {
 		super("Javassonne");
+		
+		//Set Program Icon
+		ImageIcon icon = new ImageIcon(ICON_IMAGE);
+		setIconImage(icon.getImage());
+		
+		//Load the splash screen image
 		ImageIcon img = new ImageIcon(SPLASH_IMAGE);
 		setUndecorated(true);
 
