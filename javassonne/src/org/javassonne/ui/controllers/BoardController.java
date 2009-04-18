@@ -59,6 +59,8 @@ public class BoardController {
 
 	List<Tile.Region> currentRegionOptions_;
 	List<Tile.Quadrant> currentQuadrantOptions_;
+	
+	private static int spin_count_ = 0;  // Holds the auto-rotation tries
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -195,6 +197,14 @@ public class BoardController {
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_ADD_SPRITE, tempPlacementSprite_);
+				}else{
+					// Auto-rotate to see if other rotations are valid
+					if(spin_count_ <= 3){
+						spin_count_++;
+						NotificationManager.getInstance().sendNotification(Notification.TILE_ROTATE_RIGHT);
+						placeTile(n);
+					}
+					spin_count_=0;
 				}
 
 			} catch (BoardPositionFilledException ex) {
