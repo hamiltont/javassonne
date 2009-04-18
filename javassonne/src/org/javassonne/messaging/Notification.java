@@ -65,6 +65,9 @@ public class Notification {
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String TOGGLE_INSTRUCTIONS = "NotificationToggleInstructions";
 	
+	// Used to signal that the mode we are in updated
+	public static final String GAME_MODE_CHANGED = "GameModeChanged";
+	
 	public static final String UPDATED_DECK = "NotificationUpdatedDeck";
 	public static final String UPDATED_BOARD = "NotificationUpdatedBoard";
 	public static final String UPDATED_PLAYER_DATA = "NotificationUpdatedPlayerData";

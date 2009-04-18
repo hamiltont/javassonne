@@ -77,7 +77,7 @@ public class GameState {
 	public void startGameWithPlayers(ArrayList<Player> players) {
 		// Update our mode
 		setMode(Mode.PLAYING_GAME);
-		
+
 		players_ = players;
 		currentPlayer_ = 0;
 		gameInProgress_ = true;
@@ -87,7 +87,7 @@ public class GameState {
 	public void resetGameState() {
 		// Update our mode
 		setMode(Mode.IN_LOBBY);
-		
+
 		board_ = null;
 		deck_ = null;
 		tileInHand_ = null;
@@ -164,18 +164,17 @@ public class GameState {
 	}
 
 	public void setGlobalMeepleSet(List<Meeple> list) {
-		globalMeepleSet_ = list;		
+		globalMeepleSet_ = list;
 	}
 
 	public void addMeepleToGlobalMeepleSet(Meeple meeple) {
 		globalMeepleSet_.add(meeple);
-		
+
 	}
 
 	public void removeMeepleFromGlobalMeepleSet(Meeple meeple) {
-        globalMeepleSet_.remove(meeple);
+		globalMeepleSet_.remove(meeple);
 	}
-
 
 	public ArrayList<Player> getPlayers() {
 		return players_;
@@ -204,6 +203,9 @@ public class GameState {
 	}
 
 	public void setMode(Mode m) {
+		if (m != mode_)
+			NotificationManager.getInstance().sendNotification(
+					Notification.GAME_MODE_CHANGED);
 		mode_ = m;
 	}
 
