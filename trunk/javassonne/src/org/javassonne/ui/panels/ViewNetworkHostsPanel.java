@@ -179,8 +179,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		        if (lsm.isSelectionEmpty()) {
 		            //no rows are selected
 		        } else {
-		            int selectedRow = lsm.getMinSelectionIndex();
-		    		if (!tableModel.getValueAt(selectedRow, 2).equals(GameState.Mode.WAITING.text))
+		        	int s = lsm.getMinSelectionIndex();
+		    		if (!tableModel.getValueAt(s, 2).equals(GameState.Mode.WAITING.text))
 		    			availHostsTable_.clearSelection();	
 		        }
 		    }
@@ -273,12 +273,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.add(label);
 
 		// Add the cancel game button
-		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(
-				0, 175), hostGamePanel_);
+		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, 
+				new Point(0, 175), hostGamePanel_);
 		
 		// Add the go button
-		addButtonToPanel("images/host_start_game.png", START_GAME,
-				new Point(0, 175), hostGamePanel_);
+		addButtonToPanel("images/host_start_game.jpg", START_GAME,
+				new Point(602, 175), hostGamePanel_);
 	}
 
 	private void addButtonToPanel(String imgPath, String notification,
@@ -326,8 +326,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	public void tableChanged(TableModelEvent e) {
@@ -338,13 +337,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			current = availHostsTable_;
 		else
 			current = connectedClientsTable_;
-		
-		int selection = current.getSelectedRow();
-		if (selection != -1){
-			current.clearSelection();
-			current.setRowSelectionInterval(selection, selection);
-		}
-
 	}
 
 	public void keyPressed(KeyEvent e) {
