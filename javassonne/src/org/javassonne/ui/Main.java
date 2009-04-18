@@ -32,7 +32,7 @@ import org.javassonne.ui.panels.LogPanel;
 
 public class Main {
 
-	public static void main(String args[]) {
+	public static void main(String args[]) {		
 		// Create our LogWatcher
 		LogWatcher lw = new LogWatcher();
 
@@ -45,7 +45,11 @@ public class Main {
 		// create the application controller. This will handle starting a new
 		// game, etc...
 		GameController controller = new GameController();
-
+		
+		// Splash Screen
+		JSplashScreen splash = new JSplashScreen();
+		splash = null;
+		
 		// create the game window
 		DisplayWindow window = new DisplayWindow();
 		window.setVisible(true);
