@@ -40,12 +40,12 @@ import org.javassonne.networking.impl.CachedHost;
  * 
  * Updates itself automatically
  */
-public class AvailableNetworkHosts extends TimerTask implements TableModel {
+public class ConnectedHosts extends TimerTask implements TableModel {
 
 	private List<CachedHost> tableData_;
 	private ArrayList<TableModelListener> observers_;
 
-	public AvailableNetworkHosts() {
+	public ConnectedHosts() {
 		tableData_ = new ArrayList<CachedHost>();
 		observers_ = new ArrayList<TableModelListener>();
 		updateData();

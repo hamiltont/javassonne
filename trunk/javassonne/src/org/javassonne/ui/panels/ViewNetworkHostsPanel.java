@@ -42,13 +42,15 @@ import javax.swing.event.TableModelListener;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.model.AvailableNetworkHosts;
+import org.javassonne.model.ConnectedHosts;
 import org.javassonne.model.ConnectedClients;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalClient;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.ChatMessage;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
+import org.javassonne.ui.GameState.Mode;
 
 // TODO - add a button that will allow you to join a game to the joinGamePanel
 //			Do a check that that person has a status that will allow others to join
@@ -159,7 +161,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		add(joinGamePanel_);
 		
 		// Create the hosts table
-		AvailableNetworkHosts tableModel = new AvailableNetworkHosts();
+		ConnectedHosts tableModel = new ConnectedHosts();
 		availHostsTable_ = new JTable();
 		availHostsTable_.setModel(tableModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -273,10 +275,16 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			// Hide the join game options, and show host
 			joinGamePanel_.setVisible(false);
 			hostGamePanel_.setVisible(true);
+			
+			// We are now waiting for players
+			GameState.getInstance().setMode(Mode.WAITING);
 		} else if (e.getActionCommand().equals(SHOW_JOIN_PANEL)) {
 			// Hide the host options, and show the join
 			hostGamePanel_.setVisible(false);
 			joinGamePanel_.setVisible(true);
+			
+			// Change our state
+			GameState.getInstance().setMode(Mode.IN_LOBBY);
 		} else if (e.getActionCommand().equals(CANCEL)) {
 			DisplayHelper.getInstance().remove(this);
 			NotificationManager.getInstance().removeObserver(this);

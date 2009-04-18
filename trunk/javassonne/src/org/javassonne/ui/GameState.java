@@ -60,7 +60,7 @@ public class GameState {
 	// Singelton implementation
 	// --------------------------------------------------------
 	protected GameState() {
-		mode_ = Mode.WAITING;
+		mode_ = Mode.IN_LOBBY;
 	}
 
 	// Provide access to singleton
@@ -75,6 +75,9 @@ public class GameState {
 	// --------------------------------------------------------
 
 	public void startGameWithPlayers(ArrayList<Player> players) {
+		// Update our mode
+		setMode(Mode.PLAYING_GAME);
+		
 		players_ = players;
 		currentPlayer_ = 0;
 		gameInProgress_ = true;
@@ -82,6 +85,9 @@ public class GameState {
 	}
 
 	public void resetGameState() {
+		// Update our mode
+		setMode(Mode.IN_LOBBY);
+		
 		board_ = null;
 		deck_ = null;
 		tileInHand_ = null;

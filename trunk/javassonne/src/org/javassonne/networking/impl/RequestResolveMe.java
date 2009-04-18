@@ -59,6 +59,15 @@ public class RequestResolveMe implements Runnable {
 		LogSender.sendInfo("RequestResolveMe: trying to resolve host "
 				+ hostURI_);
 
+		// Ensure our local service is started, and ensure that we are not
+		// trying to resolve ourself
+		String s = LocalHost.getURI();
+		if (s == null)
+			return;
+
+		if (hostURI_ == s)
+			return;
+
 		RemoteHost h = HostResolver.attemptToResolveHost(hostURI_);
 
 		// We cannot resolve them, give up
@@ -70,12 +79,13 @@ public class RequestResolveMe implements Runnable {
 
 		// Add them to the pending hosts list!
 		HostMonitor.addToPendingHosts(new CachedHost(h));
-		
-		// NOTE: If they ACK us, then they will be added to the cached host list,
-		// 		 but that is the handled in HostMonitor
+
+		// NOTE: If they ACK us, then they will be added to the cached host
+		// list,
+		// but that is the handled in HostMonitor
 		LogSender.sendInfo("RequestResolveMe: resolve succeeded for "
 				+ hostURI_ + ", added to pending hosts");
-		
+
 		// Let them know we can see them
 		h.resolveHost(LocalHost.getURI());
 	}
