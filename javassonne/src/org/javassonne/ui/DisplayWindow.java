@@ -27,6 +27,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import org.javassonne.ui.controls.DisplayDesktopPane;
@@ -41,6 +42,7 @@ import org.javassonne.ui.controls.DisplayDesktopPane;
  */
 public class DisplayWindow extends JFrame implements WindowListener {
 
+	private static final String ICON_IMAGE = "images/icon.png";
 	private static final String WINDOW_TITLE = "Javassonne";
 	private static boolean FULL_SCREEN = true;
 
@@ -52,7 +54,10 @@ public class DisplayWindow extends JFrame implements WindowListener {
 	 */
 	public DisplayWindow() {
 		super();
-
+		
+		ImageIcon img = new ImageIcon(ICON_IMAGE);
+		setIconImage(img.getImage());
+		
 		GraphicsDevice device = GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		boolean fakeFullscreen = false;
