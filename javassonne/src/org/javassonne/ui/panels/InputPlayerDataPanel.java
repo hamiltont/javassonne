@@ -48,10 +48,8 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	private static final String NEW_GAME_CANCEL_IMAGE = "images/new_game_cancel.jpg";
 	private static final String NEW_GAME_IMAGE = "images/new_game_background.jpg";
 
-	private JPanel generalButtons_;
-	private JPanel textFields_;
-	private JPanel labels_;
-	private JPanel comboBoxes_;
+	private ArrayList<JTextField> textFields_ = new ArrayList<JTextField>();
+	private ArrayList<JComboBox> comboBoxes_= new ArrayList<JComboBox>();
 
 	public InputPlayerDataPanel() {
 		super();
@@ -61,53 +59,31 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		setBackgroundImagePath(NEW_GAME_IMAGE);
 		setVisible(true);
 		setSize(800, 600);
-		setLayout(new OverlayLayout(this));
+		setLayout(null);
 		setAlignmentY(CENTER_ALIGNMENT);
-
-		// TODO: Use BoxLayout instead of null layout
-		generalButtons_ = new JPanel();
-		generalButtons_.setOpaque(false);
-		generalButtons_.setLayout(null);
-		generalButtons_.setAlignmentY(CENTER_ALIGNMENT);
-
-		textFields_ = new JPanel();
-		textFields_.setOpaque(false);
-		textFields_.setLayout(null);
-		textFields_.setAlignmentY(CENTER_ALIGNMENT);
-
-		labels_ = new JPanel();
-		labels_.setOpaque(false);
-		labels_.setLayout(null);
-		labels_.setAlignmentY(CENTER_ALIGNMENT);
-
-		comboBoxes_ = new JPanel();
-		comboBoxes_.setOpaque(false);
-		comboBoxes_.setLayout(null);
-		comboBoxes_.setAlignmentY(CENTER_ALIGNMENT);
 
 		// TODO: Use Java default layout organizers to eliminate ugly integers
 		// add the buttons to the generalButtons_ panel
-		addButtonToPanel(NEW_GAME_CANCEL_IMAGE, "", new Point(25, 543),
-				generalButtons_);
+		addButtonToPanel(NEW_GAME_CANCEL_IMAGE, "", new Point(25, 543));
 		addButtonToPanel(NEW_GAME_START_IMAGE, Notification.START_GAME,
-				new Point(492, 543), generalButtons_);
+				new Point(492, 543));
 
 		// add the labels to labels_ panel
 		int offset = 165;
-		addLabelToPanel(new Point(200, 0 + offset), "Player 1", labels_);
-		addLabelToPanel(new Point(200, 45 + offset), "Player 2", labels_);
-		addLabelToPanel(new Point(200, 90 + offset), "Player 3", labels_);
-		addLabelToPanel(new Point(200, 135 + offset), "Player 4", labels_);
-		addLabelToPanel(new Point(200, 180 + offset), "Player 5", labels_);
-		addLabelToPanel(new Point(200, 225 + offset), "Player 6", labels_);
+		addLabelToPanel(new Point(200, 0 + offset), "Player 1");
+		addLabelToPanel(new Point(200, 45 + offset), "Player 2");
+		addLabelToPanel(new Point(200, 90 + offset), "Player 3");
+		addLabelToPanel(new Point(200, 135 + offset), "Player 4");
+		addLabelToPanel(new Point(200, 180 + offset), "Player 5");
+		addLabelToPanel(new Point(200, 225 + offset), "Player 6");
 
 		// add text boxes to the textFields_ panel
-		addTextBoxToPanel(new Point(255, 0 + offset), textFields_);
-		addTextBoxToPanel(new Point(255, 45 + offset), textFields_);
-		addTextBoxToPanel(new Point(255, 90 + offset), textFields_);
-		addTextBoxToPanel(new Point(255, 135 + offset), textFields_);
-		addTextBoxToPanel(new Point(255, 180 + offset), textFields_);
-		addTextBoxToPanel(new Point(255, 225 + offset), textFields_);
+		addTextBoxToPanel(new Point(255, 0 + offset));
+		addTextBoxToPanel(new Point(255, 45 + offset));
+		addTextBoxToPanel(new Point(255, 90 + offset));
+		addTextBoxToPanel(new Point(255, 135 + offset));
+		addTextBoxToPanel(new Point(255, 180 + offset));
+		addTextBoxToPanel(new Point(255, 225 + offset));
 
 		// place MeepleColors into ImageIcon array
 		ImageIcon[] colors = new ImageIcon[MeepleColor.values().length];
@@ -118,53 +94,50 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		}
 
 		// add combo boxes to comboBoxes_ panel
-		addComboBoxToPanel(new Point(545, 0 + offset), colors, 0, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 45 + offset), colors, 1, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 90 + offset), colors, 2, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 135 + offset), colors, 3, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 180 + offset), colors, 4, comboBoxes_);
-		addComboBoxToPanel(new Point(545, 225 + offset), colors, 5, comboBoxes_);
-
-		// add panels
-		add(textFields_);
-		add(generalButtons_);
-		add(labels_);
-		add(comboBoxes_);
+		addComboBoxToPanel(new Point(545, 0 + offset), colors, 0);
+		addComboBoxToPanel(new Point(545, 45 + offset), colors, 1);
+		addComboBoxToPanel(new Point(545, 90 + offset), colors, 2);
+		addComboBoxToPanel(new Point(545, 135 + offset), colors, 3);
+		addComboBoxToPanel(new Point(545, 180 + offset), colors, 4);
+		addComboBoxToPanel(new Point(545, 225 + offset), colors, 5);
 	}
 
 	private void addButtonToPanel(String imagePath, String notification,
-			Point location, JPanel panel) {
+			Point location) {
 		JButton b = new JButton(new ImageIcon(imagePath));
 		b.addActionListener(this);
 		b.setActionCommand(notification);
 		b.setLocation(location);
 		// TODO: explain this weird size?
 		b.setSize(279, 38);
-		panel.add(b);
+		add(b);
 	}
 
-	private void addTextBoxToPanel(Point location, JPanel panel) {
+	private void addTextBoxToPanel(Point location) {
 		JTextField text = new JTextField();
 		text.setLocation(location);
 		text.setSize(279, 38);
-		panel.add(text);
+		add(text);
+		textFields_.add(text);
 	}
 
-	private void addLabelToPanel(Point location, String text, JPanel panel) {
+	private void addLabelToPanel(Point location, String text) {
 		JLabel label = new JLabel(text);
 		label.setLocation(location);
 		label.setSize(50, 38);
-		panel.add(label);
+		add(label);
 	}
 
 	private void addComboBoxToPanel(Point location, ImageIcon[] colors,
-			int selectedIndex, JPanel panel) {
+			int selectedIndex) {
 		JComboBox comboBox = new JComboBox(colors);
 		comboBox.setSelectedIndex(selectedIndex);
 		comboBox.setLocation(location);
 		// determine whether we need to fake full screen.
 		comboBox.setSize(50, 38);
 
+		comboBoxes_.add(comboBox);
+		
 		try {
 			String os = System.getProperty("os.name");
 			if (os.equals("Mac OS X"))
@@ -172,37 +145,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		} catch (Exception e) {
 			// who cares?
 		}
-		panel.add(comboBox);
-	}
-
-	// This function does return empty text too, so other methods that use
-	// getPlayerNames() need to take that into consideration
-	public List<String> getPlayerNames() {
-		List<String> list = new ArrayList<String>();
-
-		// for each Component/JTextField in textFields_ add the text in the text
-		// box to the list
-		for (Component c : textFields_.getComponents()) {
-			list.add(((JTextField) c).getText());
-		}
-
-		return list;
-	}
-
-	public List<MeepleColor> getPlayerColors() {
-		List<MeepleColor> list = new ArrayList<MeepleColor>();
-
-		// for each Component/JComboBox in comboBoxes add the color selected to
-		// the list
-		for (Component c : comboBoxes_.getComponents()) {
-			if (getPlayerNames().get(((JComboBox) c).getSelectedIndex())
-					.length() > 0) {
-				list.add(MeepleColor.values()[((JComboBox) c)
-						.getSelectedIndex()]);
-			}
-		}
-
-		return list;
+		add(comboBox);
 	}
 
 	/*
@@ -215,22 +158,46 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().length() > 0) {
 			// see if the input in the panel is valid:
-			if (!validatePlayerNames()) {
-				// Play error sound and initialize sound monitor
-				NotificationManager.getInstance().sendNotification(
-						Notification.ERROR);
+			ArrayList<Player> players = this.getPlayers();
+			
+			Boolean namesOK = true;
+			Boolean colorsOK = true;
+			
+			for (Player p : players){
+				for (Player q : players){
+					if (p != q){
+						if (p.getMeepleColor() == q.getMeepleColor())
+							colorsOK = false;
+						if (p.getName().equals(q.getName()))
+							namesOK = false;
+					}
+				}
+			}
 
+			if (players.size() < 2){
+				// Play error sound
+				NotificationManager.getInstance().sendNotification(
+						Notification.ERROR);			
 				JPopUp warning = new JPopUp(
 						"At least two player names must be entered");
 				warning.showMsg();
-			} else if (!validateColors()) {
-				// Play error sound and initialize sound monitor
+				
+			} else if (!colorsOK) {
+				// Play error sound
 				NotificationManager.getInstance().sendNotification(
 						Notification.ERROR);
-
 				JPopUp warning = new JPopUp(
 						"Each player must have a unique color");
 				warning.showMsg();
+
+			} else if (!namesOK){
+				// Play error sound
+				NotificationManager.getInstance().sendNotification(
+						Notification.ERROR);
+				JPopUp warning = new JPopUp(
+						"Each player must have a unique name");
+				warning.showMsg();
+				
 			} else {
 				NotificationManager.getInstance().sendNotification(
 						e.getActionCommand(), this);
@@ -242,66 +209,18 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 		}
 	}
 
-	// Checks to see if there are at least two player names provided
-	// by the user
-	public boolean validatePlayerNames() {
-		List<String> names = this.getPlayerNames();
-		int playerCount = 0;
-
-		for (String s : names) {
-			if (s.length() > 0) {
-				playerCount++;
-			}
-		}
-
-		if (playerCount < 2) {
-			return false;
-		}
-
-		return true;
-	}
-
-	// Checks to see if the user provided a unique color for each player name
-	// provided
-	public boolean validateColors() {
-		int playerCount = 0;
-		List<MeepleColor> colors = this.getPlayerColors();
-		List<MeepleColor> temp = colors;
-
-		for (String s : getPlayerNames()) {
-			if (s.length() > 0) {
-				playerCount++;
-			}
-		}
-
-		for (int i = 0; i < playerCount; i++) {
-			int count = 0;
-			for (int j = 0; j < playerCount; j++) {
-				if (colors.get(i).value == temp.get(j).value)
-					count++;
-			}
-
-			if (count > 1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 	// This function used to be in the GameController, but since the
 	// InputPlayerDataPanel has direct access to the information, it makes
 	// more sense for the logic of creating Player objects to happen here.
 	public ArrayList<Player> getPlayers() {
 		ArrayList<Player> players_ = new ArrayList<Player>();
-
-		int playerCount = 0;
-		for (String s : this.getPlayerNames()) {
-			if (s.length() > 0) {
-				Player player = new Player(s);
-				player.setMeepleColor(getPlayerColors().get(playerCount));
+		
+		for (int ii = 0; ii < 6; ii ++){
+			if (textFields_.get(ii).getText().length() > 0) {
+				Player player = new Player(textFields_.get(ii).getText());
+				player.setMeepleColor(MeepleColor.values()[comboBoxes_.get(ii).getSelectedIndex()]);
 				players_.add(player);
-				playerCount++;
 			}
 		}
 		return players_;

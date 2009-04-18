@@ -161,13 +161,33 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		add(joinGamePanel_);
 		
 		// Create the hosts table
-		ConnectedHosts tableModel = new ConnectedHosts();
+		final ConnectedHosts tableModel = new ConnectedHosts();
 		availHostsTable_ = new JTable();
 		availHostsTable_.setModel(tableModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		availHostsTable_.repaint();
+		availHostsTable_.setColumnSelectionAllowed(false);
+		availHostsTable_.setRowSelectionAllowed(true);
 		tableModel.addTableModelListener(this);
 
+		ListSelectionModel rowSM = availHostsTable_.getSelectionModel();
+		rowSM.addListSelectionListener(new ListSelectionListener() {
+		    public void valueChanged(ListSelectionEvent e) {
+		        //Ignore extra messages.
+		        if (e.getValueIsAdjusting()) return;
+		        
+		        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+		        if (lsm.isSelectionEmpty()) {
+		            //no rows are selected
+		        } else {
+		            int selectedRow = lsm.getMinSelectionIndex();
+		    		if (!tableModel.getValueAt(selectedRow, 2).equals(GameState.Mode.WAITING.text))
+		    			availHostsTable_.clearSelection();	
+		        }
+		    }
+		});
+		
+		
+		
 		// Make it scrollable
 		JScrollPane availHostsTableContainer = new JScrollPane(availHostsTable_);
 		availHostsTableContainer.setLocation(0, 20);
@@ -195,8 +215,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		JButton ipAddressGo = new JButton(new ImageIcon("images/host_add_by_ip.jpg"));
 		ipAddressGo.setActionCommand(ENTER_IP);
 		ipAddressGo.addActionListener(this);
-		ipAddressGo.setLocation(new Point(320, 179));
-		ipAddressGo.setSize(50, 30);
+		ipAddressGo.setLocation(new Point(328, 182));
+		ipAddressGo.setSize(39, 23);
 		joinGamePanel_.add(ipAddressGo);
 
 		// Add a label
@@ -233,6 +253,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		connectedClientsTable_.setModel(provider);
 		connectedClientsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		connectedClientsTable_.repaint();
+		connectedClientsTable_.setColumnSelectionAllowed(false);
+		connectedClientsTable_.setRowSelectionAllowed(true);
 		provider.addTableModelListener(this);
 
 		// Make it scrollable
@@ -309,13 +331,20 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void tableChanged(TableModelEvent e) {
-		// We need the checks for != null just in case we have not fully started
-		// yet
+		// We need the checks for != null just in case we have not fully started yet
+		
+		JTable current = null;
 		if (joinGamePanel_.isVisible() == true)
-			if (availHostsTable_ != null)
-				availHostsTable_.repaint();
-			else if (connectedClientsTable_ != null)
-				connectedClientsTable_.repaint();
+			current = availHostsTable_;
+		else
+			current = connectedClientsTable_;
+		
+		int selection = current.getSelectedRow();
+		if (selection != -1){
+			current.clearSelection();
+			current.setRowSelectionInterval(selection, selection);
+		}
+
 	}
 
 	public void keyPressed(KeyEvent e) {
