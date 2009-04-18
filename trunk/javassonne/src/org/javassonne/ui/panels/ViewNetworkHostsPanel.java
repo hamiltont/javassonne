@@ -168,25 +168,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		availHostsTable_.setColumnSelectionAllowed(false);
 		availHostsTable_.setRowSelectionAllowed(true);
 		tableModel.addTableModelListener(this);
-
-		ListSelectionModel rowSM = availHostsTable_.getSelectionModel();
-		rowSM.addListSelectionListener(new ListSelectionListener() {
-		    public void valueChanged(ListSelectionEvent e) {
-		        //Ignore extra messages.
-		        if (e.getValueIsAdjusting()) return;
-		        
-		        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-		        if (lsm.isSelectionEmpty()) {
-		            //no rows are selected
-		        } else {
-		        	int s = lsm.getMinSelectionIndex();
-		    		if (!tableModel.getValueAt(s, 2).equals(GameState.Mode.WAITING.text))
-		    			availHostsTable_.clearSelection();	
-		        }
-		    }
-		});
-		
-		
 		
 		// Make it scrollable
 		JScrollPane availHostsTableContainer = new JScrollPane(availHostsTable_);
