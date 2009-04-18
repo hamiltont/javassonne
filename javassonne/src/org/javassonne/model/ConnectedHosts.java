@@ -120,10 +120,22 @@ public class ConnectedHosts extends TimerTask implements TableModel {
 	}
 
 	private void updateData() {
+		Boolean notify = false;
 		synchronized (tableData_) {
-			tableData_ = HostMonitor.getHosts();
+			List<CachedHost> newTableData = HostMonitor.getHostsCopy();
+			if (tableData_ != null){
+				if (tableData_.size() != newTableData.size())
+					notify = true;
+				for (int ii = 0; ii < tableData_.size(); ii++)
+					if (!newTableData.get(ii).equals(tableData_.get(ii)))
+						notify = true;
+			} else {
+				notify = true;
+			}
+			tableData_ = newTableData;
 		}
-		notifyListeners();
+		if (notify) 
+			notifyListeners();
 	}
 
 	private void notifyListeners() {

@@ -93,9 +93,14 @@ public class HostMonitor {
 		return getInstance()._getHosts();
 	}
 
+	public static List<CachedHost> getHostsCopy() {
+		return getInstance().deepCopyCachedHosts();
+	}
+
 	private List<CachedHost> _getHosts() {
 		return cachedHosts_;
 	}
+
 
 	/**
 	 * Allows the NotificationManager to let us know a SEND_GLOBAL_CHAT message
@@ -309,8 +314,10 @@ public class HostMonitor {
 	 * @return
 	 */
 	private ArrayList<CachedHost> deepCopyCachedHosts() {
-		String deepCopy = xStream_.toXML(cachedHosts_);
-		return (ArrayList<CachedHost>) xStream_.fromXML(deepCopy);
+		ArrayList<CachedHost> result = new ArrayList<CachedHost>();
+		for (CachedHost h : this.cachedHosts_)
+			result.add(new CachedHost(h, false));
+		return result;
 	}
 
 	/**
@@ -327,7 +334,6 @@ public class HostMonitor {
 			CachedHost next = it.next();
 			// TODO - change to name.equals(JavassonneHost_ + next.getName() )
 			// and verify
-
 
 			if (uriOrName.equals(next.getURI())
 					|| uriOrName.equals(next.getName())) {
