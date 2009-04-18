@@ -402,7 +402,7 @@ public class MapLayer extends JPanel implements MouseListener,
 
 	// Zoomed all the way out?
 	public boolean zoomedMin() {
-		return (scale_ < .6);
+		return (scale_ < .4);
 	}
 
 	void setShift(int dx, int dy) {
