@@ -55,13 +55,11 @@ public class JSoundManager {
 		register_sound(Notification.START_GAME, TADA);
 		register_sound(Notification.GAME_OVER, VICTORY);
 		register_sound(Notification.ERROR, ERROR);
-		register_sound(Notification.TILE_DROPPED, PLACE);
+		register_sound(Notification.PLACE_TILE, PLACE);
 		register_sound(Notification.MEEPLE_VILLAGER_DROPPED, PLACE);
 		register_sound(Notification.MEEPLE_FARMER_DROPPED, PLACE);
 		register_sound(Notification.MEEPLE_FARMER_DRAG_STARTED, PICKUP);
 		register_sound(Notification.MEEPLE_VILLAGER_DRAG_STARTED, PICKUP);
-		register_sound(Notification.TILE_ROTATE_LEFT, ROTATE);
-		register_sound(Notification.TILE_ROTATE_RIGHT, ROTATE);
 		register_sound(Notification.END_TURN, CONFIRM);
 		register_sound(Notification.UNDO_PLACE_TILE, CANCEL);
 	}
