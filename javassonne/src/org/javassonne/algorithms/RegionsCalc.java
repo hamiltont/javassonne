@@ -234,11 +234,20 @@ public class RegionsCalc {
 				scoreOfReg_.put(iter.getLocation(),
 						new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 			scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
+			
+			// add meeple
+			if(globalMeep_.get(iter.getLocation()) == null )
+				globalMeep_.put(iter.getLocation(), new EnumMap<Region, List<Meeple>>(Tile.Region.class));
+			globalMeep_.get(iter.getLocation()).put(reg, meeps);
 
 			// If completely surrounded, it is complete
-			if (tempScore == 9)
+			if (tempScore == 9){
+				if(isComplete_.get(iter.getLocation()) == null )
+					isComplete_.put(iter.getLocation(), new EnumMap<Region, Boolean>(Tile.Region.class));
+				isComplete_.get(iter.getLocation()).put(reg, true);
+			
 				return true;
-			else
+			} else
 				return false;
 		}
 		// center feature is null - pass back returnVal
@@ -262,7 +271,7 @@ public class RegionsCalc {
 	/*
 	 * If traverseRegion has touched given Region of Tile at given location and
 	 * it has a nonempty meeple list claiming it, this function returns the list
-	 * of meeple, else returns empty list
+	 * of meepl, else returns empty list
 	 */
 	public List<Meeple> getMeepleList(Point loc, Tile.Region reg) {
 		ArrayList<Meeple> returnVal = new ArrayList<Meeple>();
