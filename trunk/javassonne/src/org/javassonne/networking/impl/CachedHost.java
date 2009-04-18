@@ -21,6 +21,9 @@ package org.javassonne.networking.impl;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.javassonne.messaging.Notification;
+import org.javassonne.messaging.NotificationManager;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
 
 /**
@@ -35,23 +38,29 @@ public class CachedHost implements RemoteHost {
 	private String name_;
 	private String uri_;
 	private Mode status_;
+	private CachedHostUpdater updater_;
 
 	public CachedHost(RemoteHost host) {
 		name_ = host.getName();
 		uri_ = host.getURI();
 		status_ = host.getStatus();
+		updater_ = new CachedHostUpdater();
 
-		// Start a timer to update this hosts status
-		ThreadPool.execute(new Runnable() {
-			public void run() {
-				Timer t = new Timer("Cached Host Updater - " + uri_, true);
-				t.scheduleAtFixedRate(new TimerTask() {
-					public void run() {
-						update();
-					}
-				}, 10000, 1000);
-			}
-		});
+		// Check the first game state to see if we need to be updating
+		gameModeChanged(null);
+
+		NotificationManager.getInstance().addObserver(
+				Notification.GAME_MODE_CHANGED, this, "gameModeChanged");
+
+	}
+
+	public void gameModeChanged(Notification n) {
+		if (GameState.getInstance().getMode() == Mode.IN_LOBBY)
+			// Start a timer to update this hosts status
+			ThreadPool.execute(updater_);
+		else
+			// Cancel a previous timer
+			updater_.cancel();
 	}
 
 	/**
@@ -198,5 +207,24 @@ public class CachedHost implements RemoteHost {
 				me.receiveACK(hostURI);
 			}
 		});
+	}
+
+	private class CachedHostUpdater implements Runnable {
+
+		private Timer t_;
+
+		public void run() {
+			t_ = new Timer("Cached Host Updater - " + uri_, true);
+			t_.scheduleAtFixedRate(new TimerTask() {
+				public void run() {
+					update();
+				}
+			}, 10000, 1000);
+		}
+
+		public void cancel() {
+			t_.cancel();
+		}
+
 	}
 }
