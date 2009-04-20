@@ -191,6 +191,32 @@ public class GameController {
 		beginTurn();
 	}
 
+	public void startGameAsNetworkClient(Notification n)
+	{
+		HashMap<String, Object> gameData = (HashMap<String, Object>)n.argument();
+		GameState.getInstance().setDeck((TileDeck) gameData.get("deck"));
+		GameState.getInstance().setBoard((TileBoard) gameData.get("board"));
+		
+		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
+		
+		// Which player are we? Make sure we set ourselves to be local, and make
+		// everyone else remote. That way we don't let the interface place tiles
+		// during their turns.
+		String me = LocalHost.getName();
+		for (Player p : players){
+			if (p.getName().equals(me))
+				p.setIsLocal(true);
+			else
+				p.setIsLocal(false);
+		}
+		
+		GameState.getInstance().startGameWithPlayers(players);
+		
+		boardController_ = new BoardController();
+		hudController_ = new HUDController();
+		beginTurn();
+	}
+	
 	/**
 	 * Called when a turn is ended, and may be called again if the
 	 * BoardController finds the drawn tile unusable.
