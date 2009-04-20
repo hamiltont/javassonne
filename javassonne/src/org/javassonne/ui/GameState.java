@@ -182,9 +182,6 @@ public class GameState {
 
 	public void setPlayers(ArrayList<Player> players) {
 		players_ = players;
-
-		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_PLAYERS, players);
 	}
 
 	public Tile getTileInHand() {
