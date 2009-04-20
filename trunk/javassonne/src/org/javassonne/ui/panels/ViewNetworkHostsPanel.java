@@ -56,6 +56,7 @@ import org.javassonne.networking.impl.HostImpl;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
+import org.javassonne.ui.controls.JPopUp;
 
 // TODO - add a button that will allow you to join a game to the joinGamePanel
 //			Do a check that that person has a status that will allow others to join
@@ -68,6 +69,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 	// Subpanels
 	private JPanel joinGamePanel_;
+	private JPanel joinedGamePanel_;
 	private JPanel hostGamePanel_;
 
 	// Tables
@@ -114,6 +116,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		setDraggable(false);
 
 		hostGamePanel_.setVisible(false);
+		joinedGamePanel_.setVisible(false);
 	}
 
 	private void setupCommonComponents() {
@@ -227,6 +230,25 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// Add the Host game button
 		addButtonToPanel("images/host_game.png", SHOW_HOST_PANEL, new Point(
 				602, 175), joinGamePanel_);
+
+		// Create the panel that is displayed while waiting for the host to
+		// start.
+		joinedGamePanel_ = new JPanel();
+		joinedGamePanel_.setOpaque(false);
+		joinedGamePanel_.setLayout(null);
+		joinedGamePanel_.setSize(720, 220);
+		joinedGamePanel_.setLocation(40, 122);
+		add(joinedGamePanel_);
+
+		// Add a label
+		JLabel waitingLabel = new JLabel(new ImageIcon("images/waiting_for_host.jpg"));
+		waitingLabel.setLocation(new Point(0, 20));
+		waitingLabel.setSize(721, 150);
+		joinedGamePanel_.add(waitingLabel);
+
+		// Add the cancel game button
+		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(0,
+				175), joinedGamePanel_);
 	}
 
 	/**
@@ -289,6 +311,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		if (e.getActionCommand().equals(SHOW_HOST_PANEL)) {
 			// Hide the join game options, and show host
 			joinGamePanel_.setVisible(false);
+			joinedGamePanel_.setVisible(false);
 			hostGamePanel_.setVisible(true);
 
 			// We are now waiting for players
@@ -296,6 +319,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		} else if (e.getActionCommand().equals(SHOW_JOIN_PANEL)) {
 			// Hide the host options, and show the join
 			hostGamePanel_.setVisible(false);
+			joinedGamePanel_.setVisible(false);
 			joinGamePanel_.setVisible(true);
 
 			// Change our state
@@ -307,25 +331,48 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			clientsModel.removeTableModelListener(this);
 			clientsModel.cancel();
 			NotificationManager.getInstance().removeObserver(this);
+
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
-			int selected = availHostsTable_.getSelectedRow();
-			// TODO - make this dynamic! (once selected works)
-			String hostURI = (String) availHostsTable_.getModel().getValueAt(0,
-					1);
-			LocalClient.connectToHost(hostURI);
+			int ii = availHostsTable_.getSelectedRow();
+			
+			if (ii >= 0){
+				Boolean hostWaiting = (Boolean) availHostsTable_.getModel()
+						.getValueAt(ii, 2).equals(GameState.Mode.WAITING.text);
+				String hostURI = (String) availHostsTable_.getModel().getValueAt(
+						ii, 1);
+	
+				if (hostWaiting){
+					LocalClient.connectToHost(hostURI);
+					joinedGamePanel_.setVisible(true);
+					joinGamePanel_.setVisible(false);
+	
+				} else {
+					String[] options = { "OK" };
+					JPopUp dialogBox = new JPopUp(
+							"Please select a host that is waiting for players.");
+					dialogBox.promptUser(options);
+				}
+			} else {
+				String[] options = { "OK" };
+				JPopUp dialogBox = new JPopUp(
+						"Please select a host from the list above.");
+				dialogBox.promptUser(options);
+			}
 
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
 			HostMonitor.resolveNewHost(ipaddressField_.getText());
 
 		} else if (e.getActionCommand().equals(START_GAME)) {
 			// Do everything to destroy this panel
-			DisplayHelper.getInstance().remove(this);
 			hostsModel.removeTableModelListener(this);
 			hostsModel.cancel();
 			clientsModel.removeTableModelListener(this);
 			clientsModel.cancel();
-			NotificationManager.getInstance().removeObserver(this);
 
+			// Close ourselves
+			this.close();
+
+			// Create the array of players
 			ArrayList<Player> players = new ArrayList<Player>();
 			int color = 0;
 
@@ -352,9 +399,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 			// send notification START_NETWORK_GAME to clients with data
 			// from our game? We don't want to run this ourselves.
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.START_NETWORK_GAME);
 
 		} else
 			NotificationManager.getInstance().sendNotification(
