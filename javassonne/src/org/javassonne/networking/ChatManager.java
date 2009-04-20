@@ -135,11 +135,12 @@ public class ChatManager implements Iterable<String> {
 		if (currentlyTyping_ == false)
 			return;
 
+		// Remember that Notification are synchronous, so we need to update our
+		// control variable before we get called back!
+		currentlyTyping_ = false;
+
 		// Send the message
 		if (mode_ == Mode.GLOBAL) {
-			// Remove the prefix
-			currentMessage_.delete(0, PREFIX_GLOBAL.length());
-
 			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
 					LocalHost.getName());
 
@@ -150,9 +151,6 @@ public class ChatManager implements Iterable<String> {
 					Notification.SEND_GLOBAL_CHAT, cm);
 
 		} else {
-			// Remove the prefix
-			currentMessage_.delete(0, PREFIX_PRIVATE.length());
-
 			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
 					LocalHost.getName());
 
@@ -164,10 +162,8 @@ public class ChatManager implements Iterable<String> {
 
 		}
 
-		// Because the first message is gone, we need to update
-		fireChatTextChanged();
+		// Remove the message
 		currentMessage_.delete(0, currentMessage_.length());
-		currentlyTyping_ = false;
 	}
 
 	private void handleBackspace() {
@@ -177,15 +173,23 @@ public class ChatManager implements Iterable<String> {
 
 		currentMessage_.delete(currentMessage_.length() - 1, currentMessage_
 				.length());
+
+		// Remove the old message
+		if (mode_ == Mode.GLOBAL)
+			globalMessages_.remove(0);
+		else
+			privateMessages_.remove(0);
+
+		// If we have no more current message, we are not typing any more
+		// if we do have some more, add the new message
 		if (currentMessage_.length() == 0) {
 			currentlyTyping_ = false;
-			
-			// Remove the empty message
+		} else {
+			// Remove the old message
 			if (mode_ == Mode.GLOBAL)
-				globalMessages_.remove(0);
+				globalMessages_.add(0, PREFIX_GLOBAL + currentMessage_.toString());
 			else
-				privateMessages_.remove(0);
-
+				privateMessages_.add(0, PREFIX_PRIVATE + currentMessage_.toString());
 		}
 
 		// We changed something
