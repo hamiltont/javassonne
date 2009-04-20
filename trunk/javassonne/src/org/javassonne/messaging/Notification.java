@@ -65,6 +65,10 @@ public class Notification {
 	public static final String TOGGLE_MAIN_MENU = "NotificationToggleMainMenu";
 	public static final String TOGGLE_INSTRUCTIONS = "NotificationToggleInstructions";
 	
+	// Signals that 1) on the host, we would like the clients to be started
+	//  and         2) on the clients, start yourself with the passed data
+	public static final String START_NETWORK_GAME = "NotificationStartNetworkGame";
+	
 	// Used to signal that the mode we are in updated
 	public static final String GAME_MODE_CHANGED = "GameModeChanged";
 	

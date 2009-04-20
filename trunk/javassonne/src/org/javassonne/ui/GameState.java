@@ -20,7 +20,6 @@ package org.javassonne.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -47,7 +46,8 @@ public class GameState {
 	// TODO - Make GameState listeners for appropriate Notifications, so that
 	// the Mode is automatically updated
 	public static enum Mode {
-		PLAYING_GAME("Playing"), IDLE("Idle"), IN_LOBBY("In the lobby"), WAITING(
+		PLAYING_LOCAL_GAME("Playing Local Game"), PLAYING_NW_GAME(
+				"Playing Network Game"), IDLE("Idle"), IN_LOBBY("In the lobby"), WAITING(
 				"Waiting for players");
 		// Paused game, or currently playing the game but stepped out
 		public final String text;
@@ -76,7 +76,7 @@ public class GameState {
 
 	public void startGameWithPlayers(ArrayList<Player> players) {
 		// Update our mode
-		setMode(Mode.PLAYING_GAME);
+		setMode(Mode.PLAYING_LOCAL_GAME);
 
 		players_ = players;
 		currentPlayer_ = 0;
@@ -129,7 +129,7 @@ public class GameState {
 		gameInProgress_ = b;
 
 		if (b)
-			setMode(Mode.PLAYING_GAME);
+			setMode(Mode.PLAYING_LOCAL_GAME);
 		else
 			setMode(Mode.IN_LOBBY);
 

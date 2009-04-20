@@ -79,6 +79,10 @@ public class HostImpl implements RemoteHost {
 				+ Thread.currentThread().getName());
 		Timer t = new Timer("Host Starter", true);
 		t.schedule(new HostStarter(), 0);
+
+		NotificationManager.getInstance().addObserver(
+				Notification.START_NETWORK_GAME, this,
+				"sendNotificationToClients");
 	}
 
 	/**
@@ -144,7 +148,7 @@ public class HostImpl implements RemoteHost {
 	public String getURI() {
 		return myURI_;
 	}
-	
+
 	public List<CachedClient> getConnectedClients() {
 		synchronized (connectedClients_) {
 			return connectedClients_;
@@ -204,7 +208,7 @@ public class HostImpl implements RemoteHost {
 			}
 		});
 	}
-
+	
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
@@ -240,6 +244,45 @@ public class HostImpl implements RemoteHost {
 	public void shareHost(String hostURI) {
 		HostMonitor.shareHost(hostURI);
 	}
+	
+	/**
+	 * Handles receiving all notifications and sending them to all connected
+	 * clients
+	 * 
+	 * @param n
+	 */
+	public void sendNotificationToClients(Notification n) {
+		if (n.identifier() == Notification.START_NETWORK_GAME)
+			GameState.getInstance().setMode(Mode.PLAYING_NW_GAME);
+
+		// If we are not playing a network game, quit
+		if (GameState.getInstance().getMode() != Mode.PLAYING_NW_GAME)
+			return;
+
+		// Convert to XML
+		final String serializedNotification = xStream_.toXML(n);
+
+		LogSender.sendInfo("HostImpl - Scheduled notification '"
+				+ n.identifier() + "' to be sent to all clients");
+
+		// Retransmit to all clients
+		// Should probably put this into a class, and pass a deep-copied
+		// connectedClients
+		ThreadPool.execute(new Runnable() {
+			public void run() {
+				synchronized (connectedClients_) {
+					for (Iterator<CachedClient> it = connectedClients_
+							.iterator(); it.hasNext();) {
+
+						it.next().receiveNotificationFromHost(
+								serializedNotification);
+					}
+				}
+			}
+		});
+
+	}
+
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost

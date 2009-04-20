@@ -328,31 +328,34 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 			ArrayList<Player> players = new ArrayList<Player>();
 			int color = 0;
-			
+
 			// add ourselves
 			Player p = new Player(HostImpl.getInstance().getName());
 			players.add(p);
-			
+
 			// add other players to the game
 			for (CachedClient c : LocalHost.getConnectedClients()) {
 				p = new Player(c.getName());
 				p.setIsLocal(false);
 				p.setMeepleColor(MeepleColor.values()[color]);
 				players.add(p);
-				
+
 				color++;
 			}
 
 			// start the game locally
 			NotificationManager.getInstance().sendNotification(
 					Notification.START_GAME, players);
-				// this calls setBoard, setDeck... notifications
-			
+			// this calls setBoard, setDeck... notifications
+
 			// enable notification sending
-			
+
 			// send notification START_NETWORK_GAME to clients with data
 			// from our game? We don't want to run this ourselves.
-			
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.START_NETWORK_GAME);
+
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
