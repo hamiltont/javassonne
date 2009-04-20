@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -46,6 +47,8 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.ConnectedClients;
 import org.javassonne.model.ConnectedHosts;
 import org.javassonne.model.Player;
+import org.javassonne.model.TileBoard;
+import org.javassonne.model.TileDeck;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalClient;
@@ -241,7 +244,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		add(joinedGamePanel_);
 
 		// Add a label
-		JLabel waitingLabel = new JLabel(new ImageIcon("images/waiting_for_host.jpg"));
+		JLabel waitingLabel = new JLabel(new ImageIcon(
+				"images/waiting_for_host.jpg"));
 		waitingLabel.setLocation(new Point(0, 20));
 		waitingLabel.setSize(721, 150);
 		joinedGamePanel_.add(waitingLabel);
@@ -334,18 +338,18 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 			int ii = availHostsTable_.getSelectedRow();
-			
-			if (ii >= 0){
+
+			if (ii >= 0) {
 				Boolean hostWaiting = (Boolean) availHostsTable_.getModel()
 						.getValueAt(ii, 2).equals(GameState.Mode.WAITING.text);
-				String hostURI = (String) availHostsTable_.getModel().getValueAt(
-						ii, 1);
-	
-				if (hostWaiting){
+				String hostURI = (String) availHostsTable_.getModel()
+						.getValueAt(ii, 1);
+
+				if (hostWaiting) {
 					LocalClient.connectToHost(hostURI);
 					joinedGamePanel_.setVisible(true);
 					joinGamePanel_.setVisible(false);
-	
+
 				} else {
 					String[] options = { "OK" };
 					JPopUp dialogBox = new JPopUp(
@@ -395,10 +399,14 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 					Notification.START_GAME, players);
 			// this calls setBoard, setDeck... notifications
 
-			// enable notification sending
-
 			// send notification START_NETWORK_GAME to clients with data
 			// from our game? We don't want to run this ourselves.
+			HashMap<String, Object> gameData = new HashMap<String, Object>();
+			gameData.put("deck", GameState.getInstance().getDeck());
+			gameData.put("board", GameState.getInstance().getBoard());
+			gameData.put("players", GameState.getInstance().getPlayers());			
+			NotificationManager.getInstance().sendNotification(
+					Notification.START_NETWORK_GAME, gameData);
 
 		} else
 			NotificationManager.getInstance().sendNotification(
