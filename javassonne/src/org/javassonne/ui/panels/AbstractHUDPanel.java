@@ -77,7 +77,7 @@ public class AbstractHUDPanel extends JPanel implements MouseListener,
 
 	public AbstractHUDPanel() {
 		super();
-
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
@@ -242,7 +242,7 @@ public class AbstractHUDPanel extends JPanel implements MouseListener,
 			if (draggableNotification_ != null)
 				NotificationManager.getInstance().sendNotification(
 						draggableNotification_, clickLocation);
-		} else {
+		} else if (draggable_) {
 			setLocation(resetLocation_);
 		}
 		resize(false, false);
