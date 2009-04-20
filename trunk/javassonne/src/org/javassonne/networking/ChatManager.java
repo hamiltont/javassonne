@@ -31,7 +31,8 @@ public class ChatManager implements Iterable<String> {
 	private StringBuffer currentMessage_;
 	private ArrayList<String> privateMessages_;
 	private ArrayList<String> globalMessages_;
-	private boolean addedCurrentMessage_;
+	private boolean currentlyTyping_;
+	private Mode mode_;
 
 	private static enum Mode {
 		GLOBAL, PRIVATE
@@ -43,19 +44,16 @@ public class ChatManager implements Iterable<String> {
 	private static final String PREFIX_GLOBAL = "Global> ";
 	private static final String PREFIX_PRIVATE = "Private> ";
 
-	private Mode mode_;
-
 	// Currently contains only alphanumeric, should prob add symbols
 	private static String allowed_ = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}<>,.?/\\|;':\"~` ";
 
 	private ChatManager() {
 		currentMessage_ = new StringBuffer();
 		mode_ = Mode.GLOBAL;
+		currentlyTyping_ = false;
 
 		privateMessages_ = new ArrayList<String>();
 		globalMessages_ = new ArrayList<String>();
-
-		addedCurrentMessage_ = false;
 
 		NotificationManager.getInstance().addObserver(
 				Notification.RECV_GLOBAL_CHAT, this, "chatReceivedGlobal");
@@ -73,20 +71,38 @@ public class ChatManager implements Iterable<String> {
 	public void chatReceivedGlobal(Notification n) {
 		ChatMessage cm = (ChatMessage) n.argument();
 		String message = cm.getSenderName() + ": " + cm.getMessage();
-		globalMessages_.add(0, message);
-		verifyMessageLists();
-		fireChatTextChanged();
+
+		// Determine where to add the message
+		if (currentlyTyping_ && mode_ == Mode.GLOBAL)
+			globalMessages_.add(1, message);
+		else
+			globalMessages_.add(0, message);
+
+		verifyMaxMessages();
+
+		// Should we fire a notification?
+		if (mode_ == Mode.GLOBAL)
+			fireChatTextChanged();
 	}
 
 	public void chatReceivedPrivate(Notification n) {
 		ChatMessage cm = (ChatMessage) n.argument();
 		String message = cm.getSenderName() + ": " + cm.getMessage();
-		privateMessages_.add(0, message);
-		verifyMessageLists();
-		fireChatTextChanged();
+
+		// Determine where to add the message
+		if (currentlyTyping_ && mode_ == Mode.PRIVATE)
+			privateMessages_.add(1, message);
+		else
+			privateMessages_.add(0, message);
+
+		verifyMaxMessages();
+
+		// Should we fire a notification?
+		if (mode_ == Mode.PRIVATE)
+			fireChatTextChanged();
 	}
 
-	private void verifyMessageLists() {
+	private void verifyMaxMessages() {
 		if (globalMessages_.size() > NUMBER_GLOBAL_MESSAGES)
 			globalMessages_.remove(NUMBER_GLOBAL_MESSAGES);
 		if (privateMessages_.size() > NUMBER_PRIVATE_MESSAGES)
@@ -99,53 +115,113 @@ public class ChatManager implements Iterable<String> {
 
 	private void _KeyPressed(KeyEvent e) {
 		String s = String.valueOf(e.getKeyChar());
-		
+
 		// Detect enter key
 		if (e.getKeyCode() == KeyEvent.VK_ENTER)
 			handleEnter();
 
 		// Detect backspace key
 		else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
-			handleBackspace();
+			handleBackspace(); // be sure to update currentlyTyping in here
 
 		// Detect other valid key
 		else if (allowed_.contains(s.toLowerCase())) {
-			currentMessage_.append(s);
-			updateCurrentMessage();
+			updateCurrentMessage(s);
 		}
 	}
 
 	private void handleEnter() {
-		// TODO - remove ourselves from the ArrayList before we call this,
-		// anticipating that we will immediately be re-added?
-		fireChatMessageSent();
-		addedCurrentMessage_ = false;
+		// If we do not have a message to send, quit
+		if (currentlyTyping_ == false)
+			return;
+
+		// Send the message
+		if (mode_ == Mode.GLOBAL) {
+			// Remove the prefix
+			currentMessage_.delete(0, PREFIX_GLOBAL.length());
+
+			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
+					LocalHost.getName());
+
+			// Remove the temporary message before we send
+			globalMessages_.remove(0);
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.SEND_GLOBAL_CHAT, cm);
+
+		} else {
+			// Remove the prefix
+			currentMessage_.delete(0, PREFIX_PRIVATE.length());
+
+			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
+					LocalHost.getName());
+
+			// Remove the temporary message before we send
+			privateMessages_.remove(0);
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.SEND_PRIVATE_CHAT, cm);
+
+		}
+
+		// Because the first message is gone, we need to update
+		fireChatTextChanged();
 		currentMessage_.delete(0, currentMessage_.length());
-		updateCurrentMessage();
+		currentlyTyping_ = false;
 	}
 
 	private void handleBackspace() {
-		if (currentMessage_.length() > 0) {
-			currentMessage_.delete(currentMessage_.length() - 1,
-					currentMessage_.length());
-			updateCurrentMessage();
+		// If we have nothing to update, then return
+		if (currentlyTyping_ == false)
+			return;
+
+		currentMessage_.delete(currentMessage_.length() - 1, currentMessage_
+				.length());
+		if (currentMessage_.length() == 0) {
+			currentlyTyping_ = false;
+			
+			// Remove the empty message
+			if (mode_ == Mode.GLOBAL)
+				globalMessages_.remove(0);
+			else
+				privateMessages_.remove(0);
+
 		}
+
+		// We changed something
+		fireChatTextChanged();
 	}
 
-	private void updateCurrentMessage() {
+	private void updateCurrentMessage(String key) {
+		currentMessage_.append(key);
+
 		if (mode_ == Mode.GLOBAL) {
-			if (addedCurrentMessage_)
+			// If they are typing, remove the old message
+			// If not, set them typing
+			if (currentlyTyping_)
 				globalMessages_.remove(0);
+			else
+				currentlyTyping_ = true;
+
+			// Add the message
 			globalMessages_.add(0, PREFIX_GLOBAL + currentMessage_.toString());
 		} else {
-			if (addedCurrentMessage_)
+			// If they are typing, remove the old message
+			// If not, set them typing
+			if (currentlyTyping_)
 				privateMessages_.remove(0);
+			else
+				currentlyTyping_ = true;
+
+			// Add the message
 			privateMessages_
 					.add(0, PREFIX_PRIVATE + currentMessage_.toString());
 		}
 
-		addedCurrentMessage_ = true;
-		verifyMessageLists();
+		// Verify that we have not overstepped our limit
+		verifyMaxMessages();
+
+		// Redraw, please
 		fireChatTextChanged();
 	}
 
@@ -154,34 +230,14 @@ public class ChatManager implements Iterable<String> {
 				Notification.CHAT_TEXT_CHANGED);
 	}
 
-	private void fireChatMessageSent() {
-
-		// Send the message
-		if (mode_ == Mode.GLOBAL) {
-			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
-					LocalHost.getName());
-			NotificationManager.getInstance().sendNotification(
-					Notification.SEND_GLOBAL_CHAT, cm);
-
-		} else {
-			currentMessage_.delete(0, PREFIX_PRIVATE.length());
-			ChatMessage cm = new ChatMessage(currentMessage_.toString(),
-					LocalHost.getName());
-			NotificationManager.getInstance().sendNotification(
-					Notification.SEND_PRIVATE_CHAT, cm);
-
-		}
-	}
-
 	public static Iterator<String> getIterator() {
 		return getInstance().iterator();
 	}
-	
+
 	public Iterator<String> iterator() {
 		if (instance_.mode_ == Mode.GLOBAL)
 			return instance_.globalMessages_.iterator();
 		return instance_.privateMessages_.iterator();
 	}
-	
-	
+
 }

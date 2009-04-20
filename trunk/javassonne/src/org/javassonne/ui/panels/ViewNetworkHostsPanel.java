@@ -108,6 +108,10 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		setupJoinPanel();
 		setupHostPanel();
 
+		// Notify the AbstractHUD Panel that we do not need any of the timer
+		// functionality for dragging
+		setDraggable(false);
+
 		hostGamePanel_.setVisible(false);
 	}
 
