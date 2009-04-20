@@ -109,10 +109,11 @@ public class Notification {
 
 	// Notifications that will be sent from Host to client, and from client to
 	// host
+	// TODO - allow private chatting! (Don't think this will allow that)
 	public static String[] networkSafeNotifications = {
 			Notification.UPDATED_BOARD, Notification.UPDATED_CURRENT_PLAYER,
 			Notification.UPDATED_DECK, Notification.BEGIN_TURN,
-			Notification.END_TURN };
+			Notification.END_TURN, Notification.START_NETWORK_GAME };
 
 	private String identifier_;
 	private Object argument_;
