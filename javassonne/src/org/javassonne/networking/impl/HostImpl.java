@@ -261,6 +261,17 @@ public class HostImpl implements RemoteHost {
 		if (GameState.getInstance().getMode() != Mode.PLAYING_NW_GAME)
 			return;
 
+		boolean allowedNotification = false;
+		for (String notif : Notification.networkSafeNotifications) {
+			if (n.identifier() == notif) {
+				allowedNotification = true;
+				break;
+			}
+		}
+		
+		if (allowedNotification == false)
+			return;
+		
 		// Convert to XML
 		final String serializedNotification = xStream_.toXML(n);
 

@@ -188,20 +188,23 @@ public class ClientImpl implements RemoteClient {
 
 		Notification n = (Notification) xStream_
 				.fromXML(serializedNotification);
-		
+
 		LogSender.sendInfo("ClientImpl - Received notification - "
 				+ n.identifier());
 
 		boolean allowedNotification = false;
-		for (String notif : Notification.networkSafeNotifications)
-		{
-			if (n.identifier() == notif)
-			{
+		for (String notif : Notification.networkSafeNotifications) {
+			if (n.identifier() == notif) {
 				allowedNotification = true;
 				break;
 			}
 		}
-		
+
+		if (allowedNotification == false) {
+			LogSender.sendInfo("ClientImpl - Notification not allowed, ignoring");
+			return;
+		}
+
 		NotificationManager.getInstance().sendNotification(n.identifier(),
 				n.argument());
 	}
