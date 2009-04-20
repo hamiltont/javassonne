@@ -28,6 +28,7 @@ import java.util.Timer;
 import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Tile;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
@@ -64,7 +65,8 @@ public class HostImpl implements RemoteHost {
 		connectedClients_ = new ArrayList<CachedClient>();
 		myURI_ = null;
 		xStream_ = new XStream();
-
+		xStream_.omitField(Tile.class, "image_");
+		
 		InetAddress addr = null;
 		try {
 			addr = InetAddress.getLocalHost();
