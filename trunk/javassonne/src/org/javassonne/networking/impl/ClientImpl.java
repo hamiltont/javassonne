@@ -182,17 +182,26 @@ public class ClientImpl implements RemoteClient {
 	}
 
 	// TODO - list notifications that are illegal to send
-	// TODO - no one currently listens for RECV_PRIVATE_CHAT
 	public void receiveNotificationFromHost(String serializedNotification) {
 		if (connectedToHost_.get() == false)
 			return;
 
 		Notification n = (Notification) xStream_
 				.fromXML(serializedNotification);
-
+		
 		LogSender.sendInfo("ClientImpl - Received notification - "
 				+ n.identifier());
 
+		boolean allowedNotification = false;
+		for (String notif : Notification.networkSafeNotifications)
+		{
+			if (n.identifier() == notif)
+			{
+				allowedNotification = true;
+				break;
+			}
+		}
+		
 		NotificationManager.getInstance().sendNotification(n.identifier(),
 				n.argument());
 	}

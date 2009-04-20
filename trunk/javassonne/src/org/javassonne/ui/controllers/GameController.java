@@ -50,6 +50,7 @@ import org.javassonne.model.TileSet;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
+import org.javassonne.ui.GameState.Mode;
 import org.javassonne.ui.controls.JPopUp;
 import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.panels.InputPlayerDataPanel;
@@ -115,6 +116,8 @@ public class GameController {
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
 		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,
 				"toggleInstructions");
+		n.addObserver(Notification.START_NETWORK_GAME, this,
+				"startGameAsNetworkClient");
 	}
 
 	/**
@@ -172,10 +175,10 @@ public class GameController {
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		// Uncomment to Test the Game Over functionality
-		//while(deck.tilesRemaining() > 5)
-			//deck.popRandomTile();
+		// while(deck.tilesRemaining() > 5)
+		// deck.popRandomTile();
 		GameState.getInstance().setDeck(deck);
-		
+
 		TileBoard board = new TileMapBoard();
 		GameState.getInstance().setBoard(board);
 
@@ -191,35 +194,38 @@ public class GameController {
 		beginTurn();
 	}
 
-	public void startGameAsNetworkClient(Notification n)
-	{
-		HashMap<String, Object> gameData = (HashMap<String, Object>)n.argument();
+	public void startGameAsNetworkClient(Notification n) {
+		if (GameState.getInstance().getMode() != Mode.IN_LOBBY)
+			return;
+
+		HashMap<String, Object> gameData = (HashMap<String, Object>) n
+				.argument();
 		GameState.getInstance().setDeck((TileDeck) gameData.get("deck"));
-		
+
 		TileBoard board = (TileBoard) gameData.get("board");
 		board.removeTemps();
 		GameState.getInstance().setBoard(board);
 		
 		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
-		
+
 		// Which player are we? Make sure we set ourselves to be local, and make
 		// everyone else remote. That way we don't let the interface place tiles
 		// during their turns.
 		String me = LocalHost.getName();
-		for (Player p : players){
+		for (Player p : players) {
 			if (p.getName().equals(me))
 				p.setIsLocal(true);
 			else
 				p.setIsLocal(false);
 		}
-		
+
 		GameState.getInstance().startGameWithPlayers(players);
-		
+
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
 		beginTurn();
 	}
-	
+
 	/**
 	 * Called when a turn is ended, and may be called again if the
 	 * BoardController finds the drawn tile unusable.
@@ -362,8 +368,9 @@ public class GameController {
 					Tile.Region.Center));
 		}
 
-		if(GameState.getInstance().getDeck().tilesRemaining() == 0)
-			NotificationManager.getInstance().sendNotification(Notification.GAME_OVER);
+		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
+			NotificationManager.getInstance().sendNotification(
+					Notification.GAME_OVER);
 		else
 			beginTurn();
 	}
@@ -386,7 +393,7 @@ public class GameController {
 			// sprites that the meeple is attached to.
 			NotificationManager.getInstance().sendNotification(
 					Notification.MAP_REMOVE_SPRITE_GROUP, m);
-			
+
 			GameState.getInstance().removeMeepleFromGlobalMeepleSet(m);
 			m.getParentTile().setMeeple(null);
 			m.setParentTile(null);
@@ -413,8 +420,9 @@ public class GameController {
 				menu_.close();
 
 		} else {
-			menu_.setGameInProgress(GameState.getInstance()
-				.getGameInProgress());
+			menu_
+					.setGameInProgress(GameState.getInstance()
+							.getGameInProgress());
 
 			// Make sure the instructions menu is hidden
 			NotificationManager.getInstance().sendNotification(
@@ -455,22 +463,21 @@ public class GameController {
 		// if the user does not select a file, cancel
 		if (f == null)
 			return;
-		
+
 		// read the file into a string
 		StringBuilder contents = new StringBuilder();
 		try {
-			BufferedReader input =  new BufferedReader(new FileReader(f));
+			BufferedReader input = new BufferedReader(new FileReader(f));
 			try {
 				String line = null;
-				while (( line = input.readLine()) != null){
+				while ((line = input.readLine()) != null) {
 					contents.append(line);
 				}
-			}
-			finally {
+			} finally {
 				input.close();
 			}
 		} catch (Exception e) {
-			
+
 		}
 
 		// close the main menu
@@ -479,19 +486,20 @@ public class GameController {
 		// unserialize the string
 		XStream x = new XStream();
 		x.omitField(Tile.class, "image_");
-		HashMap<String, Object> map = (HashMap<String, Object>)x.fromXML(contents.toString());
-		
+		HashMap<String, Object> map = (HashMap<String, Object>) x
+				.fromXML(contents.toString());
+
 		// Set gameState properties
 		GameState state = GameState.getInstance();
-		TileDeck deck = (TileDeck)map.get("deck");
-		TileBoard board = (TileBoard)map.get("board");
-		
-		ArrayList<Player> players = (ArrayList<Player>)map.get("players");
-		
+		TileDeck deck = (TileDeck) map.get("deck");
+		TileBoard board = (TileBoard) map.get("board");
+
+		ArrayList<Player> players = (ArrayList<Player>) map.get("players");
+
 		state.setPlayers(players);
-		state.setCurrentPlayer((Integer)map.get("currentPlayer"));
-		state.setTileInHand((Tile)map.get("tileInHand"));
-		state.setGlobalMeepleSet((List<Meeple>)map.get("meeple"));
+		state.setCurrentPlayer((Integer) map.get("currentPlayer"));
+		state.setTileInHand((Tile) map.get("tileInHand"));
+		state.setGlobalMeepleSet((List<Meeple>) map.get("meeple"));
 		state.setGameInProgress(true);
 		state.setBoard(board);
 		state.setDeck(deck);
@@ -501,13 +509,15 @@ public class GameController {
 		// tile).
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
-		
+
 		// re-attach meeple sprites on the map where they belong
-		for (Meeple s : state.globalMeepleSet()){	
-			MeepleSprite sprite = new MeepleSprite(s,players.get(s.getPlayer()).getMeepleColor());
-			NotificationManager.getInstance().sendNotification(Notification.MAP_ADD_SPRITE, sprite);
+		for (Meeple s : state.globalMeepleSet()) {
+			MeepleSprite sprite = new MeepleSprite(s, players
+					.get(s.getPlayer()).getMeepleColor());
+			NotificationManager.getInstance().sendNotification(
+					Notification.MAP_ADD_SPRITE, sprite);
 		}
-		
+
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
@@ -520,8 +530,8 @@ public class GameController {
 
 		// make sure we have the file extension
 		if (!f.getName().endsWith(".javassonne"))
-			f = new File(f.getAbsolutePath()+".javassonne");
-		
+			f = new File(f.getAbsolutePath() + ".javassonne");
+
 		// serialize shit!
 		GameState state = GameState.getInstance();
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -532,10 +542,10 @@ public class GameController {
 		map.put("tileInHand", state.getTileInHand());
 		map.put("currentPlayer", state.getCurrentPlayerIndex());
 		map.put("meeple", state.globalMeepleSet());
-		
+
 		XStream x = new XStream();
 		x.omitField(Tile.class, "image_");
-		
+
 		FileWriter fw;
 		try {
 			fw = new FileWriter(f);

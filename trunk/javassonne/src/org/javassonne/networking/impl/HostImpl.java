@@ -82,9 +82,9 @@ public class HostImpl implements RemoteHost {
 		Timer t = new Timer("Host Starter", true);
 		t.schedule(new HostStarter(), 0);
 
-		NotificationManager.getInstance().addObserver(
-				Notification.START_NETWORK_GAME, this,
-				"sendNotificationToClients");
+		NotificationManager n = NotificationManager.getInstance();
+		for (String notification : Notification.networkSafeNotifications)
+			n.addObserver(notification, this, "sendNotificationToClients");
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class HostImpl implements RemoteHost {
 			}
 		});
 	}
-	
+
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
@@ -246,7 +246,7 @@ public class HostImpl implements RemoteHost {
 	public void shareHost(String hostURI) {
 		HostMonitor.shareHost(hostURI);
 	}
-	
+
 	/**
 	 * Handles receiving all notifications and sending them to all connected
 	 * clients
@@ -284,7 +284,6 @@ public class HostImpl implements RemoteHost {
 		});
 
 	}
-
 
 	/**
 	 * @see org.javassonne.networking.impl.RemoteHost
