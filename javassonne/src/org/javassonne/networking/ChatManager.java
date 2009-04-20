@@ -38,8 +38,8 @@ public class ChatManager implements Iterable<String> {
 		GLOBAL, PRIVATE
 	};
 
-	private static final int NUMBER_GLOBAL_MESSAGES = 4;
-	private static final int NUMBER_PRIVATE_MESSAGES = 4;
+	private static final int NUMBER_GLOBAL_MESSAGES = 6;
+	private static final int NUMBER_PRIVATE_MESSAGES = 6;
 
 	private static final String PREFIX_GLOBAL = "Global> ";
 	private static final String PREFIX_PRIVATE = "Private> ";
@@ -54,12 +54,16 @@ public class ChatManager implements Iterable<String> {
 
 		privateMessages_ = new ArrayList<String>();
 		globalMessages_ = new ArrayList<String>();
+		
+		globalMessages_.add(0, "Type to chat");
+		globalMessages_.add(1, "Hit shift + space to switch chat rooms");
 
+		fireChatTextChanged();
+		
 		NotificationManager.getInstance().addObserver(
 				Notification.RECV_GLOBAL_CHAT, this, "chatReceivedGlobal");
 		NotificationManager.getInstance().addObserver(
 				Notification.RECV_PRIVATE_CHAT, this, "chatReceivedPrivate");
-
 	}
 
 	private static ChatManager getInstance() {
@@ -124,6 +128,10 @@ public class ChatManager implements Iterable<String> {
 		else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
 			handleBackspace(); // be sure to update currentlyTyping in here
 
+		// Detect Mode switch
+		else if ((e.getKeyCode() == KeyEvent.VK_SPACE) && (e.isShiftDown()))
+			toggleMode();
+		
 		// Detect other valid key
 		else if (allowed_.contains(s.toLowerCase())) {
 			updateCurrentMessage(s);
@@ -228,7 +236,52 @@ public class ChatManager implements Iterable<String> {
 		// Redraw, please
 		fireChatTextChanged();
 	}
+	
+	// TODO - need to move the current message from private to global and vice versa, and debug
+	private void toggleMode() {
+		
+		// Determine where to add the message
+		
+		if (mode_ == Mode.GLOBAL && currentlyTyping_) {
+			mode_ = Mode.PRIVATE;
+			String message = "Chat room changed to private";
+			
+			globalMessages_.remove(0);
+			privateMessages_.add(0, PREFIX_PRIVATE + currentMessage_.toString());
+			privateMessages_.add(1, message);
+		}
+		else if (mode_ == Mode.GLOBAL) 
+		{
+			mode_ = Mode.PRIVATE;
+			String message = "Chat room changed to private";
+			
+			privateMessages_.add(0, message);
+		}
+		else if (mode_ == Mode.PRIVATE && currentlyTyping_)
+		{
+			mode_ = Mode.GLOBAL;
+			String message = "Chat room changed to global";
+			
+			
+			privateMessages_.remove(0);
+			globalMessages_.add(0, PREFIX_GLOBAL + currentMessage_.toString());
+			globalMessages_.add(1, message);	
+		}
+		else if (mode_ == Mode.PRIVATE)
+		{
+			mode_ = Mode.GLOBAL;
+			String message = "Chat room changed to global";
+			
+			globalMessages_.add(0, message);
+		}
+		
 
+		verifyMaxMessages();
+
+		
+		fireChatTextChanged();
+	}
+	
 	private void fireChatTextChanged() {
 		NotificationManager.getInstance().sendNotification(
 				Notification.CHAT_TEXT_CHANGED);
