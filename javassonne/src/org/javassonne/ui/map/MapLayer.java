@@ -82,7 +82,7 @@ public class MapLayer extends JPanel implements MouseListener,
 	private static final int MAP_SHIFT_SPEED = 10;
 
 	// The scale the tiles are drawn at
-	private double scale_ = 0.7;
+	private static double scale_ = 0.7;
 
 	// For scrolling hotspots:
 	private Rectangle2D navLeft_;
@@ -413,7 +413,10 @@ public class MapLayer extends JPanel implements MouseListener,
 		mapShift_ = newShift;
 		recalculateUpdateFrequency();
 	}
-
+	
+	public static double getScale(){
+		return scale_;
+	}
 	/**
 	 * ShiftView allows you to pan the map by passing a scroll amount. This
 	 * function is used by the MapScrollEdges to move the map when the user

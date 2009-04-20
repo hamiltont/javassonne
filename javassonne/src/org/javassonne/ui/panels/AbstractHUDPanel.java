@@ -20,8 +20,10 @@ package org.javassonne.ui.panels;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -38,6 +40,7 @@ import javax.swing.JPanel;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.map.MapLayer;
 
 /**
  * The AbstractHUDPanel provides basic functionality used in the game's HUD
@@ -49,7 +52,7 @@ import org.javassonne.ui.DisplayHelper;
  * 
  */
 public class AbstractHUDPanel extends JPanel implements MouseListener,
-MouseMotionListener {
+		MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
 	private BufferedImage backgroundOriginal_ = null;
@@ -68,7 +71,10 @@ MouseMotionListener {
 	private Boolean draggable_ = false;
 	private String draggableNotification_ = null;
 	private String dragStartNotification_ = null;
-	
+
+	// used by resize()
+	private Dimension defaultSize_ = null;
+
 	public AbstractHUDPanel() {
 		super();
 
@@ -132,13 +138,14 @@ MouseMotionListener {
 
 	public void setDraggable(Boolean d) {
 		draggable_ = d;
-		NotificationManager.getInstance().addObserver(Notification.DRAG_PANEL_RESET, this, "resetDrag");
+		NotificationManager.getInstance().addObserver(
+				Notification.DRAG_PANEL_RESET, this, "resetDrag");
 	}
 
 	public void setDragNotification(String notificationIdentifier) {
 		dragStartNotification_ = notificationIdentifier;
 	}
-	
+
 	public void setDropNotification(String notificationIdentifier) {
 		draggableNotification_ = notificationIdentifier;
 	}
@@ -200,14 +207,15 @@ MouseMotionListener {
 		System.out.println(String.format("reset location set %d,%d", l.x, l.y));
 		resetLocation_ = l;
 	}
-	
+
 	public void setResetLocation(int x, int y) {
 		System.out.println("reset location set");
-		resetLocation_ = new Point(x,y);
+		resetLocation_ = new Point(x, y);
 	}
 
 	public void mousePressed(MouseEvent e) {
 		if ((respondToClick_) && (draggable_)) {
+			resize(true, true);
 			repaint();
 			if (dragStartNotification_ != null)
 				NotificationManager.getInstance().sendNotification(
@@ -233,8 +241,42 @@ MouseMotionListener {
 
 			if (draggableNotification_ != null)
 				NotificationManager.getInstance().sendNotification(
-					draggableNotification_, clickLocation);
+						draggableNotification_, clickLocation);
+		} else {
+			setLocation(resetLocation_);
 		}
+		resize(false, false);
+	}
+
+	/*
+	 * Updates the size of the tile/meeple to match the current zoom level when
+	 * being drug.
+	 */
+	private void resize(boolean downsize, boolean centerUnderMouse) {
+		// Make sure the default size is set so that the size can be restored
+		if (defaultSize_ == null) {
+			Dimension d = getSize();
+			defaultSize_ = new Dimension(d.width, d.height);
+		}
+
+		// Upscaling or downscaling?
+		if (!downsize) {
+			// Restore the original size
+			setSize(defaultSize_.width, defaultSize_.height);
+
+		} else {
+			double scale = MapLayer.getScale();
+			setSize((int) (background_.getWidth() * scale), (int) (background_
+					.getHeight() * scale));
+		}
+
+		// Place the resized image under the mouse pointer
+		if (centerUnderMouse) {
+			Point loc = MouseInfo.getPointerInfo().getLocation();
+			Dimension d = getSize();
+			setLocation(loc.x - d.width / 2, loc.y - d.height / 2);
+		}
+
 	}
 
 	/*
@@ -263,15 +305,16 @@ MouseMotionListener {
 	}
 
 	public void resetDrag() {
-		if (resetLocation_!= null) setLocation(resetLocation_);
+		if (resetLocation_ != null)
+			setLocation(resetLocation_);
 		setBackgroundAlpha(1.0f);
 		respondToClick_ = true;
-		if (resetTimer_ != null){
+		if (resetTimer_ != null) {
 			resetTimer_.cancel();
 			resetTimer_ = null;
 		}
 	}
-	
+
 	// TIMERS
 	// ---------------------------------------------------------------------
 	class FadeTimer extends TimerTask {
@@ -315,7 +358,8 @@ MouseMotionListener {
 			// if we are now in the starting location, make us opaque again and
 			// stop the timer from firing. Also set the location to the exact
 			// one, just in case.
-			if (Math.abs(x - resetLocation_.x) < 20.0 || Math.abs(y - resetLocation_.y) < 20.0) {
+			if (Math.abs(x - resetLocation_.x) < 20.0
+					|| Math.abs(y - resetLocation_.y) < 20.0) {
 				resetDrag();
 			}
 		}
