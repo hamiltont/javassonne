@@ -153,10 +153,9 @@ public class GameController {
 	 */
 	public void startGame(Notification n) {
 		// Game in progress!
-		InputPlayerDataPanel panel_ = (InputPlayerDataPanel) n.argument();
-		GameState.getInstance().startGameWithPlayers(panel_.getPlayers());
+		ArrayList<Player> players_ = (ArrayList<Player>) n.argument();
+		GameState.getInstance().startGameWithPlayers(players_);
 
-		DisplayHelper.getInstance().remove(panel_);
 		NotificationManager.getInstance().sendNotification(
 				Notification.TOGGLE_MAIN_MENU);
 
