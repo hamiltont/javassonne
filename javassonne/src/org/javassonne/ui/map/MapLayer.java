@@ -512,7 +512,7 @@ public class MapLayer extends JPanel implements MouseListener,
 			
 			// draw on the fps
 			gra.setColor(Color.BLACK);
-			gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
+			//gra.drawString(String.format("%d FPS", updateFPS_), 10, 240);
 		
 			// draw the chat messages
 			Iterator<String> iter = ChatManager.getIterator();
