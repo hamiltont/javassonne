@@ -200,6 +200,7 @@ public class GameController {
 
 		HashMap<String, Object> gameData = (HashMap<String, Object>) n
 				.argument();
+
 		GameState.getInstance().setDeck((TileDeck) gameData.get("deck"));
 
 		TileBoard board = (TileBoard) gameData.get("board");
@@ -219,7 +220,13 @@ public class GameController {
 				p.setIsLocal(false);
 		}
 
+
+		// close the main menu
+		menu_.close();
+
+		// start the game!
 		GameState.getInstance().startGameWithPlayers(players);
+		GameState.getInstance().setMode(Mode.PLAYING_NW_GAME);
 
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();

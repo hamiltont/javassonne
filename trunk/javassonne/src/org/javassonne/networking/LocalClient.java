@@ -47,4 +47,8 @@ public class LocalClient  {
 		ClientImpl.getInstance().connectToHost(hostURI);
 	}
 
+	public static void disconnectFromHost() {
+		ClientImpl.getInstance().disconnectFromHost();
+	}
+
 }
