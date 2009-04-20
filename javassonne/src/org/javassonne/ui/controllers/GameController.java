@@ -195,7 +195,10 @@ public class GameController {
 	{
 		HashMap<String, Object> gameData = (HashMap<String, Object>)n.argument();
 		GameState.getInstance().setDeck((TileDeck) gameData.get("deck"));
-		GameState.getInstance().setBoard((TileBoard) gameData.get("board"));
+		
+		TileBoard board = (TileBoard) gameData.get("board");
+		board.removeTemps();
+		GameState.getInstance().setBoard(board);
 		
 		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
 		
