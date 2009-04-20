@@ -198,9 +198,14 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 						"Each player must have a unique name");
 				warning.showMsg();
 				
-			} else {
+			} else { // Start a game
+				// Remove ourselves from display
+				DisplayHelper.getInstance().remove(this);
+				
+				// Send the notification, along with the players
 				NotificationManager.getInstance().sendNotification(
-						e.getActionCommand(), this);
+						e.getActionCommand(), getPlayers());
+				
 			}
 		} else {
 			// user pressed cancel
@@ -213,7 +218,7 @@ public class InputPlayerDataPanel extends AbstractHUDPanel implements
 	// This function used to be in the GameController, but since the
 	// InputPlayerDataPanel has direct access to the information, it makes
 	// more sense for the logic of creating Player objects to happen here.
-	public ArrayList<Player> getPlayers() {
+	private ArrayList<Player> getPlayers() {
 		ArrayList<Player> players_ = new ArrayList<Player>();
 		
 		for (int ii = 0; ii < 6; ii ++){

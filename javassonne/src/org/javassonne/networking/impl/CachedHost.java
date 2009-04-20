@@ -38,15 +38,15 @@ public class CachedHost implements RemoteHost {
 	private String name_;
 	private String uri_;
 	private Mode status_;
-	
+
 	private CachedHostUpdater updater_;
 	private boolean runningUpdater_;
-	
+
 	public CachedHost(RemoteHost host) {
 		name_ = host.getName();
 		uri_ = host.getURI();
 		status_ = host.getStatus();
-		
+
 		updater_ = new CachedHostUpdater();
 		runningUpdater_ = false;
 
@@ -71,15 +71,17 @@ public class CachedHost implements RemoteHost {
 	}
 	
 	public void gameModeChanged(Notification n) {
-		if ((GameState.getInstance().getMode() == Mode.IN_LOBBY) && (runningUpdater_ == false)) {
+		if ((GameState.getInstance().getMode() == Mode.IN_LOBBY)
+				&& (runningUpdater_ == false)) {
 			// Start a timer to update this hosts status
 			ThreadPool.execute(updater_);
 			runningUpdater_ = true;
-		}
-		else
+		} else if (runningUpdater_) {
 			// Cancel a previous timer
 			updater_.cancel();
 			runningUpdater_ = false;
+		}
+
 	}
 
 	/**
@@ -251,7 +253,7 @@ public class CachedHost implements RemoteHost {
 				public void run() {
 					update();
 				}
-			}, 10000, 1000);
+			}, 0, 1000);
 		}
 
 		public void cancel() {

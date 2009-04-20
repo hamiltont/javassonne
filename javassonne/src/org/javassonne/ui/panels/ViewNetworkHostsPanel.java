@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,12 +43,15 @@ import javax.swing.event.TableModelListener;
 
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
-import org.javassonne.model.ConnectedHosts;
 import org.javassonne.model.ConnectedClients;
+import org.javassonne.model.ConnectedHosts;
+import org.javassonne.model.Player;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalClient;
 import org.javassonne.networking.LocalHost;
+import org.javassonne.networking.impl.CachedClient;
 import org.javassonne.networking.impl.ChatMessage;
+import org.javassonne.networking.impl.HostImpl;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
@@ -73,6 +77,10 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private JTextArea chatArea_;
 	private JTextField chatMessageField_;
 	private JTextField ipaddressField_;
+
+	// Models
+	final ConnectedHosts hostsModel = new ConnectedHosts();
+	final ConnectedClients clientsModel = new ConnectedClients();
 
 	// Action commands for buttons
 	private static String CANCEL = "Cancel";
@@ -108,7 +116,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		// the join game panel, and the host game
 		addButtonToPanel("images/host_cancel.png", CANCEL, new Point(40, 547),
 				this);
-		
+
 		// Add your IP address
 		JLabel ipAddy = new JLabel(LocalHost.getURI());
 		ipAddy.setLocation(new Point(200, 557));
@@ -159,16 +167,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinGamePanel_.setSize(720, 220);
 		joinGamePanel_.setLocation(40, 122);
 		add(joinGamePanel_);
-		
+
 		// Create the hosts table
-		final ConnectedHosts tableModel = new ConnectedHosts();
 		availHostsTable_ = new JTable();
-		availHostsTable_.setModel(tableModel);
+		availHostsTable_.setModel(hostsModel);
 		availHostsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availHostsTable_.setColumnSelectionAllowed(false);
 		availHostsTable_.setRowSelectionAllowed(true);
-		tableModel.addTableModelListener(this);
-		
+		hostsModel.addTableModelListener(this);
+
 		// Make it scrollable
 		JScrollPane availHostsTableContainer = new JScrollPane(availHostsTable_);
 		availHostsTableContainer.setLocation(0, 20);
@@ -193,7 +200,8 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinGamePanel_.add(ipaddressField_);
 
 		// Add a button for the IP entry
-		JButton ipAddressGo = new JButton(new ImageIcon("images/host_add_by_ip.jpg"));
+		JButton ipAddressGo = new JButton(new ImageIcon(
+				"images/host_add_by_ip.jpg"));
 		ipAddressGo.setActionCommand(ENTER_IP);
 		ipAddressGo.addActionListener(this);
 		ipAddressGo.setLocation(new Point(328, 182));
@@ -227,23 +235,22 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.setSize(720, 220);
 		hostGamePanel_.setLocation(40, 122);
 		add(hostGamePanel_);
-		
+
 		// Create the hosts table
-		ConnectedClients provider = new ConnectedClients();
 		connectedClientsTable_ = new JTable();
-		connectedClientsTable_.setModel(provider);
-		connectedClientsTable_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		connectedClientsTable_.setModel(clientsModel);
+		connectedClientsTable_
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		connectedClientsTable_.repaint();
 		connectedClientsTable_.setColumnSelectionAllowed(false);
 		connectedClientsTable_.setRowSelectionAllowed(true);
-		provider.addTableModelListener(this);
+		clientsModel.addTableModelListener(this);
 
 		// Make it scrollable
 		JScrollPane container = new JScrollPane(connectedClientsTable_);
 		container.setLocation(0, 20);
 		container.setSize(720, 150);
-		availHostsTable_.setSize(container.getWidth(),
-				container.getHeight());
+		availHostsTable_.setSize(container.getWidth(), container.getHeight());
 		hostGamePanel_.add(container);
 
 		// Add a label
@@ -254,12 +261,12 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		hostGamePanel_.add(label);
 
 		// Add the cancel game button
-		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, 
-				new Point(0, 175), hostGamePanel_);
-		
+		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(0,
+				175), hostGamePanel_);
+
 		// Add the go button
-		addButtonToPanel("images/host_start_game.jpg", START_GAME,
-				new Point(602, 175), hostGamePanel_);
+		addButtonToPanel("images/host_start_game.jpg", START_GAME, new Point(
+				602, 175), hostGamePanel_);
 	}
 
 	private void addButtonToPanel(String imgPath, String notification,
@@ -278,28 +285,53 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			// Hide the join game options, and show host
 			joinGamePanel_.setVisible(false);
 			hostGamePanel_.setVisible(true);
-			
+
 			// We are now waiting for players
 			GameState.getInstance().setMode(Mode.WAITING);
 		} else if (e.getActionCommand().equals(SHOW_JOIN_PANEL)) {
 			// Hide the host options, and show the join
 			hostGamePanel_.setVisible(false);
 			joinGamePanel_.setVisible(true);
-			
+
 			// Change our state
 			GameState.getInstance().setMode(Mode.IN_LOBBY);
 		} else if (e.getActionCommand().equals(CANCEL)) {
 			DisplayHelper.getInstance().remove(this);
+			hostsModel.removeTableModelListener(this);
+			hostsModel.cancel();
+			clientsModel.removeTableModelListener(this);
+			clientsModel.cancel();
 			NotificationManager.getInstance().removeObserver(this);
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 			int selected = availHostsTable_.getSelectedRow();
 			// TODO - make this dynamic! (once selected works)
-			String hostURI = (String)availHostsTable_.getModel().getValueAt(0, 1);
+			String hostURI = (String) availHostsTable_.getModel().getValueAt(0,
+					1);
 			LocalClient.connectToHost(hostURI);
-			
+
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
 			HostMonitor.resolveNewHost(ipaddressField_.getText());
 
+		} else if (e.getActionCommand().equals(START_GAME)) {
+			// Do everything to destroy this panel
+			DisplayHelper.getInstance().remove(this);
+			hostsModel.removeTableModelListener(this);
+			hostsModel.cancel();
+			clientsModel.removeTableModelListener(this);
+			clientsModel.cancel();
+			NotificationManager.getInstance().removeObserver(this);
+
+			ArrayList<Player> players = new ArrayList<Player>();
+			Player p;
+			p = new Player(HostImpl.getInstance().getName());
+			players.add(p);
+			for (CachedClient c : LocalHost.getConnectedClients()) {
+				p = new Player(c.getName());
+				players.add(p);
+			}
+
+			NotificationManager.getInstance().sendNotification(
+					Notification.START_GAME, players);
 		} else
 			NotificationManager.getInstance().sendNotification(
 					e.getActionCommand(), this);
@@ -307,24 +339,33 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void valueChanged(ListSelectionEvent e) {
-		
+		// TODO Auto-generated method stub
+
 	}
 
 	public void tableChanged(TableModelEvent e) {
-		// We need the checks for != null just in case we have not fully started yet
-		
+		// We need the checks for != null just in case we have not fully started
+		// yet
+
 		JTable current = null;
 		if (joinGamePanel_.isVisible() == true)
 			current = availHostsTable_;
 		else
 			current = connectedClientsTable_;
+
+		int selection = current.getSelectedRow();
+		if (selection != -1) {
+			current.clearSelection();
+			current.setRowSelectionInterval(selection, selection);
+		}
+
 	}
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
-			ChatMessage cm = new ChatMessage(chatMessageField_.getText(), LocalHost
-					.getName());
+			ChatMessage cm = new ChatMessage(chatMessageField_.getText(),
+					LocalHost.getName());
 
 			// Send the message for the benefit of everyone else
 			NotificationManager.getInstance().sendNotification(
@@ -349,7 +390,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	}
 
 	public void mouseClicked(MouseEvent m) {
-		if (m.getSource().getClass() == JTextField.class){
+		if (m.getSource().getClass() == JTextField.class) {
 			JTextField field = (JTextField) m.getSource();
 			if (field.getText().substring(0, 1).equals("<")) {
 				field.selectAll();
