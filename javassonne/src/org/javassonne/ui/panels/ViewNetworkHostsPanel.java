@@ -47,8 +47,6 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.ConnectedClients;
 import org.javassonne.model.ConnectedHosts;
 import org.javassonne.model.Player;
-import org.javassonne.model.TileBoard;
-import org.javassonne.model.TileDeck;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalClient;
@@ -93,6 +91,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 	private static String SHOW_JOIN_PANEL = "Cancel_Host_Game";
 	private static String SHOW_HOST_PANEL = "Host_Game";
 	private static String JOIN_GAME = "Join_Game";
+	private static String LEAVE_GAME = "Leave_Game";
 	private static String START_GAME = "Start_Game";
 	private static String ENTER_IP = "Enter_new_IP";
 
@@ -110,6 +109,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		NotificationManager n = NotificationManager.getInstance();
 		n.addObserver(Notification.RECV_GLOBAL_CHAT, this,
 				"receiveGlobalChatMessage");
+		n.addObserver(Notification.START_NETWORK_GAME, this, "close");
 
 		setupJoinPanel();
 		setupHostPanel();
@@ -122,6 +122,17 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinedGamePanel_.setVisible(false);
 	}
 
+	@Override
+	public void close()
+	{
+		DisplayHelper.getInstance().remove(this);
+		hostsModel.removeTableModelListener(this);
+		hostsModel.cancel();
+		clientsModel.removeTableModelListener(this);
+		clientsModel.cancel();
+		NotificationManager.getInstance().removeObserver(this);
+	}
+	
 	private void setupCommonComponents() {
 		// Add Buttons that will be present for both
 		// the join game panel, and the host game
@@ -251,7 +262,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 		joinedGamePanel_.add(waitingLabel);
 
 		// Add the cancel game button
-		addButtonToPanel("images/host_back.png", SHOW_JOIN_PANEL, new Point(0,
+		addButtonToPanel("images/host_back.png", LEAVE_GAME, new Point(0,
 				175), joinedGamePanel_);
 	}
 
@@ -329,12 +340,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			// Change our state
 			GameState.getInstance().setMode(Mode.IN_LOBBY);
 		} else if (e.getActionCommand().equals(CANCEL)) {
-			DisplayHelper.getInstance().remove(this);
-			hostsModel.removeTableModelListener(this);
-			hostsModel.cancel();
-			clientsModel.removeTableModelListener(this);
-			clientsModel.cancel();
-			NotificationManager.getInstance().removeObserver(this);
+			this.close();
 
 		} else if (e.getActionCommand().equals(JOIN_GAME)) {
 			int ii = availHostsTable_.getSelectedRow();
@@ -362,7 +368,15 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 						"Please select a host from the list above.");
 				dialogBox.promptUser(options);
 			}
-
+		
+		} else if (e.getActionCommand().equals(LEAVE_GAME)) {
+			// Hide the host options, and show the join
+			hostGamePanel_.setVisible(false);
+			joinedGamePanel_.setVisible(false);
+			joinGamePanel_.setVisible(true);
+			
+			LocalClient.disconnectFromHost();
+			
 		} else if (e.getActionCommand().equals(ENTER_IP)) {
 			HostMonitor.resolveNewHost(ipaddressField_.getText());
 
@@ -372,9 +386,6 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			hostsModel.cancel();
 			clientsModel.removeTableModelListener(this);
 			clientsModel.cancel();
-
-			// Close ourselves
-			this.close();
 
 			// Create the array of players
 			ArrayList<Player> players = new ArrayList<Player>();

@@ -32,6 +32,7 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileDeck;
 import org.javassonne.ui.DisplayHelper;
+import org.javassonne.ui.GameState;
 import org.javassonne.ui.JKeyListener;
 
 public class RemainingTilesPanel extends AbstractHUDPanel{
@@ -61,6 +62,10 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 				Notification.UPDATED_DECK, this, "updatedDeck");
 		NotificationManager.getInstance().addObserver(
 				Notification.END_GAME, this, "endGame");
+		
+		if (GameState.getInstance().getDeck() != null){
+			updatedDeck(GameState.getInstance().getDeck());
+		}
 	}
 
 	public void endGame(Notification n) {
@@ -70,7 +75,12 @@ public class RemainingTilesPanel extends AbstractHUDPanel{
 	
 	public void updatedDeck(Notification n) {
 		TileDeck deck = (TileDeck) n.argument();
-		HashMap<Tile, Integer> remaining = deck.tilesRemainingByType();
+		if (deck != null)
+			updatedDeck(deck);
+	}
+
+	private void updatedDeck(TileDeck d) {
+		HashMap<Tile, Integer> remaining = d.tilesRemainingByType();
 
 		int ii = 0;
 

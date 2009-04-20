@@ -132,7 +132,17 @@ public class HostImpl implements RemoteHost {
 	 * @see org.javassonne.networking.impl.RemoteHost
 	 */
 	public void removeClient(String clientURI) {
-		// TODO - implement me
+		// TODO: Make sure this works
+		
+		synchronized (connectedClients_) {
+			for (int ii = connectedClients_.size()-1; ii >= 0; ii--){
+				if (connectedClients_.get(ii).getURI().equals(clientURI)){
+					connectedClients_.remove(ii);
+				}
+			}		
+		}
+		LogSender.sendInfo("HostImpl: Client '" + clientURI
+				+ "' disconnected");
 	}
 
 	/**
