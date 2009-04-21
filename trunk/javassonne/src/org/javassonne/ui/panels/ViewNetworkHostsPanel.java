@@ -410,13 +410,16 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 			NotificationManager.getInstance().sendNotification(
 					Notification.START_GAME, players);
 			// this calls setBoard, setDeck... notifications
-
+			
+			// Update GameState
+			GameState.getInstance().setMode(Mode.PLAYING_NW_GAME);
+			
 			// send notification START_NETWORK_GAME to clients with data
 			// from our game? We don't want to run this ourselves.
 			HashMap<String, Object> gameData = new HashMap<String, Object>();
 			gameData.put("deck", GameState.getInstance().getDeck());
 			gameData.put("board", GameState.getInstance().getBoard());
-			gameData.put("players", GameState.getInstance().getPlayers());			
+			gameData.put("players", GameState.getInstance().getPlayers());		
 			NotificationManager.getInstance().sendNotification(
 					Notification.START_NETWORK_GAME, gameData);
 
