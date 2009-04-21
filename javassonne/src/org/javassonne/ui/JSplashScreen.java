@@ -27,7 +27,7 @@ import org.javassonne.ui.controls.JScrollablePicture;
 
 public class JSplashScreen extends JFrame {
 
-	private static final String SPLASH_IMAGE = "images/menu_background.jpg";
+	private static final String SPLASH_IMAGE = "images/splash_screen.jpg";
 	private static final String ICON_IMAGE = "images/icon.png";
 	
 	public JSplashScreen() {
