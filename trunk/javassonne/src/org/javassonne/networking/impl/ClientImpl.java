@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
+import org.javassonne.model.Tile;
 import org.javassonne.networking.LocalHost;
 
 import com.thoughtworks.xstream.XStream;
@@ -55,7 +56,8 @@ public class ClientImpl implements RemoteClient {
 		myURI_ = null;
 		connectionTimer_ = new Timer("Client Connection Timer", true);
 		xStream_ = new XStream();
-
+		xStream_.omitField(Tile.class, "image_");
+		
 		Timer t = new Timer("Client Starter", true);
 		t.schedule(new ClientStarter(this), 0);
 
