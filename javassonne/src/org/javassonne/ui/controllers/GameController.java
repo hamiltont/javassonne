@@ -471,19 +471,30 @@ public class GameController {
 
 		boardController_ = null;
 		hudController_ = null;
-
-		// Return control to final shutdown process
+		
+		Boolean doDownloadCleanup = true;
 		try {
-			// Spawn a thread that guarantees shutdown
-			new Thread(new Runnable() {
-				public void run() {
-					force_shutdown();
-				}
-			}).start();
-		} catch (Exception e) {
-			System.exit(0);
-		}
+			String os = System.getProperty("os.name");
+			if (os.equals("Mac OS X"))
+				doDownloadCleanup = false;
 
+		} catch (Exception e) {
+			// who cares?
+		}
+		
+		if (doDownloadCleanup){
+			// Return control to final shutdown process
+			try {
+				// Spawn a thread that guarantees shutdown
+				new Thread(new Runnable() {
+					public void run() {
+						force_shutdown();
+					}
+				}).start();
+			} catch (Exception e) {
+				System.exit(0);
+			}
+		}
 	}
 
 	public void loadGame(Notification n) {
