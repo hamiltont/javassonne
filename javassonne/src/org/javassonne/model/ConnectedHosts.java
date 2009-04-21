@@ -126,9 +126,11 @@ public class ConnectedHosts extends TimerTask implements TableModel {
 			if (tableData_ != null){
 				if (tableData_.size() != newTableData.size())
 					notify = true;
-				for (int ii = 0; ii < tableData_.size(); ii++)
-					if (!newTableData.get(ii).equals(tableData_.get(ii)))
-						notify = true;
+				else {
+					for (int ii = 0; ii < newTableData.size(); ii++)
+						if (!newTableData.get(ii).equals(tableData_.get(ii)))
+							notify = true;
+				}
 			} else {
 				notify = true;
 			}

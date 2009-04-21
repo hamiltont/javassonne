@@ -194,7 +194,7 @@ public class ClientImpl implements RemoteClient {
 
 		boolean allowedNotification = false;
 		for (String notif : Notification.networkSafeNotifications) {
-			if (n.identifier() == notif) {
+			if (n.identifier().equals(notif)) {
 				allowedNotification = true;
 				break;
 			}
