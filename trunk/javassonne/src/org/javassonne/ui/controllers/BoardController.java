@@ -99,6 +99,7 @@ public class BoardController {
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
+		n.addObserver(Notification.END_NETWORK_TURN, this, "endNetworkTurn");
 		n.addObserver(Notification.UPDATED_TILE_IN_HAND, this,
 				"updateTileInHand");
 	}
