@@ -61,6 +61,18 @@ public class GameState {
 	// --------------------------------------------------------
 	protected GameState() {
 		mode_ = Mode.IN_LOBBY;
+		
+		// listen for the notifications we send. THis may seem backwards,
+		// but we want to receive them if they come from the network so
+		// we can update our data respectively.
+		NotificationManager n = NotificationManager.getInstance();
+		n.addObserver(Notification.UPDATED_BOARD, this, "updatedBoard");
+		n.addObserver(Notification.UPDATED_CURRENT_PLAYER, this, "updatedCurrentPlayer");
+		n.addObserver(Notification.UPDATED_DECK, this, "updatedDeck");
+		n.addObserver(Notification.UPDATED_GAME_IN_PROGRESS, this, "updatedGameInProgress");
+		n.addObserver(Notification.UPDATED_TILE_IN_HAND, this, "updatedTileInHand");
+		n.addObserver(Notification.UPDATED_PLAYERS, this, "updatedPlayers");
+		n.addObserver(Notification.UPDATED_GLOBAL_MEEPLE_SET, this, "updatedGlobalMeepleSet");
 	}
 
 	// Provide access to singleton
@@ -71,6 +83,44 @@ public class GameState {
 		return instance_;
 	}
 
+	// Network Receive Functions
+	// --------------------------------------------------------
+
+	public void updatedBoard(Notification n){
+		if (n.receivedFromHost() == true){
+			board_ = (TileBoard)n.argument();		
+		}
+	}
+	public void updatedCurrentPlayer(Notification n){
+		if (n.receivedFromHost() == true){
+			currentPlayer_ = (Integer)n.argument();
+		}
+	}
+	public void updatedDeck(Notification n){
+		if (n.receivedFromHost() == true){
+			deck_ = (TileDeck)n.argument();		
+		}
+	}
+	public void updatedGameInProgress(Notification n){
+		if (n.receivedFromHost() == true){
+			gameInProgress_ = (Boolean)n.argument();		
+		}
+	}
+	public void updatedTileInHand(Notification n){
+		if (n.receivedFromHost() == true){
+			tileInHand_ = (Tile)n.argument();		
+		}
+	}
+	public void updatedPlayers(Notification n){
+		if (n.receivedFromHost() == true){
+			players_ = (ArrayList<Player>)n.argument();		
+		}
+	}
+    public void updatedGlobalMeepleSet(Notification n){
+		if (n.receivedFromHost() == true){
+			globalMeepleSet_ = (List<Meeple>)n.argument();		
+		}
+	}
 	// Convenience Functions
 	// --------------------------------------------------------
 
@@ -118,7 +168,7 @@ public class GameState {
 		currentPlayer_ = i;
 
 		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_CURRENT_PLAYER, getCurrentPlayer());
+				Notification.UPDATED_CURRENT_PLAYER, currentPlayer_);
 	}
 
 	public boolean getGameInProgress() {
@@ -134,7 +184,7 @@ public class GameState {
 			setMode(Mode.IN_LOBBY);
 
 		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_GAME_IN_PROGRESS, getCurrentPlayer());
+				Notification.UPDATED_GAME_IN_PROGRESS, gameInProgress_);
 	}
 
 	public TileDeck getDeck() {
@@ -165,15 +215,23 @@ public class GameState {
 
 	public void setGlobalMeepleSet(List<Meeple> list) {
 		globalMeepleSet_ = list;
+        
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_GLOBAL_MEEPLE_SET, globalMeepleSet_);
 	}
 
 	public void addMeepleToGlobalMeepleSet(Meeple meeple) {
 		globalMeepleSet_.add(meeple);
 
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_GLOBAL_MEEPLE_SET, globalMeepleSet_);
 	}
 
 	public void removeMeepleFromGlobalMeepleSet(Meeple meeple) {
 		globalMeepleSet_.remove(meeple);
+        
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_GLOBAL_MEEPLE_SET, globalMeepleSet_);
 	}
 
 	public ArrayList<Player> getPlayers() {
@@ -182,6 +240,9 @@ public class GameState {
 
 	public void setPlayers(ArrayList<Player> players) {
 		players_ = players;
+
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_PLAYERS, players_);
 	}
 
 	public Tile getTileInHand() {

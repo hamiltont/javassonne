@@ -393,6 +393,7 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 			// add ourselves
 			Player p = new Player(HostImpl.getInstance().getName());
+			p.setIsLocal(true);
 			players.add(p);
 
 			// add other players to the game

@@ -255,11 +255,11 @@ public class GameController {
 
 			NotificationManager.getInstance().sendNotification(
 					Notification.BEGIN_TURN, p);
-
-			// Toggle an update of the score board
-			NotificationManager.getInstance().sendNotification(
-					Notification.SCORE_UPDATE);
 		}
+
+		// Toggle an update of the score board
+		NotificationManager.getInstance().sendNotification(
+				Notification.SCORE_UPDATE);
 	}
 
 	/**
@@ -375,6 +375,9 @@ public class GameController {
 					Tile.Region.Center));
 		}
 
+		NotificationManager.getInstance().sendNotification(
+				Notification.UPDATED_PLAYERS, GameState.getInstance().getPlayers());
+		
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);

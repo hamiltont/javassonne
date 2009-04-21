@@ -214,6 +214,8 @@ public class TileMapBoard implements TileBoard {
 	 */
 	public void removeTempStatus(TileBoardIterator iter)
 			throws NotValidPlacementException {
+		if (iter == null)
+			return;
 		if (iter.current() == null)
 			return;
 		if (!isValidPlacement(iter, iter.current()))
