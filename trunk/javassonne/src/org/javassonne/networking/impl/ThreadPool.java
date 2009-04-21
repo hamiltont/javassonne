@@ -21,6 +21,8 @@ package org.javassonne.networking.impl;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.swing.SwingUtilities;
+
 import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
@@ -30,14 +32,22 @@ public class ThreadPool {
 	private static ThreadPool instance_ = null;
 
 	private ThreadPool() {
-		executor_ = Executors.newCachedThreadPool();
+		SwingUtilities.invokeLater(new Runnable(){
+	        public void run() {
+	        	executor_ = Executors.newCachedThreadPool();
+	        }
+	    }); 
 		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
 				"shutdown");
 	}
 
 	public void shutdown(Notification n) {
-		LogSender.sendInfo("ThreadPool - notifying all of shutdown");
-		executor_.notifyAll();
+		SwingUtilities.invokeLater(new Runnable(){
+	        public void run() {
+	        	LogSender.sendInfo("ThreadPool - notifying all of shutdown");
+	    		executor_.notifyAll();
+	        }
+	    }); 
 	}
 
 	private static ThreadPool getInstance() {
