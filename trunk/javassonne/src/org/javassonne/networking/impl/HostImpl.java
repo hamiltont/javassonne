@@ -264,13 +264,14 @@ public class HostImpl implements RemoteHost {
 	 * @param n
 	 */
 	public void sendNotificationToClients(Notification n) {
-		if (n.identifier() == Notification.START_NETWORK_GAME)
-			GameState.getInstance().setMode(Mode.PLAYING_NW_GAME);
 
 		// If we are not playing a network game, quit
 		if (GameState.getInstance().getMode() != Mode.PLAYING_NW_GAME)
 			return;
-
+		
+		if (n.receivedFromHost() == true)
+			return;
+		
 		boolean allowedNotification = false;
 		for (String notif : Notification.networkSafeNotifications) {
 			if (n.identifier().equals(notif)) {

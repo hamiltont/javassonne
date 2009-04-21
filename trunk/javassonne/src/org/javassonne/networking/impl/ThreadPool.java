@@ -32,11 +32,7 @@ public class ThreadPool {
 	private static ThreadPool instance_ = null;
 
 	private ThreadPool() {
-		SwingUtilities.invokeLater(new Runnable(){
-	        public void run() {
-	        	executor_ = Executors.newCachedThreadPool();
-	        }
-	    }); 
+    	executor_ = Executors.newCachedThreadPool();
 		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
 				"shutdown");
 	}

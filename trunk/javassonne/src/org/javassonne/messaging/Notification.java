@@ -76,7 +76,9 @@ public class Notification {
 	public static final String UPDATED_CURRENT_PLAYER = "NotificationUpdatedCurrentPlayer";
 	public static final String UPDATED_TILE_IN_HAND = "NotificationUpdatedTileInHand";
 	public static final String UPDATED_GAME_IN_PROGRESS = "NotificationUpdatedGameInProgress";
-
+	public static final String UPDATED_PLAYERS = "NotificationUpdatedPlayers";
+	public static final String UPDATED_GLOBAL_MEEPLE_SET = "NotificationUpdatedMeepleSet";
+	
 	public static final String PLACE_TILE = "NotificationClickAddTile";
 	public static final String PLACE_VILLAGER_MEEPLE = "PlaceVillagerMeeple";
 	public static final String PLACE_FARMER_MEEPLE = "PlaceFarmerMeeple";
@@ -113,11 +115,13 @@ public class Notification {
 	public static String[] networkSafeNotifications = {
 			Notification.UPDATED_BOARD, Notification.UPDATED_CURRENT_PLAYER,
 			Notification.UPDATED_DECK, Notification.BEGIN_TURN,
-			Notification.END_TURN, Notification.START_NETWORK_GAME };
+			Notification.START_NETWORK_GAME, Notification.UPDATED_PLAYERS,
+			Notification.UPDATED_GLOBAL_MEEPLE_SET};
 
-	private String identifier_;
-	private Object argument_;
-
+	private String identifier_ = "Undefined";
+	private Object argument_ = null;
+	private Boolean receivedFromHost_ = false;
+	
 	public Notification(String identifier, Object arg) {
 		identifier_ = identifier;
 		argument_ = arg;
@@ -134,6 +138,14 @@ public class Notification {
 	@Override
 	public String toString() {
 		return identifier_;
+	}
+
+	public void setReceivedFromHost(Boolean receivedFromHost_) {
+		this.receivedFromHost_ = receivedFromHost_;
+	}
+
+	public Boolean receivedFromHost() {
+		return receivedFromHost_;
 	}
 
 }

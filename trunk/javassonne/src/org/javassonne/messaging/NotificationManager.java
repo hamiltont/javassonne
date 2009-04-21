@@ -128,7 +128,11 @@ public class NotificationManager {
 
 	public void sendNotification(String identifier, Object obj) {
 		Notification n = new Notification(identifier, obj);
-		ArrayList<NotificationCallback> observers = bindings_.get(identifier);
+		sendNotification(n);
+	}
+
+	public void sendNotification(Notification n) {
+		ArrayList<NotificationCallback> observers = bindings_.get(n.identifier());
 
 		if (observers != null) {
 			// we have to do it this way in case any of the observers remove
@@ -141,9 +145,10 @@ public class NotificationManager {
 			}
 		} else {
 			String msg = String.format("Notification with "
-					+ "identifier %s sent to zero observers.", identifier);
+					+ "identifier %s sent to zero observers.", n.identifier());
 
 			this.sendNotification(Notification.LOG_WARNING, msg);
 		}
+		
 	}
 }

@@ -107,33 +107,35 @@ public class BoardController {
 
 	public void endTurn(Notification n) {
 		// update the tile's status so that it is now permanent
-		try {
-			GameState.getInstance().getBoard().removeTempStatus(
-					tempLocationIter_);
-		} catch (NotValidPlacementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (GameState.getInstance().getCurrentPlayer().getIsLocal()){
+			try {
+				GameState.getInstance().getBoard().removeTempStatus(
+						tempLocationIter_);
+			} catch (NotValidPlacementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+				Meeple placed = tempLocationIter_.current().getMeeple();
+				if (placed != null)
+					GameState.getInstance().addMeepleToGlobalMeepleSet(placed);
+			
+			
+			// remove the placement sprite if it exists
+			if (tempPlacementSprite_ != null)
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
+			
+				NotificationManager.getInstance().sendNotification(
+						Notification.SCORE_TURN, tempLocationIter_);
+			
+			GameState.getInstance().advanceCurrentPlayer();
+	
+			tempPlacedMeeple_ = null;
+			tempPlacementSprite_ = null;
+			tempPlacedTile_ = null;
+			tempLocationIter_ = null;
 		}
-		
-			Meeple placed = tempLocationIter_.current().getMeeple();
-			if (placed != null)
-				GameState.getInstance().addMeepleToGlobalMeepleSet(placed);
-		
-		
-		// remove the placement sprite if it exists
-		if (tempPlacementSprite_ != null)
-			NotificationManager.getInstance().sendNotification(
-					Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
-		
-			NotificationManager.getInstance().sendNotification(
-					Notification.SCORE_TURN, tempLocationIter_);
-		
-		GameState.getInstance().advanceCurrentPlayer();
-
-		tempPlacedMeeple_ = null;
-		tempPlacementSprite_ = null;
-		tempPlacedTile_ = null;
-		tempLocationIter_ = null;
 	}
 
 	public void placeTile(Notification n) {

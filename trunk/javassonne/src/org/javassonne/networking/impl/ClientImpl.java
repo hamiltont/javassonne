@@ -188,10 +188,13 @@ public class ClientImpl implements RemoteClient {
 
 		Notification n = (Notification) xStream_
 				.fromXML(serializedNotification);
-
+		n.setReceivedFromHost(true);
+		
 		LogSender.sendInfo("ClientImpl - Received notification - "
 				+ n.identifier());
 
+		System.out.println(n.identifier());
+		
 		boolean allowedNotification = false;
 		for (String notif : Notification.networkSafeNotifications) {
 			if (n.identifier().equals(notif)) {
@@ -205,8 +208,7 @@ public class ClientImpl implements RemoteClient {
 			return;
 		}
 
-		NotificationManager.getInstance().sendNotification(n.identifier(),
-				n.argument());
+		NotificationManager.getInstance().sendNotification(n);
 	}
 
 	/**
@@ -232,6 +234,10 @@ public class ClientImpl implements RemoteClient {
 		if (connectedToHost_.get() == false)
 			return;
 
+		// Don't send back notifications that the host sent us!
+		if (n.receivedFromHost() == true)
+			return;
+		
 		LogSender.sendInfo("Sending notification " + n.identifier()
 				+ " to host");
 
