@@ -62,6 +62,10 @@ public class ClientImpl implements RemoteClient {
 		// We handle giving private chat messages to the host
 		NotificationManager.getInstance().addObserver(
 				Notification.SEND_PRIVATE_CHAT, this, "sendChatMessageToHost");
+
+		NotificationManager n = NotificationManager.getInstance();
+		for (String notification : Notification.networkSafeNotifications)
+			n.addObserver(notification, this, "sendNotificationToHost");
 	}
 
 	public static ClientImpl getInstance() {
