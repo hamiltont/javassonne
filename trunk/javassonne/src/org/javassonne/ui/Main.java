@@ -42,6 +42,9 @@ public class Main {
 		// Initialize sound monitor
 		JSoundManager.getInstance();
 
+		// Initialize GameState first
+		GameState.getInstance();
+		
 		// create the application controller. This will handle starting a new
 		// game, etc...
 		GameController controller = new GameController();

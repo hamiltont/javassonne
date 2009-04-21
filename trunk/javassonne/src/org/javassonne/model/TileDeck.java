@@ -113,6 +113,19 @@ public class TileDeck {
 		return t;
 	}
 
+	public void removeTileWithIdentifier(String uniqueIdentifier) {
+		Tile t = null;
+		for (int ii = 0; ii < tiles_.size(); ii++){
+			if (tiles_.get(ii).getUniqueIdentifier().equals(uniqueIdentifier)){
+				t = tiles_.get(ii);
+				tiles_.remove(ii);
+				break;
+			}
+		}
+		if (t != null)
+			tilesRemaining_.put(t, tilesRemaining_.get(t) - 1);
+	}
+	
 	/**
 	 * @return The number of tiles remaining in the deck. Should decrement when
 	 *         popRandomTile() is called.
