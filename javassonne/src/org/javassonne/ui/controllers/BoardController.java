@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -34,10 +35,12 @@ import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.BoardPositionFilledException;
 import org.javassonne.model.Meeple;
 import org.javassonne.model.NotValidPlacementException;
+import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
+import org.javassonne.model.TileDeck;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
@@ -59,8 +62,8 @@ public class BoardController {
 
 	List<Tile.Region> currentRegionOptions_;
 	List<Tile.Quadrant> currentQuadrantOptions_;
-	
-	private static int spin_count_ = 0;  // Holds the auto-rotation tries
+
+	private static int spin_count_ = 0; // Holds the auto-rotation tries
 
 	/**
 	 * The BoardController will handle interaction between the board model and
@@ -90,8 +93,9 @@ public class BoardController {
 		n.addObserver(Notification.PLACE_FARMER_MEEPLE, this, "placeFarmer");
 		n.addObserver(Notification.MEEPLE_VILLAGER_DRAG_STARTED, this,
 				"dragVillager");
-		n.addObserver(Notification.PLACE_VILLAGER_MEEPLE, this,
-				"placeVillager");
+		n
+				.addObserver(Notification.PLACE_VILLAGER_MEEPLE, this,
+						"placeVillager");
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
@@ -106,7 +110,7 @@ public class BoardController {
 
 	public void endTurn(Notification n) {
 		// update the tile's status so that it is now permanent
-		if (GameState.getInstance().getCurrentPlayer().getIsLocal()){
+		if (GameState.getInstance().getCurrentPlayer().getIsLocal()) {
 			try {
 				GameState.getInstance().getBoard().removeTempStatus(
 						tempLocationIter_);
@@ -114,28 +118,88 @@ public class BoardController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			Meeple placed = tempLocationIter_.current().getMeeple();
 			if (placed != null)
-				GameState.getInstance().addMeepleToGlobalMeepleSet(placed);		
-			
+				GameState.getInstance().addMeepleToGlobalMeepleSet(placed);
+
 			// remove the placement sprite if it exists
 			if (tempPlacementSprite_ != null)
 				NotificationManager.getInstance().sendNotification(
 						Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
-			
-				NotificationManager.getInstance().sendNotification(
-						Notification.SCORE_TURN, tempLocationIter_);
-			
-			GameState.getInstance().advanceCurrentPlayer();
-			
+
+			// create a dictionary we can pass to the score turn notification.
+			// The score will be calculated and then this can be sent to the
+			// other
+			// clients on the network so they can update their gameState.
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("tile", tempPlacedTile_);
+			map.put("location", tempLocationIter_.getLocation());
 			NotificationManager.getInstance().sendNotification(
-					Notification.BEGIN_TURN);
-			
+					Notification.SCORE_TURN, map);
+
+			// EDIT: Score turn will automatically advance the current player.
+
 			tempPlacedMeeple_ = null;
 			tempPlacementSprite_ = null;
 			tempPlacedTile_ = null;
 			tempLocationIter_ = null;
+		}
+	}
+
+	// We receive this notificaiton when someone elses turn ends. We just need
+	// to update our game state to reflect whatever they did during their turn.
+	public void endNetworkTurn(Notification n) {
+		// we want to ignore this notification if it originated locally. We're
+		// trying to send this to the OTHER Players.
+		if (n.receivedFromHost() == true) {
+			HashMap<String, Object> data = (HashMap<String, Object>) n
+					.argument();
+
+			// remove the tile that they just placed from the deck, so we can't
+			// draw it again
+			Tile t = (Tile) data.get("tile");
+			TileDeck d = GameState.getInstance().getDeck();
+			d.removeTileWithIdentifier(t.getUniqueIdentifier());
+
+			// put the new tile on the board at the correct location
+			TileBoard b = GameState.getInstance().getBoard();
+			TileBoardIterator iter = new TileBoardGenIterator(b, (Point) data
+					.get("point"));
+			try {
+				b.addTemp(iter, t);
+				b.removeTempStatus(iter);
+			} catch (BoardPositionFilledException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotValidPlacementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// add a meeple sprite to globalMeepleSet and to board if it was
+			// placed.
+			Meeple m = t.getMeeple();
+			if (m != null) {
+				// create sprite, add it to board
+				MeepleSprite sprite = new MeepleSprite(m, GameState
+						.getInstance().getCurrentPlayer().getMeepleColor());
+				sprite.setGroup(m);
+				NotificationManager.getInstance().sendNotification(
+						Notification.MAP_ADD_SPRITE, sprite);
+
+				// add meeple to globalMeepleSet
+				GameState.getInstance().addMeepleToGlobalMeepleSet(m);
+			}
+
+			// score turn. We set "receivedFromHost" to make sure we don't
+			// send a post-turn message to everyone else playing. Local only!
+			data.put("receivedFromHost", (Boolean) true);
+			NotificationManager.getInstance().sendNotification(
+					Notification.SCORE_TURN, data);
+			
+			// SCORE_TURN will automatically advance the current player index
+			// and begin turn, if it's ours.
 		}
 	}
 
@@ -200,14 +264,15 @@ public class BoardController {
 					// Add the placement indicator to the map
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_ADD_SPRITE, tempPlacementSprite_);
-				}else{
+				} else {
 					// Auto-rotate to see if other rotations are valid
-					if(spin_count_ <= 3){
+					if (spin_count_ <= 3) {
 						spin_count_++;
-						NotificationManager.getInstance().sendNotification(Notification.TILE_ROTATE_RIGHT);
+						NotificationManager.getInstance().sendNotification(
+								Notification.TILE_ROTATE_RIGHT);
 						placeTile(n);
 					}
-					spin_count_=0;
+					spin_count_ = 0;
 				}
 
 			} catch (BoardPositionFilledException ex) {
@@ -235,41 +300,41 @@ public class BoardController {
 	}
 
 	public void placeVillager(Notification n) {
-		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0)
-		{
+		if (GameState.getInstance().getCurrentPlayer().getMeepleRemaining() > 0) {
 			// the meeple is created in the map layer, because the map layer
 			// has more intimate knowledege of which region the drag ended on.
 			// (It can convert the pixel to the tile, and then to a region)
 			// Region / Quadrant is set. We just set everything else.
 			Meeple m = (Meeple) n.argument();
-	
+
 			if ((currentRegionOptions_.contains(m.getRegionOnTile()))
 					&& (m.getParentTile() == tempPlacedTile_)) {
-	
+
 				// if they've already tried placing a meeple, remove it before
 				// allowing them to place another.
 				if (tempPlacedMeeple_ != null) {
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 				}
-	
+
 				m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
-	
+
 				// add the meeple to the tile
 				tempPlacedTile_.setMeeple(m);
-	
+
 				// add the meeple sprite to the map layer so the guy is visible
 				MeepleColor c = GameState.getInstance().getCurrentPlayer()
 						.getMeepleColor();
 				tempPlacedMeeple_ = new MeepleSprite(m, c);
-	
+
 				// decrement the player's meeple count
-				GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-	
+				GameState.getInstance().getCurrentPlayer()
+						.shiftMeepleRemaining(-1);
+
 				// tell the scoreboard to update based on the new meeple count
 				NotificationManager.getInstance().sendNotification(
 						Notification.SCORE_UPDATE);
-	
+
 				NotificationManager.getInstance().sendNotification(
 						Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
 
@@ -294,44 +359,45 @@ public class BoardController {
 	}
 
 	public void placeFarmer(Notification n) {
-		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
-		
+		if (GameState.getInstance().getCurrentPlayer().getMeepleRemaining() > 0) {
+
 			// the meeple is created in the map layer, because the map layer
 			// has more intimate knowledege of which region the drag ended on.
 			// (It can convert the pixel to the tile, and then to a region)
 			// Region / Quadrant is set. We just set everything else.
 			Meeple m = (Meeple) n.argument();
-		
+
 			if ((currentQuadrantOptions_.contains(m.getQuadrantOnTile()))
 					&& (m.getParentTile() == tempPlacedTile_)) {
-		
+
 				// if they've already tried placing a meeple, remove it before
 				// allowing them to place another.
 				if (tempPlacedMeeple_ != null) {
 					NotificationManager.getInstance().sendNotification(
 							Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);
 				}
-		
+
 				m.setPlayer(GameState.getInstance().getCurrentPlayerIndex());
-		
+
 				// add the meeple to the tile
 				tempPlacedTile_.setMeeple(m);
-		
+
 				// add the meeple sprite to the map layer so the guy is visible
 				MeepleColor c = GameState.getInstance().getCurrentPlayer()
 						.getMeepleColor();
 				tempPlacedMeeple_ = new MeepleSprite(m, c);
-		
+
 				// decrement the player's meeple count
-				GameState.getInstance().getCurrentPlayer().shiftMeepleRemaining(-1);
-		
+				GameState.getInstance().getCurrentPlayer()
+						.shiftMeepleRemaining(-1);
+
 				// tell the scoreboard to update based on the new meeple count
 				NotificationManager.getInstance().sendNotification(
 						Notification.SCORE_UPDATE);
-		
+
 				NotificationManager.getInstance().sendNotification(
 						Notification.MAP_ADD_SPRITE, tempPlacedMeeple_);
-			
+
 				NotificationManager.getInstance().sendNotification(
 						Notification.DRAG_PANEL_RESET);
 			}
@@ -391,7 +457,7 @@ public class BoardController {
 			}
 		}
 	}
-	
+
 	private void resetTempPlacedMeeple() {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);

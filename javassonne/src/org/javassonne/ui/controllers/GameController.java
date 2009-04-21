@@ -208,7 +208,7 @@ public class GameController {
 		TileBoard board = (TileBoard) gameData.get("board");
 		board.removeTemps();
 		GameState.getInstance().setBoard(board);
-		
+
 		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
 
 		// close the main menu
@@ -220,7 +220,7 @@ public class GameController {
 
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
-		
+
 		beginTurn();
 	}
 
@@ -291,10 +291,20 @@ public class GameController {
 	}
 
 	public void scoreTurn(Notification n) {
-		TileBoardIterator iter = (TileBoardIterator) n.argument();
-		Point p = iter.getLocation();
+		HashMap<String, Object> data = (HashMap<String, Object>) n.argument();
+		Point p = (Point) data.get("location");
+
+		TileBoardIterator iter = new TileBoardGenIterator(GameState
+				.getInstance().getBoard(), p);
+
+		// record the current score. After scoring is complete, we'll figure out
+		// what the difference is, so we can send the score change to network
+		// clients.
+		int originalScore = GameState.getInstance().getCurrentPlayer()
+				.getScore();
 
 		Set<Meeple> meeple = new HashSet<Meeple>();
+
 		// Score completed features on this tile
 		RegionsCalc c = new RegionsCalc();
 		for (Tile.Region r : Tile.Region.values()) {
@@ -363,14 +373,23 @@ public class GameController {
 					Tile.Region.Center));
 		}
 
-		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_PLAYERS, GameState.getInstance().getPlayers());
-		
+		// Store the score change in the data dictionary that we'll send to
+		// network clients
+		int newScore = GameState.getInstance().getCurrentPlayer().getScore();
+		data.put("points", (Integer) (newScore - originalScore));
+
+		if (data.containsKey("receivedFromHost") == false) {
+			// Send the notification to the network clients
+			NotificationManager.getInstance().sendNotification(
+					Notification.END_NETWORK_TURN, data);
+		}
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);
-		else
+		else{
+			GameState.getInstance().advanceCurrentPlayer();
 			beginTurn();
+		}
 	}
 
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,

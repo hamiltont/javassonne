@@ -67,6 +67,7 @@ public class Notification {
 	// Signals that 1) on the host, we would like the clients to be started
 	// and 2) on the clients, start yourself with the passed data
 	public static final String START_NETWORK_GAME = "NotificationStartNetworkGame";
+	public static final String END_NETWORK_TURN = "NotificationEndNetworkTurn";
 
 	// Used to signal that the mode we are in updated
 	public static final String GAME_MODE_CHANGED = "GameModeChanged";
@@ -113,11 +114,9 @@ public class Notification {
 	// host
 	// TODO - allow private chatting! (Don't think this will allow that)
 	public static String[] networkSafeNotifications = {
-			Notification.UPDATED_BOARD, Notification.UPDATED_CURRENT_PLAYER,
-			Notification.UPDATED_DECK, Notification.BEGIN_TURN, Notification.MAP_ADD_SPRITE,
-			Notification.MAP_REMOVE_SPRITE, Notification.MAP_REMOVE_SPRITE_GROUP,
-			Notification.START_NETWORK_GAME, Notification.UPDATED_PLAYERS,
-			Notification.UPDATED_GLOBAL_MEEPLE_SET};
+			Notification.START_NETWORK_GAME,
+			Notification.END_NETWORK_TURN
+	};
 
 	private String identifier_ = "Undefined";
 	private Object argument_ = null;
