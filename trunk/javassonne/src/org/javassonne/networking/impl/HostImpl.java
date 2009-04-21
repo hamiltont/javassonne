@@ -219,6 +219,31 @@ public class HostImpl implements RemoteHost {
 				}
 			}
 		});
+		
+		Notification n = (Notification) xStream_
+		.fromXML(serializedNotification);
+		n.setReceivedFromHost(true);
+
+		LogSender.sendInfo("HostImpl - Received notification - "
+				+ n.identifier());
+
+		System.out.println(n.identifier());
+
+		boolean allowedNotification = false;
+		for (String notif : Notification.networkSafeNotifications) {
+			if (n.identifier().equals(notif)) {
+				allowedNotification = true;
+				break;
+			}
+		}
+
+		if (allowedNotification == false) {
+			LogSender
+					.sendInfo("ClientImpl - Notification not allowed, ignoring");
+			return;
+		}
+
+		NotificationManager.getInstance().sendNotification(n);
 	}
 
 	/**
