@@ -28,6 +28,7 @@ import org.javassonne.model.Player;
 import org.javassonne.model.Tile;
 import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileDeck;
+import org.javassonne.networking.LocalHost;
 
 public class GameState {
 
@@ -114,6 +115,19 @@ public class GameState {
 	public void updatedPlayers(Notification n){
 		if (n.receivedFromHost() == true){
 			players_ = (ArrayList<Player>)n.argument();		
+			if (mode_ == Mode.PLAYING_NW_GAME){
+				// Which player are we? Make sure we set ourselves to be local, and make
+				// everyone else remote. That way we don't let the interface place tiles
+				// during their turns.
+				String me = LocalHost.getName();
+				for (Player p : players_) {
+					if (p.getName().equals(me))
+						p.setIsLocal(true);
+					else
+						p.setIsLocal(false);
+				}
+			}
+			
 		}
 	}
     public void updatedGlobalMeepleSet(Notification n){
@@ -126,9 +140,8 @@ public class GameState {
 
 	public void startGameWithPlayers(ArrayList<Player> players) {
 		// Update our mode
-		setMode(Mode.PLAYING_LOCAL_GAME);
-
-		players_ = players;
+		setPlayers(players);
+		
 		currentPlayer_ = 0;
 		gameInProgress_ = true;
 
@@ -239,8 +252,21 @@ public class GameState {
 	}
 
 	public void setPlayers(ArrayList<Player> players) {
+		
 		players_ = players;
-
+		if (mode_ == Mode.PLAYING_NW_GAME){
+			// Which player are we? Make sure we set ourselves to be local, and make
+			// everyone else remote. That way we don't let the interface place tiles
+			// during their turns.
+			String me = LocalHost.getName();
+			for (Player p : players_) {
+				if (p.getName().equals(me))
+					p.setIsLocal(true);
+				else
+					p.setIsLocal(false);
+			}
+		}
+		
 		NotificationManager.getInstance().sendNotification(
 				Notification.UPDATED_PLAYERS, players_);
 	}
