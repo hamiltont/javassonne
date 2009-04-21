@@ -166,7 +166,7 @@ public class BoardController {
 			// put the new tile on the board at the correct location
 			TileBoard b = GameState.getInstance().getBoard();
 			TileBoardIterator iter = new TileBoardGenIterator(b, (Point) data
-					.get("point"));
+					.get("location"));
 			try {
 				b.addTemp(iter, t);
 				b.removeTempStatus(iter);
