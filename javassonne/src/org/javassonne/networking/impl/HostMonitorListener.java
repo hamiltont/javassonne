@@ -45,6 +45,7 @@ public class HostMonitorListener implements ServiceListener {
 		// These are 'old' instances of the current host that are still
 		// alive in multicast, but will not be there when you try to make
 		// calls on them
+        /*
 		if (e.getName().matches(".+\\(\\d+\\)") == true) {
 			String info2 = "HostMonitorListener: Determined that service '"
 					+ e.getName() + "' is a duplicate, ignoring";
@@ -53,7 +54,7 @@ public class HostMonitorListener implements ServiceListener {
 
 			return;
 		}
-
+*/
 		// because Service requestor calls on JmDNS, we need to
 		// ensure that the servicerequestor is run in a different thread
 		// from the one jmdns is in.

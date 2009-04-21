@@ -90,9 +90,8 @@ public class BoardController {
 		n.addObserver(Notification.PLACE_FARMER_MEEPLE, this, "placeFarmer");
 		n.addObserver(Notification.MEEPLE_VILLAGER_DRAG_STARTED, this,
 				"dragVillager");
-		n
-				.addObserver(Notification.PLACE_VILLAGER_MEEPLE, this,
-						"placeVillager");
+		n.addObserver(Notification.PLACE_VILLAGER_MEEPLE, this,
+				"placeVillager");
 		n.addObserver(Notification.UNDO_PLACE_TILE, this, "undoPlaceTile");
 		n.addObserver(Notification.END_GAME, this, "endGame");
 		n.addObserver(Notification.END_TURN, this, "endTurn");
@@ -116,10 +115,9 @@ public class BoardController {
 				e.printStackTrace();
 			}
 			
-				Meeple placed = tempLocationIter_.current().getMeeple();
-				if (placed != null)
-					GameState.getInstance().addMeepleToGlobalMeepleSet(placed);
-			
+			Meeple placed = tempLocationIter_.current().getMeeple();
+			if (placed != null)
+				GameState.getInstance().addMeepleToGlobalMeepleSet(placed);		
 			
 			// remove the placement sprite if it exists
 			if (tempPlacementSprite_ != null)
@@ -130,7 +128,10 @@ public class BoardController {
 						Notification.SCORE_TURN, tempLocationIter_);
 			
 			GameState.getInstance().advanceCurrentPlayer();
-	
+			
+			NotificationManager.getInstance().sendNotification(
+					Notification.BEGIN_TURN);
+			
 			tempPlacedMeeple_ = null;
 			tempPlacementSprite_ = null;
 			tempPlacedTile_ = null;
@@ -221,7 +222,6 @@ public class BoardController {
 
 	public void dragVillager(Notification n) {
 
-		
 		// if they've already tried placing a meeple, remove it before
 		// allowing them to place another.
 		if (tempPlacedMeeple_ != null) {
@@ -235,8 +235,8 @@ public class BoardController {
 	}
 
 	public void placeVillager(Notification n) {
-		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0){
-	
+		if(GameState.getInstance().getCurrentPlayer().getMeepleRemaining()>0)
+		{
 			// the meeple is created in the map layer, because the map layer
 			// has more intimate knowledege of which region the drag ended on.
 			// (It can convert the pixel to the tile, and then to a region)
@@ -391,7 +391,7 @@ public class BoardController {
 			}
 		}
 	}
-
+	
 	private void resetTempPlacedMeeple() {
 		NotificationManager.getInstance().sendNotification(
 				Notification.MAP_REMOVE_SPRITE, tempPlacedMeeple_);

@@ -114,12 +114,11 @@ public class GameController {
 		n.addObserver(Notification.QUIT, this, "quitGame");
 		n.addObserver(Notification.TOGGLE_MAIN_MENU, this, "toggleMainMenu");
 		n.addObserver(Notification.TILE_UNUSABLE, this, "beginTurn");
+		n.addObserver(Notification.BEGIN_TURN, this, "beginTurn");
 		n.addObserver(Notification.TOGGLE_INSTRUCTIONS, this,
 				"toggleInstructions");
 		n.addObserver(Notification.START_NETWORK_GAME, this,
 				"startGameAsNetworkClient");
-		n.addObserver(Notification.UPDATED_CURRENT_PLAYER, this,
-				"updatedCurrentPlayer");
 	}
 
 	/**
@@ -183,6 +182,7 @@ public class GameController {
 
 		TileBoard board = new TileMapBoard();
 		GameState.getInstance().setBoard(board);
+		GameState.getInstance().setMode(GameState.Mode.PLAYING_LOCAL_GAME);
 
 		// Create a BoardController to do the heavy lifting during gameplay.
 		// These two objects handle notifications from the UI (like rotate
@@ -193,7 +193,7 @@ public class GameController {
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
-		updatedCurrentPlayer();
+		beginTurn();
 	}
 
 	public void startGameAsNetworkClient(Notification n) {
@@ -208,29 +208,20 @@ public class GameController {
 		TileBoard board = (TileBoard) gameData.get("board");
 		board.removeTemps();
 		GameState.getInstance().setBoard(board);
-
+		
 		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
-
-		// Which player are we? Make sure we set ourselves to be local, and make
-		// everyone else remote. That way we don't let the interface place tiles
-		// during their turns.
-		String me = LocalHost.getName();
-		for (Player p : players) {
-			if (p.getName().equals(me))
-				p.setIsLocal(true);
-			else
-				p.setIsLocal(false);
-		}
 
 		// close the main menu
 		menu_.close();
 
 		// start the game!
-		GameState.getInstance().startGameWithPlayers(players);
 		GameState.getInstance().setMode(Mode.PLAYING_NW_GAME);
+		GameState.getInstance().startGameWithPlayers(players);
 
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
+		
+		beginTurn();
 	}
 
 	/**
@@ -238,7 +229,7 @@ public class GameController {
 	 * BoardController finds the drawn tile unusable.
 	 * 
 	 */
-	public void updatedCurrentPlayer() {
+	public void beginTurn() {
 		// if the current player is playing on this machine, we need to enable
 		// the interface so they can place a tile. We do that by passing another
 		// notification
@@ -252,9 +243,6 @@ public class GameController {
 
 			// Send notifications to attach our tileInHand to the view
 			GameState.getInstance().setTileInHand(t);
-
-			NotificationManager.getInstance().sendNotification(
-					Notification.BEGIN_TURN, p);
 		}
 
 		// Toggle an update of the score board
@@ -376,14 +364,13 @@ public class GameController {
 		}
 
 		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_PLAYERS,
-				GameState.getInstance().getPlayers());
-
+				Notification.UPDATED_PLAYERS, GameState.getInstance().getPlayers());
+		
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);
 		else
-			updatedCurrentPlayer();
+			beginTurn();
 	}
 
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
@@ -532,7 +519,7 @@ public class GameController {
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
-		updatedCurrentPlayer();
+		beginTurn();
 	}
 
 	public void saveGame(Notification n) {
