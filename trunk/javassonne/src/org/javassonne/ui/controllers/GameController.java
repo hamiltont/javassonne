@@ -383,6 +383,7 @@ public class GameController {
 			NotificationManager.getInstance().sendNotification(
 					Notification.END_NETWORK_TURN, data);
 		}
+
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);
@@ -466,11 +467,22 @@ public class GameController {
 	public void quitGame(Notification n) {
 		// The board controller and HUD controller that we created during
 		// game play should be deleted.
+
 		boardController_ = null;
 		hudController_ = null;
 
 		// Return control to final shutdown process
-		System.exit(0);
+		try {
+			// Spawn a thread that guarantees shutdown
+			new Thread(new Runnable() {
+				public void run() {
+					force_shutdown();
+				}
+			}).start();
+		} catch (Exception e) {
+			System.exit(0);
+		}
+
 	}
 
 	public void loadGame(Notification n) {
@@ -570,6 +582,34 @@ public class GameController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	// Ensures that JRE exits when user closes the game
+	private void force_shutdown() {
+		try {
+			System.out.println("Forcing shutdown!");
+			Thread.sleep(500);
+			while (Thread.activeCount() > 1) {
+				Thread allThreads[] = new Thread[Thread.activeCount()];
+				int active = Thread.enumerate(allThreads);
+				for (int i = 0; i < active; i++) {
+					// Don't want to close ourselves
+					if (allThreads[i] == Thread.currentThread())
+						continue;
+
+					try {
+						allThreads[i].stop();
+					} catch (Exception e) {
+						System.out.println("Unable to destory all threads");
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.exit(0);
+		}
+		
+		// Kill any remaining threads
+		System.exit(0);
 	}
 
 }
