@@ -44,6 +44,7 @@ import org.javassonne.model.TileDeck;
 import org.javassonne.model.Player.MeepleColor;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
+import org.javassonne.ui.GameState.Mode;
 import org.javassonne.ui.map.MeepleSprite;
 import org.javassonne.ui.map.TilePlacementSprite;
 import org.javassonne.ui.panels.HUDConfirmPlacementPanel;
@@ -129,13 +130,22 @@ public class BoardController {
 				NotificationManager.getInstance().sendNotification(
 						Notification.MAP_REMOVE_SPRITE, tempPlacementSprite_);
 
+			// Toggle an update of the map, because it seems to misdraw meeple.
+			NotificationManager.getInstance().sendNotification(
+					Notification.UPDATED_BOARD);
+			
 			// create a dictionary we can pass to the score turn notification.
 			// The score will be calculated and then this can be sent to the
-			// other
-			// clients on the network so they can update their gameState.
+			// other clients on the network so they can update their gameState.
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("tile", tempPlacedTile_);
 			map.put("location", tempLocationIter_.getLocation());
+
+            if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME){
+    			NotificationManager.getInstance().sendNotification(
+    					Notification.END_NETWORK_TURN, map);
+            }
+
 			NotificationManager.getInstance().sendNotification(
 					Notification.SCORE_TURN, map);
 
@@ -181,6 +191,7 @@ public class BoardController {
 			// add a meeple sprite to globalMeepleSet and to board if it was
 			// placed.
 			Meeple m = t.getMeeple();
+
 			if (m != null) {
 				// create sprite, add it to board
 				MeepleSprite sprite = new MeepleSprite(m, GameState
@@ -191,11 +202,16 @@ public class BoardController {
 
 				// add meeple to globalMeepleSet
 				GameState.getInstance().addMeepleToGlobalMeepleSet(m);
+				
+				// decrement meeple from the player's hand
+				Player p = GameState.getInstance().getCurrentPlayer();
+				p.setMeepleRemaining(p.getMeepleRemaining() - 1);
 			}
 
-			// score turn. We set "receivedFromHost" to make sure we don't
-			// send a post-turn message to everyone else playing. Local only!
-			data.put("receivedFromHost", (Boolean) true);
+			// Toggle an update of the map, because it seems to misdraw meeple.
+			NotificationManager.getInstance().sendNotification(
+					Notification.UPDATED_BOARD);
+			
 			NotificationManager.getInstance().sendNotification(
 					Notification.SCORE_TURN, data);
 			

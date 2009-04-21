@@ -38,8 +38,8 @@ public class ChatManager implements Iterable<String> {
 		GLOBAL, PRIVATE
 	};
 
-	private static final int NUMBER_GLOBAL_MESSAGES = 6;
-	private static final int NUMBER_PRIVATE_MESSAGES = 6;
+	private static final int NUMBER_GLOBAL_MESSAGES = 7;
+	private static final int NUMBER_PRIVATE_MESSAGES = 7;
 
 	private static final String PREFIX_GLOBAL = "Global> ";
 	private static final String PREFIX_PRIVATE = "Private> ";
