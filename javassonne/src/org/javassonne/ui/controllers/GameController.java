@@ -279,15 +279,29 @@ public class GameController {
 	 * Game is currently in progress. Verify that the user wants to exit
 	 */
 	public void attemptEndGame() {
-		String[] options = { RETURN_TO_GAME, END_WITHOUT_SAVING };
-
-		JPopUp dialogBox = new JPopUp("A game is currently in progress!");
-		String ans = dialogBox.promptUser(options);
-
-		if (ans == END_WITHOUT_SAVING) {
-			GameState.getInstance().resetGameState();
-			NotificationManager.getInstance().sendNotification(
-					Notification.END_GAME);
+		if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME){
+			String[] options = { RETURN_TO_GAME, END_WITHOUT_SAVING };
+	
+			JPopUp dialogBox = new JPopUp("A game is currently in progress!");
+			String ans = dialogBox.promptUser(options);
+	
+			if (ans == END_WITHOUT_SAVING) {
+				GameState.getInstance().resetGameState();
+				NotificationManager.getInstance().sendNotification(
+						Notification.END_GAME);
+			}
+		} else {
+			String[] options = { "Yes, Exit", "Back to Game" };
+			
+			JPopUp dialogBox = new JPopUp("A game is currently in progress! Are you sure?");
+			String ans = dialogBox.promptUser(options);
+	
+			if (ans == "Yes, Exit") {
+				GameState.getInstance().resetGameState();
+				NotificationManager.getInstance().sendNotification(
+						Notification.END_GAME);
+			}		
+			
 		}
 	}
 
@@ -471,29 +485,17 @@ public class GameController {
 
 		boardController_ = null;
 		hudController_ = null;
-		
-		Boolean doDownloadCleanup = true;
+	
+		// Return control to final shutdown process
 		try {
-			String os = System.getProperty("os.name");
-			if (os.equals("Mac OS X"))
-				doDownloadCleanup = false;
-
+			// Spawn a thread that guarantees shutdown
+			new Thread(new Runnable() {
+				public void run() {
+					force_shutdown();
+				}
+			}).start();
 		} catch (Exception e) {
-			// who cares?
-		}
-		
-		if (doDownloadCleanup){
-			// Return control to final shutdown process
-			try {
-				// Spawn a thread that guarantees shutdown
-				new Thread(new Runnable() {
-					public void run() {
-						force_shutdown();
-					}
-				}).start();
-			} catch (Exception e) {
-				System.exit(0);
-			}
+			System.exit(0);
 		}
 	}
 
@@ -566,6 +568,13 @@ public class GameController {
 	}
 
 	public void saveGame(Notification n) {
+		if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME){
+			String[] options = { "OK" };
+			JPopUp dialogBox = new JPopUp(
+					"Sorry, you cannot save a network game...");
+			dialogBox.promptUser(options);	
+		}
+		
 		JPopUp p = new JPopUp("", "Select a location to save your game...");
 		File f = p.saveFileDialog();
 

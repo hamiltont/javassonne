@@ -398,12 +398,11 @@ public class ViewNetworkHostsPanel extends AbstractHUDPanel implements
 
 			// add other players to the game
 			for (CachedClient c : LocalHost.getConnectedClients()) {
+				color++;
 				p = new Player(c.getName());
 				p.setIsLocal(false);
 				p.setMeepleColor(MeepleColor.values()[color]);
 				players.add(p);
-
-				color++;
 			}
 
 			// start the game locally
