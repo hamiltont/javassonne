@@ -150,7 +150,7 @@ public class GameState {
 		currentPlayer_ = (currentPlayer_ + 1) % players_.size();
 
 		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_CURRENT_PLAYER, getCurrentPlayer());
+				Notification.UPDATED_CURRENT_PLAYER, currentPlayer_);
 	}
 
 	// Getters and Setter Functions

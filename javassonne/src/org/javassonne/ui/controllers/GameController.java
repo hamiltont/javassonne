@@ -118,6 +118,8 @@ public class GameController {
 				"toggleInstructions");
 		n.addObserver(Notification.START_NETWORK_GAME, this,
 				"startGameAsNetworkClient");
+		n.addObserver(Notification.UPDATED_CURRENT_PLAYER, this,
+				"updatedCurrentPlayer");
 	}
 
 	/**
@@ -191,7 +193,7 @@ public class GameController {
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
-		beginTurn();
+		updatedCurrentPlayer();
 	}
 
 	public void startGameAsNetworkClient(Notification n) {
@@ -206,7 +208,7 @@ public class GameController {
 		TileBoard board = (TileBoard) gameData.get("board");
 		board.removeTemps();
 		GameState.getInstance().setBoard(board);
-		
+
 		ArrayList<Player> players = (ArrayList<Player>) gameData.get("players");
 
 		// Which player are we? Make sure we set ourselves to be local, and make
@@ -220,7 +222,6 @@ public class GameController {
 				p.setIsLocal(false);
 		}
 
-
 		// close the main menu
 		menu_.close();
 
@@ -230,7 +231,6 @@ public class GameController {
 
 		boardController_ = new BoardController();
 		hudController_ = new HUDController();
-		beginTurn();
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class GameController {
 	 * BoardController finds the drawn tile unusable.
 	 * 
 	 */
-	public void beginTurn() {
+	public void updatedCurrentPlayer() {
 		// if the current player is playing on this machine, we need to enable
 		// the interface so they can place a tile. We do that by passing another
 		// notification
@@ -376,13 +376,14 @@ public class GameController {
 		}
 
 		NotificationManager.getInstance().sendNotification(
-				Notification.UPDATED_PLAYERS, GameState.getInstance().getPlayers());
-		
+				Notification.UPDATED_PLAYERS,
+				GameState.getInstance().getPlayers());
+
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);
 		else
-			beginTurn();
+			updatedCurrentPlayer();
 	}
 
 	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
@@ -531,7 +532,7 @@ public class GameController {
 		// See if the first person is playing on this computer. If they are,
 		// send the begin turn notification to activate the interface for
 		// them.
-		beginTurn();
+		updatedCurrentPlayer();
 	}
 
 	public void saveGame(Notification n) {
