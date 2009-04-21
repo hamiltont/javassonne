@@ -176,9 +176,9 @@ public class GameController {
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		// Uncomment to Test the Game Over functionality
-		while(deck.tilesRemaining() > 10)
+		while (deck.tilesRemaining() > 10)
 			deck.popRandomTile();
-		
+
 		GameState.getInstance().setDeck(deck);
 
 		TileBoard board = new TileMapBoard();
@@ -279,12 +279,12 @@ public class GameController {
 	 * Game is currently in progress. Verify that the user wants to exit
 	 */
 	public void attemptEndGame() {
-		if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME){
+		if (GameState.getInstance().getMode() != Mode.PLAYING_NW_GAME) {
 			String[] options = { RETURN_TO_GAME, END_WITHOUT_SAVING };
-	
+
 			JPopUp dialogBox = new JPopUp("A game is currently in progress!");
 			String ans = dialogBox.promptUser(options);
-	
+
 			if (ans == END_WITHOUT_SAVING) {
 				GameState.getInstance().resetGameState();
 				NotificationManager.getInstance().sendNotification(
@@ -292,16 +292,17 @@ public class GameController {
 			}
 		} else {
 			String[] options = { "Yes, Exit", "Back to Game" };
-			
-			JPopUp dialogBox = new JPopUp("A game is currently in progress! Are you sure?");
+
+			JPopUp dialogBox = new JPopUp(
+					"A game is currently in progress! Are you sure?");
 			String ans = dialogBox.promptUser(options);
-	
+
 			if (ans == "Yes, Exit") {
 				GameState.getInstance().resetGameState();
 				NotificationManager.getInstance().sendNotification(
 						Notification.END_GAME);
-			}		
-			
+			}
+
 		}
 	}
 
@@ -311,13 +312,7 @@ public class GameController {
 
 		TileBoardIterator iter = new TileBoardGenIterator(GameState
 				.getInstance().getBoard(), p);
-
-		// record the current score. After scoring is complete, we'll figure out
-		// what the difference is, so we can send the score change to network
-		// clients.
-		int originalScore = GameState.getInstance().getCurrentPlayer()
-				.getScore();
-
+		
 		Set<Meeple> meeple = new HashSet<Meeple>();
 
 		// Score completed features on this tile
@@ -335,6 +330,7 @@ public class GameController {
 				}
 			}
 		}
+
 		// Score cloisters - go right then move clockwise
 		// Note: do not need to recheck iter because it was checked above
 		TileBoardGenIterator temp = new TileBoardGenIterator(iter);
@@ -388,21 +384,10 @@ public class GameController {
 					Tile.Region.Center));
 		}
 
-		// Store the score change in the data dictionary that we'll send to
-		// network clients
-		int newScore = GameState.getInstance().getCurrentPlayer().getScore();
-		data.put("points", (Integer) (newScore - originalScore));
-
-		if (data.containsKey("receivedFromHost") == false) {
-			// Send the notification to the network clients
-			NotificationManager.getInstance().sendNotification(
-					Notification.END_NETWORK_TURN, data);
-		}
-
 		if (GameState.getInstance().getDeck().tilesRemaining() == 0)
 			NotificationManager.getInstance().sendNotification(
 					Notification.GAME_OVER);
-		else{
+		else {
 			GameState.getInstance().advanceCurrentPlayer();
 			beginTurn();
 		}
@@ -485,7 +470,7 @@ public class GameController {
 
 		boardController_ = null;
 		hudController_ = null;
-	
+
 		// Return control to final shutdown process
 		try {
 			// Spawn a thread that guarantees shutdown
@@ -568,13 +553,13 @@ public class GameController {
 	}
 
 	public void saveGame(Notification n) {
-		if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME){
+		if (GameState.getInstance().getMode() == Mode.PLAYING_NW_GAME) {
 			String[] options = { "OK" };
 			JPopUp dialogBox = new JPopUp(
 					"Sorry, you cannot save a network game...");
-			dialogBox.promptUser(options);	
+			dialogBox.promptUser(options);
 		}
-		
+
 		JPopUp p = new JPopUp("", "Select a location to save your game...");
 		File f = p.saveFileDialog();
 
@@ -628,7 +613,7 @@ public class GameController {
 		} catch (Exception e) {
 			System.exit(0);
 		}
-		
+
 		// Kill any remaining threads
 		System.exit(0);
 	}
