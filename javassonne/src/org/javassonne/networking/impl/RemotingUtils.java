@@ -158,7 +158,7 @@ public class RemotingUtils {
 			public void run() {
 				proxy.setServiceUrl(uri);
 				proxy.setServiceInterface(svcinterface);
-				proxy.afterPropertiesSet();
+				//proxy.afterPropertiesSet();
 				complete_ = true;
 			}
 		}

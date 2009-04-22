@@ -24,11 +24,7 @@ import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
-
-import org.javassonne.messaging.Notification;
-import org.javassonne.messaging.NotificationManager;
 
 /**
  * @author Hamilton Turner
@@ -124,8 +120,8 @@ public class DisplayHelper {
 			return null;
 		return desktopPane_.getSize();
 	}
-	
-	public Component[] getComponents(){
+
+	public Component[] getComponents() {
 		return desktopPane_.getComponents();
 	}
 
@@ -201,6 +197,11 @@ public class DisplayHelper {
 
 	public void remove(JComponent removeMe) {
 		desktopPane_.remove(removeMe);
+		desktopPane_.repaint();
+	}
+
+	public void removeAll() {
+		desktopPane_.removeAll();
 		desktopPane_.repaint();
 	}
 

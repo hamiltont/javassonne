@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.javassonne.algorithms.RegionsCalc;
+import org.javassonne.logger.LogSender;
 import org.javassonne.messaging.Notification;
 import org.javassonne.messaging.NotificationManager;
 import org.javassonne.model.Meeple;
@@ -47,6 +49,9 @@ import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
 import org.javassonne.networking.LocalHost;
+import org.javassonne.networking.impl.JmDNSSingleton;
+import org.javassonne.networking.impl.RemotingUtils;
+import org.javassonne.networking.impl.ThreadPool;
 import org.javassonne.ui.DisplayHelper;
 import org.javassonne.ui.GameState;
 import org.javassonne.ui.GameState.Mode;
@@ -462,17 +467,24 @@ public class GameController {
 		boardController_ = null;
 		hudController_ = null;
 
-		// Return control to final shutdown process
+		DisplayHelper.getInstance().removeAll();
+		ThreadPool.shutdown();
+
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				JmDNSSingleton.getJmDNS().close();
+			}
+		}, "JmDNS Reaper");
+		t.start();
+
 		try {
-			// Spawn a thread that guarantees shutdown
-			new Thread(new Runnable() {
-				public void run() {
-					force_shutdown();
-				}
-			}).start();
-		} catch (Exception e) {
-			System.exit(0);
+			RemotingUtils.shutdownService(LocalHost.getName());
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
+		
+		// Exit
+		System.exit(0);
 	}
 
 	public void loadGame(Notification n) {
@@ -579,34 +591,6 @@ public class GameController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	// Ensures that JRE exits when user closes the game
-	private void force_shutdown() {
-		try {
-			System.out.println("Forcing shutdown!");
-			Thread.sleep(500);
-			while (Thread.activeCount() > 1) {
-				Thread allThreads[] = new Thread[Thread.activeCount()];
-				int active = Thread.enumerate(allThreads);
-				for (int i = 0; i < active; i++) {
-					// Don't want to close ourselves
-					if (allThreads[i] == Thread.currentThread())
-						continue;
-
-					try {
-						allThreads[i].stop();
-					} catch (Exception e) {
-						System.out.println("Unable to destory all threads");
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.exit(0);
-		}
-
-		// Kill any remaining threads
-		System.exit(0);
 	}
 
 }
