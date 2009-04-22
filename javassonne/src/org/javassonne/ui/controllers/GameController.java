@@ -43,7 +43,6 @@ import org.javassonne.model.TileBoard;
 import org.javassonne.model.TileBoardGenIterator;
 import org.javassonne.model.TileBoardIterator;
 import org.javassonne.model.TileDeck;
-import org.javassonne.model.TileFeature;
 import org.javassonne.model.TileMapBoard;
 import org.javassonne.model.TileSerializer;
 import org.javassonne.model.TileSet;
@@ -176,8 +175,8 @@ public class GameController {
 		TileDeck deck = new TileDeck();
 		deck.addTileSet(set);
 		// Uncomment to Test the Game Over functionality
-		while (deck.tilesRemaining() > 10)
-			deck.popRandomTile();
+		// while (deck.tilesRemaining() > 10)
+		// deck.popRandomTile();
 
 		GameState.getInstance().setDeck(deck);
 
@@ -312,7 +311,7 @@ public class GameController {
 
 		TileBoardIterator iter = new TileBoardGenIterator(GameState
 				.getInstance().getBoard(), p);
-		
+
 		Set<Meeple> meeple = new HashSet<Meeple>();
 
 		// Score completed features on this tile
@@ -324,8 +323,7 @@ public class GameController {
 			if (c.getRegionCompletion(iter.getLocation(), r)) {
 				if (!meeple.containsAll(c.getMeepleList(p, r))) {
 					scoreFeature(c.getScoreOfRegion(p, r), c
-							.getMeepleList(p, r), iter.current()
-							.featureInRegion(r));
+							.getMeepleList(p, r));
 					meeple.addAll(c.getMeepleList(p, r));
 				}
 			}
@@ -337,50 +335,44 @@ public class GameController {
 		c.traverseRegion(temp.right(), Tile.Region.Center);
 		// TODO: Change these to get the correct score (algorithm should do it)
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),
+					Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.down(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),
+					Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.left(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.left(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.up(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.up(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.right(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 		c.traverseRegion(temp.right(), Tile.Region.Center);
 		if (c.getRegionCompletion(temp.getLocation(), Tile.Region.Center)) {
-			scoreFeature(9, c.getMeepleList(temp.getLocation(),
-					Tile.Region.Center), temp.current().featureInRegion(
+			scoreFeature(c.getScoreOfRegion(temp.getLocation(),Tile.Region.Center), c.getMeepleList(temp.getLocation(),
 					Tile.Region.Center));
 		}
 
@@ -393,8 +385,7 @@ public class GameController {
 		}
 	}
 
-	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple,
-			TileFeature regionFeatureType) {
+	private void scoreFeature(Integer regionSize, List<Meeple> regionMeeple) {
 
 		ArrayList<Player> players_ = GameState.getInstance().getPlayers();
 
