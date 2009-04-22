@@ -111,7 +111,7 @@ public class TileMapBoard implements TileBoard {
 			Tile bottom = localIter.downCopy().current();
 
 			// we want to make sure the tiles we're looking at in the adjacent
-			// squares are not temp. tiles. This could lead to illeigal "feature
+			// squares are not temp. tiles. This could lead to illegal "feature
 			// bindings" and this function returning false unnecessarily.
 			if (tempTileLocations_.contains(localIter.leftCopy().getLocation()))
 				left = null;

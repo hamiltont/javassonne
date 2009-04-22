@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 
 import javax.jmdns.ServiceInfo;
 
@@ -79,8 +80,9 @@ public class RemotingUtils {
 	 * @throws RemoteException
 	 * @throws UnknownHostException
 	 */
-	public static synchronized ServiceInfo exportRMIService(Object svc, Class svcinterface,
-			int port, String name) throws RemoteException, UnknownHostException {
+	public static synchronized ServiceInfo exportRMIService(Object svc,
+			Class svcinterface, int port, String name) throws RemoteException,
+			UnknownHostException {
 		RmiServiceExporter exporter = new RmiServiceExporter();
 		exporter.setRegistryPort(port);
 		exporter.setServiceInterface(svcinterface);
@@ -92,7 +94,7 @@ public class RemotingUtils {
 
 		ServiceInfo info = ServiceInfo.create("_rmi._tcp.local.", name, port,
 				"path=index.html");
-		
+
 		// return "rmi://"+LOCAL_HOST+":"+port+"/"+name;
 		return info;
 	}
@@ -122,12 +124,45 @@ public class RemotingUtils {
 	 * @param svcinterface
 	 * @return
 	 */
+	private static final RemotingUtils ru = new RemotingUtils();
 	public static Object lookupRMIService(String uri, Class svcinterface) {
-		RmiProxyFactoryBean proxy = new RmiProxyFactoryBean();
-		proxy.setServiceUrl(uri);
-		proxy.setServiceInterface(svcinterface);
-		proxy.afterPropertiesSet();
-		return proxy.getObject();
+		LookupRMI l = ru.new LookupRMI();
+		return l.getProxy(uri, svcinterface);
+	}
+
+	private class LookupRMI {
+		RmiProxyFactoryBean proxy;
+		String uri;
+		Class svcinterface;
+		boolean complete_ = false;
+
+		public Object getProxy(String u, Class inter) {
+			uri = u;
+			svcinterface = inter;
+			proxy = new RmiProxyFactoryBean();
+			ThisBlows tb = new ThisBlows();
+			Thread t = new Thread(tb, "Lookup");
+			t.start();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			if (complete_)
+				return proxy.getObject();
+			return null;
+		}
+
+		private class ThisBlows implements Runnable {
+			public void run() {
+				proxy.setServiceUrl(uri);
+				proxy.setServiceInterface(svcinterface);
+				proxy.afterPropertiesSet();
+				complete_ = true;
+			}
+		}
+
 	}
 
 	/**
