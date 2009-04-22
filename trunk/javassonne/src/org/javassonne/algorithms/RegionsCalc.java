@@ -132,8 +132,7 @@ public class RegionsCalc {
 		 * boundaries but are based on Tiles surrounding current
 		 */
 		if (reg.equals(Tile.Region.Center)) {
-			return traverseCenter(iter, reg, meeps, list, returnVal)
-					&& returnVal;
+			return traverseCenter(iter, reg, meeps, returnVal) && returnVal;
 		}
 		// else
 
@@ -198,8 +197,7 @@ public class RegionsCalc {
 
 	// Helper function for calculating Center score
 	private boolean traverseCenter(TileBoardIterator iter, Region reg,
-			List<Meeple> meeps, Map<Point, ArrayList<Region>> list,
-			boolean returnVal) {
+			List<Meeple> meeps, boolean returnVal) {
 		// test for not null
 		if (iter.current().featureInRegion(reg) != null) {
 			// meeple?
@@ -211,46 +209,59 @@ public class RegionsCalc {
 			// (including itself)
 			TileBoardGenIterator temp = new TileBoardGenIterator(iter);
 			int tempScore = 1;
-			if (temp.right().current() != null) {
+			if (temp.right().current() != null)
 				++tempScore;
-			} else if (temp.down().current() != null) {
+			if (temp.down().current() != null)
 				++tempScore;
-			} else if (temp.left().current() != null) {
+			if (temp.left().current() != null)
 				++tempScore;
-			} else if (temp.left().current() != null) {
+			if (temp.left().current() != null)
 				++tempScore;
-			} else if (temp.up().current() != null) {
+			if (temp.up().current() != null)
 				++tempScore;
-			} else if (temp.up().current() != null) {
+			if (temp.up().current() != null)
 				++tempScore;
-			} else if (temp.right().current() != null) {
+			if (temp.right().current() != null)
 				++tempScore;
-			} else if (temp.right().current() != null) {
+			if (temp.right().current() != null)
 				++tempScore;
-			}
+			
+			if (tempScore == 9) {
+				
+				returnVal = true;
 
-			// Touch globally
+				//Multiplier?
+				tempScore *= GameState.getInstance().getDeck()
+						.tileFeatureBindings().completionMultiplierForFeature(
+								iter.current().featureIdentifierInRegion(reg));
+				
+				//Add completion
+				if (isComplete_.get(iter.getLocation()) == null)
+					isComplete_
+							.put(iter.getLocation(),
+									new EnumMap<Tile.Region, Boolean>(
+											Tile.Region.class));
+				isComplete_.get(iter.getLocation()).put(reg, true);
+
+			} else
+				returnVal = false;
+
+			// Touch globally (with score)
 			if (scoreOfReg_.get(iter.getLocation()) == null)
 				scoreOfReg_.put(iter.getLocation(),
 						new EnumMap<Tile.Region, Integer>(Tile.Region.class));
 			scoreOfReg_.get(iter.getLocation()).put(reg, tempScore);
-			
-			// add meeple
-			if(globalMeep_.get(iter.getLocation()) == null )
-				globalMeep_.put(iter.getLocation(), new EnumMap<Region, List<Meeple>>(Tile.Region.class));
-			globalMeep_.get(iter.getLocation()).put(reg, meeps);
 
-			// If completely surrounded, it is complete
-			if (tempScore == 9){
-				if(isComplete_.get(iter.getLocation()) == null )
-					isComplete_.put(iter.getLocation(), new EnumMap<Region, Boolean>(Tile.Region.class));
-				isComplete_.get(iter.getLocation()).put(reg, true);
+			// add meeple
+			if (globalMeep_.get(iter.getLocation()) == null)
+				globalMeep_.put(iter.getLocation(),
+						new EnumMap<Tile.Region, List<Meeple>>(
+								Tile.Region.class));
+			globalMeep_.get(iter.getLocation()).put(reg, meeps);
 			
-				return true;
-			} else
-				return false;
 		}
 		// center feature is null - pass back returnVal
+		// OR everything went fine, and we set returnVal to the correct value
 		return returnVal;
 	}
 
