@@ -19,6 +19,7 @@
 package org.javassonne.ui;
 
 import java.rmi.RemoteException;
+import java.util.Map;
 
 import org.javassonne.logger.LogWatcher;
 import org.javassonne.messaging.Notification;
@@ -27,6 +28,7 @@ import org.javassonne.networking.HostMonitor;
 import org.javassonne.networking.LocalHost;
 import org.javassonne.networking.impl.JmDNSSingleton;
 import org.javassonne.networking.impl.RemotingUtils;
+import org.javassonne.networking.impl.ThreadPool;
 import org.javassonne.ui.controllers.GameController;
 import org.javassonne.ui.panels.LogPanel;
 
@@ -69,15 +71,6 @@ public class Main {
 		NotificationManager.getInstance().sendNotification(
 				Notification.TOGGLE_MAIN_MENU);
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				JmDNSSingleton.getJmDNS().close();
-				try {
-					RemotingUtils.shutdownService(LocalHost.getName());
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+
 	}
 }

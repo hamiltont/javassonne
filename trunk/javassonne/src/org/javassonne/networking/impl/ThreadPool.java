@@ -18,32 +18,49 @@
 
 package org.javassonne.networking.impl;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.SwingUtilities;
-
 import org.javassonne.logger.LogSender;
-import org.javassonne.messaging.Notification;
-import org.javassonne.messaging.NotificationManager;
 
 public class ThreadPool {
-	private Executor executor_;
 	private static ThreadPool instance_ = null;
+	private boolean started_;
+	private boolean killOwner_;
+	private ExecutorService executor_;
 
 	private ThreadPool() {
-    	executor_ = Executors.newCachedThreadPool();
-		NotificationManager.getInstance().addObserver(Notification.QUIT, this,
-				"shutdown");
+		started_ = false;
+		killOwner_ = false;
+
+		// Start the executor in it's own thread
+		new Owner("Thread Pool Owner");
+
+		while (started_ == false) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
-	public void shutdown(Notification n) {
-		SwingUtilities.invokeLater(new Runnable(){
-	        public void run() {
-	        	LogSender.sendInfo("ThreadPool - notifying all of shutdown");
-	    		executor_.notifyAll();
-	        }
-	    }); 
+	private void _shutdown() {
+		LogSender.sendInfo("Asking owner to die with thread "
+				+ Thread.currentThread().getName());
+		killOwner_ = true;
+		
+		// Sleep long enough for the Owner to wake and notifyAll
+		try {
+			Thread.sleep(101);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void shutdown() {
+		getInstance()._shutdown();
 	}
 
 	private static ThreadPool getInstance() {
@@ -57,6 +74,54 @@ public class ThreadPool {
 	}
 
 	private void _execute(Runnable r) {
-		executor_.execute(r);
+		synchronized (executor_) {
+			executor_.execute(r);
+		}
+	}
+
+	public class Owner extends Thread {
+
+		public Owner(String name) {
+			super(name);
+			start();
+		}
+
+		public void run() {
+			LogSender.sendInfo("Starting thread pool with thread "
+					+ Thread.currentThread().getName());
+			
+			executor_ = Executors.newCachedThreadPool();
+			
+			started_ = true;
+
+			// Wakeup to check the flag
+			while (killOwner_ == false) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			LogSender.sendInfo("noticed flag is true with Thread "
+					+ Thread.currentThread().getName());
+			// Kill the thread
+			shutdown();
+		}
+
+		public void shutdown() {
+			LogSender
+					.sendInfo("ThreadPool - notifying all of shutdown from Thread "
+							+ Thread.currentThread().getName());
+			
+			// Put the executor in a synchronized block to guarantee that the
+			// current thread is the owner
+			synchronized (executor_) {
+				executor_.shutdownNow();
+			}
+			LogSender
+					.sendInfo("ThreadPool - done notifying all of shutdown from Thread "
+							+ Thread.currentThread().getName());
+		}
 	}
 }
