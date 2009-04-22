@@ -18,7 +18,9 @@
 
 package org.javassonne.ui;
 
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -44,10 +46,10 @@ public class JSplashScreen extends JFrame {
 		int width = img.getIconWidth();
 		int height = img.getIconHeight();
 
-		int swidth = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice().getDisplayMode().getWidth();
-		int sheight = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice().getDisplayMode().getHeight();
+		GraphicsDevice d= GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		Rectangle b = d.getDefaultConfiguration().getBounds();
+		int swidth = b.width;
+		int sheight = b.height;
 
 		setSize(width, height);
 		setLocation((swidth - width) / 2, (sheight - height) / 2);

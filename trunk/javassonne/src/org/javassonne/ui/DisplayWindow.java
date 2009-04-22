@@ -24,6 +24,7 @@ package org.javassonne.ui;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -76,12 +77,12 @@ public class DisplayWindow extends JFrame implements WindowListener {
 		setTitle(WINDOW_TITLE);
 
 		if (FULL_SCREEN) {
+			Rectangle b = device.getDefaultConfiguration().getBounds();
+			
 			if (fakeFullscreen) {
-				setSize(device.getDisplayMode().getWidth(), device
-						.getDisplayMode().getHeight() - 20);
+				setSize(b.width, b.height - 20);
 			} else
-				setSize(device.getDisplayMode().getWidth(), device
-						.getDisplayMode().getHeight());
+				setSize(b.width, b.height);
 
 		} else {
 			setSize(1024, 768);

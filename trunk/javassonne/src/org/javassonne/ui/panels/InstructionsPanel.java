@@ -20,8 +20,10 @@ package org.javassonne.ui.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -53,9 +55,10 @@ public class InstructionsPanel extends AbstractHUDPanel implements MouseListener
 
 		setLayout(new BorderLayout());
 		setOpaque(true);
-		setSize(image.getIconWidth() + 18, GraphicsEnvironment
-				.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-				.getDisplayMode().getHeight() - 100);
+
+		GraphicsDevice d= GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		Rectangle rect = d.getDefaultConfiguration().getBounds();
+		setSize(image.getIconWidth() + 18, rect.height - 100);
 
 		// Create an exit button
 		JButton b = new JButton("CLOSE");
